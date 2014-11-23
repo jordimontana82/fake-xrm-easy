@@ -13,12 +13,60 @@ namespace FakeXrmEasy
     /// how entities are persisted in Tables (with the logical name) and then the records themselves
     /// where the Primary Key is the Guid
     /// </summary>
-    public class FakedContext
+    public class XrmFakedContext: IFakedContextFactory
     {
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
-        public FakedContext()
+        public XrmFakedContext()
         {
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
+        }
+
+        public void Build(XrmFakedContext data)
+        {
+            this.Data = data.Data;
+        }
+
+        /// <summary>
+        /// Initializes the context with the provided entities
+        /// </summary>
+        /// <param name="col"></param>
+        public void Initialize(IEnumerable<Entity> entities)
+        {
+            if (entities == null)
+            {
+                throw new InvalidOperationException("The entities parameter must be not null");
+            }
+
+            foreach (var e in entities)
+            {
+                //Validate the entity
+                if (string.IsNullOrWhiteSpace(e.LogicalName))
+                {
+                    throw new InvalidOperationException("An entity must not have a null or empty LogicalName property.");
+                }
+
+                if (e.Id == Guid.Empty)
+                {
+                    throw new InvalidOperationException("An entity with an empty Id can't be added");
+                }
+
+                //Add the entity collection
+                if (!Data.ContainsKey(e.LogicalName))
+                {
+                    Data.Add(e.LogicalName, new Dictionary<Guid, Entity>());
+                }
+
+                
+
+                if (Data[e.LogicalName].ContainsKey(e.Id))
+                {
+                    Data[e.LogicalName][e.Id] = e;
+                }
+                else
+                {
+                    Data[e.LogicalName].Add(e.Id, e);
+                }
+            }
         }
 
         /// <summary>
@@ -36,11 +84,11 @@ namespace FakeXrmEasy
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public static IOrganizationService GetFakedOrganizationService(FakedContext context)
+        public IOrganizationService GetFakedOrganizationService(XrmFakedContext context)
         {
             if (context == null)
             {
-                throw new Exception("The faked context must not be null");
+                throw new InvalidOperationException("The faked context must not be null.");
             }
 
             var fakedService = A.Fake<IOrganizationService>();
@@ -57,11 +105,26 @@ namespace FakeXrmEasy
         /// <param name="context">The faked context</param>
         /// <param name="fakedService">The faked service where the Retrieve method will be faked</param>
         /// <returns></returns>
-        public static void FakeRetrieve(FakedContext context, IOrganizationService fakedService)
+        public static void FakeRetrieve(XrmFakedContext context, IOrganizationService fakedService)
         {
             A.CallTo(() => fakedService.Retrieve(A<string>._, A<Guid>._, A<ColumnSet>._))
                 .ReturnsLazily((string entityName, Guid id, ColumnSet columnSet) =>
                 {
+                    if (string.IsNullOrWhiteSpace(entityName))
+                    {
+                        throw new InvalidOperationException("The entity logical name must not be null or empty.");
+                    }
+
+                    if (id == Guid.Empty)
+                    {
+                        throw new InvalidOperationException("The id must not be empty.");
+                    }
+
+                    if (columnSet == null)
+                    {
+                        throw new InvalidOperationException("The columnset parameter must not be null.");
+                    }
+
                     if (!context.Data.ContainsKey(entityName))
                         throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.", entityName));
 
