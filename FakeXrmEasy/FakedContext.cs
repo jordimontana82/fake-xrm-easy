@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xrm.Sdk.Query;
+using System.ServiceModel;
 
 namespace FakeXrmEasy
 {
@@ -104,6 +105,8 @@ namespace FakeXrmEasy
             //Fake CRUD methods
             FakeRetrieve(context, fakedService);
             FakeCreate(context, fakedService);
+            FakeUpdate(context, fakedService);
+
             return fakedService;
         }
 
@@ -197,6 +200,43 @@ namespace FakeXrmEasy
                     context.AddEntity(e);
 
                     return e.Id;
+                });
+
+        }
+
+        public static void FakeUpdate(XrmFakedContext context, IOrganizationService fakedService)
+        {
+            A.CallTo(() => fakedService.Update(A<Entity>._))
+                .Invokes((Entity e) =>
+                {
+                    if (e == null)
+                    {
+                        throw new InvalidOperationException("The entity must not be null");
+                    }
+
+                    if (e.Id == Guid.Empty)
+                    {
+                        throw new InvalidOperationException("The Id property must not be empty");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(e.LogicalName))
+                    {
+                        throw new InvalidOperationException("The LogicalName property must not be empty");
+                    }
+
+                    //The entity record must exist in the context
+                    if(context.Data.ContainsKey(e.LogicalName) &&
+                        context.Data[e.LogicalName].ContainsKey(e.Id))
+                    {
+                        //Now the entity is the one passed
+                        context.Data[e.LogicalName][e.Id] = e;
+                    }
+                    else
+                    {
+                        //The entity record was not found, return a CRM-ish update error message
+                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault() 
+                            { Message = string.Format("{0} with Id {1} Does Not Exist", e.LogicalName, e.Id)} );
+                    }
                 });
 
         }
