@@ -8,6 +8,7 @@ using Microsoft.Xrm.Sdk.Query;
 
 using System.Collections.Generic;
 using Microsoft.Xrm.Sdk;
+using System.ServiceModel;
 
 namespace FakeXrmEasy.Tests
 {
@@ -68,7 +69,26 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(context.Data["account"][guid]["name"], "After update");
         }
 
-        
+        [Fact]
+        public void When_update_is_invoked_with_non_existing_entity_an_exception_is_thrown()
+        {
+            var context = new XrmFakedContext();
+
+            //Initialize the context with a single entity
+            var guid = Guid.NewGuid();
+            var nonExistingGuid = Guid.NewGuid();
+            var data = new List<Entity>() {
+                new Entity("account") { Id = guid }
+            }.AsQueryable();
+
+            context.Initialize(data);
+
+            var service = context.GetFakedOrganizationService();
+            var update = new Entity("account") { Id = nonExistingGuid };
+            var ex = Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Update(update));
+
+            Assert.Equal(ex.Message, string.Format("account with Id {0} Does Not Exist", nonExistingGuid));
+        }
 
         
     }

@@ -106,6 +106,7 @@ namespace FakeXrmEasy
             FakeRetrieve(context, fakedService);
             FakeCreate(context, fakedService);
             FakeUpdate(context, fakedService);
+            FakeDelete(context, fakedService);
 
             return fakedService;
         }
@@ -234,11 +235,50 @@ namespace FakeXrmEasy
                     else
                     {
                         //The entity record was not found, return a CRM-ish update error message
-                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault() 
-                            { Message = string.Format("{0} with Id {1} Does Not Exist", e.LogicalName, e.Id)} );
+                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("{0} with Id {1} Does Not Exist", e.LogicalName, e.Id) );
                     }
                 });
 
+        }
+
+        /// <summary>
+        /// Fakes the delete method. Very similar to the Retrieve one
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="fakedService"></param>
+        public static void FakeDelete(XrmFakedContext context, IOrganizationService fakedService)
+        {
+            A.CallTo(() => fakedService.Delete(A<string>._, A<Guid>._))
+                .Invokes((string entityName, Guid id) =>
+                {
+                    if (string.IsNullOrWhiteSpace(entityName))
+                    {
+                        throw new InvalidOperationException("The entity logical name must not be null or empty.");
+                    }
+
+                    if (id == Guid.Empty)
+                    {
+                        throw new InvalidOperationException("The id must not be empty.");
+                    }
+
+                    if (!context.Data.ContainsKey(entityName))
+                        throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.", entityName));
+
+                    //Entity logical name exists, so , check if the requested entity exists
+                    if (context.Data[entityName] != null
+                        && context.Data[entityName].ContainsKey(id))
+                    {
+                        //Entity found => return only the subset of columns specified or all of them
+                        context.Data[entityName].Remove(id);
+                    }
+                    else
+                    {
+                        //Entity not found in the context => throw not found exception
+                        //The entity record was not found, return a CRM-ish update error message
+                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(),
+                            string.Format("{0} with Id {1} Does Not Exist", entityName, id));
+                    }
+                });
         }
     }
 }
