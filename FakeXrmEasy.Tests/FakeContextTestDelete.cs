@@ -41,7 +41,7 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
-        public void When_retrieve_is_invoked_with_non_existing_entity_an_exception_is_thrown()
+        public void When_delete_is_invoked_with_non_existing_entity_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
 
