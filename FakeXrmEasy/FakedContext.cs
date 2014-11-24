@@ -39,33 +39,41 @@ namespace FakeXrmEasy
 
             foreach (var e in entities)
             {
-                //Validate the entity
-                if (string.IsNullOrWhiteSpace(e.LogicalName))
-                {
-                    throw new InvalidOperationException("An entity must not have a null or empty LogicalName property.");
-                }
+                AddEntity(e);
+            }
+        }
 
-                if (e.Id == Guid.Empty)
-                {
-                    throw new InvalidOperationException("An entity with an empty Id can't be added");
-                }
+        protected void ValidateEntity(Entity e)
+        {
+            //Validate the entity
+            if (string.IsNullOrWhiteSpace(e.LogicalName))
+            {
+                throw new InvalidOperationException("An entity must not have a null or empty LogicalName property.");
+            }
 
-                //Add the entity collection
-                if (!Data.ContainsKey(e.LogicalName))
-                {
-                    Data.Add(e.LogicalName, new Dictionary<Guid, Entity>());
-                }
+            if (e.Id == Guid.Empty)
+            {
+                throw new InvalidOperationException("An entity with an empty Id can't be added");
+            }
+        }
 
-                
+        protected internal void AddEntity(Entity e)
+        {
+            ValidateEntity(e);
 
-                if (Data[e.LogicalName].ContainsKey(e.Id))
-                {
-                    Data[e.LogicalName][e.Id] = e;
-                }
-                else
-                {
-                    Data[e.LogicalName].Add(e.Id, e);
-                }
+            //Add the entity collection
+            if (!Data.ContainsKey(e.LogicalName))
+            {
+                Data.Add(e.LogicalName, new Dictionary<Guid, Entity>());
+            }
+
+            if (Data[e.LogicalName].ContainsKey(e.Id))
+            {
+                Data[e.LogicalName][e.Id] = e;
+            }
+            else
+            {
+                Data[e.LogicalName].Add(e.Id, e);
             }
         }
 
@@ -93,8 +101,9 @@ namespace FakeXrmEasy
 
             var fakedService = A.Fake<IOrganizationService>();
 
-            //Fake Retrieve method
+            //Fake CRUD methods
             FakeRetrieve(context, fakedService);
+            FakeCreate(context, fakedService);
             return fakedService;
         }
 
@@ -156,6 +165,40 @@ namespace FakeXrmEasy
                         return null;
                     }
                 });
+        }
+
+        /// <summary>
+        /// Fakes the Create message
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="fakedService"></param>
+        public static void FakeCreate(XrmFakedContext context, IOrganizationService fakedService)
+        {
+            A.CallTo(() => fakedService.Create(A<Entity>._))
+                .ReturnsLazily((Entity e) =>
+                {
+                    if (e == null)
+                    {
+                        throw new InvalidOperationException("The entity must not be null");
+                    }
+
+                    if (e.Id != Guid.Empty)
+                    {
+                        throw new InvalidOperationException("The Id property must not be initialized");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(e.LogicalName))
+                    {
+                        throw new InvalidOperationException("The LogicalName property must not be empty");
+                    }
+
+                    //Add entity to the context
+                    e.Id = Guid.NewGuid();
+                    context.AddEntity(e);
+
+                    return e.Id;
+                });
+
         }
     }
 }
