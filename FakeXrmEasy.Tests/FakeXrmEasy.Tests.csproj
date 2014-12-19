@@ -73,6 +73,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="build\FakeXrmEasy.1.0.0.nupkg" />
+    <None Include="build\FakeXrmEasy.dll.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +82,10 @@
       <Project>{1ff34479-d38a-4b6b-86a7-b48182403437}</Project>
       <Name>FakeXrmEasy</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="build\lib\net40\FakeXrmEasy.dll" />
+    <Content Include="build\nuget.exe" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
