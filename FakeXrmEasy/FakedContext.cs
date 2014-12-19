@@ -14,7 +14,7 @@ namespace FakeXrmEasy
     /// how entities are persisted in Tables (with the logical name) and then the records themselves
     /// where the Primary Key is the Guid
     /// </summary>
-    public class XrmFakedContext: IFakedContextFactory
+    public class XrmFakedContext: IFakedContext
     {
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
         public XrmFakedContext()
@@ -279,6 +279,24 @@ namespace FakeXrmEasy
                             string.Format("{0} with Id {1} Does Not Exist", entityName, id));
                     }
                 });
+        }
+
+        public IQueryable<T> CreateQuery<T>() where T: Entity
+        {
+            Type typeParameter = typeof(T);
+
+            if (!Data.ContainsKey((typeParameter.Name.ToLower())))
+            {
+                throw new Exception(string.Format("The type {0} was not found", typeParameter.Name));
+            }
+
+            List<T> lst = new List<T>();
+            foreach (var e in Data[typeParameter.Name.ToLower()].Values)
+            {
+                lst.Add((T) e);
+            }
+
+            return lst.AsQueryable<T>();
         }
     }
 }

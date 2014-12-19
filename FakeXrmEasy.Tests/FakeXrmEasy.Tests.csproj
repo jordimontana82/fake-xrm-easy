@@ -64,6 +64,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="FakeContextTestCreateQuery.cs" />
     <Compile Include="FakeContextTestDelete.cs" />
     <Compile Include="FakeContextTestUpdate.cs" />
     <Compile Include="FakeContextTestCreate.cs" />
