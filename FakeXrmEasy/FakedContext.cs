@@ -6,6 +6,10 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xrm.Sdk.Query;
 using System.ServiceModel;
+using Microsoft.Xrm.Sdk.Messages;
+using System.Dynamic;
+using System.Linq.Expressions;
+using FakeXrmEasy.Extensions;
 
 namespace FakeXrmEasy
 {
@@ -44,6 +48,13 @@ namespace FakeXrmEasy
             }
         }
 
+        public void EnsureEntityNameExistsInMetadata(string sEntityName)
+        {
+            if (!Data.ContainsKey(sEntityName))
+            {
+                throw new Exception(string.Format("Entity {0} does not exist in the metadata cache", sEntityName));
+            };
+        }
         protected void ValidateEntity(Entity e)
         {
             //Validate the entity
@@ -58,6 +69,7 @@ namespace FakeXrmEasy
             }
         }
 
+        
         protected internal void AddEntity(Entity e)
         {
             ValidateEntity(e);
@@ -298,5 +310,84 @@ namespace FakeXrmEasy
 
             return lst.AsQueryable<T>();
         }
+
+        public IQueryable<Entity> CreateQueryFromEntityName(string s)
+        {
+            return Data[s].Values.AsQueryable();
+        }
+
+        /// <summary>
+        /// Fakes the Execute method of the organization service.
+        /// Not all the OrganizationRequest are going to be implemented, so stay tunned on updates!
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="fakedService"></param>
+        public static void FakeExecute(XrmFakedContext context, IOrganizationService fakedService)
+        {
+            A.CallTo(() => fakedService.Execute(A<OrganizationRequest>._))
+                .ReturnsLazily((OrganizationRequest req) =>
+                {
+                    if(req is RetrieveMultipleRequest) {
+                        var request = req as RetrieveMultipleRequest;
+                        if (request.Query is QueryExpression)
+                        {
+                            var linqQuery = TranslateQueryExpressionToLinq(context, request.Query as QueryExpression);
+                            var response = new RetrieveMultipleResponse();
+                            response.EntityCollection.Entities.AddRange(linqQuery.ToList());
+                            return response;
+                        }
+                    }
+                    return new OrganizationResponse();
+                });
+        }
+
+        
+        public static IQueryable<Entity> TranslateQueryExpressionToLinq(XrmFakedContext context, QueryExpression qe)
+        {
+            if (qe == null) return null;
+
+            //Start form the root entity and build a LINQ query to execute the query against the In-Memory context:
+            context.EnsureEntityNameExistsInMetadata(qe.EntityName);
+            var query = context.Data[qe.EntityName].Values.AsQueryable();
+
+            //Add as many Joins as linked entities
+            foreach (LinkEntity le in qe.LinkEntities)
+            {
+                var leAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkFromEntityName : le.EntityAlias;
+                context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName);
+                context.EnsureEntityNameExistsInMetadata(le.LinkToEntityName);
+                var inner = context.Data[le.LinkFromEntityName].Values.AsQueryable();
+
+                switch (le.JoinOperator)
+                {
+                    case JoinOperator.Inner:
+                        query = query.Join(inner, 
+                                        outerKey => outerKey.Id, 
+                                        innerKey => innerKey[le.LinkFromAttributeName] is EntityReference ? (innerKey[le.LinkFromAttributeName] as EntityReference).Id : Guid.Empty, 
+                                        (outerEl, innerEl) => outerEl.JoinAttributes(innerEl, le.Columns, leAlias));
+                        
+                        break;
+                    case JoinOperator.LeftOuter:
+                        query = query.GroupJoin(inner,
+                                        outerKey => outerKey.Id,
+                                        innerKey => innerKey[le.LinkFromAttributeName] is EntityReference ? (innerKey[le.LinkFromAttributeName] as EntityReference).Id : Guid.Empty,
+                                        (outerEl, innerElemsCol) => outerEl.JoinAttributes(innerElemsCol, le.Columns, leAlias));
+
+                        break;
+                        
+                }
+            }
+
+            return query;
+        }
+
+        //public static IQueryable<Entity> JoinLinkedEntities(IQueryable<Entity> outerEntity, LinkEntity linkedEntity)
+        //{
+        //    //Recursive case
+        //    foreach (DataCollection<LinkEntity> linkedSubEntities in linkedEntity.LinkEntities)
+        //    {
+
+        //    }
+        //}
     }
 }

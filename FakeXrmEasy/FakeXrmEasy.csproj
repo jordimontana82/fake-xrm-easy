@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\EntityExtensions.cs" />
     <Compile Include="FakedContext.cs" />
     <Compile Include="IFakedContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
