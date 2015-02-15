@@ -90,7 +90,6 @@ namespace FakeXrmEasy.Tests
             contact["fullname"] = "Contact full name";
             context.Initialize(new List<Entity>() { account1, account2, contact });
 
-
             var qe = new QueryExpression() { EntityName = "account" };
             qe.LinkEntities.Add(
                 new LinkEntity()
