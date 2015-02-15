@@ -114,5 +114,80 @@ namespace FakeXrmEasy.Tests
             var lastEntity = result.LastOrDefault(); // Second account
             Assert.True(lastEntity["name"].Equals(account2["name"]));
         }
+
+        [Fact]
+        public void When_executing_a_query_expression_join_with_orphans_these_are_not_returned()
+        {
+            var context = new XrmFakedContext();
+            var account1 = new Entity("account") { Id = Guid.NewGuid() }; account1["name"] = "Account 1";
+            var account2 = new Entity("account") { Id = Guid.NewGuid() }; account2["name"] = "Account 2";
+            
+            var contact = new Entity("contact") { Id = Guid.NewGuid() };
+            contact["accountid"] = new EntityReference() { Id = account1.Id, LogicalName = "account" };
+            contact["fullname"] = "Contact full name";
+
+            var orphanContact = new Entity("contact") { Id = Guid.NewGuid() };
+            orphanContact["fullname"] = "Orphan";
+            context.Initialize(new List<Entity>() { account1, account2, contact, orphanContact });
+
+
+            var qe = new QueryExpression() { EntityName = "account" };
+            qe.LinkEntities.Add(
+                new LinkEntity()
+                {
+                    LinkFromEntityName = "contact",
+                    LinkToEntityName = "account",
+                    LinkFromAttributeName = "accountid",
+                    LinkToAttributeName = "accountid",
+                    JoinOperator = JoinOperator.Inner,
+                    Columns = new ColumnSet(new string[] { "fullname" })
+                }
+            );
+            var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe);
+
+            Assert.True(result.Count() == 1);
+            var entityResult = result.FirstOrDefault();
+            Assert.True((entityResult["contact.fullname"] as AliasedValue).Value.Equals(contact["fullname"]));
+        }
+        [Fact]
+        public void When_executing_a_query_expression_leftjoin_with_orphans_these_are_not_returned()
+        {
+            var context = new XrmFakedContext();
+            var account1 = new Entity("account") { Id = Guid.NewGuid() }; account1["name"] = "Account 1";
+            var account2 = new Entity("account") { Id = Guid.NewGuid() }; account2["name"] = "Account 2";
+
+            var contact = new Entity("contact") { Id = Guid.NewGuid() };
+            contact["accountid"] = new EntityReference() { Id = account1.Id, LogicalName = "account" };
+            contact["fullname"] = "Contact full name";
+
+            var orphanContact = new Entity("contact") { Id = Guid.NewGuid() };
+            orphanContact["fullname"] = "Orphan";
+            context.Initialize(new List<Entity>() { account1, account2, contact, orphanContact });
+
+
+            var qe = new QueryExpression() { EntityName = "account" };
+            qe.LinkEntities.Add(
+                new LinkEntity()
+                {
+                    LinkFromEntityName = "contact",
+                    LinkToEntityName = "account",
+                    LinkFromAttributeName = "accountid",
+                    LinkToAttributeName = "accountid",
+                    JoinOperator = JoinOperator.LeftOuter,
+                    Columns = new ColumnSet(new string[] { "fullname" })
+                }
+            );
+            var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe);
+
+            Assert.True(result.Count() == 2);
+            var entityResult = result.FirstOrDefault(); //First account
+
+            Assert.True(entityResult.Attributes.Count == 2);
+            Assert.True(entityResult["name"].Equals(account1["name"]));
+            Assert.True((entityResult["contact.fullname"] as AliasedValue).Value.Equals(contact["fullname"]));
+
+            var lastEntity = result.LastOrDefault(); // Second account
+            Assert.True(lastEntity["name"].Equals(account2["name"]));
+        }
     }
 }

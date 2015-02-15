@@ -363,14 +363,14 @@ namespace FakeXrmEasy
                     case JoinOperator.Inner:
                         query = query.Join(inner, 
                                         outerKey => outerKey.Id, 
-                                        innerKey => innerKey[le.LinkFromAttributeName] is EntityReference ? (innerKey[le.LinkFromAttributeName] as EntityReference).Id : Guid.Empty, 
+                                        innerKey => innerKey.Attributes.ContainsKey(le.LinkFromAttributeName) && innerKey[le.LinkFromAttributeName] is EntityReference ? (innerKey[le.LinkFromAttributeName] as EntityReference).Id : Guid.Empty, 
                                         (outerEl, innerEl) => outerEl.JoinAttributes(innerEl, le.Columns, leAlias));
                         
                         break;
                     case JoinOperator.LeftOuter:
                         query = query.GroupJoin(inner,
                                         outerKey => outerKey.Id,
-                                        innerKey => innerKey[le.LinkFromAttributeName] is EntityReference ? (innerKey[le.LinkFromAttributeName] as EntityReference).Id : Guid.Empty,
+                                        innerKey => innerKey.Attributes.ContainsKey(le.LinkFromAttributeName) && innerKey[le.LinkFromAttributeName] is EntityReference ? (innerKey[le.LinkFromAttributeName] as EntityReference).Id : Guid.Empty,
                                         (outerEl, innerElemsCol) => outerEl.JoinAttributes(innerElemsCol, le.Columns, leAlias));
 
                         break;
