@@ -43,151 +43,172 @@ namespace FakeXrmEasy.Tests
         public void When_executing_a_query_expression_with_a_simple_join_right_result_is_returned()
         {
             var context = new XrmFakedContext();
-            var account1 = new Entity("account") { Id = Guid.NewGuid() };
-            account1["name"] = "Account 1";
-            var account2 = new Entity("account") { Id = Guid.NewGuid() };
-            account2["name"] = "Account 2";
-            var contact = new Entity("contact") { Id = Guid.NewGuid() };
-            contact["accountid"] = new EntityReference() { Id = account1.Id, LogicalName = "account" };
-            contact["fullname"] = "Contact full name";
-            context.Initialize(new List<Entity>() { account1, account2, contact});
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1";
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "Contact 2";
+            
+            var account = new Entity("account") { Id = Guid.NewGuid() };
+            account["name"] = "Account 1";
 
-      
-            var qe = new QueryExpression() { EntityName = "account" };
+            contact1["parentcustomerid"] = account.ToEntityReference(); //Both contacts are related to the same account
+            contact2["parentcustomerid"] = account.ToEntityReference();
+
+            context.Initialize(new List<Entity>() { account, contact1, contact2});
+
+            var qe = new QueryExpression() { EntityName = "contact" };
             qe.LinkEntities.Add(
                 new LinkEntity()
                 {
                     LinkFromEntityName = "contact",
                     LinkToEntityName = "account",
-                    LinkFromAttributeName = "accountid",
+                    LinkFromAttributeName = "parentcustomerid",
                     LinkToAttributeName = "accountid",
                     JoinOperator = JoinOperator.Inner,
-                    Columns = new ColumnSet(new string[] { "fullname" })
+                    Columns = new ColumnSet(new string[] { "name" })
                 }
             );
+            qe.ColumnSet = new ColumnSet(new string[] { "fullname", "parentcustomerid" });
+
             var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe);
 
-            Assert.True(result.Count() == 1);
-            var entityResult = result.FirstOrDefault();
+            Assert.True(result.Count() == 2); //2 Contacts related to the same account
+            var firstContact = result.FirstOrDefault();
+            var secondContact = result.LastOrDefault();
 
-            Assert.True(entityResult.Attributes.Count == 2);
-            Assert.True(entityResult["name"].Equals(account1["name"]));
-            Assert.True((entityResult["contact.fullname"] as AliasedValue).Value.Equals(contact["fullname"]));
+            Assert.True(firstContact.Attributes.Count == 3);
+            Assert.True(secondContact.Attributes.Count == 3);
+
+            Assert.True(firstContact["fullname"].Equals(contact1["fullname"]));
+            Assert.True((firstContact["account.name"] as AliasedValue).Value.Equals(account["name"]));
+
+            Assert.True(secondContact["fullname"].Equals(contact2["fullname"]));
+            Assert.True((secondContact["account.name"] as AliasedValue).Value.Equals(account["name"]));
 
         }
         [Fact]
         public void When_executing_a_query_expression_with_a_left_join_all_left_hand_side_elements_are_returned()
         {
-            //2 account and 1 contact, contact is associated to Account 1 only, but the two accounts are returned
-            //First row is the join of account 1 and contact attributes, whereas second row is just the account attribtues
             var context = new XrmFakedContext();
-            var account1 = new Entity("account") { Id = Guid.NewGuid() };
-            account1["name"] = "Account 1";
-            var account2 = new Entity("account") { Id = Guid.NewGuid() };
-            account2["name"] = "Account 2";
-            var contact = new Entity("contact") { Id = Guid.NewGuid() };
-            contact["accountid"] = new EntityReference() { Id = account1.Id, LogicalName = "account" };
-            contact["fullname"] = "Contact full name";
-            context.Initialize(new List<Entity>() { account1, account2, contact });
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1";
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "Contact 2";
+            var contact3 = new Entity("contact") { Id = Guid.NewGuid() }; contact3["fullname"] = "Contact 3";
 
-            var qe = new QueryExpression() { EntityName = "account" };
+            var account = new Entity("account") { Id = Guid.NewGuid() };
+            account["name"] = "Account 1";
+
+            contact1["parentcustomerid"] = account.ToEntityReference(); //Both contacts are related to the same account
+            contact2["parentcustomerid"] = account.ToEntityReference();
+
+            //Contact3 doesnt have a parent customer, but must be returned anyway (left outer)
+
+            context.Initialize(new List<Entity>() { account, contact1, contact2, contact3 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
             qe.LinkEntities.Add(
                 new LinkEntity()
                 {
                     LinkFromEntityName = "contact",
                     LinkToEntityName = "account",
-                    LinkFromAttributeName = "accountid",
+                    LinkFromAttributeName = "parentcustomerid",
                     LinkToAttributeName = "accountid",
                     JoinOperator = JoinOperator.LeftOuter,
-                    Columns = new ColumnSet(new string[] { "fullname" })
+                    Columns = new ColumnSet(new string[] { "name" })
                 }
             );
+            qe.ColumnSet = new ColumnSet(new string[] { "fullname", "parentcustomerid" });
+
             var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe);
 
-            Assert.True(result.Count() == 2);
-            var entityResult = result.FirstOrDefault(); //First account
+            Assert.True(result.Count() == 3); //2 Contacts related to the same account + 1 contact without parent account
+            var firstContact = result.FirstOrDefault();
+            var lastContact = result.LastOrDefault();
 
-            Assert.True(entityResult.Attributes.Count == 2);
-            Assert.True(entityResult["name"].Equals(account1["name"]));
-            Assert.True((entityResult["contact.fullname"] as AliasedValue).Value.Equals(contact["fullname"]));
-
-            var lastEntity = result.LastOrDefault(); // Second account
-            Assert.True(lastEntity["name"].Equals(account2["name"]));
+            Assert.True(firstContact["fullname"].Equals(contact1["fullname"]));
+            Assert.True(lastContact["fullname"].Equals(contact3["fullname"]));
         }
 
         [Fact]
         public void When_executing_a_query_expression_join_with_orphans_these_are_not_returned()
         {
             var context = new XrmFakedContext();
-            var account1 = new Entity("account") { Id = Guid.NewGuid() }; account1["name"] = "Account 1";
-            var account2 = new Entity("account") { Id = Guid.NewGuid() }; account2["name"] = "Account 2";
-            
-            var contact = new Entity("contact") { Id = Guid.NewGuid() };
-            contact["accountid"] = new EntityReference() { Id = account1.Id, LogicalName = "account" };
-            contact["fullname"] = "Contact full name";
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1";
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "Contact 2";
+            var contact3 = new Entity("contact") { Id = Guid.NewGuid() }; contact3["fullname"] = "Contact 3";
 
-            var orphanContact = new Entity("contact") { Id = Guid.NewGuid() };
-            orphanContact["fullname"] = "Orphan";
-            context.Initialize(new List<Entity>() { account1, account2, contact, orphanContact });
+            var account = new Entity("account") { Id = Guid.NewGuid() };
+            account["name"] = "Account 1";
 
+            contact1["parentcustomerid"] = account.ToEntityReference(); //Both contacts are related to the same account
+            contact2["parentcustomerid"] = account.ToEntityReference();
 
-            var qe = new QueryExpression() { EntityName = "account" };
+            //Contact3 doesnt have a parent customer, but must be returned anyway (left outer)
+
+            context.Initialize(new List<Entity>() { account, contact1, contact2, contact3 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
             qe.LinkEntities.Add(
                 new LinkEntity()
                 {
                     LinkFromEntityName = "contact",
                     LinkToEntityName = "account",
-                    LinkFromAttributeName = "accountid",
+                    LinkFromAttributeName = "parentcustomerid",
                     LinkToAttributeName = "accountid",
                     JoinOperator = JoinOperator.Inner,
-                    Columns = new ColumnSet(new string[] { "fullname" })
+                    Columns = new ColumnSet(new string[] { "name" })
                 }
             );
+            qe.ColumnSet = new ColumnSet(new string[] { "fullname", "parentcustomerid" });
+
             var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe);
 
-            Assert.True(result.Count() == 1);
-            var entityResult = result.FirstOrDefault();
-            Assert.True((entityResult["contact.fullname"] as AliasedValue).Value.Equals(contact["fullname"]));
+            Assert.True(result.Count() == 2); 
+            var firstContact = result.FirstOrDefault();
+            var lastContact = result.LastOrDefault();
+
+            Assert.True(firstContact["fullname"].Equals(contact1["fullname"]));
+            Assert.True(lastContact["fullname"].Equals(contact2["fullname"]));
         }
+
         [Fact]
-        public void When_executing_a_query_expression_leftjoin_with_orphans_these_are_not_returned()
+        public void When_executing_a_query_expression_only_the_selected_columns_in_the_columnset_are_returned()
         {
             var context = new XrmFakedContext();
-            var account1 = new Entity("account") { Id = Guid.NewGuid() }; account1["name"] = "Account 1";
-            var account2 = new Entity("account") { Id = Guid.NewGuid() }; account2["name"] = "Account 2";
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1"; contact1["firstname"] = "First 1";
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "Contact 2"; contact2["firstname"] = "First 2";
+            var contact3 = new Entity("contact") { Id = Guid.NewGuid() }; contact3["fullname"] = "Contact 3"; contact3["firstname"] = "First 3";
 
-            var contact = new Entity("contact") { Id = Guid.NewGuid() };
-            contact["accountid"] = new EntityReference() { Id = account1.Id, LogicalName = "account" };
-            contact["fullname"] = "Contact full name";
+            var account = new Entity("account") { Id = Guid.NewGuid() };
+            account["name"] = "Account 1";
 
-            var orphanContact = new Entity("contact") { Id = Guid.NewGuid() };
-            orphanContact["fullname"] = "Orphan";
-            context.Initialize(new List<Entity>() { account1, account2, contact, orphanContact });
+            contact1["parentcustomerid"] = account.ToEntityReference(); //Both contacts are related to the same account
+            contact2["parentcustomerid"] = account.ToEntityReference();
 
+            context.Initialize(new List<Entity>() { account, contact1, contact2, contact3 });
 
-            var qe = new QueryExpression() { EntityName = "account" };
+            var qe = new QueryExpression() { EntityName = "contact" };
             qe.LinkEntities.Add(
                 new LinkEntity()
                 {
                     LinkFromEntityName = "contact",
                     LinkToEntityName = "account",
-                    LinkFromAttributeName = "accountid",
+                    LinkFromAttributeName = "parentcustomerid",
                     LinkToAttributeName = "accountid",
-                    JoinOperator = JoinOperator.LeftOuter,
-                    Columns = new ColumnSet(new string[] { "fullname" })
+                    JoinOperator = JoinOperator.Inner,
+                    Columns = new ColumnSet(new string[] { "name" })
                 }
             );
+
+            //We only select fullname and parentcustomerid, firstname should not be included
+            qe.ColumnSet = new ColumnSet(new string[] { "fullname", "parentcustomerid" });
+
             var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe);
 
             Assert.True(result.Count() == 2);
-            var entityResult = result.FirstOrDefault(); //First account
+            var firstContact = result.FirstOrDefault();
+            var lastContact = result.LastOrDefault();
 
-            Assert.True(entityResult.Attributes.Count == 2);
-            Assert.True(entityResult["name"].Equals(account1["name"]));
-            Assert.True((entityResult["contact.fullname"] as AliasedValue).Value.Equals(contact["fullname"]));
-
-            var lastEntity = result.LastOrDefault(); // Second account
-            Assert.True(lastEntity["name"].Equals(account2["name"]));
+            Assert.False(firstContact.Attributes.ContainsKey("firstname"));
+            Assert.False(lastContact.Attributes.ContainsKey("firstname"));
         }
+        
     }
 }

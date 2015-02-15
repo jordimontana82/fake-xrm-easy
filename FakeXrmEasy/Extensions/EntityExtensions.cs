@@ -26,6 +26,35 @@ namespace FakeXrmEasy.Extensions
         }
 
         /// <summary>
+        /// Projects the attributes of entity e so that only the attributes specified in the columnSet are returned
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="columnSet"></param>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public static Entity ProjectAttributes(this Entity e, ColumnSet columnSet)
+        {
+            if (columnSet == null) return e;
+
+            if (columnSet.AllColumns)
+            {
+                return e; //return all the original attributes
+            }
+            else
+            {
+                //Return selected list of attributes
+                var projected = new Entity(e.LogicalName) { Id = e.Id };
+
+                foreach (var attKey in columnSet.Columns)
+                {
+                    if(e.Attributes.ContainsKey(attKey))
+                        projected[attKey] = e[attKey];
+                }
+                return projected;
+            }
+        }
+
+        /// <summary>
         /// Extension method to join the attributes of entity e and otherEntity
         /// </summary>
         /// <param name="e"></param>
@@ -34,6 +63,8 @@ namespace FakeXrmEasy.Extensions
         /// <returns></returns>
         public static Entity JoinAttributes(this Entity e, Entity otherEntity, ColumnSet columnSet, string alias)
         {
+            if (otherEntity == null) return e; //Left Join where otherEntity was not matched
+
             if (columnSet.AllColumns)
             {
                 foreach (var attKey in otherEntity.Attributes.Keys)
@@ -72,6 +103,35 @@ namespace FakeXrmEasy.Extensions
                 }
             }
             return e;
+        }
+
+        /// <summary>
+        /// Returns the key for the attribute name selected (could an entity reference or a primary key or a guid)
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="sAttributeName"></param>
+        /// <returns></returns>
+        public static Guid KeySelector(this Entity e, string sAttributeName)
+        {
+            sAttributeName = sAttributeName.ToLower();
+
+            if (!e.Attributes.ContainsKey(sAttributeName))
+            {
+                //Check if it is the primery key
+                if (sAttributeName.Contains("id") &&
+                   e.LogicalName.ToLower().Equals(sAttributeName.Substring(0, sAttributeName.Length - 2)))
+                {
+                    return e.Id;
+                }
+                return Guid.Empty; //Atrribute is null or doesn´t exists so it can´t be joined
+            } 
+
+            if (e[sAttributeName] is EntityReference) 
+                return (e[sAttributeName] as EntityReference).Id;
+            if (e[sAttributeName] is Guid)
+                return ((Guid)e[sAttributeName]);
+
+            return Guid.Empty;
         }
         
          

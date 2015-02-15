@@ -353,27 +353,34 @@ namespace FakeXrmEasy
             //Add as many Joins as linked entities
             foreach (LinkEntity le in qe.LinkEntities)
             {
-                var leAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkFromEntityName : le.EntityAlias;
+                var leAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
                 context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName);
                 context.EnsureEntityNameExistsInMetadata(le.LinkToEntityName);
-                var inner = context.Data[le.LinkFromEntityName].Values.AsQueryable();
+                var inner = context.Data[le.LinkToEntityName].Values.AsQueryable();
 
                 switch (le.JoinOperator)
                 {
                     case JoinOperator.Inner:
-                        query = query.Join(inner, 
-                                        outerKey => outerKey.Id, 
-                                        innerKey => innerKey.Attributes.ContainsKey(le.LinkFromAttributeName) && innerKey[le.LinkFromAttributeName] is EntityReference ? (innerKey[le.LinkFromAttributeName] as EntityReference).Id : Guid.Empty, 
-                                        (outerEl, innerEl) => outerEl.JoinAttributes(innerEl, le.Columns, leAlias));
+                        query = query.Join(inner,
+                                        outerKey => outerKey.KeySelector(le.LinkFromAttributeName),
+                                        innerKey => innerKey.KeySelector(le.LinkToAttributeName),
+                                        (outerEl, innerEl) => outerEl
+                                                                .ProjectAttributes(qe.ColumnSet)
+                                                                .JoinAttributes(innerEl, le.Columns, leAlias));
                         
                         break;
                     case JoinOperator.LeftOuter:
                         query = query.GroupJoin(inner,
-                                        outerKey => outerKey.Id,
-                                        innerKey => innerKey.Attributes.ContainsKey(le.LinkFromAttributeName) && innerKey[le.LinkFromAttributeName] is EntityReference ? (innerKey[le.LinkFromAttributeName] as EntityReference).Id : Guid.Empty,
-                                        (outerEl, innerElemsCol) => outerEl.JoinAttributes(innerElemsCol, le.Columns, leAlias));
-
-                        break;
+                                        outerKey => outerKey.KeySelector(le.LinkFromAttributeName),
+                                        innerKey => innerKey.KeySelector(le.LinkToAttributeName),
+                                        (outerEl, innerElemsCol) => new {outerEl, innerElemsCol})
+                                                    .SelectMany(x => x.innerElemsCol.DefaultIfEmpty()
+                                                                , (x, y) => x.outerEl
+                                                                                .ProjectAttributes(qe.ColumnSet)
+                                                                                .JoinAttributes(y, le.Columns, leAlias));
+                        
+                           
+                                break;
                         
                 }
             }
