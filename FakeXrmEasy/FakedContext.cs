@@ -385,7 +385,129 @@ namespace FakeXrmEasy
                 }
             }
 
+            // Compose the expression tree that represents the parameter to the predicate.
+            ParameterExpression entity = Expression.Parameter(typeof(Entity));
+            var expTreeBody = TranslateFilterExpressionToExpression(qe.Criteria, entity);
+            Expression<Func<Entity, bool>> lambda = Expression.Lambda<Func<Entity, bool>>(expTreeBody, entity);
+            query = query.Where(lambda);
             return query;
+        }
+
+        public static Expression TranslateConditionExpression(ConditionExpression c, ParameterExpression entity)
+        {
+            Expression attributesProperty = Expression.Property(
+                entity,
+                "Attributes"
+                );
+
+            Expression containsAttributeExpression = Expression.Call(
+                attributesProperty,
+                typeof(AttributeCollection).GetMethod("ContainsKey", new Type[] { typeof(string) }),
+                Expression.Constant(c.AttributeName)
+                );
+
+            Expression getAttributeValueExpr = Expression.Property(
+                attributesProperty, "Item", 
+                Expression.Constant(c.AttributeName, typeof(string))
+                );
+
+            //
+            switch (c.Operator)
+            {
+                case ConditionOperator.Equal:
+                default:
+                    /*return (e) => e.Attributes.ContainsKey(c.AttributeName) &&
+                                c.Values.All(x => x.Equals(e[c.AttributeName]));  */
+                    return Expression.And(
+                                    containsAttributeExpression,
+                                    Expression.Equal(
+                                    getAttributeValueExpr,
+                                    Expression.Constant(c.Values[0]))
+                                                            );
+
+                
+            }
+        }
+
+        public static BinaryExpression TranslateMultipleConditionExpressions(List<ConditionExpression> conditions, LogicalOperator op, ParameterExpression entity)
+        {
+            BinaryExpression binaryExpression = null;  //Default initialisation depending on logical operator
+            if (op == LogicalOperator.And)
+                binaryExpression = Expression.And(Expression.Constant(true), Expression.Constant(true));
+            else
+                binaryExpression = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+
+            foreach (var c in conditions) {
+                //Build a binary expression  
+                if (op == LogicalOperator.And)
+                {
+                    binaryExpression = Expression.And(binaryExpression, TranslateConditionExpression(c, entity));
+                }
+                else
+                    binaryExpression = Expression.Or(binaryExpression, TranslateConditionExpression(c, entity));
+            }
+
+            return binaryExpression;
+        }
+
+        public static BinaryExpression TranslateMultipleFilterExpressions(List<FilterExpression> filters, LogicalOperator op, ParameterExpression entity)
+        {
+            BinaryExpression binaryExpression = null; 
+            if (op == LogicalOperator.And)
+                binaryExpression = Expression.And(Expression.Constant(true), Expression.Constant(true));
+            else
+                binaryExpression = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+              
+            foreach (var f in filters)
+            {
+                var thisFilterLambda = TranslateFilterExpressionToExpression(f, entity);
+
+                //Build a binary expression  
+                if (op == LogicalOperator.And)
+                {
+                    binaryExpression = Expression.And(binaryExpression, thisFilterLambda);
+                }
+                else
+                    binaryExpression = Expression.Or(binaryExpression, thisFilterLambda);
+            }
+
+            return binaryExpression;
+        }
+
+        public static Expression TranslateFilterExpressionToExpression(FilterExpression fe, ParameterExpression entity)
+        {
+            if (fe == null) return Expression.Constant(true);
+
+            BinaryExpression conditionsLambda = null;
+            BinaryExpression filtersLambda = null;
+            if(fe.Conditions != null && fe.Conditions.Count > 0) {
+                conditionsLambda = TranslateMultipleConditionExpressions(fe.Conditions.ToList(), fe.FilterOperator, entity);
+            }
+
+            //Process nested filters recursively
+            if (fe.Filters != null && fe.Filters.Count > 0)
+            {
+                filtersLambda = TranslateMultipleFilterExpressions(fe.Filters.ToList(), fe.FilterOperator, entity);
+            }
+
+            if (conditionsLambda != null && filtersLambda != null)
+            {
+                //Satisfy both
+                if (fe.FilterOperator == LogicalOperator.And)
+                {
+                    return Expression.Add(conditionsLambda, filtersLambda);
+                }
+                else
+                {
+                    return Expression.Or(conditionsLambda, filtersLambda);
+                }
+            }
+            else if (conditionsLambda != null)
+                return conditionsLambda;
+            else if (filtersLambda != null)
+                return filtersLambda;
+
+            return Expression.Constant(true); //Satisfy filter if there are no conditions nor filters
         }
 
         //public static IQueryable<Entity> JoinLinkedEntities(IQueryable<Entity> outerEntity, LinkEntity linkedEntity)
