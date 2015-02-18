@@ -51,6 +51,7 @@
     <Compile Include="FakedContext.cs" />
     <Compile Include="IFakedContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PullRequestException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

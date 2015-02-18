@@ -7,6 +7,9 @@ using FakeXrmEasy;
 using Xunit;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using Microsoft.Xrm.Sdk.Client;
+using Crm;
+using Microsoft.Xrm.Sdk.Messages;  //TypedEntities generated code for testing
 
 namespace FakeXrmEasy.Tests
 {
@@ -39,6 +42,28 @@ namespace FakeXrmEasy.Tests
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe));
         }
 
+        
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_a_retrievemultiple_with_a_queryexpression_is_called()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid = Guid.NewGuid();
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid, FirstName = "Jordi" }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using(XrmServiceContext ctx = new XrmServiceContext(service)) {
+                var contact = (from c in ctx.CreateQuery<Contact>()
+                             where c.FirstName.Equals("Jordi")
+                            select c).FirstOrDefault();
+
+                
+            }
+            A.CallTo(() => service.Execute(A<OrganizationRequest>.That.Matches(x => x is RetrieveMultipleRequest && ((RetrieveMultipleRequest) x).Query is QueryExpression))).MustHaveHappened(); 
+        }
         [Fact]
         public void When_executing_a_query_expression_with_a_simple_join_right_result_is_returned()
         {

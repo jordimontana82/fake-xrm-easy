@@ -119,6 +119,7 @@ namespace FakeXrmEasy
             FakeCreate(context, fakedService);
             FakeUpdate(context, fakedService);
             FakeDelete(context, fakedService);
+            FakeExecute(context, fakedService);
 
             return fakedService;
         }
@@ -332,8 +333,13 @@ namespace FakeXrmEasy
                         if (request.Query is QueryExpression)
                         {
                             var linqQuery = TranslateQueryExpressionToLinq(context, request.Query as QueryExpression);
-                            var response = new RetrieveMultipleResponse();
-                            response.EntityCollection.Entities.AddRange(linqQuery.ToList());
+                            var response = new RetrieveMultipleResponse
+                            {
+                                Results = new ParameterCollection
+                                 {
+                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
+                                 }
+                            };
                             return response;
                         }
                     }
@@ -341,6 +347,23 @@ namespace FakeXrmEasy
                 });
         }
 
+        public static void FakeRetrieveMultiple(XrmFakedContext context, IOrganizationService fakedService)
+        {
+            A.CallTo(() => fakedService.RetrieveMultiple(A<QueryBase>._))
+                .ReturnsLazily((QueryBase req) =>
+                {
+                    if (req is QueryExpression)
+                    {
+                        var query = req as QueryExpression;
+                        var linqQuery = TranslateQueryExpressionToLinq(context, query as QueryExpression);
+                        var response = new RetrieveMultipleResponse();
+                        response.EntityCollection.Entities.AddRange(linqQuery.ToList());
+                        return response.EntityCollection;
+                        
+                    }
+                    throw new PullRequestException("Unexpected querybase for RetrieveMultiple");
+                });
+        }
         
         public static IQueryable<Entity> TranslateQueryExpressionToLinq(XrmFakedContext context, QueryExpression qe)
         {
@@ -415,7 +438,7 @@ namespace FakeXrmEasy
             switch (c.Operator)
             {
                 case ConditionOperator.Equal:
-                default:
+                
                     /*return (e) => e.Attributes.ContainsKey(c.AttributeName) &&
                                 c.Values.All(x => x.Equals(e[c.AttributeName]));  */
                     return Expression.And(
@@ -424,6 +447,9 @@ namespace FakeXrmEasy
                                     getAttributeValueExpr,
                                     Expression.Constant(c.Values[0]))
                                                             );
+
+                default:
+                    throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.Operator.ToString()));
 
                 
             }

@@ -71,6 +71,7 @@
     <Compile Include="FakeContextTestCreate.cs" />
     <Compile Include="FakeContextTestRetrieve.cs" />
     <Compile Include="FakeContextTests.cs" />
+    <Compile Include="GeneratedCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
