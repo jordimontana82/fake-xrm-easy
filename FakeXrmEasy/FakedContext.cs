@@ -434,19 +434,25 @@ namespace FakeXrmEasy
                 Expression.Constant(c.AttributeName, typeof(string))
                 );
 
-            //
             switch (c.Operator)
             {
                 case ConditionOperator.Equal:
+                    return TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpression);
+
+                case ConditionOperator.BeginsWith:
+                case ConditionOperator.Like:
+                case ConditionOperator.Contains:
+                case ConditionOperator.EndsWith:
+                    return TranslateConditionExpressionLike(c, getAttributeValueExpr, containsAttributeExpression);
+
+                case ConditionOperator.NotEqual:
+                    return Expression.Not(TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpression));
                 
-                    /*return (e) => e.Attributes.ContainsKey(c.AttributeName) &&
-                                c.Values.All(x => x.Equals(e[c.AttributeName]));  */
-                    return Expression.And(
-                                    containsAttributeExpression,
-                                    Expression.Equal(
-                                    getAttributeValueExpr,
-                                    Expression.Constant(c.Values[0]))
-                                                            );
+                case ConditionOperator.DoesNotBeginWith:
+                case ConditionOperator.DoesNotEndWith:
+                case ConditionOperator.NotLike:
+                case ConditionOperator.DoesNotContain:
+                    return Expression.Not(TranslateConditionExpressionLike(c, getAttributeValueExpr, containsAttributeExpression));
 
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.Operator.ToString()));
@@ -455,6 +461,66 @@ namespace FakeXrmEasy
             }
         }
 
+        protected static Expression TranslateConditionExpressionEqual(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+            foreach (object value in c.Values)
+            {
+                expOrValues = Expression.Or(expOrValues, Expression.Equal(
+                            getAttributeValueExpr,
+                            Expression.Constant(value)));
+            }
+            return Expression.And(
+                            containsAttributeExpr,
+                            expOrValues);
+        }
+
+        protected static Expression TranslateConditionExpressionLike(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+            Expression convertedValueToStr = Expression.Convert(getAttributeValueExpr, typeof(string));
+
+            string sLikeOperator = "%";
+            foreach (object value in c.Values)
+            {
+                var strValue = value.ToString();
+                string sMethod = "";
+                if (strValue.EndsWith(sLikeOperator) && strValue.StartsWith(sLikeOperator))
+                    sMethod = "Contains";
+                else if (strValue.StartsWith(sLikeOperator))
+                    sMethod = "EndsWith";
+                else
+                    sMethod = "StartsWith";
+
+                expOrValues = Expression.Or(expOrValues, Expression.Call(
+                    convertedValueToStr,
+                    typeof(string).GetMethod(sMethod, new Type[] { typeof(string) }),
+                    Expression.Constant(value.ToString().Replace("%", "")) //Linq2CRM adds the percentage value to be executed as a LIKE operator, here we are replacing it to just use the appropiate method
+                ));
+            }
+
+            return Expression.And(
+                            containsAttributeExpr,
+                            expOrValues);
+        }
+        protected static Expression TranslateConditionExpressionContains(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+            Expression convertedValueToStr = Expression.Convert(getAttributeValueExpr, typeof(string));
+
+            foreach (object value in c.Values)
+            {
+                expOrValues = Expression.Or(expOrValues, Expression.Call(
+                    convertedValueToStr,
+                    typeof(string).GetMethod("Contains", new Type[] { typeof(string) }),
+                    Expression.Constant(value.ToString())
+                ));
+            }
+
+            return Expression.And(
+                            containsAttributeExpr,
+                            expOrValues);
+        }
         public static BinaryExpression TranslateMultipleConditionExpressions(List<ConditionExpression> conditions, LogicalOperator op, ParameterExpression entity)
         {
             BinaryExpression binaryExpression = null;  //Default initialisation depending on logical operator
@@ -535,14 +601,5 @@ namespace FakeXrmEasy
 
             return Expression.Constant(true); //Satisfy filter if there are no conditions nor filters
         }
-
-        //public static IQueryable<Entity> JoinLinkedEntities(IQueryable<Entity> outerEntity, LinkEntity linkedEntity)
-        //{
-        //    //Recursive case
-        //    foreach (DataCollection<LinkEntity> linkedSubEntities in linkedEntity.LinkEntities)
-        //    {
-
-        //    }
-        //}
     }
 }
