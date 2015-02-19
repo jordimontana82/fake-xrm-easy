@@ -26,11 +26,6 @@ namespace FakeXrmEasy
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
         }
 
-        public void Build(XrmFakedContext data)
-        {
-            this.Data = data.Data;
-        }
-
         /// <summary>
         /// Initializes the context with the provided entities
         /// </summary>
@@ -48,7 +43,7 @@ namespace FakeXrmEasy
             }
         }
 
-        public void EnsureEntityNameExistsInMetadata(string sEntityName)
+        protected void EnsureEntityNameExistsInMetadata(string sEntityName)
         {
             if (!Data.ContainsKey(sEntityName))
             {

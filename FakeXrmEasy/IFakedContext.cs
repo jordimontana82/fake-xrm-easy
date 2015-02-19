@@ -8,13 +8,6 @@ namespace FakeXrmEasy
 {
     public interface IFakedContext
     {
-
-        /// <summary>
-        /// Deprecated and should not be used
-        /// </summary>
-        /// <param name="data"></param>
-        void Build(XrmFakedContext data);
-
         /// <summary>
         /// Receives a list of entities, that are used to initialize the context with those
         /// </summary>
