@@ -18,7 +18,7 @@ namespace FakeXrmEasy
     /// how entities are persisted in Tables (with the logical name) and then the records themselves
     /// where the Primary Key is the Guid
     /// </summary>
-    public class XrmFakedContext: IFakedContext
+    public class XrmFakedContext: IXrmFakedContext
     {
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
         public XrmFakedContext()

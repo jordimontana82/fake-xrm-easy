@@ -6,7 +6,7 @@ using System.Text;
 
 namespace FakeXrmEasy
 {
-    public interface IFakedContext
+    public interface IXrmFakedContext
     {
         /// <summary>
         /// Receives a list of entities, that are used to initialize the context with those

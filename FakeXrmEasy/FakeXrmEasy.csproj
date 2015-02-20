@@ -48,8 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\EntityExtensions.cs" />
-    <Compile Include="FakedContext.cs" />
-    <Compile Include="IFakedContext.cs" />
+    <Compile Include="XrmFakedContext.cs" />
+    <Compile Include="IXrmFakedContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PullRequestException.cs" />
   </ItemGroup>
