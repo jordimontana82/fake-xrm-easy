@@ -449,6 +449,28 @@ namespace FakeXrmEasy
                 case ConditionOperator.DoesNotContain:
                     return Expression.Not(TranslateConditionExpressionLike(c, getAttributeValueExpr, containsAttributeExpression));
 
+                case ConditionOperator.Null:
+                    return TranslateConditionExpressionNull(c, getAttributeValueExpr, containsAttributeExpression);
+
+                case ConditionOperator.NotNull:
+                    return Expression.Not(TranslateConditionExpressionNull(c, getAttributeValueExpr, containsAttributeExpression));
+
+                case ConditionOperator.GreaterThan:
+                    return TranslateConditionExpressionGreaterThan(c, getAttributeValueExpr, containsAttributeExpression);
+                
+                case ConditionOperator.GreaterEqual:
+                    return Expression.Or(
+                                TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpression),
+                                TranslateConditionExpressionGreaterThan(c, getAttributeValueExpr, containsAttributeExpression));
+                
+                case ConditionOperator.LessThan:
+                    return TranslateConditionExpressionLessThan(c, getAttributeValueExpr, containsAttributeExpression);
+
+                case ConditionOperator.LessEqual:
+                    return Expression.Or(
+                                TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpression),
+                                TranslateConditionExpressionLessThan(c, getAttributeValueExpr, containsAttributeExpression));
+                
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.Operator.ToString()));
 
@@ -462,12 +484,53 @@ namespace FakeXrmEasy
             foreach (object value in c.Values)
             {
                 expOrValues = Expression.Or(expOrValues, Expression.Equal(
-                            getAttributeValueExpr,
+                            Expression.Convert(getAttributeValueExpr, value.GetType()),
                             Expression.Constant(value)));
             }
-            return Expression.And(
+            return Expression.AndAlso(
                             containsAttributeExpr,
                             expOrValues);
+        }
+
+        protected static Expression TranslateConditionExpressionGreaterThan(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+            foreach (object value in c.Values)
+            {
+                expOrValues = Expression.Or(expOrValues, 
+                        Expression.GreaterThan(
+                            Expression.Convert(getAttributeValueExpr, value.GetType()),
+                            Expression.Constant(value)));
+            }
+            return Expression.AndAlso(
+                            containsAttributeExpr,
+                            expOrValues);
+        }
+        protected static Expression TranslateConditionExpressionLessThan(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+            foreach (object value in c.Values)
+            {
+                expOrValues = Expression.Or(expOrValues,
+                        Expression.LessThan(
+                            Expression.Convert(getAttributeValueExpr, value.GetType()),
+                            Expression.Constant(value)));
+            }
+            return Expression.AndAlso(
+                            containsAttributeExpr,
+                            expOrValues);
+        }
+
+        protected static Expression TranslateConditionExpressionNull(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            return Expression.Or(Expression.AndAlso(
+                                    containsAttributeExpr,
+                                    Expression.Equal(
+                                    getAttributeValueExpr,
+                                    Expression.Constant(null))),   //Attribute is null
+                                 Expression.AndAlso(
+                                    Expression.Not(containsAttributeExpr),
+                                    Expression.Constant(true)));   //Or attribute is not defined (null)
         }
 
         protected static Expression TranslateConditionExpressionLike(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
@@ -494,7 +557,7 @@ namespace FakeXrmEasy
                 ));
             }
 
-            return Expression.And(
+            return Expression.AndAlso(
                             containsAttributeExpr,
                             expOrValues);
         }
@@ -512,7 +575,7 @@ namespace FakeXrmEasy
                 ));
             }
 
-            return Expression.And(
+            return Expression.AndAlso(
                             containsAttributeExpr,
                             expOrValues);
         }

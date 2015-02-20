@@ -241,5 +241,167 @@ namespace FakeXrmEasy.Tests
                 Assert.True(matches[0].FirstName.Equals("Other"));
             }
         }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_a_null_operator_record_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid1 = Guid.NewGuid();
+            var guid2 = Guid.NewGuid();
+            var guid3 = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid1, FirstName = null },
+                new Contact() { Id = guid2 }, //FirstName attribute omitted
+                new Contact() { Id = guid3, FirstName = "Other" }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.FirstName == null
+                               select c).ToList();
+
+                Assert.True(matches.Count == 2);
+                Assert.True(matches[0].FirstName == null);
+                Assert.True(matches[1].FirstName == null);
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_a_not_null_operator_record_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid1 = Guid.NewGuid();
+            var guid2 = Guid.NewGuid();
+            var guid3 = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid1, FirstName = null },
+                new Contact() { Id = guid2 }, //FirstName attribute omitted
+                new Contact() { Id = guid3, FirstName = "Other" }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.FirstName != null
+                               select c).ToList();
+
+                Assert.True(matches.Count == 1);
+                Assert.True(matches[0].FirstName == "Other");
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_a_greater_than_operator_record_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid1 = Guid.NewGuid();
+            var guid2 = Guid.NewGuid();
+            var guid3 = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid1, NumberOfChildren = 3 },
+                new Contact() { Id = guid2, NumberOfChildren = 1 }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.NumberOfChildren.Value > 2
+                               select c).ToList();
+
+                Assert.True(matches.Count == 1);
+                Assert.True(matches[0].Id == guid1);
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_a_greater_than_or_equal_operator_record_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid1 = Guid.NewGuid();
+            var guid2 = Guid.NewGuid();
+            var guid3 = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid1, NumberOfChildren = 3 },
+                new Contact() { Id = guid2, NumberOfChildren = 1 },
+                new Contact() { Id = guid3, NumberOfChildren = 2 }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.NumberOfChildren.Value >= 2
+                               select c).ToList();
+
+                Assert.True(matches.Count == 2);
+                Assert.True(matches[0].Id == guid1);
+                Assert.True(matches[1].Id == guid3);
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_a_less_than_operator_record_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid1 = Guid.NewGuid();
+            var guid2 = Guid.NewGuid();
+            var guid3 = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid1, NumberOfChildren = 3 },
+                new Contact() { Id = guid2, NumberOfChildren = 1 },
+                new Contact() { Id = guid3, NumberOfChildren = 2 }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.NumberOfChildren.Value < 3
+                               select c).ToList();
+
+                Assert.True(matches.Count == 2);
+                Assert.True(matches[0].Id == guid2);
+                Assert.True(matches[1].Id == guid3);
+            }
+        }
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_a_less_than_or_equal_operator_record_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid1 = Guid.NewGuid();
+            var guid2 = Guid.NewGuid();
+            var guid3 = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid1, NumberOfChildren = 3 },
+                new Contact() { Id = guid2, NumberOfChildren = 1 },
+                new Contact() { Id = guid3, NumberOfChildren = 2 }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.NumberOfChildren.Value <= 3
+                               select c).ToList();
+
+                Assert.True(matches.Count == 3);
+            }
+        }
     }
 }
