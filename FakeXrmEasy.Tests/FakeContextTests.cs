@@ -20,14 +20,6 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
-        public void When_getting_the_faked_organization_service_the_context_must_not_be_null()
-        {
-            var context = new XrmFakedContext();
-            var ex = Assert.Throws<InvalidOperationException>(() => context.GetFakedOrganizationService(null));
-            Assert.Equal(ex.Message, "The faked context must not be null.");
-        }
-
-        [Fact]
         public void When_initializing_the_context_with_a_null_list_of_entities_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
