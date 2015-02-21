@@ -55,6 +55,7 @@
     <Compile Include="PullRequestException.cs" />
     <Compile Include="XrmFakedContext.Plugins.cs" />
     <Compile Include="XrmFakedContext.Queries.cs" />
+    <Compile Include="XrmFakedTracingService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

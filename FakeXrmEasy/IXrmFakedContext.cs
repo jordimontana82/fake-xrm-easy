@@ -33,7 +33,7 @@ namespace FakeXrmEasy
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        IPlugin GetFakedPlugin<T>() where T : IPlugin;
+        IPlugin ExecutePluginWithTarget<T>(Entity target) where T : IPlugin, new();
     }
 
   

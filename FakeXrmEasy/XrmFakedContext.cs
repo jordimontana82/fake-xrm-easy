@@ -78,9 +78,6 @@ namespace FakeXrmEasy
             return fakedService;
         }
 
-        
-        
-
         /// <summary>
         /// Fakes the Execute method of the organization service.
         /// Not all the OrganizationRequest are going to be implemented, so stay tunned on updates!
