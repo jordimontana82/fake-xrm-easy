@@ -2,15 +2,15 @@
 <package >
   <metadata>
     <id>FakeXrmEasy</id>
-    <version>1.0.0</version>
+    <version>1.2.1-alpha</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/jordimontana82/fake-xrm-easy</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Utilities to streamline unit testing in Dynamics CRM by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
-    <releaseNotes>The first release includes a mocking context for the Organization Service</releaseNotes>
-    <copyright>Copyright 2014</copyright>
+    <releaseNotes>Added support for RetrieveMultiple with QueryExpressions, support for LINQ queries, plugins and workflows</releaseNotes>
+    <copyright>Copyright 2015</copyright>
     <tags>xrm dynamics crm unit testing</tags>
     <dependencies>
       <dependency id="FakeItEasy" version="1.25.1" />
