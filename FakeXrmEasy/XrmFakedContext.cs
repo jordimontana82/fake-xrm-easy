@@ -10,6 +10,9 @@ using Microsoft.Xrm.Sdk.Messages;
 using System.Dynamic;
 using System.Linq.Expressions;
 using FakeXrmEasy.Extensions;
+using Microsoft.Xrm.Sdk.Client;
+using System.ServiceModel.Description;
+using System.Reflection;
 
 namespace FakeXrmEasy
 {
@@ -21,6 +24,9 @@ namespace FakeXrmEasy
     public partial class XrmFakedContext: IXrmFakedContext
     {
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
+
+        public Assembly ProxyTypesAssembly { get; set; }
+ 
         public XrmFakedContext()
         {
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();

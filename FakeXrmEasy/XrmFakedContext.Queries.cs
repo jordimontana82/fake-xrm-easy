@@ -10,11 +10,28 @@ using Microsoft.Xrm.Sdk.Messages;
 using System.Dynamic;
 using System.Linq.Expressions;
 using FakeXrmEasy.Extensions;
+using System.Reflection;
+using Microsoft.Xrm.Sdk.Client;
 
 namespace FakeXrmEasy
 {
     public partial class XrmFakedContext : IXrmFakedContext
     {
+        protected internal Type FindReflectedType(string sLogicalName)
+        {
+            Assembly assembly = this.ProxyTypesAssembly;
+            if (assembly == null)
+            {
+                assembly = Assembly.GetExecutingAssembly();
+            }
+            var subClassType = assembly.GetTypes()
+                    .Where(t => typeof(Entity).IsAssignableFrom(t))
+                    .Where(t => t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
+                    .Where(t => ((EntityLogicalNameAttribute)t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0]).LogicalName.Equals(sLogicalName.ToLower()))
+                    .FirstOrDefault();
+            return subClassType;
+        }
+
         public IQueryable<T> CreateQuery<T>() where T : Entity
         {
             Type typeParameter = typeof(T);
@@ -24,10 +41,25 @@ namespace FakeXrmEasy
                 throw new Exception(string.Format("The type {0} was not found", typeParameter.Name));
             }
 
+            return this.CreateQuery<T>(typeParameter.Name.ToLower());
+        }
+
+        protected IQueryable<T> CreateQuery<T>(string entityLogicalName) where T : Entity
+        {
             List<T> lst = new List<T>();
-            foreach (var e in Data[typeParameter.Name.ToLower()].Values)
+            foreach (var e in Data[entityLogicalName].Values)
             {
-                lst.Add((T)e);
+                var subClassType = FindReflectedType(entityLogicalName);
+
+                if (subClassType != null)
+                {
+                    var instance = Activator.CreateInstance(subClassType);
+                    ((T)instance).Attributes = e.Attributes;
+                    ((T)instance).Id = e.Id;
+                    lst.Add((T)instance);
+                }
+                else
+                    lst.Add((T)e);
             }
 
             return lst.AsQueryable<T>();
@@ -44,7 +76,9 @@ namespace FakeXrmEasy
 
             //Start form the root entity and build a LINQ query to execute the query against the In-Memory context:
             context.EnsureEntityNameExistsInMetadata(qe.EntityName);
-            var query = context.Data[qe.EntityName].Values.AsQueryable();
+
+            var proxyType = context.FindReflectedType(qe.EntityName);
+            var query = context.CreateQuery<Entity>(qe.EntityName);
 
             //Add as many Joins as linked entities
             foreach (LinkEntity le in qe.LinkEntities)

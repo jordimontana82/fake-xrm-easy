@@ -75,6 +75,7 @@
     <Compile Include="FakeContextTests.cs" />
     <Compile Include="GeneratedCode.cs" />
     <Compile Include="PluginsForTesting\AccountNumberPlugin.cs" />
+    <Compile Include="PluginsForTesting\FollowupPlugin.cs" />
     <Compile Include="PluginsForTesting\RetrieveServicesPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

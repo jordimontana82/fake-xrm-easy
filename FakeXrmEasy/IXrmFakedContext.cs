@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,28 @@ namespace FakeXrmEasy
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        IPlugin ExecutePluginWithTarget<T>(Entity target) where T : IPlugin, new();
+        IPlugin ExecutePluginWithTarget<T>(object target) where T : IPlugin, new();
+
+
+        /// <summary>
+        /// Returns a faked plugin with a target and the specified pre entity images
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        IPlugin ExecutePluginWithTargetAndPreEntityImages<T>(object target, EntityImageCollection preEntityImages) where T : IPlugin, new();
+
+
+        /// <summary>
+        /// Most flexible plugin execution
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
+                                     ParameterCollection outputParameters,
+                                     EntityImageCollection preEntityImages,
+                                     EntityImageCollection postEntityImages) where T : IPlugin, new();
+
+
     }
 
   

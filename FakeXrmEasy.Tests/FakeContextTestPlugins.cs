@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using Microsoft.Xrm.Sdk;
 
 using FakeXrmEasy.Tests.PluginsForTesting;
+using Crm;
+using System.Reflection;
 
 namespace FakeXrmEasy.Tests
 {
@@ -57,9 +59,63 @@ namespace FakeXrmEasy.Tests
             var target = new Entity("account") { Id = guid1 };
             target["accountnumber"] = 69;
 
-            //Execute our plugin against a target that doesn't contains the accountnumber attribute
+            //Execute our plugin against a target thatcontains the accountnumber attribute will throw exception
             Assert.Throws<InvalidPluginExecutionException>(() => fakedContext.ExecutePluginWithTarget<AccountNumberPlugin>(target));
 
+        }
+
+        [Fact]
+        public void When_the_followup_plugin_is_executed_for_an_account_it_should_create_a_new_task()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly(); //Needed to be able to return early bound entities
+
+            var guid1 = Guid.NewGuid();
+            var target = new Entity("account") { Id = guid1 };
+
+            fakedContext.ExecutePluginWithTarget<FollowupPlugin>(target);
+
+            //The plugin creates a followup activity, check that that one exists
+            var service = fakedContext.GetFakedOrganizationService();
+            using (var context = new XrmServiceContext(service))
+            {
+                var tasks = (from t in context.CreateQuery<Task>()
+                             select t).ToList();
+
+                Assert.True(tasks.Count == 1);
+                Assert.True(tasks[0]["subject"].Equals("Send e-mail to the new customer."));
+            }
+        }
+
+        [Fact]
+        public void When_the_followup_plugin_is_executed_for_an_account_after_create_it_should_create_a_new_task_with_a_regardingid()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly(); //Needed to be able to return early bound entities
+
+            var guid1 = Guid.NewGuid();
+            var target = new Entity("account") { Id = guid1 };
+
+            ParameterCollection inputParameters = new ParameterCollection();
+            inputParameters.Add("Target", target);
+
+            ParameterCollection outputParameters = new ParameterCollection();
+            outputParameters.Add("id", guid1);
+
+            fakedContext.ExecutePluginWith<FollowupPlugin>(inputParameters,outputParameters,null,null);
+
+            //The plugin creates a followup activity, check that that one exists
+            var service = fakedContext.GetFakedOrganizationService();
+            using (var context = new XrmServiceContext(service))
+            {
+                var tasks = (from t in context.CreateQuery<Task>()
+                             select t).ToList();
+
+                Assert.True(tasks.Count == 1);
+                Assert.True(tasks[0].Subject.Equals("Send e-mail to the new customer."));
+                Assert.True(tasks[0].RegardingObjectId != null && tasks[0].RegardingObjectId.Id.Equals(guid1));
+
+            }
         }
     }
 }

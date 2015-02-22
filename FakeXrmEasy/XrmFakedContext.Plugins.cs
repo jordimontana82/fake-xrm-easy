@@ -16,16 +16,12 @@ namespace FakeXrmEasy
     public partial class XrmFakedContext : IXrmFakedContext
     {
 
-        /// <summary>
-        /// Executes the plugin of type T against the faked context for an entity target
-        /// and returns the faked plugin
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        public IPlugin ExecutePluginWithTarget<T>(Entity target) where T: IPlugin, new()
+        public IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
+                                     ParameterCollection outputParameters,
+                                     EntityImageCollection preEntityImages,
+                                     EntityImageCollection postEntityImages) where T : IPlugin, new()
         {
-            var fakedServiceProvider = GetFakedServiceProvider(target);
+            var fakedServiceProvider = GetFakedServiceProvider(inputParameters, outputParameters, preEntityImages, postEntityImages);
 
             var fakedPlugin = A.Fake<IPlugin>();
             A.CallTo(() => fakedPlugin.Execute(A<IServiceProvider>._))
@@ -39,23 +35,62 @@ namespace FakeXrmEasy
             return fakedPlugin;
         }
 
-        protected IPluginExecutionContext GetFakedPluginContext(Entity target)
+        /// <summary>
+        /// Executes the plugin of type T against the faked context for an entity target
+        /// and returns the faked plugin
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public IPlugin ExecutePluginWithTarget<T>(object target) where T: IPlugin, new()
         {
-            var context = A.Fake<IPluginExecutionContext>();
-
             //Add the target entity to the InputParameters
             ParameterCollection inputParameters = new ParameterCollection();
             inputParameters.Add("Target", target);
-            
+
+            return this.ExecutePluginWith<T>(inputParameters, null, null, null);
+        }
+
+        public IPlugin ExecutePluginWithTargetAndPreEntityImages<T>(object target, EntityImageCollection preEntityImages) where T : IPlugin, new()
+        {
+            //Add the target entity to the InputParameters
+            ParameterCollection inputParameters = new ParameterCollection();
+            inputParameters.Add("Target", target);
+
+            return this.ExecutePluginWith<T>(inputParameters, null, preEntityImages, null);
+        }
+
+        protected IPluginExecutionContext GetFakedPluginContext(ParameterCollection inputParameters,
+                                                            ParameterCollection outputParameters,
+                                                            EntityImageCollection preEntityImages,
+                                                            EntityImageCollection postEntityImages)
+        {
+            var context = A.Fake<IPluginExecutionContext>();
+
             A.CallTo(() => context.Depth).ReturnsLazily(() => 1);
             A.CallTo(() => context.IsExecutingOffline).ReturnsLazily(() => false);
-            A.CallTo(() => context.PrimaryEntityId).ReturnsLazily(() => target.Id);
-            A.CallTo(() => context.PrimaryEntityName).ReturnsLazily(() => target.LogicalName);
-            A.CallTo(() => context.InputParameters).ReturnsLazily(() => inputParameters);
-            
+            A.CallTo(() => context.InputParameters).ReturnsLazily(() => inputParameters != null ? inputParameters : new ParameterCollection());
+            A.CallTo(() => context.OutputParameters).ReturnsLazily(() => outputParameters != null ? outputParameters : new ParameterCollection());
+            A.CallTo(() => context.PreEntityImages).ReturnsLazily(() => preEntityImages);
+            A.CallTo(() => context.PostEntityImages).ReturnsLazily(() => postEntityImages);
+
+            //Create message will pass an Entity as the target but this is not always true
+            //For instance, a Delete request will receive an EntityReference
+            if (inputParameters != null &&
+                inputParameters.ContainsKey("Target") &&
+                inputParameters["Target"] is Entity)
+            {
+                var target = inputParameters["Target"] as Entity;
+                A.CallTo(() => context.PrimaryEntityId).ReturnsLazily(() => target.Id);
+                A.CallTo(() => context.PrimaryEntityName).ReturnsLazily(() => target.LogicalName);
+            }
+
             return context;
         }
-        protected IServiceProvider GetFakedServiceProvider(Entity target)
+        protected IServiceProvider GetFakedServiceProvider(ParameterCollection inputParameters, 
+                                                            ParameterCollection outputParameters,
+                                                            EntityImageCollection preEntityImages,
+                                                            EntityImageCollection postEntityImages)
         {
 
             var fakedServiceProvider = A.Fake<IServiceProvider>();
@@ -73,7 +108,17 @@ namespace FakeXrmEasy
                    }
                    else if (t.Equals(typeof(IPluginExecutionContext)))
                    {
-                       return GetFakedPluginContext(target);   
+                       return GetFakedPluginContext(inputParameters, outputParameters, preEntityImages, postEntityImages);   
+                   }
+                   else if (t.Equals(typeof(IOrganizationServiceFactory)))
+                   {
+                       var fakedServiceFactory = A.Fake<IOrganizationServiceFactory>();
+                       A.CallTo(() => fakedServiceFactory.CreateOrganizationService(A<Guid?>._))
+                            .ReturnsLazily((Guid? g) =>
+                            {
+                                return GetFakedOrganizationService();
+                            });
+                       return fakedServiceFactory;
                    }
                    throw new PullRequestException("The specified service type is not supported");
                });
