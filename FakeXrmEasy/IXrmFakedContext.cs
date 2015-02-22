@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Activities;
 
 namespace FakeXrmEasy
 {
@@ -55,7 +56,19 @@ namespace FakeXrmEasy
                                      EntityImageCollection preEntityImages,
                                      EntityImageCollection postEntityImages) where T : IPlugin, new();
 
+        /// <summary>
+        /// Executes a code activity against this context
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        IDictionary<string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs) where T : CodeActivity, new();
 
+
+        /// <summary>
+        /// Executes a code activity passing the primary entity
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs) where T : CodeActivity, new();
+        
     }
 
   

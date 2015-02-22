@@ -36,7 +36,11 @@
     <Reference Include="microsoft.xrm.sdk">
       <HintPath>..\packages\Microsoft.Xrm.Sdk.2011.5.0.18\lib\net40\microsoft.xrm.sdk.dll</HintPath>
     </Reference>
+    <Reference Include="microsoft.xrm.sdk.workflow">
+      <HintPath>..\packages\Microsoft.Xrm.Sdk.Workflow.2011.5.0.18\lib\net40\microsoft.xrm.sdk.workflow.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -48,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\EntityExtensions.cs" />
+    <Compile Include="XrmFakedContext.CodeActivities.cs" />
     <Compile Include="XrmFakedContext.Crud.cs" />
     <Compile Include="XrmFakedContext.cs" />
     <Compile Include="IXrmFakedContext.cs" />

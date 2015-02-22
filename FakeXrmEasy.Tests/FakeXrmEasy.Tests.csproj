@@ -41,7 +41,11 @@
     <Reference Include="microsoft.xrm.sdk">
       <HintPath>..\packages\Microsoft.Xrm.Sdk.2011.5.0.18\lib\net40\microsoft.xrm.sdk.dll</HintPath>
     </Reference>
+    <Reference Include="microsoft.xrm.sdk.workflow">
+      <HintPath>..\packages\Microsoft.Xrm.Sdk.Workflow.2011.5.0.18\lib\net40\microsoft.xrm.sdk.workflow.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -64,6 +68,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="CodeActivitiesForTesting\AddActivity.cs" />
+    <Compile Include="CodeActivitiesForTesting\CreateTaskActivity.cs" />
+    <Compile Include="FakeContextTestCodeActivities.cs" />
     <Compile Include="FakeContextTestCreateQuery.cs" />
     <Compile Include="FakeContextTestDelete.cs" />
     <Compile Include="FakeContextTestLinqQueries.cs" />
