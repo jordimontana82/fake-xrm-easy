@@ -53,23 +53,19 @@ namespace FakeXrmEasy.Tests
             var result = fakedContext.ExecuteCodeActivity<CreateTaskActivity>(inputs);
 
             //The wf creates an activity, so make sure it is created
-            var service = fakedContext.GetFakedOrganizationService();
-            using (var context = new XrmServiceContext(service))
-            {
-                var tasks = (from t in context.CreateQuery<Task>()
-                             select t).ToList();
+            var tasks = (from t in fakedContext.CreateQuery<Task>()
+                         select t).ToList();
 
-                //The activity creates a taks
-                Assert.True(tasks.Count == 1);
+            //The activity creates a taks
+            Assert.True(tasks.Count == 1);
 
-                var output = result["taskCreated"] as EntityReference;
+            var output = result["taskCreated"] as EntityReference;
 
-                //Task created contains the account passed as the regarding Id
-                Assert.True(tasks[0].RegardingObjectId != null && tasks[0].RegardingObjectId.Id.Equals(guid1));
+            //Task created contains the account passed as the regarding Id
+            Assert.True(tasks[0].RegardingObjectId != null && tasks[0].RegardingObjectId.Id.Equals(guid1));
 
-                //Same task created is returned
-                Assert.Equal(output.Id, tasks[0].Id);
-            }
+            //Same task created is returned
+            Assert.Equal(output.Id, tasks[0].Id);
         }
     }
 }

@@ -87,9 +87,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="buildNugetPackages.bat" />
     <None Include="build\FakeXrmEasy.1.0.0.nupkg" />
     <None Include="build\FakeXrmEasy.1.2.0.nupkg" />
     <None Include="build\FakeXrmEasy.1.2.1-alpha.nupkg" />
+    <None Include="build\FakeXrmEasy.1.2.4-alpha.nupkg" />
     <None Include="build\FakeXrmEasy.dll.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -124,6 +126,9 @@
   </Choose>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy ..\FakeXrmEasy\bin\Debug\FakeXrmEasy.dll .\build\lib\net40</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

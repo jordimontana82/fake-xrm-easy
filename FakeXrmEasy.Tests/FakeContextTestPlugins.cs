@@ -76,15 +76,11 @@ namespace FakeXrmEasy.Tests
             fakedContext.ExecutePluginWithTarget<FollowupPlugin>(target);
 
             //The plugin creates a followup activity, check that that one exists
-            var service = fakedContext.GetFakedOrganizationService();
-            using (var context = new XrmServiceContext(service))
-            {
-                var tasks = (from t in context.CreateQuery<Task>()
+            var tasks = (from t in fakedContext.CreateQuery<Task>()
                              select t).ToList();
 
-                Assert.True(tasks.Count == 1);
-                Assert.True(tasks[0]["subject"].Equals("Send e-mail to the new customer."));
-            }
+            Assert.True(tasks.Count == 1);
+            Assert.True(tasks[0]["subject"].Equals("Send e-mail to the new customer."));
         }
 
         [Fact]
@@ -105,17 +101,12 @@ namespace FakeXrmEasy.Tests
             fakedContext.ExecutePluginWith<FollowupPlugin>(inputParameters,outputParameters,null,null);
 
             //The plugin creates a followup activity, check that that one exists
-            var service = fakedContext.GetFakedOrganizationService();
-            using (var context = new XrmServiceContext(service))
-            {
-                var tasks = (from t in context.CreateQuery<Task>()
-                             select t).ToList();
+            var tasks = (from t in fakedContext.CreateQuery<Task>()
+                         select t).ToList();
 
-                Assert.True(tasks.Count == 1);
-                Assert.True(tasks[0].Subject.Equals("Send e-mail to the new customer."));
-                Assert.True(tasks[0].RegardingObjectId != null && tasks[0].RegardingObjectId.Id.Equals(guid1));
-
-            }
+            Assert.True(tasks.Count == 1);
+            Assert.True(tasks[0].Subject.Equals("Send e-mail to the new customer."));
+            Assert.True(tasks[0].RegardingObjectId != null && tasks[0].RegardingObjectId.Id.Equals(guid1));
         }
     }
 }

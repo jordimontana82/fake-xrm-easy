@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>FakeXrmEasy</id>
-    <version>1.2.1-alpha</version>
+    <version>1.2.4-alpha</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
@@ -15,6 +15,7 @@
     <dependencies>
       <dependency id="FakeItEasy" version="1.25.1" />
       <dependency id="Microsoft.Xrm.Sdk.2011" version="5.0.18" />
+      <dependency id="Microsoft.Xrm.Sdk.Workflow.2011" version="5.0.18" />
     </dependencies>
   </metadata>
 </package>

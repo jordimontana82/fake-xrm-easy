@@ -36,12 +36,21 @@ namespace FakeXrmEasy
         {
             Type typeParameter = typeof(T);
 
-            if (!Data.ContainsKey((typeParameter.Name.ToLower())))
+            string sLogicalName = "";
+
+            if (typeParameter.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
             {
-                throw new Exception(string.Format("The type {0} was not found", typeParameter.Name));
+                sLogicalName = (typeParameter.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0] as EntityLogicalNameAttribute).LogicalName;
+            }
+            else
+                sLogicalName = typeParameter.Name.ToLower();
+
+            if (!Data.ContainsKey(sLogicalName))
+            {
+                throw new Exception(string.Format("The type {0} was not found", sLogicalName));
             }
 
-            return this.CreateQuery<T>(typeParameter.Name.ToLower());
+            return this.CreateQuery<T>(sLogicalName);
         }
 
         protected IQueryable<T> CreateQuery<T>(string entityLogicalName) where T : Entity
