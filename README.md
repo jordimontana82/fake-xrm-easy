@@ -5,4 +5,6 @@ Utilities to streamline unit testing in Dynamics CRM by faking the IOrganization
 
 This is a work in progress.
 
+For a general overview of the library and samples please refer to [this](https://it-gems.com/fake-xrm-easy.html) link.
+
 
