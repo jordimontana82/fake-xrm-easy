@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>FakeXrmEasy</id>
-    <version>1.2.4-alpha</version>
+    <version>1.2.5-alpha</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>

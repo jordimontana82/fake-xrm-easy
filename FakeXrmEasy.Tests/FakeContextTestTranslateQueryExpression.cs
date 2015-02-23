@@ -423,10 +423,109 @@ namespace FakeXrmEasy.Tests
                 }
             };
 
-            var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe);
+            var service = context.GetFakedOrganizationService();
+            var result = service.Execute(new RetrieveMultipleRequest()
+            {
+                Query = qe
+            }) as RetrieveMultipleResponse;
 
-            Assert.True(result.Count() == 1);
-            var firstContact = result.FirstOrDefault();
+            Assert.True(result.EntityCollection.Entities.Count == 1);
+            var firstContact = result.EntityCollection.Entities.FirstOrDefault();
+            Assert.True(firstContact["fullname"].Equals("Contact 1"));
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_with_simple_equals_condition_expression_returns_right_number_of_results_with_execute_request()
+        {
+            var context = new XrmFakedContext();
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1"; contact1["firstname"] = "First 1";
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "Contact 2"; contact2["firstname"] = "First 2";
+            var contact3 = new Entity("contact") { Id = Guid.NewGuid() }; contact3["fullname"] = "Contact 3"; contact3["firstname"] = "First 3";
+
+            var account = new Entity("account") { Id = Guid.NewGuid() };
+            account["name"] = "Account 1";
+
+            contact1["parentcustomerid"] = account.ToEntityReference(); //Both contacts are related to the same account
+            contact2["parentcustomerid"] = account.ToEntityReference();
+
+            context.Initialize(new List<Entity>() { account, contact1, contact2, contact3 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+            qe.LinkEntities.Add(
+                new LinkEntity()
+                {
+                    LinkFromEntityName = "contact",
+                    LinkToEntityName = "account",
+                    LinkFromAttributeName = "parentcustomerid",
+                    LinkToAttributeName = "accountid",
+                    JoinOperator = JoinOperator.Inner
+                }
+            );
+            qe.ColumnSet = new ColumnSet(true);
+            //Filter criteria
+            qe.Criteria = new FilterExpression()
+            {
+                FilterOperator = LogicalOperator.And,
+                Conditions =
+                {
+                    new ConditionExpression("fullname", ConditionOperator.Equal, "Contact 1")
+                }
+            };
+
+            var service = context.GetFakedOrganizationService();
+            var result = service.Execute(new RetrieveMultipleRequest()
+            {
+                Query = qe
+            }) as RetrieveMultipleResponse;
+
+            Assert.True(result.EntityCollection.Entities.Count == 1);
+            var firstContact = result.EntityCollection.Entities.FirstOrDefault();
+            Assert.True(firstContact["fullname"].Equals("Contact 1"));
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_with_simple_equals_condition_expression_returns_right_number_of_results_with_retrieve_multiple()
+        {
+            var context = new XrmFakedContext();
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1"; contact1["firstname"] = "First 1";
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "Contact 2"; contact2["firstname"] = "First 2";
+            var contact3 = new Entity("contact") { Id = Guid.NewGuid() }; contact3["fullname"] = "Contact 3"; contact3["firstname"] = "First 3";
+
+            var account = new Entity("account") { Id = Guid.NewGuid() };
+            account["name"] = "Account 1";
+
+            contact1["parentcustomerid"] = account.ToEntityReference(); //Both contacts are related to the same account
+            contact2["parentcustomerid"] = account.ToEntityReference();
+
+            context.Initialize(new List<Entity>() { account, contact1, contact2, contact3 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+            qe.LinkEntities.Add(
+                new LinkEntity()
+                {
+                    LinkFromEntityName = "contact",
+                    LinkToEntityName = "account",
+                    LinkFromAttributeName = "parentcustomerid",
+                    LinkToAttributeName = "accountid",
+                    JoinOperator = JoinOperator.Inner
+                }
+            );
+            qe.ColumnSet = new ColumnSet(true);
+            //Filter criteria
+            qe.Criteria = new FilterExpression()
+            {
+                FilterOperator = LogicalOperator.And,
+                Conditions =
+                {
+                    new ConditionExpression("fullname", ConditionOperator.Equal, "Contact 1")
+                }
+            };
+
+            var service = context.GetFakedOrganizationService();
+            var result = service.RetrieveMultiple(qe);
+
+            Assert.True(result.Entities.Count == 1);
+            var firstContact = result.Entities.FirstOrDefault();
             Assert.True(firstContact["fullname"].Equals("Contact 1"));
         }
         #endregion

@@ -79,6 +79,11 @@ namespace FakeXrmEasy
             FakeCreate(context, fakedService);
             FakeUpdate(context, fakedService);
             FakeDelete(context, fakedService);
+            
+            //Fake / Intercept Retrieve Multiple Requests
+            FakeRetrieveMultiple(context, fakedService);
+
+            //Fake / Intercept other requests
             FakeExecute(context, fakedService);
 
             return fakedService;
@@ -123,8 +128,13 @@ namespace FakeXrmEasy
                     {
                         var query = req as QueryExpression;
                         var linqQuery = TranslateQueryExpressionToLinq(context, query as QueryExpression);
-                        var response = new RetrieveMultipleResponse();
-                        response.EntityCollection.Entities.AddRange(linqQuery.ToList());
+                        var response = new RetrieveMultipleResponse
+                        {
+                            Results = new ParameterCollection
+                                 {
+                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
+                                 }
+                        };
                         return response.EntityCollection;
                         
                     }
