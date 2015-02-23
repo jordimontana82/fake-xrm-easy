@@ -132,6 +132,15 @@ namespace FakeXrmEasy
             return query;
         }
 
+        //protected static Expression<Func<object, object, bool>> AreValuesEqual = (object o1, object o2) =>
+        //{
+        //    if (o1 is EntityReference && o2 is Guid)
+        //    {
+        //        return (o1 as EntityReference).Id.Equals((Guid) o2);
+        //    }
+        //    return o1 == o2;
+        //};
+
         protected static Expression TranslateConditionExpression(ConditionExpression c, ParameterExpression entity)
         {
             Expression attributesProperty = Expression.Property(
@@ -150,47 +159,73 @@ namespace FakeXrmEasy
                 Expression.Constant(c.AttributeName, typeof(string))
                 );
 
+
+            Expression getNonBasicValueExpr = getAttributeValueExpr;
+            //Expression getEntityReferenceExpr =
+            //    Expression.Condition(Expression.TypeIs(getAttributeValueExpr, typeof(EntityReference)), 
+            //                        Expression.Convert(
+            //                                        Expression.Call(Expression.TypeAs(getAttributeValueExpr, typeof(EntityReference)), 
+            //                                        typeof(EntityReference).GetMethod("get_Id")),
+            //                                    typeof(Guid)),
+            //                         Expression.Constant(Guid.Empty));
+
+            //Expression getOptionSetValueExpr =
+            //    Expression.Condition(Expression.TypeIs(getAttributeValueExpr, typeof(OptionSetValue)),
+            //                        Expression.Convert(
+            //                                        Expression.Call(Expression.TypeAs(getAttributeValueExpr, typeof(OptionSetValue)),
+            //                                        typeof(OptionSetValue).GetMethod("get_Value")),
+            //                                    typeof(int?)),
+            //                         Expression.Constant(new Nullable<int>()));
+
+            ////Return entityreference value, or optionsetvalue, or basic type
+            //Expression getNonBasicValueExpr =
+            //    Expression.Condition(Expression.NotEqual(getEntityReferenceExpr, Expression.Constant(null)),
+            //                            getEntityReferenceExpr,
+            //                            Expression.Condition(Expression.NotEqual(getOptionSetValueExpr, Expression.Constant(null)),
+            //                                    getOptionSetValueExpr,
+            //                                            getAttributeValueExpr));
+
             switch (c.Operator)
             {
                 case ConditionOperator.Equal:
-                    return TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpression);
+                    return TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.BeginsWith:
                 case ConditionOperator.Like:
                 case ConditionOperator.Contains:
                 case ConditionOperator.EndsWith:
-                    return TranslateConditionExpressionLike(c, getAttributeValueExpr, containsAttributeExpression);
+                    return TranslateConditionExpressionLike(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.NotEqual:
-                    return Expression.Not(TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpression));
+                    return Expression.Not(TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression));
 
                 case ConditionOperator.DoesNotBeginWith:
                 case ConditionOperator.DoesNotEndWith:
                 case ConditionOperator.NotLike:
                 case ConditionOperator.DoesNotContain:
-                    return Expression.Not(TranslateConditionExpressionLike(c, getAttributeValueExpr, containsAttributeExpression));
+                    return Expression.Not(TranslateConditionExpressionLike(c, getNonBasicValueExpr, containsAttributeExpression));
 
                 case ConditionOperator.Null:
-                    return TranslateConditionExpressionNull(c, getAttributeValueExpr, containsAttributeExpression);
+                    return TranslateConditionExpressionNull(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.NotNull:
-                    return Expression.Not(TranslateConditionExpressionNull(c, getAttributeValueExpr, containsAttributeExpression));
+                    return Expression.Not(TranslateConditionExpressionNull(c, getNonBasicValueExpr, containsAttributeExpression));
 
                 case ConditionOperator.GreaterThan:
-                    return TranslateConditionExpressionGreaterThan(c, getAttributeValueExpr, containsAttributeExpression);
+                    return TranslateConditionExpressionGreaterThan(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.GreaterEqual:
                     return Expression.Or(
-                                TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpression),
-                                TranslateConditionExpressionGreaterThan(c, getAttributeValueExpr, containsAttributeExpression));
+                                TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression),
+                                TranslateConditionExpressionGreaterThan(c, getNonBasicValueExpr, containsAttributeExpression));
 
                 case ConditionOperator.LessThan:
-                    return TranslateConditionExpressionLessThan(c, getAttributeValueExpr, containsAttributeExpression);
+                    return TranslateConditionExpressionLessThan(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.LessEqual:
                     return Expression.Or(
-                                TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpression),
-                                TranslateConditionExpressionLessThan(c, getAttributeValueExpr, containsAttributeExpression));
+                                TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression),
+                                TranslateConditionExpressionLessThan(c, getNonBasicValueExpr, containsAttributeExpression));
 
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.Operator.ToString()));
@@ -199,18 +234,56 @@ namespace FakeXrmEasy
             }
         }
 
+        protected static Expression GetAppropiateCastExpressionBasedOnValue(Expression input, object value)
+        {
+            if (value is Guid)
+                return GetAppropiateCastExpressionBasedGuid(input);
+            if (value is int)
+                return GetAppropiateCastExpressionBasedOnInt(input);
+
+            return Expression.Convert(input, value.GetType());  //Try to do a default conversion
+        }
+
+        protected static Expression GetAppropiateCastExpressionBasedGuid(Expression input)
+        {
+            return Expression.Condition(
+                        Expression.TypeIs(input, typeof(EntityReference)),
+                                Expression.Convert(
+                                    Expression.Call(Expression.TypeAs(input, typeof(EntityReference)),
+                                            typeof(EntityReference).GetMethod("get_Id")),
+                                            typeof(Guid)),
+                           Expression.Condition(Expression.TypeIs(input, typeof(Guid)),
+                                        Expression.Convert(input, typeof(Guid)),
+                                        Expression.Constant(Guid.Empty)));
+
+        }
+
+        protected static Expression GetAppropiateCastExpressionBasedOnInt(Expression input)
+        {
+            return Expression.Condition(
+                        Expression.TypeIs(input, typeof(OptionSetValue)), 
+                                            Expression.Convert(
+                                                Expression.Call(Expression.TypeAs(input, typeof(OptionSetValue)),
+                                                        typeof(OptionSetValue).GetMethod("get_Value")),
+                                                        typeof(int)),
+                                                    Expression.Convert(input, typeof(int)));
+        }
         protected static Expression TranslateConditionExpressionEqual(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             foreach (object value in c.Values)
             {
+
                 expOrValues = Expression.Or(expOrValues, Expression.Equal(
-                            Expression.Convert(getAttributeValueExpr, value.GetType()),
+                            GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr,value),
                             Expression.Constant(value)));
+                
+
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
-                            expOrValues);
+                            Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                expOrValues));
         }
 
         protected static Expression TranslateConditionExpressionGreaterThan(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
@@ -220,12 +293,13 @@ namespace FakeXrmEasy
             {
                 expOrValues = Expression.Or(expOrValues,
                         Expression.GreaterThan(
-                            Expression.Convert(getAttributeValueExpr, value.GetType()),
+                            GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr, value),
                             Expression.Constant(value)));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
-                            expOrValues);
+                            Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                expOrValues));
         }
 
         protected static Expression TranslateConditionExpressionLessThan(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
@@ -235,12 +309,13 @@ namespace FakeXrmEasy
             {
                 expOrValues = Expression.Or(expOrValues,
                         Expression.LessThan(
-                            Expression.Convert(getAttributeValueExpr, value.GetType()),
+                            GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr, value),
                             Expression.Constant(value)));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
-                            expOrValues);
+                            Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                expOrValues));
         }
 
         protected static Expression TranslateConditionExpressionNull(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
@@ -300,7 +375,8 @@ namespace FakeXrmEasy
 
             return Expression.AndAlso(
                             containsAttributeExpr,
-                            expOrValues);
+                            Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                expOrValues));
         }
 
         protected static BinaryExpression TranslateMultipleConditionExpressions(List<ConditionExpression> conditions, LogicalOperator op, ParameterExpression entity)

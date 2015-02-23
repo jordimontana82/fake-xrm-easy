@@ -9,7 +9,8 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Xrm.Sdk.Client;
 using Crm;
-using Microsoft.Xrm.Sdk.Messages;  //TypedEntities generated code for testing
+using Microsoft.Xrm.Sdk.Messages;
+using System.Reflection;  //TypedEntities generated code for testing
 
 
 namespace FakeXrmEasy.Tests
@@ -401,6 +402,107 @@ namespace FakeXrmEasy.Tests
                                select c).ToList();
 
                 Assert.True(matches.Count == 3);
+            }
+        }
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_an_entity_reference_in_where_filter_record_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contactId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Account() { Id = accountId },
+                new Contact() { Id = contactId, 
+                                ParentCustomerId = new EntityReference(Account.EntityLogicalName, accountId) },
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.ParentCustomerId.Id == accountId
+                               select c).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_an_entity_reference_with_nulls_in_where_filter_record_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contactId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Account() { Id = accountId },
+                new Contact() { Id = contactId, 
+                                ParentCustomerId = new EntityReference(Account.EntityLogicalName, accountId) },
+                new Contact() { Id = Guid.NewGuid(), 
+                                ParentCustomerId = null }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.ParentCustomerId.Id == accountId
+                               select c).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_an_optionset_in_where_filter_record_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contactId = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = contactId, StatusCode = new OptionSetValue(1) },
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.StatusCode.Value == 1
+                               select c).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_an_optionset_with_nulls_in_where_filter_record_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contactId = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = contactId, StatusCode = new OptionSetValue(1) },
+                new Contact() { Id = Guid.NewGuid(), StatusCode = null },
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.StatusCode.Value == 1
+                               select c).ToList();
+
+                Assert.True(matches.Count == 1);
             }
         }
     }
