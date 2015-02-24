@@ -79,6 +79,48 @@ namespace FakeXrmEasy
             return Data[s].Values.AsQueryable();
         }
 
+        public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet) {
+            
+            var leAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
+            context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName);
+            context.EnsureEntityNameExistsInMetadata(le.LinkToEntityName);
+
+            var inner = context.CreateQuery<Entity>(le.LinkToEntityName);
+
+            switch (le.JoinOperator)
+            {
+                case JoinOperator.Inner:
+                    query = query.Join(inner,
+                                    outerKey => outerKey.KeySelector(le.LinkFromAttributeName),
+                                    innerKey => innerKey.KeySelector(le.LinkToAttributeName),
+                                    (outerEl, innerEl) => outerEl
+                                                            .ProjectAttributes(previousColumnSet)
+                                                            .JoinAttributes(innerEl, le.Columns, leAlias));
+
+                    break;
+                case JoinOperator.LeftOuter:
+                    query = query.GroupJoin(inner,
+                                    outerKey => outerKey.KeySelector(le.LinkFromAttributeName),
+                                    innerKey => innerKey.KeySelector(le.LinkToAttributeName),
+                                    (outerEl, innerElemsCol) => new { outerEl, innerElemsCol })
+                                                .SelectMany(x => x.innerElemsCol.DefaultIfEmpty()
+                                                            , (x, y) => x.outerEl
+                                                                            .ProjectAttributes(previousColumnSet)
+                                                                            .JoinAttributes(y, le.Columns, leAlias));
+
+
+                    break;
+
+            }
+
+            //Process nested linked entities recursively
+            foreach (LinkEntity nestedLinkedEntity in le.LinkEntities)
+            {
+                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, query, le.Columns);
+            }
+            return query;
+        }
+        
         public static IQueryable<Entity> TranslateQueryExpressionToLinq(XrmFakedContext context, QueryExpression qe)
         {
             if (qe == null) return null;
@@ -86,42 +128,13 @@ namespace FakeXrmEasy
             //Start form the root entity and build a LINQ query to execute the query against the In-Memory context:
             context.EnsureEntityNameExistsInMetadata(qe.EntityName);
 
-            var proxyType = context.FindReflectedType(qe.EntityName);
+            //var proxyType = context.FindReflectedType(qe.EntityName);
             var query = context.CreateQuery<Entity>(qe.EntityName);
 
             //Add as many Joins as linked entities
             foreach (LinkEntity le in qe.LinkEntities)
             {
-                var leAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
-                context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName);
-                context.EnsureEntityNameExistsInMetadata(le.LinkToEntityName);
-                var inner = context.Data[le.LinkToEntityName].Values.AsQueryable();
-
-                switch (le.JoinOperator)
-                {
-                    case JoinOperator.Inner:
-                        query = query.Join(inner,
-                                        outerKey => outerKey.KeySelector(le.LinkFromAttributeName),
-                                        innerKey => innerKey.KeySelector(le.LinkToAttributeName),
-                                        (outerEl, innerEl) => outerEl
-                                                                .ProjectAttributes(qe.ColumnSet)
-                                                                .JoinAttributes(innerEl, le.Columns, leAlias));
-
-                        break;
-                    case JoinOperator.LeftOuter:
-                        query = query.GroupJoin(inner,
-                                        outerKey => outerKey.KeySelector(le.LinkFromAttributeName),
-                                        innerKey => innerKey.KeySelector(le.LinkToAttributeName),
-                                        (outerEl, innerElemsCol) => new { outerEl, innerElemsCol })
-                                                    .SelectMany(x => x.innerElemsCol.DefaultIfEmpty()
-                                                                , (x, y) => x.outerEl
-                                                                                .ProjectAttributes(qe.ColumnSet)
-                                                                                .JoinAttributes(y, le.Columns, leAlias));
-
-
-                        break;
-
-                }
+                query = TranslateLinkedEntityToLinq(context, le, query, qe.ColumnSet);
             }
 
             // Compose the expression tree that represents the parameter to the predicate.

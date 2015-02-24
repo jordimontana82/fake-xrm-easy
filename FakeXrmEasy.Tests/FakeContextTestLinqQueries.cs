@@ -555,5 +555,124 @@ namespace FakeXrmEasy.Tests
                 Assert.True(matches.Count == 1);
             }
         }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_an_innerjoin_right_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contactId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Account() { Id = accountId },
+                new Contact() { Id = contactId, 
+                                ParentCustomerId = new EntityReference(Account.EntityLogicalName, accountId) },
+                new Contact() { Id = Guid.NewGuid(), 
+                                ParentCustomerId = null }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               join a in ctx.CreateQuery<Account>() on c.ParentCustomerId.Id equals a.AccountId
+                               select c).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_a_leftjoin_right_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contactId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Account() { Id = accountId },
+                new Contact() { Id = contactId, 
+                                ParentCustomerId = new EntityReference(Account.EntityLogicalName, accountId) },
+                new Contact() { Id = Guid.NewGuid(), 
+                                ParentCustomerId = null }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               join a in ctx.CreateQuery<Account>() on c.ParentCustomerId.Id equals a.AccountId into joined
+                               from contact in joined.DefaultIfEmpty()
+                               select contact).ToList();
+
+                Assert.True(matches.Count == 2);
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_a_leftjoin_with_a_where_expression_right_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contactId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Account() { Id = accountId },
+                new Contact() { Id = contactId, ParentCustomerId = new EntityReference(Account.EntityLogicalName, accountId),
+                                                NumberOfChildren = 2},
+                new Contact() { Id = Guid.NewGuid(), ParentCustomerId = null, NumberOfChildren = 2 },
+                new Contact() { Id = Guid.NewGuid(), ParentCustomerId = null, NumberOfChildren = 3 }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               join a in ctx.CreateQuery<Account>() on c.ParentCustomerId.Id equals a.AccountId into joinedAccounts
+                               from account in joinedAccounts.DefaultIfEmpty()
+                               where c.NumberOfChildren == 2
+                               select c).ToList();
+
+                Assert.True(matches.Count == 2);
+            }
+        }
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_a_2_innerjoins_right_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contactId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+
+            //Contact is related to first account, but because first account is not related to itself then the query must return 0 records
+            fakedContext.Initialize(new List<Entity>() {
+                new Account() { Id = accountId },
+                new Account() { Id = Guid.NewGuid(), ParentAccountId = new EntityReference(Account.EntityLogicalName, accountId) },
+                new Contact() { Id = contactId, ParentCustomerId = new EntityReference(Account.EntityLogicalName, accountId),
+                                                NumberOfChildren = 2}
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               join account in ctx.CreateQuery<Account>() on c.ParentCustomerId.Id equals account.AccountId
+                               join parentAccount in ctx.CreateQuery<Account>() on account.ParentAccountId.Id equals parentAccount.AccountId
+                               select c).ToList();
+
+                Assert.True(matches.Count == 0);
+            }
+        }
     }
 }
