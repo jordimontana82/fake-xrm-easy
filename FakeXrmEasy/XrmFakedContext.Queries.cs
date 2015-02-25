@@ -32,6 +32,12 @@ namespace FakeXrmEasy
             return subClassType;
         }
 
+
+        public IQueryable<Entity> CreateQuery(string entityLogicalName)
+        {
+            return this.CreateQuery<Entity>(entityLogicalName);
+        }
+
         public IQueryable<T> CreateQuery<T>() where T : Entity
         {
             Type typeParameter = typeof(T);
@@ -42,13 +48,6 @@ namespace FakeXrmEasy
             {
                 sLogicalName = (typeParameter.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0] as EntityLogicalNameAttribute).LogicalName;
             }
-            else
-                sLogicalName = typeParameter.Name.ToLower();
-
-            if (!Data.ContainsKey(sLogicalName))
-            {
-                throw new Exception(string.Format("The type {0} was not found", sLogicalName));
-            }
 
             return this.CreateQuery<T>(sLogicalName);
         }
@@ -56,10 +55,20 @@ namespace FakeXrmEasy
         protected IQueryable<T> CreateQuery<T>(string entityLogicalName) where T : Entity
         {
             List<T> lst = new List<T>();
+            var subClassType = FindReflectedType(entityLogicalName);
+            if ((subClassType == null && !(typeof(T).Equals(typeof(Entity))))
+                || (typeof(T).Equals(typeof(Entity)) && string.IsNullOrWhiteSpace(entityLogicalName)))
+            {
+                throw new Exception(string.Format("The type {0} was not found", entityLogicalName));
+            }
+
+            if (!Data.ContainsKey(entityLogicalName))
+            {
+                return lst.AsQueryable<T>(); //Empty list
+            }
+
             foreach (var e in Data[entityLogicalName].Values)
             {
-                var subClassType = FindReflectedType(entityLogicalName);
-
                 if (subClassType != null)
                 {
                     var instance = Activator.CreateInstance(subClassType);
