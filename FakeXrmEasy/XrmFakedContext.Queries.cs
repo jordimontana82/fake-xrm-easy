@@ -12,6 +12,7 @@ using System.Linq.Expressions;
 using FakeXrmEasy.Extensions;
 using System.Reflection;
 using Microsoft.Xrm.Sdk.Client;
+using System.Globalization;
 
 namespace FakeXrmEasy
 {
@@ -255,15 +256,41 @@ namespace FakeXrmEasy
 
             }
         }
+        protected static Expression GetAppropiateTypedValue(object value)
+        {
+            //Basic types conversions
+            //Special case => datetime is sent as a string
+            if (value is string)
+            {
+                DateTime dtDateTimeConversion;
+                if (DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture,DateTimeStyles.AdjustToUniversal, out dtDateTimeConversion))
+                {
+                    return Expression.Constant(dtDateTimeConversion, typeof(DateTime));
+                }
+            }
+            return Expression.Constant(value);
+        }
 
         protected static Expression GetAppropiateCastExpressionBasedOnValue(Expression input, object value)
         {
             if (value is Guid)
-                return GetAppropiateCastExpressionBasedGuid(input);
+                return GetAppropiateCastExpressionBasedGuid(input); //Could be compared against an EntityReference
             if (value is int)
-                return GetAppropiateCastExpressionBasedOnInt(input);
+                return GetAppropiateCastExpressionBasedOnInt(input); //Could be compared against an OptionSet
+            if (value is decimal)
+                return GetAppropiateCastExpressionBasedOnDecimal(input); //Could be compared against a Money
 
-            return Expression.Convert(input, value.GetType());  //Try to do a default conversion
+            //Other basic types conversions
+            //Special case => datetime is sent as a string
+            if (value is string)
+            {
+                DateTime dtDateTimeConversion;
+                if (DateTime.TryParse(value.ToString(), out dtDateTimeConversion))
+                {
+                    return Expression.Convert(input, typeof(DateTime));
+                }
+            }
+            return Expression.Convert(input, value.GetType());  //Default type conversion
         }
 
         protected static Expression GetAppropiateCastExpressionBasedGuid(Expression input)
@@ -277,6 +304,20 @@ namespace FakeXrmEasy
                            Expression.Condition(Expression.TypeIs(input, typeof(Guid)),
                                         Expression.Convert(input, typeof(Guid)),
                                         Expression.Constant(Guid.Empty)));
+
+        }
+
+        protected static Expression GetAppropiateCastExpressionBasedOnDecimal(Expression input)
+        {
+            return Expression.Condition(
+                        Expression.TypeIs(input, typeof(Money)),
+                                Expression.Convert(
+                                    Expression.Call(Expression.TypeAs(input, typeof(Money)),
+                                            typeof(Money).GetMethod("get_Value")),
+                                            typeof(decimal)),
+                           Expression.Condition(Expression.TypeIs(input, typeof(decimal)),
+                                        Expression.Convert(input, typeof(decimal)),
+                                        Expression.Constant(0.0M)));
 
         }
 
@@ -298,7 +339,7 @@ namespace FakeXrmEasy
 
                 expOrValues = Expression.Or(expOrValues, Expression.Equal(
                             GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr,value),
-                            Expression.Constant(value)));
+                            GetAppropiateTypedValue(value)));
                 
 
             }
@@ -316,7 +357,7 @@ namespace FakeXrmEasy
                 expOrValues = Expression.Or(expOrValues,
                         Expression.GreaterThan(
                             GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr, value),
-                            Expression.Constant(value)));
+                            GetAppropiateTypedValue(value)));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
@@ -332,7 +373,7 @@ namespace FakeXrmEasy
                 expOrValues = Expression.Or(expOrValues,
                         Expression.LessThan(
                             GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr, value),
-                            Expression.Constant(value)));
+                            GetAppropiateTypedValue(value)));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
