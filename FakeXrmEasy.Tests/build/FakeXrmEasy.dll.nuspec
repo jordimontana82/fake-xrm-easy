@@ -2,14 +2,15 @@
 <package >
   <metadata>
     <id>FakeXrmEasy</id>
-    <version>1.2.7-alpha</version>
+    <version>1.2.8-alpha</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/jordimontana82/fake-xrm-easy</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Utilities to streamline unit testing in Dynamics CRM by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
-    <releaseNotes>Added support for Nested Linked entities (QueryExpression) and nested inner joins (Linq)</releaseNotes>
+    <releaseNotes>When querying an entity not present in the context that should return no records rather than an exception. Also, added new CreateQuery method for Dynamic entities. &#10;
+   Fixed an 'IntelliSense typo' when evaluating a condition expression and filter expressions at the same node: was using Expression.Add rather than Expression.And :)</releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>xrm dynamics crm unit testing</tags>
     <dependencies>
