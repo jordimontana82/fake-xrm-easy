@@ -73,7 +73,9 @@
     <Compile Include="FakeContextTests\FakeContextTestCodeActivities.cs" />
     <Compile Include="FakeContextTests\FakeContextTestCreateQuery.cs" />
     <Compile Include="FakeContextTests\FakeContextTestDelete.cs" />
-    <Compile Include="FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs" />
+    <Compile Include="FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs" />
     <Compile Include="FakeContextTests\FakeContextTestPlugins.cs" />
     <Compile Include="FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs" />
