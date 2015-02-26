@@ -15,6 +15,10 @@ using System.Reflection;  //TypedEntities generated code for testing
 
 namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
 {
+    /// <summary>
+    /// Test suite to check that all the different CRM types in the SDK are supported:
+    /// https://msdn.microsoft.com/en-us/library/gg328507%28v=crm.6%29.aspx
+    /// </summary>
     public class EqualityWithDifferentDataTypesTests
     {
         [Fact]
@@ -62,6 +66,28 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
         }
 
         [Fact]
+        public void When_executing_a_linq_query_with_equals_between_2_boolean_managed_properties_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid = Guid.NewGuid();
+            fakedContext.Initialize(new List<Entity>() {
+                new Report() { Id = guid, IsCustomizable = new BooleanManagedProperty(true) },
+                new Report() { Id = Guid.NewGuid()}  //To test also nulls
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var contact = (from c in ctx.CreateQuery<Report>()
+                               where c.IsCustomizable.Value == true
+                               select c).ToList();
+
+                Assert.True(contact.Count == 1);
+            }
+        }
+
+        [Fact]
         public void When_executing_a_linq_query_with_equals_between_2_integers_result_is_returned()
         {
             var fakedContext = new XrmFakedContext();
@@ -77,6 +103,30 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
             {
                 var contact = (from c in ctx.CreateQuery<Contact>()
                                where c.NumberOfChildren != null && c.NumberOfChildren.Value == 2
+                               select c).ToList();
+
+                Assert.True(contact.Count == 1);
+            }
+        }
+
+        [Fact]
+        public void When_executing_a_linq_query_with_equals_between_2_longs_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid = Guid.NewGuid();
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid },
+                new Contact() { Id = Guid.NewGuid()}  //To test also nulls
+            });
+
+            fakedContext.Data["contact"][guid]["versionnumber"] = long.MaxValue; //Couldn´t be set by the Proxy types but set here just for testing long data types
+            
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var contact = (from c in ctx.CreateQuery<Contact>()
+                               where c.VersionNumber == long.MaxValue
                                select c).ToList();
 
                 Assert.True(contact.Count == 1);
@@ -216,6 +266,29 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
         }
 
         [Fact]
+        public void When_executing_a_linq_query_with_equals_between_2_guids_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var productId = Guid.NewGuid();
+            var salesOrderDetailId = Guid.NewGuid();
+            fakedContext.Initialize(new List<Entity>() {
+                new SalesOrderDetail() { Id = salesOrderDetailId, ProductId = new EntityReference(Product.EntityLogicalName, productId) },
+                new SalesOrderDetail() { Id = Guid.NewGuid()}  //To test also nulls
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var contact = (from s in ctx.CreateQuery<SalesOrderDetail>()
+                               where s.SalesOrderDetailId == salesOrderDetailId
+                               select s).ToList();
+
+                Assert.True(contact.Count == 1);
+            }
+        }
+
+        [Fact]
         public void When_executing_a_linq_query_with_equals_between_2_optionsets_result_is_returned()
         {
             var fakedContext = new XrmFakedContext();
@@ -234,6 +307,41 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                                select a).ToList();
 
                 Assert.True(contact.Count == 1);
+            }
+        }
+
+        [Fact]
+        public void When_executing_a_linq_query_with_equals_between_2_activityparties_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var contactId = Guid.NewGuid();
+            var activityId = Guid.NewGuid();
+            
+            var partyRecord = new ActivityParty()
+            {
+                Id = Guid.NewGuid(),
+                ActivityId = new EntityReference(Email.EntityLogicalName, activityId),
+                PartyId = new EntityReference(Contact.EntityLogicalName, contactId)
+            };
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Email() { Id = activityId, Subject = "Test email"},
+                new ActivityPointer () { Id = Guid.NewGuid(), ActivityId = activityId },
+                partyRecord,    
+                new ActivityPointer() { Id = Guid.NewGuid()},  //To test also nulls
+                new ActivityParty() { Id = Guid.NewGuid()}  //To test also nulls
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var activities = (from pointer in ctx.CreateQuery<ActivityPointer>() 
+                                join party in ctx.CreateQuery<ActivityParty>() on pointer.ActivityId equals party.ActivityId.Id
+                                where party.PartyId.Id == contactId
+                                select pointer).ToList();
+
+                Assert.True(activities.Count == 1);
             }
         }
 

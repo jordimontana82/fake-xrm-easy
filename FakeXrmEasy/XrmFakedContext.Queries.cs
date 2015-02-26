@@ -279,6 +279,8 @@ namespace FakeXrmEasy
                 return GetAppropiateCastExpressionBasedOnInt(input); //Could be compared against an OptionSet
             if (value is decimal)
                 return GetAppropiateCastExpressionBasedOnDecimal(input); //Could be compared against a Money
+            if (value is bool)
+                return GetAppropiateCastExpressionBasedOnBoolean(input); //Could be a BooleanManagedProperty
 
             //Other basic types conversions
             //Special case => datetime is sent as a string
@@ -318,6 +320,20 @@ namespace FakeXrmEasy
                            Expression.Condition(Expression.TypeIs(input, typeof(decimal)),
                                         Expression.Convert(input, typeof(decimal)),
                                         Expression.Constant(0.0M)));
+
+        }
+
+        protected static Expression GetAppropiateCastExpressionBasedOnBoolean(Expression input)
+        {
+            return Expression.Condition(
+                        Expression.TypeIs(input, typeof(BooleanManagedProperty)),
+                                Expression.Convert(
+                                    Expression.Call(Expression.TypeAs(input, typeof(BooleanManagedProperty)),
+                                            typeof(BooleanManagedProperty).GetMethod("get_Value")),
+                                            typeof(bool)),
+                           Expression.Condition(Expression.TypeIs(input, typeof(bool)),
+                                        Expression.Convert(input, typeof(bool)),
+                                        Expression.Constant(false)));
 
         }
 
