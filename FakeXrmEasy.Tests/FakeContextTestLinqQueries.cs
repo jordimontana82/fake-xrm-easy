@@ -674,5 +674,98 @@ namespace FakeXrmEasy.Tests
                 Assert.True(matches.Count == 0);
             }
         }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_a_an_and_filter_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var taskId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+
+            //Contact is related to first account, but because first account is not related to itself then the query must return 0 records
+            fakedContext.Initialize(new List<Entity>() {
+                new Task() { Id = taskId, StatusCode = new OptionSetValue(2) }, //Completed
+                new Task() { Id = Guid.NewGuid() }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from t in ctx.CreateQuery<Task>()
+                               where t.StatusCode != null && t.StatusCode.Value == 2
+                               select t).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_2_and_filters_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var taskId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+            var euroId = Guid.NewGuid();
+
+            //Contact is related to first account, but because first account is not related to itself then the query must return 0 records
+            fakedContext.Initialize(new List<Entity>() {
+                new Task() { Id = taskId, StatusCode = new OptionSetValue(1), 
+                                          TransactionCurrencyId = new EntityReference(TransactionCurrency.EntityLogicalName, euroId) }, 
+                new Task() { Id = Guid.NewGuid()  }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from t in ctx.CreateQuery<Task>()
+                               where t.StatusCode != null && t.StatusCode.Value == 1
+                               where t.TransactionCurrencyId != null && t.TransactionCurrencyId.Id == euroId
+                               select t).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_that_produces_a_filter_expression_plus_condition_expression_at_same_level_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var taskId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+            var euroId = Guid.NewGuid();
+
+            //Contact is related to first account, but because first account is not related to itself then the query must return 0 records
+            fakedContext.Initialize(new List<Entity>() {
+                new Task() { Id = taskId, StatusCode = new OptionSetValue(1), 
+                                          TransactionCurrencyId = new EntityReference(TransactionCurrency.EntityLogicalName, euroId) }, 
+                new Task() { Id = Guid.NewGuid(), StatusCode = new OptionSetValue(2), 
+                                          TransactionCurrencyId = new EntityReference(TransactionCurrency.EntityLogicalName, euroId) }, 
+                
+                new Task() { Id = Guid.NewGuid()  }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from t in ctx.CreateQuery<Task>()
+                               where t.StatusCode != null && (
+                                            t.StatusCode.Value == 1 || t.StatusCode.Value == 2)
+                                        //StatusCode != null is converted into a ConditionExpression plus
+                                        //t.StatusCode.Value == 1 || t.StatusCode.Value == 2 is converted into a FilterExpression
+                               where t.TransactionCurrencyId != null && t.TransactionCurrencyId.Id == euroId
+                                        //Second where is converted as FilterExpression, but without a sibling condition
+                               select t).ToList();
+
+                Assert.True(matches.Count == 2);
+            }
+        }
     }
 }

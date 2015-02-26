@@ -469,7 +469,7 @@ namespace FakeXrmEasy
                 //Satisfy both
                 if (fe.FilterOperator == LogicalOperator.And)
                 {
-                    return Expression.Add(conditionsLambda, filtersLambda);
+                    return Expression.And(conditionsLambda, filtersLambda);
                 }
                 else
                 {
