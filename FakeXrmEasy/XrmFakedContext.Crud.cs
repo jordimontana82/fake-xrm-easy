@@ -229,6 +229,23 @@ namespace FakeXrmEasy
             {
                 Data[e.LogicalName].Add(e.Id, e);
             }
+
+            //Update metadata for that entity
+            if (!AttributeMetadata.ContainsKey(e.LogicalName))
+                AttributeMetadata.Add(e.LogicalName, new Dictionary<string, string>());
+
+            //Update attribute metadata
+            foreach (var attKey in e.Attributes.Keys)
+            {
+                if (!AttributeMetadata[e.LogicalName].ContainsKey(attKey))
+                    AttributeMetadata[e.LogicalName].Add(attKey, attKey);
+            }
+        }
+
+        protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
+        {
+            return AttributeMetadata.ContainsKey(sEntityName) &&
+                    AttributeMetadata[sEntityName].ContainsKey(sAttributeName);
         }
 #endregion
 

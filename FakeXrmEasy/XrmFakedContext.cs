@@ -23,12 +23,15 @@ namespace FakeXrmEasy
     /// </summary>
     public partial class XrmFakedContext: IXrmFakedContext
     {
+        protected Dictionary<string, Dictionary<string, string>> AttributeMetadata { get; set; }
+
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
 
         public Assembly ProxyTypesAssembly { get; set; }
  
         public XrmFakedContext()
         {
+            AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
         }
 

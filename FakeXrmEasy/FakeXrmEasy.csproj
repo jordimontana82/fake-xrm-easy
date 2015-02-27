@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\EntityExtensions.cs" />
+    <Compile Include="OrganizationFaults\OrganizationServiceFaultQueryBuilderNoAttribute.cs" />
     <Compile Include="XrmFakedContext.CodeActivities.cs" />
     <Compile Include="XrmFakedContext.Crud.cs" />
     <Compile Include="XrmFakedContext.cs" />
