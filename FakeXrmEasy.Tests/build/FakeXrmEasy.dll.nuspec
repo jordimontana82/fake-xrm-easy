@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>FakeXrmEasy</id>
-    <version>1.2.10-alpha</version>
+    <version>1.2.11-alpha</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
-    <projectUrl>https://github.com/jordimontana82/fake-xrm-easy</projectUrl>
+    <projectUrl>https://it-gems.com/fake-xrm-easy.html</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Utilities to streamline unit testing in Dynamics CRM by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
-    <releaseNotes>Added support for remaining data types based on: https://msdn.microsoft.com/en-us/library/gg328507%28v=crm.6%29.aspx </releaseNotes>
+    <releaseNotes>When joining attributes, now an exception will be thrown if the attributes in the columnset don´t exist in the entity metadata attributes. Fixed issue with columnset at the QueryExpression level: was not returning the selected set of attributes but all of them.</releaseNotes>
      <copyright>Copyright 2015</copyright>
     <tags>xrm dynamics crm unit testing</tags>
     <dependencies>
