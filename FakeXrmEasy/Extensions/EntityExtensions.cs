@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using FakeXrmEasy.OrganizationFaults;
 
 namespace FakeXrmEasy.Extensions
 {
@@ -32,7 +33,7 @@ namespace FakeXrmEasy.Extensions
         /// <param name="columnSet"></param>
         /// <param name="alias"></param>
         /// <returns></returns>
-        public static Entity ProjectAttributes(this Entity e, ColumnSet columnSet)
+        public static Entity ProjectAttributes(this Entity e, ColumnSet columnSet, XrmFakedContext context)
         {
             if (columnSet == null) return e;
 
@@ -47,7 +48,22 @@ namespace FakeXrmEasy.Extensions
 
                 foreach (var attKey in columnSet.Columns)
                 {
-                    if(e.Attributes.ContainsKey(attKey))
+                    if (e.Attributes.ContainsKey(attKey))
+                        projected[attKey] = e[attKey];
+                    else
+                    {
+                        //Check if attribute really exists in metadata
+                        if (!context.AttributeExistsInMetadata(e.LogicalName, attKey))
+                        {
+                            OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
+                        }
+                    }
+                }
+
+                //Plus the aliased attributes, if any
+                foreach (var attKey in e.Attributes.Keys)
+                {
+                    if(e[attKey] is AliasedValue && !projected.Attributes.ContainsKey(attKey))
                         projected[attKey] = e[attKey];
                 }
                 return projected;
@@ -77,6 +93,10 @@ namespace FakeXrmEasy.Extensions
                 //Return selected list of attributes
                 foreach (var attKey in columnSet.Columns)
                 {
+                    if (!otherEntity.Attributes.ContainsKey(attKey))
+                    {
+                        OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
+                    }
                     e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
                 }
             }
@@ -98,6 +118,10 @@ namespace FakeXrmEasy.Extensions
                     //Return selected list of attributes
                     foreach (var attKey in columnSet.Columns)
                     {
+                        if (!otherEntity.Attributes.ContainsKey(attKey))
+                        {
+                            OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
+                        }
                         e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
                     }
                 }

@@ -104,7 +104,7 @@ namespace FakeXrmEasy
                                     outerKey => outerKey.KeySelector(le.LinkFromAttributeName),
                                     innerKey => innerKey.KeySelector(le.LinkToAttributeName),
                                     (outerEl, innerEl) => outerEl
-                                                            .ProjectAttributes(previousColumnSet)
+                                                            .ProjectAttributes(previousColumnSet, context)
                                                             .JoinAttributes(innerEl, le.Columns, leAlias));
 
                     break;
@@ -115,7 +115,7 @@ namespace FakeXrmEasy
                                     (outerEl, innerElemsCol) => new { outerEl, innerElemsCol })
                                                 .SelectMany(x => x.innerElemsCol.DefaultIfEmpty()
                                                             , (x, y) => x.outerEl
-                                                                            .ProjectAttributes(previousColumnSet)
+                                                                            .ProjectAttributes(previousColumnSet, context)
                                                                             .JoinAttributes(y, le.Columns, leAlias));
 
 
@@ -146,6 +146,11 @@ namespace FakeXrmEasy
             {
                 query = TranslateLinkedEntityToLinq(context, le, query, qe.ColumnSet);
             }
+
+
+            //Project the attributes in the root column set
+            if(qe.ColumnSet != null && !qe.ColumnSet.AllColumns)
+                query = query.Select(x => x.ProjectAttributes(qe.ColumnSet, context));
 
             // Compose the expression tree that represents the parameter to the predicate.
             ParameterExpression entity = Expression.Parameter(typeof(Entity));

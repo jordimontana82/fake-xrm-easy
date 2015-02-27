@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using FakeItEasy;
 using FakeXrmEasy;
+using FakeXrmEasy.OrganizationFaults;
 using Xunit;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Xrm.Sdk.Client;
 using Crm;
-using Microsoft.Xrm.Sdk.Messages;  //TypedEntities generated code for testing
+using Microsoft.Xrm.Sdk.Messages;
+using System.ServiceModel;  //TypedEntities generated code for testing
 
 namespace FakeXrmEasy.Tests
 {
@@ -211,6 +213,64 @@ namespace FakeXrmEasy.Tests
 
             Assert.False(firstContact.Attributes.ContainsKey("firstname"));
             Assert.False(lastContact.Attributes.ContainsKey("firstname"));
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_with_an_attribute_in_columnset_that_doesnt_exists_descriptive_exception_is_thrown()
+        {
+            var context = new XrmFakedContext();
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1"; contact1["firstname"] = "First 1";
+
+            var account = new Entity("account") { Id = Guid.NewGuid() };
+            account["name"] = "Account 1";
+
+            contact1["parentcustomerid"] = account.ToEntityReference(); //Both contacts are related to the same account
+
+            context.Initialize(new List<Entity>() { account, contact1 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+
+            //We only select fullname and parentcustomerid, firstname should not be included
+            qe.ColumnSet = new ColumnSet(new string[] { "this attribute doesnt exists!" });
+
+            var exception = Assert.Throws<FaultException<OrganizationServiceFault>>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
+            Assert.Equal(exception.Detail.ErrorCode, OrganizationServiceFaultQueryBuilderNoAttributeException.ErrorCode);
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_with_an_attribute_in_columnset_in_a_linked_entity_that_doesnt_exists_descriptive_exception_is_thrown()
+        {
+            var context = new XrmFakedContext();
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1"; contact1["firstname"] = "First 1";
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "Contact 2"; contact2["firstname"] = "First 2";
+            var contact3 = new Entity("contact") { Id = Guid.NewGuid() }; contact3["fullname"] = "Contact 3"; contact3["firstname"] = "First 3";
+
+            var account = new Entity("account") { Id = Guid.NewGuid() };
+            account["name"] = "Account 1";
+
+            contact1["parentcustomerid"] = account.ToEntityReference(); //Both contacts are related to the same account
+            contact2["parentcustomerid"] = account.ToEntityReference();
+
+            context.Initialize(new List<Entity>() { account, contact1, contact2, contact3 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+            qe.LinkEntities.Add(
+                new LinkEntity()
+                {
+                    LinkFromEntityName = "contact",
+                    LinkToEntityName = "account",
+                    LinkFromAttributeName = "parentcustomerid",
+                    LinkToAttributeName = "accountid",
+                    JoinOperator = JoinOperator.Inner,
+                    Columns = new ColumnSet(new string[] { "this attribute does not exists" })
+                }
+            );
+
+            //We only select fullname and parentcustomerid, firstname should not be included
+            qe.ColumnSet = new ColumnSet(new string[] { "this attribute doesnt exists!" });
+
+            var exception = Assert.Throws<FaultException<OrganizationServiceFault>>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
+            Assert.Equal(exception.Detail.ErrorCode, OrganizationServiceFaultQueryBuilderNoAttributeException.ErrorCode); 
         }
 
         [Fact]
