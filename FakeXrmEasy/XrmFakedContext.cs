@@ -70,10 +70,10 @@ namespace FakeXrmEasy
         /// <returns></returns>
         protected IOrganizationService GetFakedOrganizationService(XrmFakedContext context)
         {
-            if (context == null)
-            {
-                throw new InvalidOperationException("The faked context must not be null.");
-            }
+            //if (context == null) //Impossible to reproduce as this method is protected and called from an instance
+            //{
+            //    throw new InvalidOperationException("The faked context must not be null.");
+            //}
 
             var fakedService = A.Fake<IOrganizationService>();
 
