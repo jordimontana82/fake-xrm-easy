@@ -197,10 +197,11 @@ namespace FakeXrmEasy
 
                 case ConditionOperator.BeginsWith:
                 case ConditionOperator.Like:
-                case ConditionOperator.Contains:
                     return TranslateConditionExpressionLike(c, getNonBasicValueExpr, containsAttributeExpression);
                 case ConditionOperator.EndsWith:
                     return TranslateConditionExpressionEndsWith(c, getNonBasicValueExpr, containsAttributeExpression);
+                case ConditionOperator.Contains:
+                    return TranslateConditionExpressionContains(c, getNonBasicValueExpr, containsAttributeExpression);
                 
                 case ConditionOperator.NotEqual:
                     return Expression.Not(TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression));
@@ -429,22 +430,10 @@ namespace FakeXrmEasy
 
         protected static Expression TranslateConditionExpressionContains(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
-            BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
-            Expression convertedValueToStr = Expression.Convert(getAttributeValueExpr, typeof(string));
-
-            foreach (object value in c.Values)
-            {
-                expOrValues = Expression.Or(expOrValues, Expression.Call(
-                    convertedValueToStr,
-                    typeof(string).GetMethod("Contains", new Type[] { typeof(string) }),
-                    Expression.Constant(value.ToString())
-                ));
-            }
-
-            return Expression.AndAlso(
-                            containsAttributeExpr,
-                            Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
-                                expOrValues));
+            //Append a ´%´at the end of each condition value
+            var computedCondition = new ConditionExpression(c.AttributeName, c.Operator, c.Values.Select(x => "%" + x.ToString() + "%").ToList());
+            return TranslateConditionExpressionLike(computedCondition, getAttributeValueExpr, containsAttributeExpr);
+        
         }
 
         protected static BinaryExpression TranslateMultipleConditionExpressions(List<ConditionExpression> conditions, LogicalOperator op, ParameterExpression entity)
