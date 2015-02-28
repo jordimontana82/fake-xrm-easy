@@ -189,29 +189,6 @@ namespace FakeXrmEasy
 
 
             Expression getNonBasicValueExpr = getAttributeValueExpr;
-            //Expression getEntityReferenceExpr =
-            //    Expression.Condition(Expression.TypeIs(getAttributeValueExpr, typeof(EntityReference)), 
-            //                        Expression.Convert(
-            //                                        Expression.Call(Expression.TypeAs(getAttributeValueExpr, typeof(EntityReference)), 
-            //                                        typeof(EntityReference).GetMethod("get_Id")),
-            //                                    typeof(Guid)),
-            //                         Expression.Constant(Guid.Empty));
-
-            //Expression getOptionSetValueExpr =
-            //    Expression.Condition(Expression.TypeIs(getAttributeValueExpr, typeof(OptionSetValue)),
-            //                        Expression.Convert(
-            //                                        Expression.Call(Expression.TypeAs(getAttributeValueExpr, typeof(OptionSetValue)),
-            //                                        typeof(OptionSetValue).GetMethod("get_Value")),
-            //                                    typeof(int?)),
-            //                         Expression.Constant(new Nullable<int>()));
-
-            ////Return entityreference value, or optionsetvalue, or basic type
-            //Expression getNonBasicValueExpr =
-            //    Expression.Condition(Expression.NotEqual(getEntityReferenceExpr, Expression.Constant(null)),
-            //                            getEntityReferenceExpr,
-            //                            Expression.Condition(Expression.NotEqual(getOptionSetValueExpr, Expression.Constant(null)),
-            //                                    getOptionSetValueExpr,
-            //                                            getAttributeValueExpr));
 
             switch (c.Operator)
             {
@@ -221,9 +198,10 @@ namespace FakeXrmEasy
                 case ConditionOperator.BeginsWith:
                 case ConditionOperator.Like:
                 case ConditionOperator.Contains:
-                case ConditionOperator.EndsWith:
                     return TranslateConditionExpressionLike(c, getNonBasicValueExpr, containsAttributeExpression);
-
+                case ConditionOperator.EndsWith:
+                    return TranslateConditionExpressionEndsWith(c, getNonBasicValueExpr, containsAttributeExpression);
+                
                 case ConditionOperator.NotEqual:
                     return Expression.Not(TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression));
 
@@ -414,6 +392,12 @@ namespace FakeXrmEasy
                                     Expression.Constant(true)));   //Or attribute is not defined (null)
         }
 
+        protected static Expression TranslateConditionExpressionEndsWith(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            //Append a ´%´at the end of each condition value
+            var computedCondition = new ConditionExpression(c.AttributeName, c.Operator, c.Values.Select(x => "%" + x.ToString()).ToList() );
+            return TranslateConditionExpressionLike(computedCondition, getAttributeValueExpr, containsAttributeExpr);
+        }
         protected static Expression TranslateConditionExpressionLike(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));

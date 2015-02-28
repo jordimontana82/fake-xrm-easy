@@ -78,11 +78,13 @@
     </Compile>
     <Compile Include="FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs" />
     <Compile Include="FakeContextTests\FakeContextTestPlugins.cs" />
+    <Compile Include="FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs" />
     <Compile Include="FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs" />
     <Compile Include="FakeContextTests\FakeContextTestUpdate.cs" />
     <Compile Include="FakeContextTests\FakeContextTestCreate.cs" />
     <Compile Include="FakeContextTests\FakeContextTestRetrieve.cs" />
     <Compile Include="FakeContextTests\FakeContextTests.cs" />
+    <Compile Include="FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs" />
     <Compile Include="GeneratedCode.cs" />
     <Compile Include="PluginsForTesting\AccountNumberPlugin.cs" />
     <Compile Include="PluginsForTesting\FollowupPlugin.cs" />
