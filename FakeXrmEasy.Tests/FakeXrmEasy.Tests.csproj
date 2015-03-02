@@ -73,6 +73,7 @@
     <Compile Include="FakeContextTests\FakeContextTestCodeActivities.cs" />
     <Compile Include="FakeContextTests\FakeContextTestCreateQuery.cs" />
     <Compile Include="FakeContextTests\FakeContextTestDelete.cs" />
+    <Compile Include="FakeContextTests\FakeTracingServiceTests.cs" />
     <Compile Include="FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs">
       <SubType>Code</SubType>
     </Compile>
