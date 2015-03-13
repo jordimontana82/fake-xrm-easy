@@ -73,6 +73,39 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_doing_a_crm_linq_query_and_proxy_types_and_a_selected_attribute_returned_projected_entity_is_thesubclass()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid1 = Guid.NewGuid();
+            var guid2 = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid1, FirstName = "Jordi" },
+                new Contact() { Id = guid2, FirstName = "Other" }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.FirstName.Equals("Jordi")
+                               select new
+                               {
+                                   FirstName = c.FirstName,
+                                   CrmRecord = c
+                               }).ToList();
+
+                Assert.True(matches.Count == 1);
+                Assert.True(matches[0].FirstName.Equals("Jordi"));
+                Assert.IsAssignableFrom(typeof(Contact), matches[0].CrmRecord);
+                Assert.True(matches[0].CrmRecord.GetType() == typeof(Contact));
+               
+            }
+
+        }
+
+        [Fact]
         public void When_doing_a_crm_linq_query_with_an_equals_operator_and_nulls_record_is_returned()
         {
             var fakedContext = new XrmFakedContext();

@@ -138,8 +138,13 @@ namespace FakeXrmEasy
             //Start form the root entity and build a LINQ query to execute the query against the In-Memory context:
             context.EnsureEntityNameExistsInMetadata(qe.EntityName);
 
+            IQueryable<Entity> query = null;
+
             //var proxyType = context.FindReflectedType(qe.EntityName);
-            var query = context.CreateQuery<Entity>(qe.EntityName);
+            //if(proxyType != null)
+            //    query = context.CreateQuery<proxyType.GetType()>(qe.EntityName);
+            //else 
+            query = context.CreateQuery<Entity>(qe.EntityName);
 
             //Add as many Joins as linked entities
             foreach (LinkEntity le in qe.LinkEntities)

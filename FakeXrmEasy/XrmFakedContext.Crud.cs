@@ -235,10 +235,32 @@ namespace FakeXrmEasy
                 AttributeMetadata.Add(e.LogicalName, new Dictionary<string, string>());
 
             //Update attribute metadata
-            foreach (var attKey in e.Attributes.Keys)
+            if (ProxyTypesAssembly != null)
             {
-                if (!AttributeMetadata[e.LogicalName].ContainsKey(attKey))
-                    AttributeMetadata[e.LogicalName].Add(attKey, attKey);
+                //If the context is using a proxy types assembly then we can just guess the metadata from the generated attributes
+                var type = FindReflectedType(e.LogicalName);
+                if (type != null)
+                {
+                    var props = type.GetProperties();
+                    foreach (var p in props)
+                    {
+                        if (!AttributeMetadata[e.LogicalName].ContainsKey(p.Name))
+                            AttributeMetadata[e.LogicalName].Add(p.Name, p.Name);
+                    }
+                }
+                else 
+                    throw new Exception(string.Format("Couldnt find reflected type for {0}", e.LogicalName));
+                    
+            }
+            else
+            {
+                //If dynamic entities are being used, then the only way of guessing if a property exists is just by checking
+                //if the entity has the attribute in the dictionary
+                foreach (var attKey in e.Attributes.Keys)
+                {
+                    if (!AttributeMetadata[e.LogicalName].ContainsKey(attKey))
+                        AttributeMetadata[e.LogicalName].Add(attKey, attKey);
+                }
             }
         }
 

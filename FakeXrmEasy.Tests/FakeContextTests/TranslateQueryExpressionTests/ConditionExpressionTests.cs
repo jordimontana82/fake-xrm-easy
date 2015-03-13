@@ -111,5 +111,47 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             Assert.True(result.Count() == 2);
         }
+
+        [Fact]
+        public void When_executing_a_query_expression_with_null_operator_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "1 Contact";
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = null;
+            var contact3 = new Entity("contact") { Id = Guid.NewGuid() };
+
+            context.Initialize(new List<Entity>() { contact1, contact2, contact3 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+            qe.ColumnSet = new ColumnSet(true);
+            qe.Criteria = new FilterExpression(LogicalOperator.And);
+            var condition = new ConditionExpression("fullname", ConditionOperator.Null);
+            qe.Criteria.AddCondition(condition);
+
+            var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
+
+            Assert.True(result.Count() == 2);
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_with_a_not_null_operator_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "1 Contact";
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = null;
+            var contact3 = new Entity("contact") { Id = Guid.NewGuid() };
+
+            context.Initialize(new List<Entity>() { contact1, contact2, contact3 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+            qe.ColumnSet = new ColumnSet(true);
+            qe.Criteria = new FilterExpression(LogicalOperator.And);
+            var condition = new ConditionExpression("fullname", ConditionOperator.NotNull);
+            qe.Criteria.AddCondition(condition);
+
+            var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
+
+            Assert.True(result.Count() == 1);
+        }
     }
 }
