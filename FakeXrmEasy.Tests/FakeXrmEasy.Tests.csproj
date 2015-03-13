@@ -79,6 +79,7 @@
     </Compile>
     <Compile Include="FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs" />
     <Compile Include="FakeContextTests\FakeContextTestPlugins.cs" />
+    <Compile Include="FakeContextTests\LinqTests\MetadataInferenceTests.cs" />
     <Compile Include="FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs" />
     <Compile Include="FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs" />
     <Compile Include="FakeContextTests\FakeContextTestUpdate.cs" />

@@ -190,8 +190,18 @@ namespace FakeXrmEasy
         #region Other protected methods
         protected void EnsureEntityNameExistsInMetadata(string sEntityName)
         {
-            if (!Data.ContainsKey(sEntityName))
+            //Entity metadata is checked differently when we are using a ProxyTypesAssembly => we can infer that from the generated types assembly
+            if (ProxyTypesAssembly != null)
             {
+                var subClassType = FindReflectedType(sEntityName);
+                if (subClassType == null)
+                {
+                    throw new Exception(string.Format("Entity {0} does not exist in the metadata cache", sEntityName));
+                }
+            }
+            else if (!Data.ContainsKey(sEntityName))
+            {
+                //No Proxy Types Assembly
                 throw new Exception(string.Format("Entity {0} does not exist in the metadata cache", sEntityName));
             };
         }
