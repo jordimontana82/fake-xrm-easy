@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("FakeXrmEasy")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("https://it-gems.com/fake-xrm-easy.html")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("FakeXrmEasy")]
@@ -33,6 +33,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-//[assembly: AssemblyVersion("1.2.4.0")]
-//[assembly: AssemblyFileVersion("1.2.4.0")]
-[assembly: AssemblyInformationalVersion("1.2.11-alpha")]
+//[assembly: AssemblyVersion("1.2.12.0")]
+//[assembly: AssemblyFileVersion("1.2.12.0")]
+[assembly: AssemblyInformationalVersion("1.2.12-alpha")]

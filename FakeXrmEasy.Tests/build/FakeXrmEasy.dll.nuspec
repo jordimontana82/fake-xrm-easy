@@ -1,21 +1,34 @@
 <?xml version="1.0"?>
-<package >
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>FakeXrmEasy</id>
-    <version>1.2.11-alpha</version>
+    <version>1.2.12-alpha</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
     <projectUrl>https://it-gems.com/fake-xrm-easy.html</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Utilities to streamline unit testing in Dynamics CRM by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
-    <releaseNotes>When joining attributes, now an exception will be thrown if the attributes in the columnset don´t exist in the entity metadata attributes. Fixed issue with columnset at the QueryExpression level: was not returning the selected set of attributes but all of them.</releaseNotes>
-     <copyright>Copyright 2015</copyright>
+    <releaseNotes>This version resolves important issues:
+    
+    - OrganizationServiceFaultQueryBuilderNoAttributeException must specify a fault reason
+    - When attributes were selected, the ProjectAttributes extension method was returning a new instance of the base class Microsoft.Xrm.Sdk.Entity rather than the appropiate subclass (must be the typed entity when a ProxyTypesAssembly is used in the context).
+    - When doing a projection (Select), that must be applied AFTER the Where clause
+    - Infer the existence of a typed entity from the proxy types assembly
+    - Also, added framework assemblies dependencies
+    
+    For more details please refer to https://github.com/jordimontana82/fake-xrm-easy/pull/2 
+    </releaseNotes>
+    <copyright>Copyright 2015</copyright>
     <tags>xrm dynamics crm unit testing</tags>
     <dependencies>
       <dependency id="FakeItEasy" version="1.25.1" />
       <dependency id="Microsoft.Xrm.Sdk.2011" version="5.0.18" />
       <dependency id="Microsoft.Xrm.Sdk.Workflow.2011" version="5.0.18" />
     </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Activities" targetFramework="net40" />
+      <frameworkAssembly assemblyName="System.Runtime.Serialization" targetFramework="net40" />
+    </frameworkAssemblies>
   </metadata>
 </package>
