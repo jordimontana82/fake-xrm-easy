@@ -20,7 +20,8 @@ namespace FakeXrmEasy.OrganizationFaults
                 {
                     ErrorCode = ErrorCode,
                     Message = string.Format("The attribute {0} does not exist on this entity.", sMissingAttributeName)
-                });
+                },
+                new FaultReason(string.Format("The attribute {0} does not exist on this entity.", sMissingAttributeName)));
         }
     }
 }

@@ -138,8 +138,13 @@ namespace FakeXrmEasy
             //Start form the root entity and build a LINQ query to execute the query against the In-Memory context:
             context.EnsureEntityNameExistsInMetadata(qe.EntityName);
 
+            IQueryable<Entity> query = null;
+
             //var proxyType = context.FindReflectedType(qe.EntityName);
-            var query = context.CreateQuery<Entity>(qe.EntityName);
+            //if(proxyType != null)
+            //    query = context.CreateQuery<proxyType.GetType()>(qe.EntityName);
+            //else 
+            query = context.CreateQuery<Entity>(qe.EntityName);
 
             //Add as many Joins as linked entities
             foreach (LinkEntity le in qe.LinkEntities)
@@ -147,16 +152,17 @@ namespace FakeXrmEasy
                 query = TranslateLinkedEntityToLinq(context, le, query, qe.ColumnSet);
             }
 
-
-            //Project the attributes in the root column set
-            if(qe.ColumnSet != null && !qe.ColumnSet.AllColumns)
-                query = query.Select(x => x.ProjectAttributes(qe.ColumnSet, context));
-
             // Compose the expression tree that represents the parameter to the predicate.
             ParameterExpression entity = Expression.Parameter(typeof(Entity));
             var expTreeBody = TranslateFilterExpressionToExpression(qe.Criteria, entity);
             Expression<Func<Entity, bool>> lambda = Expression.Lambda<Func<Entity, bool>>(expTreeBody, entity);
             query = query.Where(lambda);
+
+            //Project the attributes in the root column set  (must be applied after the where clause, not before!!)
+            if (qe.ColumnSet != null && !qe.ColumnSet.AllColumns)
+                query = query.Select(x => x.ProjectAttributes(qe.ColumnSet, context));
+
+
             return query;
         }
 

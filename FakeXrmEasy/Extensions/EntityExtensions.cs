@@ -43,8 +43,24 @@ namespace FakeXrmEasy.Extensions
             }
             else
             {
-                //Return selected list of attributes
-                var projected = new Entity(e.LogicalName) { Id = e.Id };
+                //Return selected list of attributes in a projected entity
+                Entity projected = null;
+
+                //However, if we are using proxy types, we must create a instance of the appropiate class
+                if (context.ProxyTypesAssembly != null)
+                {
+                    var subClassType = context.FindReflectedType(e.LogicalName);
+                    if (subClassType != null)
+                    {
+                        var instance = Activator.CreateInstance(subClassType);
+                        projected = (Entity)instance;
+                        projected.Id = e.Id;
+                    }
+                    else 
+                        projected = new Entity(e.LogicalName) { Id = e.Id }; //fallback to generic type if type not found
+                }
+                else 
+                    projected = new Entity(e.LogicalName) { Id = e.Id };
 
                 foreach (var attKey in columnSet.Columns)
                 {

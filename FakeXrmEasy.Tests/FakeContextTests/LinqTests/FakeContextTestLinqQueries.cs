@@ -39,6 +39,8 @@ namespace FakeXrmEasy.Tests
             A.CallTo(() => service.Execute(A<OrganizationRequest>.That.Matches(x => x is RetrieveMultipleRequest && ((RetrieveMultipleRequest)x).Query is QueryExpression))).MustHaveHappened();
         }
 
+
+
         [Fact]
         public void When_doing_a_crm_linq_query_with_an_equals_operator_record_is_returned()
         {
@@ -70,6 +72,70 @@ namespace FakeXrmEasy.Tests
                 Assert.True(matches[0].FirstName.Equals("Jordi"));
             }
             
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_and_proxy_types_and_a_selected_attribute_returned_projected_entity_is_thesubclass()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid1 = Guid.NewGuid();
+            var guid2 = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid1, FirstName = "Jordi" },
+                new Contact() { Id = guid2, FirstName = "Other" }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.FirstName.Equals("Jordi")
+                               select new
+                               {
+                                   FirstName = c.FirstName,
+                                   CrmRecord = c
+                               }).ToList();
+
+                Assert.True(matches.Count == 1);
+                Assert.True(matches[0].FirstName.Equals("Jordi"));
+                Assert.IsAssignableFrom(typeof(Contact), matches[0].CrmRecord);
+                Assert.True(matches[0].CrmRecord.GetType() == typeof(Contact));
+               
+            }
+
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_and_proxy_types_projection_must_be_applied_after_where_clause()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var guid1 = Guid.NewGuid();
+            var guid2 = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid1, FirstName = "Jordi", LastName = "Montana" },
+                new Contact() { Id = guid2, FirstName = "Other" }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.LastName == "Montana"  //Should be able to filter by a non-selected attribute
+                               select new
+                               {
+                                   FirstName = c.FirstName
+                               }).ToList();
+
+                Assert.True(matches.Count == 1);
+                Assert.True(matches[0].FirstName.Equals("Jordi"));
+            }
+
         }
 
         [Fact]
