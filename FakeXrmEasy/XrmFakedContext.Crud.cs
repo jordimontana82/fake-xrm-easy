@@ -218,6 +218,23 @@ namespace FakeXrmEasy
             {
                 throw new InvalidOperationException("An entity with an empty Id can't be added");
             }
+
+            //Add createdon, modifiedon, createdby, modifiedby properties
+            if (CallerId == null)
+                CallerId = new EntityReference("systemuser", Guid.NewGuid()); //Create a new instance by default
+
+
+            if (!e.Attributes.ContainsKey("createdon"))
+                e["createdon"] = DateTime.UtcNow;
+
+            if (!e.Attributes.ContainsKey("modifiedon"))
+                e["modifiedon"] = DateTime.UtcNow;
+
+            if (!e.Attributes.ContainsKey("createdby"))
+                e["createdby"] = CallerId;
+
+            if (!e.Attributes.ContainsKey("modifiedby"))
+                e["modifiedby"] = CallerId;
         }
 
 

@@ -310,8 +310,8 @@ namespace FakeXrmEasy.Tests
             var firstContact = result.FirstOrDefault();
             var lastContact = result.LastOrDefault();
 
-            Assert.True(firstContact.Attributes.Count == 3); //Contact 1
-            Assert.True(lastContact.Attributes.Count == 3);  //Contact 2
+            Assert.True(firstContact.Attributes.Count == 3 + 4); //Contact 1 (the extra four are the CreatedOn, ModifiedOn, CreatedBy, ModifiedBy attributes generated automatically
+            Assert.True(lastContact.Attributes.Count == 3 + 4);  //Contact 2
         }
 
         [Fact]
