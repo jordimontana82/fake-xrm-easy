@@ -140,10 +140,6 @@ namespace FakeXrmEasy
 
             IQueryable<Entity> query = null;
 
-            //var proxyType = context.FindReflectedType(qe.EntityName);
-            //if(proxyType != null)
-            //    query = context.CreateQuery<proxyType.GetType()>(qe.EntityName);
-            //else 
             query = context.CreateQuery<Entity>(qe.EntityName);
 
             //Add as many Joins as linked entities
@@ -162,7 +158,17 @@ namespace FakeXrmEasy
             if (qe.ColumnSet != null && !qe.ColumnSet.AllColumns)
                 query = query.Select(x => x.ProjectAttributes(qe.ColumnSet, context));
 
-
+            //Sort results
+            if (qe.Orders != null)
+            {
+                foreach (var order in qe.Orders)
+                {
+                    if (order.OrderType == OrderType.Ascending)
+                        query = query.OrderBy(e => e.Attributes[order.AttributeName]);
+                    else
+                        query = query.OrderByDescending(e => e.Attributes[order.AttributeName]);
+                }
+            }
             return query;
         }
 

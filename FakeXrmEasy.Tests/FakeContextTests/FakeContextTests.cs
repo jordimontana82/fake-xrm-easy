@@ -124,6 +124,23 @@ namespace FakeXrmEasy.Tests
 
         }
 
+
+        [Fact]
+        public void When_initializing_the_context_with_an_entity_it_should_have_default_createdon_createdby_modifiedon_and_modifiedby_attributes()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var e = new Entity("account") { Id = Guid.NewGuid() };
+            context.Initialize(new List<Entity>() { e });
+
+            Assert.True(e.Attributes.ContainsKey("createdon"));
+            Assert.True(e.Attributes.ContainsKey("modifiedon"));
+            Assert.True(e.Attributes.ContainsKey("createdby"));
+            Assert.True(e.Attributes.ContainsKey("modifiedby"));
+
+        }
+
         
         
 
