@@ -314,6 +314,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
         public void When_executing_a_linq_query_with_equals_between_2_activityparties_result_is_returned()
         {
             var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
             var contactId = Guid.NewGuid();
             var activityId = Guid.NewGuid();
             

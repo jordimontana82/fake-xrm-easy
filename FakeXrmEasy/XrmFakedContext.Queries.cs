@@ -288,14 +288,25 @@ namespace FakeXrmEasy
         protected static Expression GetAppropiateCastExpressionBasedGuid(Expression input)
         {
             return Expression.Condition(
-                        Expression.TypeIs(input, typeof(EntityReference)),
+                        Expression.TypeIs(input, typeof(EntityReference)),  //If input is an entity reference, compare the Guid against the Id property
                                 Expression.Convert(
                                     Expression.Call(Expression.TypeAs(input, typeof(EntityReference)),
                                             typeof(EntityReference).GetMethod("get_Id")),
                                             typeof(Guid)),
-                           Expression.Condition(Expression.TypeIs(input, typeof(Guid)),
-                                        Expression.Convert(input, typeof(Guid)),
-                                        Expression.Constant(Guid.Empty)));
+                        Expression.Condition(Expression.AndAlso(Expression.TypeIs(input, typeof(AliasedValue)),  //If input is an AliasedValue which has an EntityReference, compare against the Id value as well
+                                         Expression.TypeIs(Expression.Call(Expression.TypeAs(input, typeof(AliasedValue)),
+                                            typeof(AliasedValue).GetMethod("get_Value")),
+                                            typeof(EntityReference))),
+                            Expression.Call(Expression.TypeAs(Expression.Convert(
+                                                        Expression.Call(Expression.TypeAs(input, typeof(AliasedValue)),
+                                                            typeof(AliasedValue).GetMethod("get_Value")),
+                                                            typeof(Guid))
+                                            , typeof(EntityReference)),
+                                            typeof(EntityReference).GetMethod("get_Id")),
+                            
+                            Expression.Condition(Expression.TypeIs(input, typeof(Guid)),  //If any other case, then just compare it as a Guid directly
+                                            Expression.Convert(input, typeof(Guid)),
+                                            Expression.Constant(Guid.Empty))));
 
         }
 
