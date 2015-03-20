@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>FakeXrmEasy</id>
-    <version>1.3.1</version>
+    <version>1.4.0</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
@@ -10,7 +10,8 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Utilities to streamline unit testing in Dynamics CRM by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
     <releaseNotes>
-      Updated Url in Install.ps1 powershell script to load a Getting Started page the first time the package is installed.
+       Added OrderBy implementation QueryExpressions and LINQ
+       Now, when an entity is added to the context, it will define the createdon, createdby, modifiedon and modifiedby automatically, if they were not specifically set before.
     </releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>xrm dynamics crm unit testing mock mocking fake fakes</tags>
