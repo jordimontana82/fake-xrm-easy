@@ -73,9 +73,12 @@ namespace FakeXrmEasy
                 if (subClassType != null)
                 {
                     var instance = Activator.CreateInstance(subClassType);
-                    ((T)instance).Attributes = e.Attributes;
-                    ((T)instance).Id = e.Id;
-                    lst.Add((T)instance);
+
+                    //Fix for Linux/Mono =>  error CS0445: Cannot modify the result of an unboxing conversion
+                    T unboxed = (T)instance; 
+                    unboxed.Attributes = e.Attributes;
+                    unboxed.Id = e.Id;
+                    lst.Add(unboxed);
                 }
                 else
                     lst.Add((T)e);
