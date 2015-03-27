@@ -57,16 +57,9 @@ namespace FakeXrmEasy
                         else
                         {
                             //Return the subset of columns requested only
-                            var newEntity = new Entity(entityName);
-                            newEntity.Id = id;
-
-                            //Add attributes
                             var foundEntity = context.Data[entityName][id];
-                            foreach (var column in columnSet.Columns)
-                            {
-                                newEntity[column] = foundEntity[column];
-                            }
-                            return newEntity;
+                            Entity projected = foundEntity.ProjectAttributes(columnSet,context);
+                            return projected;
                         }
                     }
                     else

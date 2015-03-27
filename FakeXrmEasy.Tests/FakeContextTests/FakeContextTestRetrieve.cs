@@ -8,6 +8,8 @@ using Microsoft.Xrm.Sdk.Query;
 
 using System.Collections.Generic;
 using Microsoft.Xrm.Sdk;
+using System.Reflection;
+using Crm;
 
 namespace FakeXrmEasy.Tests
 {
@@ -137,6 +139,27 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(result.Id, data.FirstOrDefault().Id);
             Assert.True(result.Attributes.Count == 1);
             Assert.Equal(result["name"], "Test account");
+        }
+
+        [Fact]
+        public void When_retrieve_is_invoked_with_an_existing_entity_and_proxy_types_the_returned_entity_must_be_of_the_appropiate_subclass()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            //Initialize the context with a single entity
+            var guid = Guid.NewGuid();
+            var account = new Account() { Id = guid };
+            account.Name = "Test account";
+
+            var data = new List<Entity>() { account }.AsQueryable();
+            context.Initialize(data);
+
+            var service = context.GetFakedOrganizationService();
+
+            var result = service.Retrieve("account", guid, new ColumnSet(new string[] { "name" }));
+
+            Assert.True(result is Account);
         }
     }
 }
