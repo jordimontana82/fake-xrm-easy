@@ -13,6 +13,7 @@ using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk.Client;
 using System.ServiceModel.Description;
 using System.Reflection;
+using Microsoft.Crm.Sdk.Messages;
 
 namespace FakeXrmEasy
 {
@@ -123,6 +124,42 @@ namespace FakeXrmEasy
                             };
                             return response;
                         }
+                        else if (request.Query is QueryByAttribute)
+                        {
+                            //We instantiate a QueryExpression to be executed as we have the implementation done already
+                            var query = request.Query as QueryByAttribute;
+                            var qe = new QueryExpression(query.EntityName);
+
+                            qe.ColumnSet = query.ColumnSet;
+                            qe.Criteria = new FilterExpression();
+                            for (var i = 0; i < query.Attributes.Count; i++)
+                            {
+                                qe.Criteria.AddCondition(new ConditionExpression(query.Attributes[i], ConditionOperator.Equal, query.Values[i]));
+                            }
+
+                            //QueryExpression now done... execute it!
+                            var linqQuery = TranslateQueryExpressionToLinq(context, qe as QueryExpression);
+                            var response = new RetrieveMultipleResponse
+                            {
+                                Results = new ParameterCollection
+                                 {
+                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
+                                 }
+                            };
+                            return response;
+                        }
+                    }
+                    else if (req is WhoAmIRequest)
+                    {
+                        var request = req as WhoAmIRequest;
+
+                        var response = new WhoAmIResponse
+                        {
+                            Results = new ParameterCollection
+                                { { "UserId", context.CallerId.Id } }
+                                 
+                        };
+                        return response;
                     }
                     return new OrganizationResponse();
                 });
@@ -146,6 +183,29 @@ namespace FakeXrmEasy
                         };
                         return response.EntityCollection;
                         
+                    }
+                    else if (req is QueryByAttribute)
+                    {
+                        //We instantiate a QueryExpression to be executed as we have the implementation done already
+                        var query = req as QueryByAttribute;
+                        var qe = new QueryExpression(query.EntityName);
+
+                        qe.ColumnSet = query.ColumnSet;
+                        qe.Criteria = new FilterExpression();
+                        for(var i=0; i < query.Attributes.Count; i++) {
+                            qe.Criteria.AddCondition(new ConditionExpression(query.Attributes[i],ConditionOperator.Equal,query.Values[i]));
+                        }
+                        
+                        //QueryExpression now done... execute it!
+                        var linqQuery = TranslateQueryExpressionToLinq(context, qe as QueryExpression);
+                        var response = new RetrieveMultipleResponse
+                        {
+                            Results = new ParameterCollection
+                                 {
+                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
+                                 }
+                        };
+                        return response.EntityCollection;
                     }
                     throw new PullRequestException("Unexpected querybase for RetrieveMultiple");
                 });
