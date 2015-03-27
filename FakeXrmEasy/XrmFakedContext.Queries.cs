@@ -21,16 +21,33 @@ namespace FakeXrmEasy
         protected internal Type FindReflectedType(string sLogicalName)
         {
             Assembly assembly = this.ProxyTypesAssembly;
-            if (assembly == null)
+            try
             {
-                assembly = Assembly.GetExecutingAssembly();
+                if (assembly == null)
+                {
+                    assembly = Assembly.GetExecutingAssembly();
+                }
+                var subClassType = assembly.GetTypes()
+                        .Where(t => typeof(Entity).IsAssignableFrom(t))
+                        .Where(t => t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
+                        .Where(t => ((EntityLogicalNameAttribute)t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0]).LogicalName.Equals(sLogicalName.ToLower()))
+                        .FirstOrDefault();
+
+                return subClassType;
             }
-            var subClassType = assembly.GetTypes()
-                    .Where(t => typeof(Entity).IsAssignableFrom(t))
-                    .Where(t => t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
-                    .Where(t => ((EntityLogicalNameAttribute)t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0]).LogicalName.Equals(sLogicalName.ToLower()))
-                    .FirstOrDefault();
-            return subClassType;
+            catch (System.Reflection.ReflectionTypeLoadException ex)
+            {
+                // now look at ex.LoaderExceptions - this is an Exception[], so:
+                string s = "";
+                foreach (Exception inner in ex.LoaderExceptions)
+                {
+                    // write details of "inner", in particular inner.Message
+                    s += inner.Message + " ";
+                }
+
+                throw new Exception("XrmFakedContext.FindReflectedType: " + s);
+            }
+            
         }
 
 
