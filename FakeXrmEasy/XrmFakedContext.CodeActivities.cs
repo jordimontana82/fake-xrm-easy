@@ -70,8 +70,15 @@ namespace FakeXrmEasy
             catch (TypeLoadException tlex)
             {
                 var typeName = tlex.TypeName != null ? tlex.TypeName : "(null)";
-
-                throw new TypeLoadException("When loading type: " + typeName + "." + tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory + "Debug=" + sDebug);
+                if(string.IsNullOrWhiteSpace(typeName) ||
+                    typeName.Equals("System.Activities.WorkflowApplication"))
+                {
+                    //Try again
+                    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System.Activities.dll"));
+                    invoker.Invoke(inputs);
+                }
+                else
+                    throw new TypeLoadException("When loading type: " + typeName + "." + tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory + "Debug=" + sDebug);
             }
         }
 
