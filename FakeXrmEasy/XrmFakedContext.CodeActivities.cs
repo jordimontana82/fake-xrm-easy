@@ -33,9 +33,14 @@ namespace FakeXrmEasy
         /// <typeparam name="T"></typeparam>
         public IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs) where T : CodeActivity, new()
         {
+            WorkflowInvoker invoker = null;
+            string sDebug = "";
             try
             {
-                var invoker = new WorkflowInvoker(new T());
+                sDebug = "Creating instance..." + System.Environment.NewLine;
+                invoker = new WorkflowInvoker(new T());
+                sDebug += "Invoker created" + System.Environment.NewLine;
+                sDebug += "Adding extensions..." + System.Environment.NewLine;
                 invoker.Extensions.Add<ITracingService>(() => new XrmFakedTracingService());
                 invoker.Extensions.Add<IWorkflowContext>(() =>
                 {
@@ -58,12 +63,15 @@ namespace FakeXrmEasy
                     return fakedServiceFactory;
                 });
 
+                sDebug += "Adding extensions...ok." + System.Environment.NewLine;
+                sDebug += "Invoking activity..." + System.Environment.NewLine;
                 return invoker.Invoke(inputs);
             }
             catch (TypeLoadException tlex)
             {
                 var typeName = tlex.TypeName != null ? tlex.TypeName : "(null)";
-                throw new TypeLoadException("When loading type: " + typeName + "." + tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory);
+
+                throw new TypeLoadException("When loading type: " + typeName + "." + tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory + "Debug=" + sDebug);
             }
         }
 
