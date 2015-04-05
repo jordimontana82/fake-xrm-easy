@@ -77,7 +77,18 @@ namespace FakeXrmEasy
                     System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System.Activities.dll"));
                     System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Microsoft.Xrm.Sdk.dll"));
                     System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Microsoft.Xrm.Sdk.Workflow.dll"));
-                    return invoker.Invoke(inputs);
+                    try
+                    {
+                        return invoker.Invoke(inputs);
+                    }
+                    catch (TypeLoadException tlex2)
+                    {
+                        if (tlex2.InnerException != null)
+                            throw new Exception("TypeLoadException with innerexception " + tlex2.InnerException.ToString());
+                        else
+                            throw new Exception("TypeLoadException with innerexception null");
+                    }
+                    
                 }
                 else
                     throw new TypeLoadException("When loading type: " + typeName + "." + tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory + "Debug=" + sDebug);
