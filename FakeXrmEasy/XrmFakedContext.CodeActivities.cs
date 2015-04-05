@@ -62,7 +62,8 @@ namespace FakeXrmEasy
             }
             catch (TypeLoadException tlex)
             {
-                throw new TypeLoadException(tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory);
+                var typeName = tlex.TypeName != null ? tlex.TypeName : "(null)";
+                throw new TypeLoadException("When loading type: " + typeName + "." + tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory);
             }
         }
 

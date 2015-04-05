@@ -49,9 +49,7 @@
       <HintPath>..\packages\Microsoft.Xrm.Sdk.Workflow.2011.5.0.18\lib\net40\microsoft.xrm.sdk.workflow.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Activities">
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="System.Activities" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
