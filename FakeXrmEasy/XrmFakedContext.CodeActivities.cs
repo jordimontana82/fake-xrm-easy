@@ -75,6 +75,8 @@ namespace FakeXrmEasy
                 {
                     //Try again
                     System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System.Activities.dll"));
+                    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Microsoft.Xrm.Sdk.dll"));
+                    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Microsoft.Xrm.Sdk.Workflow.dll"));
                     return invoker.Invoke(inputs);
                 }
                 else
