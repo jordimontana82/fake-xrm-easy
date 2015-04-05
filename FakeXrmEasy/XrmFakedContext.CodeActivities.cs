@@ -75,7 +75,7 @@ namespace FakeXrmEasy
                 {
                     //Try again
                     System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System.Activities.dll"));
-                    invoker.Invoke(inputs);
+                    return invoker.Invoke(inputs);
                 }
                 else
                     throw new TypeLoadException("When loading type: " + typeName + "." + tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory + "Debug=" + sDebug);
