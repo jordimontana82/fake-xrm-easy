@@ -72,27 +72,27 @@ namespace FakeXrmEasy
             catch (TypeLoadException tlex)
             {
                 var typeName = tlex.TypeName != null ? tlex.TypeName : "(null)";
-                if(string.IsNullOrWhiteSpace(typeName) ||
-                    typeName.Equals("System.Activities.WorkflowApplication"))
-                {
-                    //Try again
-                    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System.Activities.dll"));
-                    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Microsoft.Xrm.Sdk.dll"));
-                    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Microsoft.Xrm.Sdk.Workflow.dll"));
-                    try
-                    {
-                        return invoker.Invoke(inputs);
-                    }
-                    catch (TypeLoadException tlex2)
-                    {
-                        if (tlex2.InnerException != null)
-                            throw new Exception("TypeLoadException with innerexception " + tlex2.InnerException.ToString());
-                        else
-                            throw new Exception("TypeLoadException with innerexception null");
-                    }
+                //if(string.IsNullOrWhiteSpace(typeName) ||
+                //    typeName.Equals("System.Activities.WorkflowApplication"))
+                //{
+                //    //Try again
+                //    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System.Activities.dll"));
+                //    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Microsoft.Xrm.Sdk.dll"));
+                //    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Microsoft.Xrm.Sdk.Workflow.dll"));
+                //    try
+                //    {
+                //        return invoker.Invoke(inputs);
+                //    }
+                //    catch (TypeLoadException tlex2)
+                //    {
+                //        if (tlex2.InnerException != null)
+                //            throw new Exception("TypeLoadException with innerexception " + tlex2.InnerException.ToString());
+                //        else
+                //            throw new Exception("TypeLoadException with innerexception null");
+                //    }
                     
-                }
-                else
+                //}
+                //else
                     throw new TypeLoadException("When loading type: " + typeName + "." + tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory + "Debug=" + sDebug);
             }
         }
