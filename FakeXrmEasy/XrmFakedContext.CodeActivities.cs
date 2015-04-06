@@ -7,11 +7,12 @@ using System.Text;
 using Microsoft.Xrm.Sdk.Query;
 using System.ServiceModel;
 using Microsoft.Xrm.Sdk.Messages;
-//using System.Dynamic;
+using System.Dynamic;
 using System.Linq.Expressions;
 using FakeXrmEasy.Extensions;
 using System.Activities;
 using Microsoft.Xrm.Sdk.Workflow;
+using System.Activities.Hosting;
 
 namespace FakeXrmEasy
 {
@@ -34,6 +35,7 @@ namespace FakeXrmEasy
         public IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs) where T : CodeActivity, new()
         {
             WorkflowInvoker invoker = null;
+            WorkflowInstanceExtensionManager mngr = null;
             string sDebug = "";
             try
             {
