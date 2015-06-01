@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>FakeXrmEasy</id>
-    <version>1.5.1</version>
+    <version>1.6.1</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Utilities to streamline unit testing in Dynamics CRM by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
     <releaseNotes>
-      Bug fix: Retrieve message should return an early bound entity if that was created
+      ExecuteCodeActivity methods now allow a specific codeactivity instance, which means that custom properties can be passed to the codeactivities before they are executed (like other mocks not necessarily related to CRM ).
     </releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>xrm dynamics crm unit testing mock mocking fake fakes</tags>
