@@ -67,5 +67,40 @@ namespace FakeXrmEasy.Tests
             //Same task created is returned
             Assert.Equal(output.Id, tasks[0].Id);
         }
+
+        [Fact]
+        public void When_the_add_activity_with_constant_is_executed_without_a_specific_instance_result_is_the_two_summands()
+        {
+            var fakedContext = new XrmFakedContext();
+
+            //Inputs
+            var inputs = new Dictionary<string, object>() {
+                { "firstSummand", 2 },
+                { "secondSummand", 3 }
+            };
+
+            var result = fakedContext.ExecuteCodeActivity<AddActivityWithConstant>(inputs);
+
+            Assert.True(((int)result["result"]).Equals(5));
+        }
+
+        [Fact]
+        public void When_the_add_activity_with_constant_is_executed_with_a_specific_instance_result_is_the_two_summands_plus_constant()
+        {
+            var fakedContext = new XrmFakedContext();
+
+            //Inputs
+            var inputs = new Dictionary<string, object>() {
+                { "firstSummand", 2 },
+                { "secondSummand", 3 }
+            };
+
+            AddActivityWithConstant codeActivity = new AddActivityWithConstant();
+            codeActivity.Constant = 69;
+
+            var result = fakedContext.ExecuteCodeActivity<AddActivityWithConstant>(inputs, codeActivity);
+
+            Assert.True(((int)result["result"]).Equals(5 + 69));
+        }
     }
 }

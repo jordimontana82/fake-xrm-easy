@@ -22,9 +22,9 @@ namespace FakeXrmEasy
         /// Executes a code activity against this context
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public IDictionary<string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs) where T : CodeActivity, new()
+        public IDictionary<string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new()
         {
-            return this.ExecuteCodeActivity<T>(null, inputs);
+            return this.ExecuteCodeActivity<T>(null, inputs, instance);
         }
 
 
@@ -32,7 +32,7 @@ namespace FakeXrmEasy
         /// Executes a code activity passing the primary entity
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs) where T : CodeActivity, new()
+        public IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new()
         {
             WorkflowInvoker invoker = null;
             WorkflowInstanceExtensionManager mngr = null;
@@ -40,7 +40,9 @@ namespace FakeXrmEasy
             try
             {
                 sDebug = "Creating instance..." + System.Environment.NewLine;
-                invoker = new WorkflowInvoker(new T());
+                if (instance == null) 
+                    instance = new T();
+                invoker = new WorkflowInvoker(instance);
                 sDebug += "Invoker created" + System.Environment.NewLine;
                 sDebug += "Adding extensions..." + System.Environment.NewLine;
                 invoker.Extensions.Add<ITracingService>(() => new XrmFakedTracingService());

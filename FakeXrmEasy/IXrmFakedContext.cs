@@ -58,16 +58,19 @@ namespace FakeXrmEasy
 
         /// <summary>
         /// Executes a code activity against this context
+        /// An optional instance can be passed. 
+        /// This is useful when the codeactivity requires additional mocks that could be stored in the codeactivity itself
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        IDictionary<string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs) where T : CodeActivity, new();
+        IDictionary<string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new();
 
 
         /// <summary>
         /// Executes a code activity passing the primary entity
+        /// This is useful when the codeactivity requires additional mocks that could be stored in the codeactivity itself
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs) where T : CodeActivity, new();
+        IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new();
         
     }
 
