@@ -101,7 +101,11 @@ namespace FakeXrmEasy.Extensions
             {
                 foreach (var attKey in otherEntity.Attributes.Keys)
                 {
-                    e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
+                    var av = new AliasedValue();
+                    av.EntityLogicalName = alias;
+                    av.AttributeLogicalName = attKey;
+                    av.Value = otherEntity[attKey];
+                    e[alias + "." + attKey] = av;
                 }
             }
             else
@@ -113,7 +117,11 @@ namespace FakeXrmEasy.Extensions
                     {
                         OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
                     }
-                    e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
+                    var av = new AliasedValue();
+                    av.EntityLogicalName = alias;
+                    av.AttributeLogicalName = attKey;
+                    av.Value = otherEntity[attKey];
+                    e[alias + "." + attKey] = av;
                 }
             }
             return e;
@@ -126,7 +134,11 @@ namespace FakeXrmEasy.Extensions
                 {
                     foreach (var attKey in otherEntity.Attributes.Keys)
                     {
-                        e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
+                        var av = new AliasedValue();
+                        av.EntityLogicalName = alias;
+                        av.AttributeLogicalName = attKey;
+                        av.Value = otherEntity[attKey];
+                        e[alias + "." + attKey] = av;
                     }
                 }
                 else
@@ -138,7 +150,11 @@ namespace FakeXrmEasy.Extensions
                         {
                             OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
                         }
-                        e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
+                        var av = new AliasedValue();
+                        av.EntityLogicalName = alias;
+                        av.AttributeLogicalName = attKey;
+                        av.Value = otherEntity[attKey];
+                        e[alias + "." + attKey] = av;
                     }
                 }
             }
