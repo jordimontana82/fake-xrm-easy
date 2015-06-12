@@ -161,6 +161,10 @@ namespace FakeXrmEasy
                         };
                         return response;
                     }
+                    else if (req is RetrieveAttributeRequest)
+                    {
+                        return FakeRetrieveAttributeRequest(context, fakedService, req as RetrieveAttributeRequest);
+                    }
                     return new OrganizationResponse();
                 });
         }
