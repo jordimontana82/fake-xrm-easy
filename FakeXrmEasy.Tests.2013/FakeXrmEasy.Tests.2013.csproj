@@ -90,6 +90,9 @@
     <Compile Include="..\FakeXrmEasy.Tests\CodeActivitiesForTesting\AddActivity.cs">
       <Link>CodeActivitiesForTesting\AddActivity.cs</Link>
     </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\CodeActivitiesForTesting\AddActivityWithConstant.cs">
+      <Link>CodeActivitiesForTesting\AddActivityWithConstant.cs</Link>
+    </Compile>
     <Compile Include="..\FakeXrmEasy.Tests\CodeActivitiesForTesting\CreateTaskActivity.cs">
       <Link>CodeActivitiesForTesting\CreateTaskActivity.cs</Link>
     </Compile>

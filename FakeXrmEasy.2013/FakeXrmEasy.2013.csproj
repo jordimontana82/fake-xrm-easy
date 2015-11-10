@@ -89,6 +89,9 @@
     <Compile Include="..\FakeXrmEasy\XrmFakedContext.cs">
       <Link>XrmFakedContext.cs</Link>
     </Compile>
+    <Compile Include="..\FakeXrmEasy\XrmFakedContext.Metadata.cs">
+      <Link>XrmFakedContext.Metadata.cs</Link>
+    </Compile>
     <Compile Include="..\FakeXrmEasy\XrmFakedContext.Plugins.cs">
       <Link>XrmFakedContext.Plugins.cs</Link>
     </Compile>
