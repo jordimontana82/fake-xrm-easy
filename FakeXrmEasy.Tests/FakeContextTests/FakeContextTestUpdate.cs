@@ -9,6 +9,8 @@ using Microsoft.Xrm.Sdk.Query;
 using System.Collections.Generic;
 using Microsoft.Xrm.Sdk;
 using System.ServiceModel;
+using Crm;
+using System.Reflection;
 
 namespace FakeXrmEasy.Tests
 {
@@ -54,7 +56,6 @@ namespace FakeXrmEasy.Tests
             var context = new XrmFakedContext();
             var service = context.GetFakedOrganizationService();
 
-            
             var e = new Entity("account") { Id = Guid.Empty };
             e["name"] = "Before update";
             var guid = service.Create(e);
@@ -62,7 +63,7 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(context.Data["account"][guid]["name"], "Before update");
 
             //now update the name
-            e.Id = guid;
+            e = new Entity("account") { Id = guid };
             e["name"] = "After update";
             service.Update(e);
 
@@ -90,6 +91,60 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(ex.Message, string.Format("account with Id {0} Does Not Exist", nonExistingGuid));
         }
 
-        
+        [Fact]
+        public void When_updating_an_entity_an_unchanged_attribute_remains_the_same()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var existingAccount = new Account() { Id = Guid.NewGuid(),  Name = "Super Great Customer", AccountNumber = "69" };
+            context.Initialize(new List<Entity>()
+            {
+                existingAccount
+            });
+
+            var service = context.GetFakedOrganizationService();
+
+            //Create a new entity class to update the name
+            var accountToUpdate = new Account() { Id = existingAccount.Id };
+            accountToUpdate.Name = "Super Great Customer Name Updated!";
+
+            //Update the entity in the context
+            service.Update(accountToUpdate);
+
+            //Make sure existing entity still maintains AccountNumber property
+            var account = context.CreateQuery<Account>().FirstOrDefault();
+            Assert.Equal(account.AccountNumber, "69");
+        }
+
+        [Fact]
+        public void When_updating_an_entity_only_one_entity_is_updated()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var existingAccount = new Account() { Id = Guid.NewGuid(), Name = "Super Great Customer", AccountNumber = "69" };
+            var otherExistingAccount = new Account() { Id = Guid.NewGuid(), Name = "Devil Customer", AccountNumber = "666" };
+
+            context.Initialize(new List<Entity>()
+            {
+                existingAccount, otherExistingAccount
+            });
+
+            var service = context.GetFakedOrganizationService();
+
+            //Create a new entity class to update the first account
+            var accountToUpdate = new Account() { Id = existingAccount.Id };
+            accountToUpdate.Name = "Super Great Customer Name Updated!";
+
+            //Update the entity in the context
+            service.Update(accountToUpdate);
+
+            //Make other account wasn't updated
+            var account = context.CreateQuery<Account>().Where(e => e.Id == otherExistingAccount.Id).FirstOrDefault();
+            Assert.Equal(account.Name, "Devil Customer");
+        }
+
+
     }
 }

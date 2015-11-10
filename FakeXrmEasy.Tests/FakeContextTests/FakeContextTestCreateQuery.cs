@@ -91,6 +91,20 @@ namespace FakeXrmEasy.Tests
 
             Assert.Equal(contact.Count, 0);
         }
-        
+
+        [Fact]
+        public void Querying_a_dynamic_using_type_should_use_the_entity_entity_logical_name_attribute()
+        {
+            var context = new XrmFakedContext();
+
+            var service = context.GetFakedOrganizationService();
+
+            //Find the contact
+            var contact = (from c in context.CreateQuery("contact")
+                           select c).ToList();
+
+            Assert.Equal(contact.Count, 0);
+        }
+
     }
 }

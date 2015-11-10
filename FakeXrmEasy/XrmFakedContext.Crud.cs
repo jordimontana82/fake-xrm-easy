@@ -127,8 +127,13 @@ namespace FakeXrmEasy
                     if (context.Data.ContainsKey(e.LogicalName) &&
                         context.Data[e.LogicalName].ContainsKey(e.Id))
                     {
-                        //Now the entity is the one passed
-                        context.Data[e.LogicalName][e.Id] = e;
+                        //Add as many attributes to the entity as the ones received (this will keep existing ones)
+                        var cachedEntity = context.Data[e.LogicalName][e.Id];
+                        foreach (var sAttributeName in e.Attributes.Keys)
+                        {
+                            cachedEntity[sAttributeName] = e[sAttributeName];
+                        }
+                        
                     }
                     else
                     {
