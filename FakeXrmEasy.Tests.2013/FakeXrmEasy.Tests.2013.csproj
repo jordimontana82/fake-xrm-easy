@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5211B83C-12A0-423F-B8CF-61F9C650F525}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FakeXrmEasy.Tests</RootNamespace>
+    <AssemblyName>FakeXrmEasy.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;FAKE_XRM_EASY_2013</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FakeItEasy">
+      <HintPath>..\packages\FakeItEasy.2.0.0-beta007\lib\net40\FakeItEasy.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Crm.Sdk.Proxy">
+      <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.6.1.1\lib\net40\Microsoft.Crm.Sdk.Proxy.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel">
+      <HintPath>..\packages\Microsoft.IdentityModel.6.1.7600.16394\lib\net35\Microsoft.IdentityModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xrm.Sdk, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.6.1.1\lib\net40\Microsoft.Xrm.Sdk.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xrm.Sdk.Workflow">
+      <HintPath>..\packages\Microsoft.CrmSdk.Workflow.6.1.1\lib\net40\Microsoft.Xrm.Sdk.Workflow.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Presentation" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Workflow.Activities" />
+    <Reference Include="System.Workflow.ComponentModel" />
+    <Reference Include="System.Workflow.Runtime" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="xunit">
+      <HintPath>..\packages\xunit.1.9.2\lib\net20\xunit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Choose>
+    <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+  <ItemGroup>
+    <Compile Include="..\FakeXrmEasy.Tests\CodeActivitiesForTesting\AddActivity.cs">
+      <Link>CodeActivitiesForTesting\AddActivity.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\CodeActivitiesForTesting\CreateTaskActivity.cs">
+      <Link>CodeActivitiesForTesting\CreateTaskActivity.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestCodeActivities.cs">
+      <Link>FakeContextTests\FakeContextTestCodeActivities.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestCreate.cs">
+      <Link>FakeContextTests\FakeContextTestCreate.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestCreateQuery.cs">
+      <Link>FakeContextTests\FakeContextTestCreateQuery.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestDelete.cs">
+      <Link>FakeContextTests\FakeContextTestDelete.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestPlugins.cs">
+      <Link>FakeContextTests\FakeContextTestPlugins.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestRetrieve.cs">
+      <Link>FakeContextTests\FakeContextTestRetrieve.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTests.cs">
+      <Link>FakeContextTests\FakeContextTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestUpdate.cs">
+      <Link>FakeContextTests\FakeContextTestUpdate.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeTracingServiceTests.cs">
+      <Link>FakeContextTests\FakeTracingServiceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs">
+      <Link>FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs">
+      <Link>FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\LinqTests\MetadataInferenceTests.cs">
+      <Link>FakeContextTests\LinqTests\MetadataInferenceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs">
+      <Link>FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs">
+      <Link>FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs">
+      <Link>FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\GeneratedCode.cs">
+      <Link>GeneratedCode.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\AccountNumberPlugin.cs">
+      <Link>PluginsForTesting\AccountNumberPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\FollowupPlugin.cs">
+      <Link>PluginsForTesting\FollowupPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\RetrieveServicesPlugin.cs">
+      <Link>PluginsForTesting\RetrieveServicesPlugin.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Debug\" />
+    <Folder Include="bin\Release\" />
+    <Folder Include="build\lib\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="buildNugetPackages.bat" />
+    <None Include="build\FakeXrmEasy.dll.nuspec" />
+    <None Include="build\tools\Install.ps1" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\coretools\CrmSvcUtil.exe" />
+    <Content Include="bin\coretools\CrmSvcUtil.xml" />
+    <Content Include="bin\coretools\Microsoft.Xrm.Sdk.dll" />
+    <Content Include="bin\coretools\SolutionPackager.exe" />
+    <Content Include="build\nuget.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FakeXrmEasy.2013\FakeXrmEasy.2013.csproj">
+      <Project>{112188e6-c759-4b2e-b5ae-54e722e26806}</Project>
+      <Name>FakeXrmEasy.2013</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Choose>
+    <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.CodedUITestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Extension, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITesting, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
