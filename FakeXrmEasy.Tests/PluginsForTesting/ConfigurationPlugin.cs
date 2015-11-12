@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 
-namespace FakeXrmEasy.Tests
+namespace FakeXrmEasy.Tests.PluginsForTesting
 {
     public class ConfigurationPlugin : IPlugin
     {
@@ -23,8 +23,6 @@ namespace FakeXrmEasy.Tests
         public void Execute(IServiceProvider serviceProvider)
         {
             var context = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
-            var factory = (IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory));
-            var service = factory.CreateOrganizationService(context.UserId);
 
             var target = (Entity)context.InputParameters["Target"];
 
