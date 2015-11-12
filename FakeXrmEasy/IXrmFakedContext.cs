@@ -57,6 +57,18 @@ namespace FakeXrmEasy
                                      EntityImageCollection postEntityImages) where T : IPlugin, new();
 
         /// <summary>
+        /// Most flexible plugin execution, with possibility to pass in secure and unsecure config
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
+                                     ParameterCollection outputParameters,
+                                     EntityImageCollection preEntityImages,
+                                     EntityImageCollection postEntityImages,
+                                     string unsecureConfiguration,
+                                     string secureConfiguration) where T : IPlugin, new();
+
+        /// <summary>
         /// Executes a code activity against this context
         /// An optional instance can be passed. 
         /// This is useful when the codeactivity requires additional mocks that could be stored in the codeactivity itself
