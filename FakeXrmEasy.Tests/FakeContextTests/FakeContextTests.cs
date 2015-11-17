@@ -7,6 +7,7 @@ using FakeXrmEasy;
 using System.Collections.Generic;
 using Microsoft.Xrm.Sdk;
 using System.Linq;
+using FakeXrmEasy.Tests.PluginsForTesting;
 
 namespace FakeXrmEasy.Tests
 {
@@ -142,7 +143,5 @@ namespace FakeXrmEasy.Tests
         }
 
         
-        
-
     }
 }

@@ -97,8 +97,10 @@
     <Compile Include="FakeContextTests\WhoAmIRequest\WhoAmITests.cs" />
     <Compile Include="GeneratedCode.cs" />
     <Compile Include="PluginsForTesting\AccountNumberPlugin.cs" />
+    <Compile Include="PluginsForTesting\ConfigurationPlugin.cs" />
     <Compile Include="PluginsForTesting\FollowupPlugin.cs" />
     <Compile Include="PluginsForTesting\RetrieveServicesPlugin.cs" />
+    <Compile Include="PluginsForTesting\TestContextPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

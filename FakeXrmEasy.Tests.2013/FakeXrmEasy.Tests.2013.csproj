@@ -147,11 +147,17 @@
     <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\AccountNumberPlugin.cs">
       <Link>PluginsForTesting\AccountNumberPlugin.cs</Link>
     </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\ConfigurationPlugin.cs">
+      <Link>PluginsForTesting\ConfigurationPlugin.cs</Link>
+    </Compile>
     <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\FollowupPlugin.cs">
       <Link>PluginsForTesting\FollowupPlugin.cs</Link>
     </Compile>
     <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\RetrieveServicesPlugin.cs">
       <Link>PluginsForTesting\RetrieveServicesPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\TestContextPlugin.cs">
+      <Link>PluginsForTesting\TestContextPlugin.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

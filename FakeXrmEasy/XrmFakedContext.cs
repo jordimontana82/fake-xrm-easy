@@ -29,13 +29,15 @@ namespace FakeXrmEasy
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
 
         public Assembly ProxyTypesAssembly { get; set; }
+        
 
         /// <summary>
         /// Sets the user to assign the CreatedBy and ModifiedBy properties when entities are added to the context.
         /// All requests will be executed on behalf of this user
         /// </summary>
         public EntityReference CallerId { get; set; }
- 
+
+
         public XrmFakedContext()
         {
             AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
