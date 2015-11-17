@@ -35,6 +35,37 @@ namespace FakeXrmEasy
             return fakedPlugin;
         }
 
+        public IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
+                                     ParameterCollection outputParameters,
+                                     EntityImageCollection preEntityImages,
+                                     EntityImageCollection postEntityImages,
+                                     string unsecureConfiguration,
+                                     string secureConfiguration) where T : IPlugin, new()
+        {
+            var fakedServiceProvider = GetFakedServiceProvider(inputParameters, outputParameters, preEntityImages, postEntityImages);
+            var fakedPlugin = A.Fake<IPlugin>();
+
+            A.CallTo(() => fakedPlugin.Execute(A<IServiceProvider>._))
+                .Invokes((IServiceProvider provider) =>
+                {
+                    var pluginType = typeof (T);
+                    var constructors = pluginType.GetConstructors().ToList();
+
+                    if (!constructors.Any(
+                            constructor => constructor.GetParameters().ToList().Count == 2
+                                && constructor.GetParameters().All(param => param.ParameterType == typeof(string))))
+                    {
+                        throw new ArgumentException("The plugin you are trying to execute does not specify a constructor for passing in two configuration strings.");
+                    }
+                    
+                    var plugin = (T)Activator.CreateInstance(pluginType, unsecureConfiguration, secureConfiguration);
+                    plugin.Execute(fakedServiceProvider);
+                });
+
+            fakedPlugin.Execute(fakedServiceProvider); //Execute the plugin
+            return fakedPlugin;
+        }
+
         /// <summary>
         /// Executes the plugin of type T against the faked context for an entity target
         /// and returns the faked plugin
@@ -73,6 +104,9 @@ namespace FakeXrmEasy
             A.CallTo(() => context.OutputParameters).ReturnsLazily(() => outputParameters != null ? outputParameters : new ParameterCollection());
             A.CallTo(() => context.PreEntityImages).ReturnsLazily(() => preEntityImages);
             A.CallTo(() => context.PostEntityImages).ReturnsLazily(() => postEntityImages);
+            A.CallTo(() => context.MessageName).ReturnsLazily(() => MessageName);
+            A.CallTo(() => context.InitiatingUserId).ReturnsLazily(() => InitiatingUserId);
+            A.CallTo(() => context.UserId).ReturnsLazily(() => UserId);
 
             //Create message will pass an Entity as the target but this is not always true
             //For instance, a Delete request will receive an EntityReference

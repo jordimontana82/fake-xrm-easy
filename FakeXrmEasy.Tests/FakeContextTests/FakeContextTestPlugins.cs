@@ -108,5 +108,46 @@ namespace FakeXrmEasy.Tests
             Assert.True(tasks[0].Subject.Equals("Send e-mail to the new customer."));
             Assert.True(tasks[0].RegardingObjectId != null && tasks[0].RegardingObjectId.Id.Equals(guid1));
         }
+
+        [Fact]
+        public void When_A_Plugin_Is_Executed_Configurations_Can_Be_Used()
+        {
+            var fakedContext = new XrmFakedContext();
+
+            var guid1 = Guid.NewGuid();
+            var target = new Entity("contact") { Id = guid1 };
+
+            var inputParams = new ParameterCollection { new KeyValuePair<string, object>("Target", target) };
+
+            var unsecureConfiguration = "Unsecure Configuration";
+            var secureConfiguration = "Secure Configuration";
+
+            //Execute our plugin against the selected target
+            fakedContext.ExecutePluginWith<ConfigurationPlugin>(inputParams, new ParameterCollection(),
+                new EntityImageCollection(), new EntityImageCollection(), unsecureConfiguration, secureConfiguration);
+
+            Assert.True(target.Contains("unsecure"));
+            Assert.True(target.Contains("secure"));
+            Assert.Equal((string)target["unsecure"], unsecureConfiguration);
+            Assert.Equal((string)target["secure"], secureConfiguration);
+        }
+
+        [Fact]
+        public void When_A_Plugin_Is_Executed_With_Configurations_But_Does_Not_Implement_Constructor_Throw_Exception()
+        {
+            var fakedContext = new XrmFakedContext();
+
+            var guid1 = Guid.NewGuid();
+            var target = new Entity("contact") { Id = guid1 };
+
+            var inputParams = new ParameterCollection { new KeyValuePair<string, object>("Target", target) };
+
+            var unsecureConfiguration = "Unsecure Configuration";
+            var secureConfiguration = "Secure Configuration";
+
+            //Execute our plugin against the selected target
+            Assert.Throws<ArgumentException>(() => fakedContext.ExecutePluginWith<FollowupPlugin>(inputParams, new ParameterCollection(),
+                new EntityImageCollection(), new EntityImageCollection(), unsecureConfiguration, secureConfiguration));
+        }
     }
 }
