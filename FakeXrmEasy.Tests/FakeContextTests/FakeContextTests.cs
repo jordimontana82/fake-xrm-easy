@@ -142,45 +142,6 @@ namespace FakeXrmEasy.Tests
 
         }
 
-        [Fact]
-        public void When_initializing_the_context_with_Properties_Plugins_Can_Access_It()
-        {
-            var context = new XrmFakedContext
-            {
-                MessageName = "Create",
-                UserId = Guid.NewGuid(),
-                InitiatingUserId = Guid.NewGuid()
-            };
-
-            Assert.DoesNotThrow(() => context.ExecutePluginWithTarget<TestContextPlugin>(new Entity()));
-        }
-
-        [Fact]
-        public void When_Passing_In_No_Properties_Plugins_Only_Get_Default_Values()
-        {
-            var context = new XrmFakedContext
-            {
-                UserId = Guid.NewGuid(),
-                InitiatingUserId = Guid.NewGuid()
-            };
-
-            Assert.Throws<InvalidPluginExecutionException>(() => context.ExecutePluginWithTarget<TestContextPlugin>(new Entity()));
-
-            context = new XrmFakedContext
-            {
-                MessageName = "Create",
-                InitiatingUserId = Guid.NewGuid()
-            };
-
-            Assert.Throws<InvalidPluginExecutionException>(() => context.ExecutePluginWithTarget<TestContextPlugin>(new Entity()));
-
-            context = new XrmFakedContext
-            {
-                UserId = Guid.NewGuid(),
-                MessageName = "Create"
-            };
-
-            Assert.Throws<InvalidPluginExecutionException>(() => context.ExecutePluginWithTarget<TestContextPlugin>(new Entity()));
-        }
+        
     }
 }

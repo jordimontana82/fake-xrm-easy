@@ -65,6 +65,7 @@
     <Compile Include="XrmFakedContext.Metadata.cs" />
     <Compile Include="XrmFakedContext.Plugins.cs" />
     <Compile Include="XrmFakedContext.Queries.cs" />
+    <Compile Include="XrmFakedPluginExecutionContext.cs" />
     <Compile Include="XrmFakedTracingService.cs" />
   </ItemGroup>
   <ItemGroup>

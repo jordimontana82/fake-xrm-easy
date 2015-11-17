@@ -15,7 +15,7 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
 
             if (string.IsNullOrEmpty(context.MessageName))
             {
-                throw new InvalidPluginExecutionException("Context was null or empty!");
+                throw new InvalidPluginExecutionException("MessageName was null or empty!");
             }
 
             if (context.UserId == Guid.Empty)

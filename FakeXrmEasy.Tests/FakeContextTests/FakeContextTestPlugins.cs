@@ -149,5 +149,62 @@ namespace FakeXrmEasy.Tests
             Assert.Throws<ArgumentException>(() => fakedContext.ExecutePluginWith<FollowupPlugin>(inputParams, new ParameterCollection(),
                 new EntityImageCollection(), new EntityImageCollection(), unsecureConfiguration, secureConfiguration));
         }
+
+        [Fact]
+        public void When_initializing_the_context_with_Properties_Plugins_Can_Access_It()
+        {
+            var context = new XrmFakedContext();
+
+            ParameterCollection inputParameters = new ParameterCollection();
+            inputParameters.Add("Target", new Entity());
+
+            var pluginContext = new XrmFakedPluginExecutionContext()
+            {
+                InputParameters = inputParameters,
+                MessageName = "Create",
+                UserId = Guid.NewGuid(),
+                InitiatingUserId = Guid.NewGuid()
+            };
+
+            Assert.DoesNotThrow(() => context.ExecutePluginWithTarget<TestContextPlugin>(pluginContext));
+        }
+
+        [Fact]
+        public void When_Passing_In_No_Properties_Plugins_Only_Get_Default_Values()
+        {
+            var context = new XrmFakedContext();
+
+            ParameterCollection inputParameters = new ParameterCollection();
+            inputParameters.Add("Target", new Entity());
+
+            var pluginContext = new XrmFakedPluginExecutionContext()
+            {
+                InputParameters = inputParameters,
+                UserId = Guid.NewGuid(),
+                InitiatingUserId = Guid.NewGuid()
+            };
+
+            //Parameters are defaulted now...
+            Assert.DoesNotThrow(() => context.ExecutePluginWith<TestContextPlugin>(pluginContext));
+
+            pluginContext = new XrmFakedPluginExecutionContext()
+            {
+                InputParameters = inputParameters,
+                MessageName = "Create",
+                InitiatingUserId = Guid.NewGuid()
+            };
+
+
+            Assert.DoesNotThrow(() => context.ExecutePluginWith<TestContextPlugin>(pluginContext));
+
+            pluginContext = new XrmFakedPluginExecutionContext()
+            {
+                InputParameters = inputParameters,
+                MessageName = "Update",
+                UserId = Guid.NewGuid()
+            };
+
+            Assert.DoesNotThrow(() => context.ExecutePluginWith<TestContextPlugin>(pluginContext));
+        }
     }
 }

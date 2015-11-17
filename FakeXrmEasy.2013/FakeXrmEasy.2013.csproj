@@ -98,6 +98,9 @@
     <Compile Include="..\FakeXrmEasy\XrmFakedContext.Queries.cs">
       <Link>XrmFakedContext.Queries.cs</Link>
     </Compile>
+    <Compile Include="..\FakeXrmEasy\XrmFakedPluginExecutionContext.cs">
+      <Link>XrmFakedPluginExecutionContext.cs</Link>
+    </Compile>
     <Compile Include="..\FakeXrmEasy\XrmFakedTracingService.cs">
       <Link>XrmFakedTracingService.cs</Link>
     </Compile>

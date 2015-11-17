@@ -37,20 +37,6 @@ namespace FakeXrmEasy
         /// </summary>
         public EntityReference CallerId { get; set; }
 
-        /// <summary>
-        /// Sets the message name that is passed to the plugin while executing
-        /// </summary>
-        public string MessageName { get; set; }
-
-        /// <summary>
-        /// Guid that is passed to plugin as ID of Initating User
-        /// </summary>
-        public Guid InitiatingUserId { get; set; }
-
-        /// <summary>
-        /// Guid that is passed to plugin as ID of User
-        /// </summary>
-        public Guid UserId { get; set; }
 
         public XrmFakedContext()
         {
