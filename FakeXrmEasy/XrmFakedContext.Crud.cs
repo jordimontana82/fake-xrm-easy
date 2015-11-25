@@ -129,11 +129,14 @@ namespace FakeXrmEasy
                     {
                         //Add as many attributes to the entity as the ones received (this will keep existing ones)
                         var cachedEntity = context.Data[e.LogicalName][e.Id];
-                        foreach (var sAttributeName in e.Attributes.Keys)
+                        foreach (var sAttributeName in e.Attributes.Keys.ToList())
                         {
                             cachedEntity[sAttributeName] = e[sAttributeName];
                         }
-                        
+
+                        // Update ModifiedOn
+                        cachedEntity["modifiedon"] = DateTime.UtcNow;
+                        cachedEntity["modifiedby"] = context.CallerId;
                     }
                     else
                     {
