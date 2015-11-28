@@ -7,6 +7,7 @@ using FakeXrmEasy;
 using System.Collections.Generic;
 using Microsoft.Xrm.Sdk;
 using System.Linq;
+using System.Threading;
 using FakeXrmEasy.Tests.PluginsForTesting;
 
 namespace FakeXrmEasy.Tests
@@ -142,6 +143,24 @@ namespace FakeXrmEasy.Tests
 
         }
 
-        
+        [Fact]
+        public void When_updating_an_entity_Modified_On_Should_Also_Be_Updated()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var e = new Entity("account") { Id = Guid.NewGuid() };
+            context.Initialize(new List<Entity>() { e });
+
+            var oldModifiedOn = (DateTime)e["modifiedon"];
+
+            Thread.Sleep(1000);
+
+            service.Update(e);
+            var newModifiedOn = (DateTime)e["modifiedon"];
+
+            Assert.NotEqual(oldModifiedOn, newModifiedOn);
+        }
+
     }
 }
