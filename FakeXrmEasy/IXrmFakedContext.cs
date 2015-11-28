@@ -31,11 +31,11 @@ namespace FakeXrmEasy
         IQueryable<T> CreateQuery<T>() where T : Entity;
 
         /// <summary>
-        /// Returns a faked plugin that will be executed against this faked context
+        /// Returns a faked plugin that will be executed against this faked context and the entity passed as the target
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        IPlugin ExecutePluginWithTarget<T>(object target) where T : IPlugin, new();
+        IPlugin ExecutePluginWithTarget<T>(Entity target) where T : IPlugin, new();
 
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace FakeXrmEasy
 
 
         /// <summary>
-        /// Most flexible plugin execution
+        /// Execute a plugin with input and output params, as well as entity images
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -56,17 +56,34 @@ namespace FakeXrmEasy
                                      EntityImageCollection preEntityImages,
                                      EntityImageCollection postEntityImages) where T : IPlugin, new();
 
+
         /// <summary>
-        /// Most flexible plugin execution, with possibility to pass in secure and unsecure config
+        /// Returns a plugin context with default properties one can override
+        /// </summary>
+        /// <returns></returns>
+        XrmFakedPluginExecutionContext GetDefaultPluginContext();
+
+        /// <summary>
+        /// Executes a plugin passing a custom context. This is useful whenever we need to mock more complex plugin contexts (ex: passing MessageName, plugin Depth, InitiatingUserId etc...)
+        /// </summary>
+        /// <typeparam name="T">Must be a plugin</typeparam>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx) where T : IPlugin, new();
+
+
+        /// <summary>
+        /// Executes a plugin with a custom context and custom configurations (configurations aren't inherent properties of the context so they need to be passed separately)
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="plugCtx"></param>
+        /// <param name="unsecureConfiguration"></param>
+        /// <param name="secureConfiguration"></param>
         /// <returns></returns>
-        IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
-                                     ParameterCollection outputParameters,
-                                     EntityImageCollection preEntityImages,
-                                     EntityImageCollection postEntityImages,
+        IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx,
                                      string unsecureConfiguration,
                                      string secureConfiguration) where T : IPlugin, new();
+
 
         /// <summary>
         /// Executes a code activity against this context
@@ -74,7 +91,7 @@ namespace FakeXrmEasy
         /// This is useful when the codeactivity requires additional mocks that could be stored in the codeactivity itself
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        IDictionary<string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new();
+        IDictionary <string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new();
 
 
         /// <summary>

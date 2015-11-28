@@ -123,8 +123,10 @@ namespace FakeXrmEasy.Tests
             var secureConfiguration = "Secure Configuration";
 
             //Execute our plugin against the selected target
-            fakedContext.ExecutePluginWith<ConfigurationPlugin>(inputParams, new ParameterCollection(),
-                new EntityImageCollection(), new EntityImageCollection(), unsecureConfiguration, secureConfiguration);
+            var plugCtx = fakedContext.GetDefaultPluginContext();
+            plugCtx.InputParameters = inputParams;
+
+            fakedContext.ExecutePluginWithConfigurations<ConfigurationPlugin>(plugCtx, unsecureConfiguration, secureConfiguration);
 
             Assert.True(target.Contains("unsecure"));
             Assert.True(target.Contains("secure"));
@@ -146,8 +148,10 @@ namespace FakeXrmEasy.Tests
             var secureConfiguration = "Secure Configuration";
 
             //Execute our plugin against the selected target
-            Assert.Throws<ArgumentException>(() => fakedContext.ExecutePluginWith<FollowupPlugin>(inputParams, new ParameterCollection(),
-                new EntityImageCollection(), new EntityImageCollection(), unsecureConfiguration, secureConfiguration));
+            var plugCtx = fakedContext.GetDefaultPluginContext();
+            plugCtx.InputParameters = inputParams;
+
+            Assert.Throws<ArgumentException>(() => fakedContext.ExecutePluginWithConfigurations<FollowupPlugin>(plugCtx, unsecureConfiguration, secureConfiguration));
         }
 
         [Fact]
@@ -158,15 +162,11 @@ namespace FakeXrmEasy.Tests
             ParameterCollection inputParameters = new ParameterCollection();
             inputParameters.Add("Target", new Entity());
 
-            var pluginContext = new XrmFakedPluginExecutionContext()
-            {
-                InputParameters = inputParameters,
-                MessageName = "Create",
-                UserId = Guid.NewGuid(),
-                InitiatingUserId = Guid.NewGuid()
-            };
+            var plugCtx = context.GetDefaultPluginContext();
+            plugCtx.MessageName = "Create";
+            plugCtx.InputParameters = inputParameters;
 
-            Assert.DoesNotThrow(() => context.ExecutePluginWithTarget<TestContextPlugin>(pluginContext));
+            Assert.DoesNotThrow(() => context.ExecutePluginWith<TestContextPlugin>(plugCtx));
         }
 
         [Fact]

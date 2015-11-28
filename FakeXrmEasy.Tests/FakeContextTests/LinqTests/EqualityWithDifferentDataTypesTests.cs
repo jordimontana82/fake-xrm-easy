@@ -318,7 +318,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
 
             var contactId = Guid.NewGuid();
             var activityId = Guid.NewGuid();
-            
+
             var partyRecord = new ActivityParty()
             {
                 Id = Guid.NewGuid(),
@@ -329,7 +329,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
             fakedContext.Initialize(new List<Entity>() {
                 new Email() { Id = activityId, ActivityId = activityId, Subject = "Test email"},
                 new ActivityPointer () { Id = Guid.NewGuid(), ActivityId = activityId },
-                partyRecord,    
+                partyRecord,
                 new ActivityPointer() { Id = Guid.NewGuid()},  //To test also nulls
                 new ActivityParty() { Id = Guid.NewGuid()}  //To test also nulls
             });
@@ -338,16 +338,16 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
-                var activities = (from pointer in ctx.CreateQuery<Email>() 
-                                join party in ctx.CreateQuery<ActivityParty>() on pointer.Id equals party.ActivityId.Id
-                                where party.PartyId.Id == contactId
-                                select pointer).ToList();
+                var activities = (from pointer in ctx.CreateQuery<Email>()
+                                  join party in ctx.CreateQuery<ActivityParty>() on pointer.Id equals party.ActivityId.Id
+                                  where party.PartyId.Id == contactId
+                                  select pointer).ToList();
 
                 Assert.True(activities.Count == 1);
             }
         }
 
-        
+
     }
     
 }

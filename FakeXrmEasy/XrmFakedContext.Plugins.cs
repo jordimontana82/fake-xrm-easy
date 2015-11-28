@@ -15,7 +15,7 @@ namespace FakeXrmEasy
 {
     public partial class XrmFakedContext : IXrmFakedContext
     {
-        protected XrmFakedPluginExecutionContext GetDefaultPluginContext()
+        public XrmFakedPluginExecutionContext GetDefaultPluginContext()
         {
             var userId = CallerId != null ? CallerId.Id : Guid.NewGuid();
             return new XrmFakedPluginExecutionContext()
@@ -27,7 +27,9 @@ namespace FakeXrmEasy
                 InitiatingUserId = userId,
                 InputParameters = new ParameterCollection(),
                 OutputParameters = new ParameterCollection(),
-                SharedVariables = new ParameterCollection()
+                SharedVariables = new ParameterCollection(),
+                PreEntityImages = new EntityImageCollection(),
+                PostEntityImages = new EntityImageCollection()
             };
         }
         protected IPluginExecutionContext GetFakedPluginContext(XrmFakedPluginExecutionContext ctx)
@@ -100,27 +102,18 @@ namespace FakeXrmEasy
             return fakedPlugin;
         }
 
-        public IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
-                                     ParameterCollection outputParameters,
-                                     EntityImageCollection preEntityImages,
-                                     EntityImageCollection postEntityImages,
+        public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx,
                                      string unsecureConfiguration,
                                      string secureConfiguration) where T : IPlugin, new()
         {
-            var ctx = new XrmFakedPluginExecutionContext();
-            ctx.InputParameters = inputParameters;
-            ctx.PreEntityImages = preEntityImages;
-            ctx.OutputParameters = outputParameters;
-            ctx.PostEntityImages = postEntityImages;
-
-            var fakedServiceProvider = GetFakedServiceProvider(ctx);
+            var fakedServiceProvider = GetFakedServiceProvider(plugCtx);
 
             var fakedPlugin = A.Fake<IPlugin>();
 
             A.CallTo(() => fakedPlugin.Execute(A<IServiceProvider>._))
                 .Invokes((IServiceProvider provider) =>
                 {
-                    var pluginType = typeof (T);
+                    var pluginType = typeof(T);
                     var constructors = pluginType.GetConstructors().ToList();
 
                     if (!constructors.Any(
@@ -129,7 +122,7 @@ namespace FakeXrmEasy
                     {
                         throw new ArgumentException("The plugin you are trying to execute does not specify a constructor for passing in two configuration strings.");
                     }
-                    
+
                     var plugin = (T)Activator.CreateInstance(pluginType, unsecureConfiguration, secureConfiguration);
                     plugin.Execute(fakedServiceProvider);
                 });
@@ -138,6 +131,56 @@ namespace FakeXrmEasy
             return fakedPlugin;
         }
 
+
+        /// <summary>
+        /// Deprecated, please use ExecutePluginWithConfigurations
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="inputParameters"></param>
+        /// <param name="outputParameters"></param>
+        /// <param name="preEntityImages"></param>
+        /// <param name="postEntityImages"></param>
+        /// <param name="unsecureConfiguration"></param>
+        /// <param name="secureConfiguration"></param>
+        /// <returns></returns>
+        //public IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
+        //                             ParameterCollection outputParameters,
+        //                             EntityImageCollection preEntityImages,
+        //                             EntityImageCollection postEntityImages,
+        //                             string unsecureConfiguration,
+        //                             string secureConfiguration) where T : IPlugin, new()
+        //{
+        //    var ctx = new XrmFakedPluginExecutionContext();
+        //    ctx.InputParameters = inputParameters;
+        //    ctx.PreEntityImages = preEntityImages;
+        //    ctx.OutputParameters = outputParameters;
+        //    ctx.PostEntityImages = postEntityImages;
+
+        //    var fakedServiceProvider = GetFakedServiceProvider(ctx);
+
+        //    var fakedPlugin = A.Fake<IPlugin>();
+
+        //    A.CallTo(() => fakedPlugin.Execute(A<IServiceProvider>._))
+        //        .Invokes((IServiceProvider provider) =>
+        //        {
+        //            var pluginType = typeof (T);
+        //            var constructors = pluginType.GetConstructors().ToList();
+
+        //            if (!constructors.Any(
+        //                    constructor => constructor.GetParameters().ToList().Count == 2
+        //                        && constructor.GetParameters().All(param => param.ParameterType == typeof(string))))
+        //            {
+        //                throw new ArgumentException("The plugin you are trying to execute does not specify a constructor for passing in two configuration strings.");
+        //            }
+                    
+        //            var plugin = (T)Activator.CreateInstance(pluginType, unsecureConfiguration, secureConfiguration);
+        //            plugin.Execute(fakedServiceProvider);
+        //        });
+
+        //    fakedPlugin.Execute(fakedServiceProvider); //Execute the plugin
+        //    return fakedPlugin;
+        //}
+
         /// <summary>
         /// Executes the plugin of type T against the faked context for an entity target
         /// and returns the faked plugin
@@ -145,7 +188,7 @@ namespace FakeXrmEasy
         /// <typeparam name="T"></typeparam>
         /// <param name="target"></param>
         /// <returns></returns>
-        public IPlugin ExecutePluginWithTarget<T>(object target) where T: IPlugin, new()
+        public IPlugin ExecutePluginWithTarget<T>(Entity target) where T: IPlugin, new()
         {
             //Add the target entity to the InputParameters
             ParameterCollection inputParameters = new ParameterCollection();
