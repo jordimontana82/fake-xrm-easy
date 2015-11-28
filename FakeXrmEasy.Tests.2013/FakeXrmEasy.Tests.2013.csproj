@@ -35,8 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FakeItEasy">
-      <HintPath>..\packages\FakeItEasy.2.0.0-beta007\lib\net40\FakeItEasy.dll</HintPath>
+    <Reference Include="FakeItEasy, Version=1.25.3.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
+      <HintPath>..\packages\FakeItEasy.1.25.3\lib\net40\FakeItEasy.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Crm.Sdk.Proxy">
       <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.6.1.1\lib\net40\Microsoft.Crm.Sdk.Proxy.dll</HintPath>
@@ -177,7 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="buildNugetPackages.bat" />
-    <None Include="build\FakeXrmEasy.dll.nuspec" />
+    <None Include="build\FakeXrmEasy.2013.dll.nuspec" />
     <None Include="build\tools\Install.ps1" />
     <None Include="packages.config" />
   </ItemGroup>
