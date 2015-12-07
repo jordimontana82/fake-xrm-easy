@@ -37,11 +37,14 @@ namespace FakeXrmEasy
         /// </summary>
         public EntityReference CallerId { get; set; }
 
+        public delegate OrganizationResponse ServiceRequestExecution(OrganizationRequest req);
+        private Dictionary<Type, ServiceRequestExecution> ExecutionMocks { get; set; }
 
         public XrmFakedContext()
         {
             AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
+            ExecutionMocks = new Dictionary<Type, ServiceRequestExecution>();
         }
 
         /// <summary>
@@ -60,7 +63,16 @@ namespace FakeXrmEasy
                 AddEntity(e);
             }
         }
-        
+
+        public void AddExecutionMock<T>(ServiceRequestExecution mock) where T : OrganizationRequest
+        {
+            ExecutionMocks.Add(typeof (T), mock);
+        }
+
+        public void RemoveExecutionMock<T>() where T : OrganizationRequest
+        {
+            ExecutionMocks.Remove(typeof (T));
+        }
 
         /// <summary>
         /// Returns a faked organization service that works against this context
@@ -167,6 +179,11 @@ namespace FakeXrmEasy
                     {
                         return FakeRetrieveAttributeRequest(context, fakedService, req as RetrieveAttributeRequest);
                     }
+                    else if (context.ExecutionMocks.ContainsKey(req.GetType()))
+                    {
+                        return context.ExecutionMocks[req.GetType()].Invoke(req);
+                    }
+
                     return new OrganizationResponse();
                 });
         }
