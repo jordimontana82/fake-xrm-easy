@@ -21,7 +21,7 @@ namespace FakeXrmEasy.Tests
         public void When_a_plugin_with_target_is_executed_the_inherent_plugin_was_also_executed_without_exceptions()
         {
             var fakedContext = new XrmFakedContext();
-            
+
             var guid1 = Guid.NewGuid();
             var target = new Entity("contact") { Id = guid1 };
 
@@ -30,8 +30,8 @@ namespace FakeXrmEasy.Tests
 
             //Assert that the plugin was executed      
             A.CallTo(() => fakedPlugin.Execute(A<IServiceProvider>._))
-                .MustHaveHappened();            
-            
+                .MustHaveHappened();
+
         }
 
         [Fact]
@@ -41,7 +41,7 @@ namespace FakeXrmEasy.Tests
 
             var guid1 = Guid.NewGuid();
             var target = new Entity("account") { Id = guid1 };
-            
+
             //Execute our plugin against a target that doesn't contains the accountnumber attribute
             var fakedPlugin = fakedContext.ExecutePluginWithTarget<AccountNumberPlugin>(target);
 
@@ -77,7 +77,7 @@ namespace FakeXrmEasy.Tests
 
             //The plugin creates a followup activity, check that that one exists
             var tasks = (from t in fakedContext.CreateQuery<Task>()
-                             select t).ToList();
+                         select t).ToList();
 
             Assert.True(tasks.Count == 1);
             Assert.True(tasks[0]["subject"].Equals("Send e-mail to the new customer."));
@@ -98,7 +98,7 @@ namespace FakeXrmEasy.Tests
             ParameterCollection outputParameters = new ParameterCollection();
             outputParameters.Add("id", guid1);
 
-            fakedContext.ExecutePluginWith<FollowupPlugin>(inputParameters,outputParameters,null,null);
+            fakedContext.ExecutePluginWith<FollowupPlugin>(inputParameters, outputParameters, null, null);
 
             //The plugin creates a followup activity, check that that one exists
             var tasks = (from t in fakedContext.CreateQuery<Task>()
@@ -205,6 +205,13 @@ namespace FakeXrmEasy.Tests
             };
 
             Assert.DoesNotThrow(() => context.ExecutePluginWith<TestContextPlugin>(pluginContext));
+        }
+
+        [Fact]
+        public void When_executing_a_plugin_which_inherits_from_iplugin_it_does_compile()
+        {
+            var fakedContext = new XrmFakedContext();
+            var fakedPlugin = fakedContext.ExecutePluginWithTarget<MyPlugin>(new Entity());
         }
     }
 }

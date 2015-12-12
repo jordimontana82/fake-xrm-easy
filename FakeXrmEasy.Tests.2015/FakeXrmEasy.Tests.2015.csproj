@@ -16,6 +16,7 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -171,6 +172,9 @@
     <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\FollowupPlugin.cs">
       <Link>PluginsForTesting\FollowupPlugin.cs</Link>
     </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\InheritedPlugin.cs">
+      <Link>PluginsForTesting\InheritedPlugin.cs</Link>
+    </Compile>
     <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\RetrieveServicesPlugin.cs">
       <Link>PluginsForTesting\RetrieveServicesPlugin.cs</Link>
     </Compile>
@@ -195,7 +199,7 @@
     <Content Include="build\nuget.exe" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="build\lib\" />
+    <Folder Include="build\lib\net452\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

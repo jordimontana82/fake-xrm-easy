@@ -101,6 +101,7 @@
     <Compile Include="PluginsForTesting\ConfigurationPlugin.cs" />
     <Compile Include="PluginsForTesting\CustomMockPlugin.cs" />
     <Compile Include="PluginsForTesting\FollowupPlugin.cs" />
+    <Compile Include="PluginsForTesting\InheritedPlugin.cs" />
     <Compile Include="PluginsForTesting\RetrieveServicesPlugin.cs" />
     <Compile Include="PluginsForTesting\TestContextPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

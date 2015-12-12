@@ -169,6 +169,9 @@
     <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\FollowupPlugin.cs">
       <Link>PluginsForTesting\FollowupPlugin.cs</Link>
     </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\InheritedPlugin.cs">
+      <Link>PluginsForTesting\InheritedPlugin.cs</Link>
+    </Compile>
     <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\RetrieveServicesPlugin.cs">
       <Link>PluginsForTesting\RetrieveServicesPlugin.cs</Link>
     </Compile>
@@ -180,7 +183,7 @@
   <ItemGroup>
     <Folder Include="bin\Debug\" />
     <Folder Include="bin\Release\" />
-    <Folder Include="build\lib\" />
+    <Folder Include="build\lib\net40\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="buildNugetPackages.bat" />
