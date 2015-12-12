@@ -75,6 +75,7 @@
     <Compile Include="CodeActivitiesForTesting\AddActivityWithConstant.cs" />
     <Compile Include="CodeActivitiesForTesting\AddActivity.cs" />
     <Compile Include="CodeActivitiesForTesting\CreateTaskActivity.cs" />
+    <Compile Include="FakeContextTests\FakeContextMockTests.cs" />
     <Compile Include="FakeContextTests\FakeContextTestCodeActivities.cs" />
     <Compile Include="FakeContextTests\FakeContextTestCreateQuery.cs" />
     <Compile Include="FakeContextTests\FakeContextTestDelete.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="GeneratedCode.cs" />
     <Compile Include="PluginsForTesting\AccountNumberPlugin.cs" />
     <Compile Include="PluginsForTesting\ConfigurationPlugin.cs" />
+    <Compile Include="PluginsForTesting\CustomMockPlugin.cs" />
     <Compile Include="PluginsForTesting\FollowupPlugin.cs" />
     <Compile Include="PluginsForTesting\RetrieveServicesPlugin.cs" />
     <Compile Include="PluginsForTesting\TestContextPlugin.cs" />

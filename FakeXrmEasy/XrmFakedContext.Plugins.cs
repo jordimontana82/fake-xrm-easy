@@ -47,6 +47,8 @@ namespace FakeXrmEasy
             A.CallTo(() => context.MessageName).ReturnsLazily(() => ctx.MessageName);
             A.CallTo(() => context.InitiatingUserId).ReturnsLazily(() => ctx.InitiatingUserId == Guid.Empty ? newUserId : ctx.InitiatingUserId);
             A.CallTo(() => context.UserId).ReturnsLazily(() => ctx.UserId == Guid.Empty ? newUserId : ctx.UserId);
+            A.CallTo(() => context.ParentContext).ReturnsLazily(() => ctx.ParentContext);
+            A.CallTo(() => context.Stage).ReturnsLazily(() => ctx.Stage);
 
             //Create message will pass an Entity as the target but this is not always true
             //For instance, a Delete request will receive an EntityReference
