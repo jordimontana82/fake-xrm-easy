@@ -99,6 +99,9 @@
     <Compile Include="..\FakeXrmEasy.Tests\CodeActivitiesForTesting\CreateTaskActivity.cs">
       <Link>CodeActivitiesForTesting\CreateTaskActivity.cs</Link>
     </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextMockTests.cs">
+      <Link>FakeContextTests\FakeContextMockTests.cs</Link>
+    </Compile>
     <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestCodeActivities.cs">
       <Link>FakeContextTests\FakeContextTestCodeActivities.cs</Link>
     </Compile>
@@ -161,6 +164,9 @@
     </Compile>
     <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\ConfigurationPlugin.cs">
       <Link>PluginsForTesting\ConfigurationPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\CustomMockPlugin.cs">
+      <Link>PluginsForTesting\CustomMockPlugin.cs</Link>
     </Compile>
     <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\FollowupPlugin.cs">
       <Link>PluginsForTesting\FollowupPlugin.cs</Link>
