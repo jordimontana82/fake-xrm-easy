@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>FakeXrmEasy.2015</id>
-    <version>1.7.0</version>
+    <version>1.8.1</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
@@ -10,9 +10,7 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Utilities to streamline unit testing in Dynamics CRM 2013 by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
     <releaseNotes>
-      Added the ability to pass custom plugin contexts.
-      Added the ability execute plugin with secure and unsecure configurations
-      Bug fixes.
+      fixed Assembly Name
     </releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>xrm dynamics crm 2013 unit testing mock mocking fake fakes</tags>

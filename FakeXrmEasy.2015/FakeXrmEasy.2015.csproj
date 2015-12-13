@@ -7,8 +7,8 @@
     <ProjectGuid>{EFD34E08-A235-462E-A853-BD9559112C15}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FakeXrmEasy._2015</RootNamespace>
-    <AssemblyName>FakeXrmEasy.2015</AssemblyName>
+    <RootNamespace>FakeXrmEasy</RootNamespace>
+    <AssemblyName>FakeXrmEasy</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
