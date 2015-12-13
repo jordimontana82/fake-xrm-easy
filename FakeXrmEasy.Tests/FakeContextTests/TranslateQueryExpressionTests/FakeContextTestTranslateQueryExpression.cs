@@ -310,8 +310,11 @@ namespace FakeXrmEasy.Tests
             var firstContact = result.FirstOrDefault();
             var lastContact = result.LastOrDefault();
 
-            Assert.True(firstContact.Attributes.Count == 3 + 4); //Contact 1 (the extra four are the CreatedOn, ModifiedOn, CreatedBy, ModifiedBy attributes generated automatically
-            Assert.True(lastContact.Attributes.Count == 3 + 4);  //Contact 2
+            //Contact 1 attributes = 3 + 4 (the extra four are the CreatedOn, ModifiedOn, CreatedBy, ModifiedBy attributes generated automatically
+            //+ Attributes from the join(account) = 1 + 4 (the extra four are the CreatedOn, ModifiedOn, CreatedBy, ModifiedBy attributes generated automatically
+
+            Assert.True(firstContact.Attributes.Count == 3 + 1 + 4 * 2); 
+            Assert.True(lastContact.Attributes.Count == 3 + 1 + 4 * 2);  //Contact 2
         }
 
         [Fact]
@@ -342,6 +345,7 @@ namespace FakeXrmEasy.Tests
                 }
             );
 
+            qe.ColumnSet = new ColumnSet(false);
             var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe);
 
             Assert.True(result.Count() == 2);

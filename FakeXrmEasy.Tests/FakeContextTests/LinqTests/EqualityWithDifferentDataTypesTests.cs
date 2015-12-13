@@ -339,8 +339,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
                 var activities = (from pointer in ctx.CreateQuery<Email>()
-                                  join party in ctx.CreateQuery<ActivityParty>() on pointer.Id equals party.ActivityId.Id
-                                  where party.PartyId.Id == contactId
+                                  join party in ctx.CreateQuery<ActivityParty>() on pointer.ActivityId.Value equals party.ActivityId.Id
+                                 // from party in ctx.CreateQuery<ActivityParty>() //on pointer.ActivityId.Value equals party.ActivityId.Id
+                                    where party.PartyId.Id == contactId
                                   select pointer).ToList();
 
                 Assert.True(activities.Count == 1);

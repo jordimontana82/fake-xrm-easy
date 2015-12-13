@@ -833,5 +833,39 @@ namespace FakeXrmEasy.Tests
                 Assert.True(matches.Count == 2);
             }
         }
+
+        [Fact(DisplayName = "When_doing_a_join_with_filter_then_can_filter_by_the_joined_entity_attributes")]
+        public void When_doing_a_join_with_filter_then_can_filter_by_the_joined_entity_attributes()
+        {
+            //REVIEW: Different implementations of the ConditionExpression class in Microsoft.Xrm.Sdk (which has EntityName property for versions >= 2013)
+             
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contactId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+            var accountId2 = Guid.NewGuid();
+
+            //Contact is related to first account, but because first account is not related to itself then the query must return 0 records
+            fakedContext.Initialize(new List<Entity>() {
+                new Account() { Id = accountId, Name="Account1" },
+                new Account() { Id = accountId2, Name = "Account2" },
+                new Contact() { Id = contactId, ParentCustomerId = new EntityReference(Account.EntityLogicalName, accountId),
+                                                NumberOfChildren = 2, FirstName = "Contact" },
+                new Contact() {Id = Guid.NewGuid(), ParentCustomerId =  new EntityReference(Account.EntityLogicalName, accountId2) }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               join account in ctx.CreateQuery<Account>() on c.ParentCustomerId.Id equals account.AccountId
+                               where account.Name == "Account1"
+                               select c).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
     }
 }

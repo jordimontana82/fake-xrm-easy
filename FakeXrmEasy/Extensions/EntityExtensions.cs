@@ -35,9 +35,14 @@ namespace FakeXrmEasy.Extensions
         /// <returns></returns>
         public static Entity ProjectAttributes(this Entity e, ColumnSet columnSet, XrmFakedContext context)
         {
-            if (columnSet == null) return e;
+            return ProjectAttributes(e, new QueryExpression() { ColumnSet = columnSet }, context);
+        }
 
-            if (columnSet.AllColumns)
+        public static Entity ProjectAttributes(this Entity e, QueryExpression qe, XrmFakedContext context)
+        {
+            if (qe.ColumnSet == null) return e;
+
+            if (qe.ColumnSet.AllColumns)
             {
                 return e; //return all the original attributes
             }
@@ -62,7 +67,7 @@ namespace FakeXrmEasy.Extensions
                 else 
                     projected = new Entity(e.LogicalName) { Id = e.Id };
 
-                foreach (var attKey in columnSet.Columns)
+                foreach (var attKey in qe.ColumnSet.Columns)
                 {
                     if (e.Attributes.ContainsKey(attKey))
                         projected[attKey] = e[attKey];
@@ -76,12 +81,22 @@ namespace FakeXrmEasy.Extensions
                     }
                 }
 
-                //Plus the aliased attributes, if any
-                foreach (var attKey in e.Attributes.Keys)
+                //Plus attributes from joins
+                foreach(var le in qe.LinkEntities)
                 {
-                    if(e[attKey] is AliasedValue && !projected.Attributes.ContainsKey(attKey))
-                        projected[attKey] = e[attKey];
+                    foreach (var attKey in le.Columns.Columns)
+                    {
+                        var sAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
+                        var linkedAttKey = sAlias + "." + attKey;
+                        if (e.Attributes.ContainsKey(linkedAttKey) || le.Columns.AllColumns)
+                            projected[linkedAttKey] = e[linkedAttKey];
+                    }
                 }
+                //foreach (var attKey in e.Attributes.Keys)
+                //{
+                //    if(e[attKey] is AliasedValue && !projected.Attributes.ContainsKey(attKey))
+                //        projected[attKey] = e[attKey];
+                //}
                 return projected;
             }
         }
