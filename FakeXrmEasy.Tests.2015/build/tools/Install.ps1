@@ -1,3 +1,3 @@
 ﻿param($installPath, $toolsPath, $package, $project)
 
-$DTE.ItemOperations.Navigate("https://it-gems.com/fake-xrm-easy-install.html")
+$DTE.ItemOperations.Navigate("http://dynamicsvalue.com/get-started/nuget-install-2015")
