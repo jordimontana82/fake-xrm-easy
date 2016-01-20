@@ -19,6 +19,7 @@ This is section is in progress, if you wanna contribute, please [get in touch](h
 ##Roadmap / Backlog
 
 *  Create projects and NuGet package for Dynamics CRM 2016
+*  Add Associate / Disassociate fake messages
 *  Add change log
 *  Increase test coverage
 *  Add automated build
