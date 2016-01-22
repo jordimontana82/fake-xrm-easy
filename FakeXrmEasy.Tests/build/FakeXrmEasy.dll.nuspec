@@ -2,18 +2,18 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>FakeXrmEasy</id>
-    <version>1.8.3</version>
+    <version>1.8.4</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
-    <projectUrl>https://it-gems.com/fake-xrm-easy.html</projectUrl>
+    <projectUrl>http://dynamicsvalue.com</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Utilities to streamline unit testing in Dynamics CRM by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
     <releaseNotes>
       Updated post install script to add a Getting Started page.
     </releaseNotes>
-    <copyright>Copyright 2015</copyright>
-    <tags>xrm dynamics crm unit testing mock mocking fake fakes</tags>
+    <copyright>Copyright 2014-2016</copyright>
+    <tags>xrm dynamics crm unit testing mock mocking fake fakes 2011</tags>
     <dependencies>
       <dependency id="FakeItEasy" version="1.25.1" />
       <dependency id="Microsoft.Xrm.Sdk.2011" version="5.0.18" />
