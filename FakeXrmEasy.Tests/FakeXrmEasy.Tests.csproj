@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props" Condition="Exists('..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" />
   <UsingTask AssemblyFile="..\packages\xunit.runners.1.9.2\tools\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit" />
   <PropertyGroup>
@@ -110,12 +110,10 @@
   <ItemGroup>
     <None Include="buildNugetPackages.bat" />
     <None Include="build\FakeXrmEasy.1.0.0.nupkg" />
-    <None Include="build\FakeXrmEasy.1.2.0.nupkg" />
-    <None Include="build\FakeXrmEasy.1.2.1-alpha.nupkg" />
-    <None Include="build\FakeXrmEasy.1.2.4-alpha.nupkg" />
     <None Include="build\FakeXrmEasy.dll.nuspec" />
     <None Include="build\tools\Install.ps1" />
     <None Include="packages.config" />
+    <Compile Include="FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FakeXrmEasy\FakeXrmEasy.csproj">
@@ -169,4 +167,5 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
+  <ItemGroup />
 </Project>

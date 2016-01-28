@@ -184,6 +184,7 @@
       <Link>PluginsForTesting\TestContextPlugin.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RetrieveMultiple\QueryLinkEntityTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="buildNugetPackages.bat" />

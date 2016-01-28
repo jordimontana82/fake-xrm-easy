@@ -585,7 +585,8 @@ namespace FakeXrmEasy
             
             foreach(var ce in le.LinkCriteria.Conditions)
             {
-                ce.AttributeName = le.EntityAlias + "." + ce.AttributeName;
+                var entityAlias = !string.IsNullOrEmpty(le.EntityAlias) ? le.EntityAlias : le.LinkToEntityName;
+                ce.AttributeName = entityAlias + "." + ce.AttributeName;
             }
 
             return TranslateFilterExpressionToExpression(le.LinkCriteria, entity);

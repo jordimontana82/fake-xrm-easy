@@ -77,6 +77,12 @@
     <Compile Include="..\FakeXrmEasy\Extensions\EntityExtensions.cs">
       <Link>Extensions\EntityExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\AssociateRequestExecutor.cs">
+      <Link>FakeMessageExecutors\AssociateRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\DisassociateRequestExecutor.cs">
+      <Link>DisassociateRequestExecutor.cs</Link>
+    </Compile>
     <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\IFakeMessageExecutor.cs">
       <Link>FakeMessageExecutors\IFakeMessageExecutor.cs</Link>
     </Compile>
@@ -121,6 +127,9 @@
     </Compile>
     <Compile Include="..\FakeXrmEasy\XrmFakedPluginExecutionContext.cs">
       <Link>XrmFakedPluginExecutionContext.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy\XrmFakedRelationship.cs">
+      <Link>XrmFakedRelationship.cs</Link>
     </Compile>
     <Compile Include="..\FakeXrmEasy\XrmFakedTracingService.cs">
       <Link>XrmFakedTracingService.cs</Link>

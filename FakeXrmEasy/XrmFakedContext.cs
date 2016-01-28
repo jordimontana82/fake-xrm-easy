@@ -47,6 +47,8 @@ namespace FakeXrmEasy
 
         private Dictionary<Type, IFakeMessageExecutor> FakeMessageExecutors { get; set; }
 
+        private Dictionary<string, XrmFakedRelationship> Relationships { get; set; }
+
         public XrmFakedContext()
         {
             AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
@@ -59,6 +61,10 @@ namespace FakeXrmEasy
             AddFakeMessageExecutor<RetrieveMultipleRequest>(new RetrieveMultipleRequestExecutor());
             AddFakeMessageExecutor<RetrieveAttributeRequest>(new RetrieveAttributeRequestExecutor());
             AddFakeMessageExecutor<SetStateRequest>(new SetStateRequestExecutor());
+            AddFakeMessageExecutor<AssociateRequest>(new AssociateRequestExecutor());
+            AddFakeMessageExecutor<DisassociateRequest>(new DisassociateRequestExecutor());
+
+            Relationships = new Dictionary<string, XrmFakedRelationship>();
         }
 
         /// <summary>
@@ -96,6 +102,26 @@ namespace FakeXrmEasy
         public void RemoveFakeMessageExecutor<T>() where T : OrganizationRequest
         {
             FakeMessageExecutors.Remove(typeof(T));
+        }
+
+        public void AddRelationship(string schemaname, XrmFakedRelationship relationship)
+        {
+            Relationships.Add(schemaname, relationship);
+        }
+
+        public void RemoveRelationship(string schemaname)
+        {
+            Relationships.Remove(schemaname);
+        }
+
+        public XrmFakedRelationship GetRelationship(string schemaName)
+        {
+            if (Relationships.ContainsKey(schemaName))
+            {
+                return Relationships[schemaName];
+            }
+
+            return null;
         }
 
         /// <summary>
