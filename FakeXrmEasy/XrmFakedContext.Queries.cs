@@ -491,6 +491,11 @@ namespace FakeXrmEasy
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             Expression convertedValueToStr = Expression.Convert(getAttributeValueExpr, typeof(string));
 
+            Expression convertedValueToStrAndToLower =
+                Expression.Call(convertedValueToStr,
+                                typeof(string).GetMethod("ToLowerInvariant", new Type[] { }));
+
+                                
             string sLikeOperator = "%";
             foreach (object value in c.Values)
             {
@@ -504,9 +509,9 @@ namespace FakeXrmEasy
                     sMethod = "StartsWith";
 
                 expOrValues = Expression.Or(expOrValues, Expression.Call(
-                    convertedValueToStr,
+                    convertedValueToStrAndToLower,
                     typeof(string).GetMethod(sMethod, new Type[] { typeof(string) }),
-                    Expression.Constant(value.ToString().Replace("%", "")) //Linq2CRM adds the percentage value to be executed as a LIKE operator, here we are replacing it to just use the appropiate method
+                    Expression.Constant(value.ToString().ToLowerInvariant().Replace("%", "")) //Linq2CRM adds the percentage value to be executed as a LIKE operator, here we are replacing it to just use the appropiate method
                 ));
             }
 

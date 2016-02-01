@@ -153,5 +153,19 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             Assert.True(result.Count() == 1);
         }
+
+        [Fact]
+        public void When_executing_a_query_expression_like_operator_is_case_insensitive()
+        {
+            var context = new XrmFakedContext { ProxyTypesAssembly = Assembly.GetExecutingAssembly() };
+            var service = context.GetFakedOrganizationService();
+
+            service.Create(new Contact { FirstName = "Jimmy" });
+
+            var qe = new QueryExpression("contact");
+            qe.Criteria.AddCondition("firstname", ConditionOperator.Like, "JIM%");
+
+            Assert.Equal(1, service.RetrieveMultiple(qe).Entities.Count);
+        }
     }
 }
