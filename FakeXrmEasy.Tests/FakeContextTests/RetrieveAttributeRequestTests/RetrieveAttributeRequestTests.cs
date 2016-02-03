@@ -30,8 +30,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveAttributeRequestTests
                 LogicalName = "name"
             };
 
-            var response = service.Execute(req) as RetrieveAttributeResponse;
-            Assert.True(true);
+            Assert.Throws<PullRequestException>(() => service.Execute(req));
         }
     }
 }

@@ -14,6 +14,7 @@ using Microsoft.Xrm.Sdk.Client;
 using System.ServiceModel.Description;
 using System.Reflection;
 using Microsoft.Crm.Sdk.Messages;
+using FakeXrmEasy.FakeMessageExecutors;
 
 namespace FakeXrmEasy
 {
@@ -38,13 +39,25 @@ namespace FakeXrmEasy
         public EntityReference CallerId { get; set; }
 
         public delegate OrganizationResponse ServiceRequestExecution(OrganizationRequest req);
+
+        /// <summary>
+        /// Probably should be replaced by FakeMessageExecutors, more generic, which can use custom interfaces rather than a single method / delegate
+        /// </summary>
         private Dictionary<Type, ServiceRequestExecution> ExecutionMocks { get; set; }
+
+        private Dictionary<Type, IFakeMessageExecutor> FakeMessageExecutors { get; set; }
 
         public XrmFakedContext()
         {
             AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
             ExecutionMocks = new Dictionary<Type, ServiceRequestExecution>();
+            FakeMessageExecutors = new Dictionary<Type, IFakeMessageExecutor>();
+
+            //Adding default execution fakes
+            AddFakeMessageExecutor<WhoAmIRequest>(new WhoAmIRequestExecutor());
+            AddFakeMessageExecutor<RetrieveMultipleRequest>(new RetrieveMultipleRequestExecutor());
+            AddFakeMessageExecutor<RetrieveAttributeRequest>(new RetrieveAttributeRequestExecutor());
         }
 
         /// <summary>
@@ -72,6 +85,16 @@ namespace FakeXrmEasy
         public void RemoveExecutionMock<T>() where T : OrganizationRequest
         {
             ExecutionMocks.Remove(typeof (T));
+        }
+
+        public void AddFakeMessageExecutor<T>(IFakeMessageExecutor executor) where T : OrganizationRequest
+        {
+            FakeMessageExecutors.Add(typeof(T), executor);
+        }
+
+        public void RemoveFakeMessageExecutor<T>() where T : OrganizationRequest
+        {
+            FakeMessageExecutors.Remove(typeof(T));
         }
 
         /// <summary>
@@ -124,67 +147,17 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Execute(A<OrganizationRequest>._))
                 .ReturnsLazily((OrganizationRequest req) =>
                 {
-                    if(req is RetrieveMultipleRequest) {
-                        var request = req as RetrieveMultipleRequest;
-                        if (request.Query is QueryExpression)
-                        {
-                            var linqQuery = TranslateQueryExpressionToLinq(context, request.Query as QueryExpression);
-                            var response = new RetrieveMultipleResponse
-                            {
-                                Results = new ParameterCollection
-                                 {
-                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
-                                 }
-                            };
-                            return response;
-                        }
-                        else if (request.Query is QueryByAttribute)
-                        {
-                            //We instantiate a QueryExpression to be executed as we have the implementation done already
-                            var query = request.Query as QueryByAttribute;
-                            var qe = new QueryExpression(query.EntityName);
 
-                            qe.ColumnSet = query.ColumnSet;
-                            qe.Criteria = new FilterExpression();
-                            for (var i = 0; i < query.Attributes.Count; i++)
-                            {
-                                qe.Criteria.AddCondition(new ConditionExpression(query.Attributes[i], ConditionOperator.Equal, query.Values[i]));
-                            }
-
-                            //QueryExpression now done... execute it!
-                            var linqQuery = TranslateQueryExpressionToLinq(context, qe as QueryExpression);
-                            var response = new RetrieveMultipleResponse
-                            {
-                                Results = new ParameterCollection
-                                 {
-                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
-                                 }
-                            };
-                            return response;
-                        }
-                    }
-                    else if (req is WhoAmIRequest)
+                    if (context.FakeMessageExecutors.ContainsKey(req.GetType()))
                     {
-                        var request = req as WhoAmIRequest;
-
-                        var response = new WhoAmIResponse
-                        {
-                            Results = new ParameterCollection
-                                { { "UserId", context.CallerId.Id } }
-                                 
-                        };
-                        return response;
-                    }
-                    else if (req is RetrieveAttributeRequest)
-                    {
-                        return FakeRetrieveAttributeRequest(context, fakedService, req as RetrieveAttributeRequest);
+                        return context.FakeMessageExecutors[req.GetType()].Execute(req, context);
                     }
                     else if (context.ExecutionMocks.ContainsKey(req.GetType()))
                     {
                         return context.ExecutionMocks[req.GetType()].Invoke(req);
                     }
 
-                    return new OrganizationResponse();
+                    throw PullRequestException.NotImplementedOrganizationRequest(req.GetType());
                 });
         }
 

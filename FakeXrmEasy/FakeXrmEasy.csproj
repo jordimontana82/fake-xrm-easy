@@ -55,6 +55,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\EntityExtensions.cs" />
+    <Compile Include="FakeMessageExecutors\IFakeMessageExecutor.cs" />
+    <Compile Include="FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs" />
+    <Compile Include="FakeMessageExecutors\RetrieveAttributeRequestExecutor.cs" />
+    <Compile Include="FakeMessageExecutors\WhoAmIRequestExecutor.cs" />
     <Compile Include="OrganizationFaults\OrganizationServiceFaultQueryBuilderNoAttribute.cs" />
     <Compile Include="XrmFakedContext.CodeActivities.cs" />
     <Compile Include="XrmFakedContext.Crud.cs" />
