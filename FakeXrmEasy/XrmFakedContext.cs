@@ -58,6 +58,7 @@ namespace FakeXrmEasy
             AddFakeMessageExecutor<WhoAmIRequest>(new WhoAmIRequestExecutor());
             AddFakeMessageExecutor<RetrieveMultipleRequest>(new RetrieveMultipleRequestExecutor());
             AddFakeMessageExecutor<RetrieveAttributeRequest>(new RetrieveAttributeRequestExecutor());
+            AddFakeMessageExecutor<SetStateRequest>(new SetStateRequestExecutor());
         }
 
         /// <summary>

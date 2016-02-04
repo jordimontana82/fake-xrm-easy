@@ -89,6 +89,9 @@
     <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs">
       <Link>FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs</Link>
     </Compile>
+    <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\SetStateRequestExecutor.cs">
+      <Link>FakeMessageExecutors\SetStateRequestExecutor.cs</Link>
+    </Compile>
     <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\WhoAmIRequestExecutor.cs">
       <Link>FakeMessageExecutors\WhoAmIRequestExecutor.cs</Link>
     </Compile>

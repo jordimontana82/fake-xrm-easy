@@ -58,6 +58,7 @@
     <Compile Include="FakeMessageExecutors\IFakeMessageExecutor.cs" />
     <Compile Include="FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs" />
     <Compile Include="FakeMessageExecutors\RetrieveAttributeRequestExecutor.cs" />
+    <Compile Include="FakeMessageExecutors\SetStateRequestExecutor.cs" />
     <Compile Include="FakeMessageExecutors\WhoAmIRequestExecutor.cs" />
     <Compile Include="OrganizationFaults\OrganizationServiceFaultQueryBuilderNoAttribute.cs" />
     <Compile Include="XrmFakedContext.CodeActivities.cs" />

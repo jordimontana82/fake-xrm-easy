@@ -142,6 +142,9 @@
     <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs">
       <Link>FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs</Link>
     </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs">
+      <Link>FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs</Link>
+    </Compile>
     <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs">
       <Link>FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs</Link>
     </Compile>
