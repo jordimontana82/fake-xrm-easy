@@ -159,6 +159,8 @@ namespace FakeXrmEasy
 
             //Fake / Intercept other requests
             FakeExecute(context, fakedService);
+            FakeAssociate(context, fakedService);
+            FakeDisassociate(context, fakedService);
 
             return fakedService;
         }
@@ -185,6 +187,48 @@ namespace FakeXrmEasy
                     }
 
                     throw PullRequestException.NotImplementedOrganizationRequest(req.GetType());
+                });
+        }
+
+        public static void FakeAssociate(XrmFakedContext context, IOrganizationService fakedService)
+        {
+            A.CallTo(() => fakedService.Associate(A<string>._, A<Guid>._, A<Relationship>._, A<EntityReferenceCollection>._))
+                .Invokes((string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection entityCollection) =>
+                {
+
+                    if (context.FakeMessageExecutors.ContainsKey(typeof(AssociateRequest)))
+                    {
+                        var request = new AssociateRequest()
+                        {
+                            Target = new EntityReference() { Id = entityId, LogicalName = entityName },
+                            Relationship = relationship,
+                            RelatedEntities = entityCollection
+                        };
+                        context.FakeMessageExecutors[typeof(AssociateRequest)].Execute(request, context);
+                    }
+                    else 
+                        throw PullRequestException.NotImplementedOrganizationRequest(typeof(AssociateRequest));
+                });
+        }
+
+        public static void FakeDisassociate(XrmFakedContext context, IOrganizationService fakedService)
+        {
+            A.CallTo(() => fakedService.Disassociate(A<string>._, A<Guid>._, A<Relationship>._, A<EntityReferenceCollection>._))
+                .Invokes((string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection entityCollection) =>
+                {
+
+                    if (context.FakeMessageExecutors.ContainsKey(typeof(DisassociateRequest)))
+                    {
+                        var request = new DisassociateRequest()
+                        {
+                            Target = new EntityReference() { Id = entityId, LogicalName = entityName },
+                            Relationship = relationship,
+                            RelatedEntities = entityCollection
+                        };
+                        context.FakeMessageExecutors[typeof(DisassociateRequest)].Execute(request, context);
+                    }
+                    else
+                        throw PullRequestException.NotImplementedOrganizationRequest(typeof(DisassociateRequest));
                 });
         }
 
