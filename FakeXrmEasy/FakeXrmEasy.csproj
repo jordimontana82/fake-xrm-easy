@@ -55,6 +55,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\EntityExtensions.cs" />
+    <Compile Include="FakeMessageExecutors\AssociateRequestExecutor.cs" />
+    <Compile Include="FakeMessageExecutors\DisassociateRequestExecutor.cs" />
     <Compile Include="FakeMessageExecutors\IFakeMessageExecutor.cs" />
     <Compile Include="FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs" />
     <Compile Include="FakeMessageExecutors\RetrieveAttributeRequestExecutor.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="XrmFakedContext.Plugins.cs" />
     <Compile Include="XrmFakedContext.Queries.cs" />
     <Compile Include="XrmFakedPluginExecutionContext.cs" />
+    <Compile Include="XrmFakedRelationship.cs" />
     <Compile Include="XrmFakedTracingService.cs" />
   </ItemGroup>
   <ItemGroup>

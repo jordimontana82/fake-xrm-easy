@@ -191,6 +191,10 @@ namespace FakeXrmEasy
         #region Other protected methods
         protected void EnsureEntityNameExistsInMetadata(string sEntityName)
         {
+			if(Relationships.Values.Any(value => new[]{value.Entity1LogicalName, value.Entity2LogicalName}.Contains(sEntityName, StringComparer.InvariantCultureIgnoreCase)))
+			{
+				return;
+			}
             //Entity metadata is checked differently when we are using a ProxyTypesAssembly => we can infer that from the generated types assembly
             if (ProxyTypesAssembly != null)
             {

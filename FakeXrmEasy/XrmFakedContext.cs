@@ -47,6 +47,8 @@ namespace FakeXrmEasy
 
         private Dictionary<Type, IFakeMessageExecutor> FakeMessageExecutors { get; set; }
 
+        private Dictionary<string, XrmFakedRelationship> Relationships { get; set; }
+
         public XrmFakedContext()
         {
             AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
@@ -59,6 +61,10 @@ namespace FakeXrmEasy
             AddFakeMessageExecutor<RetrieveMultipleRequest>(new RetrieveMultipleRequestExecutor());
             AddFakeMessageExecutor<RetrieveAttributeRequest>(new RetrieveAttributeRequestExecutor());
             AddFakeMessageExecutor<SetStateRequest>(new SetStateRequestExecutor());
+            AddFakeMessageExecutor<AssociateRequest>(new AssociateRequestExecutor());
+            AddFakeMessageExecutor<DisassociateRequest>(new DisassociateRequestExecutor());
+
+            Relationships = new Dictionary<string, XrmFakedRelationship>();
         }
 
         /// <summary>
@@ -98,6 +104,26 @@ namespace FakeXrmEasy
             FakeMessageExecutors.Remove(typeof(T));
         }
 
+        public void AddRelationship(string schemaname, XrmFakedRelationship relationship)
+        {
+            Relationships.Add(schemaname, relationship);
+        }
+
+        public void RemoveRelationship(string schemaname)
+        {
+            Relationships.Remove(schemaname);
+        }
+
+        public XrmFakedRelationship GetRelationship(string schemaName)
+        {
+            if (Relationships.ContainsKey(schemaName))
+            {
+                return Relationships[schemaName];
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Returns a faked organization service that works against this context
         /// </summary>
@@ -133,6 +159,8 @@ namespace FakeXrmEasy
 
             //Fake / Intercept other requests
             FakeExecute(context, fakedService);
+            FakeAssociate(context, fakedService);
+            FakeDisassociate(context, fakedService);
 
             return fakedService;
         }
@@ -159,6 +187,48 @@ namespace FakeXrmEasy
                     }
 
                     throw PullRequestException.NotImplementedOrganizationRequest(req.GetType());
+                });
+        }
+
+        public static void FakeAssociate(XrmFakedContext context, IOrganizationService fakedService)
+        {
+            A.CallTo(() => fakedService.Associate(A<string>._, A<Guid>._, A<Relationship>._, A<EntityReferenceCollection>._))
+                .Invokes((string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection entityCollection) =>
+                {
+
+                    if (context.FakeMessageExecutors.ContainsKey(typeof(AssociateRequest)))
+                    {
+                        var request = new AssociateRequest()
+                        {
+                            Target = new EntityReference() { Id = entityId, LogicalName = entityName },
+                            Relationship = relationship,
+                            RelatedEntities = entityCollection
+                        };
+                        context.FakeMessageExecutors[typeof(AssociateRequest)].Execute(request, context);
+                    }
+                    else 
+                        throw PullRequestException.NotImplementedOrganizationRequest(typeof(AssociateRequest));
+                });
+        }
+
+        public static void FakeDisassociate(XrmFakedContext context, IOrganizationService fakedService)
+        {
+            A.CallTo(() => fakedService.Disassociate(A<string>._, A<Guid>._, A<Relationship>._, A<EntityReferenceCollection>._))
+                .Invokes((string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection entityCollection) =>
+                {
+
+                    if (context.FakeMessageExecutors.ContainsKey(typeof(DisassociateRequest)))
+                    {
+                        var request = new DisassociateRequest()
+                        {
+                            Target = new EntityReference() { Id = entityId, LogicalName = entityName },
+                            Relationship = relationship,
+                            RelatedEntities = entityCollection
+                        };
+                        context.FakeMessageExecutors[typeof(DisassociateRequest)].Execute(request, context);
+                    }
+                    else
+                        throw PullRequestException.NotImplementedOrganizationRequest(typeof(DisassociateRequest));
                 });
         }
 
