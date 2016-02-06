@@ -34,7 +34,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             fakedContext.Initialize(new Entity[] { testUser, testRole });
 
-            fakedContext.AddRelationship("systemuserroles", new XrmFakedRelationship
+            fakedContext.AddRelationship("systemuserroles_association", new XrmFakedRelationship
             {
                 IntersectEntity = "systemuserroles",
                 Entity1LogicalName = SystemUser.EntityLogicalName,
@@ -50,7 +50,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 {
                     new EntityReference(Role.EntityLogicalName, testRole.Id),
                 },
-                Relationship = new Relationship("systemuserroles")
+                Relationship = new Relationship("systemuserroles_association")
             };
 
             fakedService.Execute(request);
@@ -119,7 +119,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             fakedContext.Initialize(new Entity[] { testUser, testRole, testUser2, testRole2 });
 
-            fakedContext.AddRelationship("systemuserroles", new XrmFakedRelationship
+            fakedContext.AddRelationship("systemuserroles_association", new XrmFakedRelationship
             {
                 IntersectEntity = "systemuserroles",
                 Entity1LogicalName = SystemUser.EntityLogicalName,
@@ -135,7 +135,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 {
                     new EntityReference(Role.EntityLogicalName, testRole.Id),
                 },
-                Relationship = new Relationship("systemuserroles")
+                Relationship = new Relationship("systemuserroles_association")
             };
 
             fakedService.Execute(request);
@@ -147,7 +147,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 {
                     new EntityReference(Role.EntityLogicalName, testRole2.Id),
                 },
-                Relationship = new Relationship("systemuserroles")
+                Relationship = new Relationship("systemuserroles_association")
             };
 
             fakedService.Execute(request2);
@@ -204,7 +204,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             fakedContext.Initialize(new Entity[] { testUser, testRole });
 
-            fakedContext.AddRelationship("systemuserroles", new XrmFakedRelationship
+            fakedContext.AddRelationship("systemuserroles_association", new XrmFakedRelationship
             {
                 IntersectEntity = "systemuserroles",
                 Entity1LogicalName = SystemUser.EntityLogicalName,
@@ -220,7 +220,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 {
                     new EntityReference(Role.EntityLogicalName, testRole.Id),
                 },
-                Relationship = new Relationship("systemuserroles")
+                Relationship = new Relationship("systemuserroles_association")
             };
 
             fakedService.Execute(request);
@@ -232,7 +232,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 {
                     new EntityReference(Role.EntityLogicalName, testRole.Id),
                 },
-                Relationship = new Relationship("systemuserroles")
+                Relationship = new Relationship("systemuserroles_association")
             };
 
             fakedService.Execute(disassociate);

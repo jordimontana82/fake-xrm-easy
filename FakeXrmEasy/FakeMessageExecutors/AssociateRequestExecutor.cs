@@ -38,7 +38,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             foreach (var relatedEntity in associateRequest.RelatedEntities)
             {
-                var association = new Entity(relationShipName)
+                var association = new Entity(relationShip.IntersectEntity)
                 {
                     Attributes = new AttributeCollection
                         {
