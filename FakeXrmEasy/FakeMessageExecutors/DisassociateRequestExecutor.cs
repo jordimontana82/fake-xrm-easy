@@ -40,7 +40,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             foreach (var relatedEntity in disassociateRequest.RelatedEntities)
             {
-                var query = new QueryExpression(relationShipName)
+                var query = new QueryExpression(relationShip.IntersectEntity)
                 {
                     ColumnSet = new ColumnSet(true),
                     Criteria = new FilterExpression(LogicalOperator.And)
@@ -55,7 +55,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
                 if (results.Entities.Count == 1)
                 {
-                    service.Delete(relationShipName, results.Entities.First().Id);
+                    service.Delete(relationShip.IntersectEntity, results.Entities.First().Id);
                 }
             }
 

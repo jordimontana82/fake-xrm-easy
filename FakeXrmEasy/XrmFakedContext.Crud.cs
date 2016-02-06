@@ -191,7 +191,7 @@ namespace FakeXrmEasy
         #region Other protected methods
         protected void EnsureEntityNameExistsInMetadata(string sEntityName)
         {
-			if(Relationships.Values.Any(value => new[]{value.Entity1LogicalName, value.Entity2LogicalName}.Contains(sEntityName, StringComparer.InvariantCultureIgnoreCase)))
+			if(Relationships.Values.Any(value => new[]{value.Entity1LogicalName, value.Entity2LogicalName, value.IntersectEntity}.Contains(sEntityName, StringComparer.InvariantCultureIgnoreCase)))
 			{
 				return;
 			}
