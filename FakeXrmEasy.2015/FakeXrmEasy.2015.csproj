@@ -77,71 +77,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\FakeXrmEasy\Extensions\EntityExtensions.cs">
-      <Link>Extensions\EntityExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\AssociateRequestExecutor.cs">
-      <Link>FakeMessageExecutors\AssociateRequestExecutor.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\DisassociateRequestExecutor.cs">
-      <Link>FakeMessageExecutors\DisassociateRequestExecutor.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\IFakeMessageExecutor.cs">
-      <Link>FakeMessageExecutors\IFakeMessageExecutor.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\RetrieveAttributeRequestExecutor.cs">
-      <Link>FakeMessageExecutors\RetrieveAttributeRequestExecutor.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs">
-      <Link>FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\SetStateRequestExecutor.cs">
-      <Link>FakeMessageExecutors\SetStateRequestExecutor.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\FakeMessageExecutors\WhoAmIRequestExecutor.cs">
-      <Link>FakeMessageExecutors\WhoAmIRequestExecutor.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\IXrmFakedContext.cs">
-      <Link>IXrmFakedContext.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\OrganizationFaults\OrganizationServiceFaultQueryBuilderNoAttribute.cs">
-      <Link>OrganizationFaults\OrganizationServiceFaultQueryBuilderNoAttribute.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\PullRequestException.cs">
-      <Link>PullRequestException.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\XrmFakedContext.CodeActivities.cs">
-      <Link>XrmFakedContext.CodeActivities.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\XrmFakedContext.Crud.cs">
-      <Link>XrmFakedContext.Crud.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\XrmFakedContext.cs">
-      <Link>XrmFakedContext.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\XrmFakedContext.Metadata.cs">
-      <Link>XrmFakedContext.Metadata.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\XrmFakedContext.Plugins.cs">
-      <Link>XrmFakedContext.Plugins.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\XrmFakedContext.Queries.cs">
-      <Link>XrmFakedContext.Queries.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\XrmFakedPluginExecutionContext.cs">
-      <Link>XrmFakedPluginExecutionContext.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\XrmFakedRelationship.cs">
-      <Link>XrmFakedRelationship.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy\XrmFakedTracingService.cs">
-      <Link>XrmFakedTracingService.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <Import Project="..\FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

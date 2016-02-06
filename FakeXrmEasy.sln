@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy", "FakeXrmEasy\FakeXrmEasy.csproj", "{1FF34479-D38A-4B6B-86A7-B48182403437}"
 EndProject
@@ -42,7 +42,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy.2016", "FakeXrm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy.Tests.2016", "FakeXrmEasy.Tests.2016\FakeXrmEasy.Tests.2016.csproj", "{590B304F-64CD-4112-B067-F3F8DB6B09D3}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FakeXrmEasy.Shared", "FakeXrmEasy.Shared\FakeXrmEasy.Shared.shproj", "{D659CC6B-7192-4236-AE49-92881F9BE563}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{112188e6-c759-4b2e-b5ae-54e722e26806}*SharedItemsImports = 4
+		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{08798ee6-7d8c-478e-a102-9424ad5dd321}*SharedItemsImports = 4
+		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{efd34e08-a235-462e-a853-bd9559112c15}*SharedItemsImports = 4
+		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{d659cc6b-7192-4236-ae49-92881f9be563}*SharedItemsImports = 13
+		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{1ff34479-d38a-4b6b-86a7-b48182403437}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
