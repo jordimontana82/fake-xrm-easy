@@ -88,102 +88,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="..\FakeXrmEasy.Tests\CodeActivitiesForTesting\AddActivity.cs">
-      <Link>CodeActivitiesForTesting\AddActivity.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\CodeActivitiesForTesting\AddActivityWithConstant.cs">
-      <Link>CodeActivitiesForTesting\AddActivityWithConstant.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\CodeActivitiesForTesting\CreateTaskActivity.cs">
-      <Link>CodeActivitiesForTesting\CreateTaskActivity.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextMockTests.cs">
-      <Link>FakeContextTests\FakeContextMockTests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestCodeActivities.cs">
-      <Link>FakeContextTests\FakeContextTestCodeActivities.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestCreate.cs">
-      <Link>FakeContextTests\FakeContextTestCreate.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestCreateQuery.cs">
-      <Link>FakeContextTests\FakeContextTestCreateQuery.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestDelete.cs">
-      <Link>FakeContextTests\FakeContextTestDelete.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestPlugins.cs">
-      <Link>FakeContextTests\FakeContextTestPlugins.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestRetrieve.cs">
-      <Link>FakeContextTests\FakeContextTestRetrieve.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTests.cs">
-      <Link>FakeContextTests\FakeContextTests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeContextTestUpdate.cs">
-      <Link>FakeContextTests\FakeContextTestUpdate.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\FakeTracingServiceTests.cs">
-      <Link>FakeContextTests\FakeTracingServiceTests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs">
-      <Link>FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs">
-      <Link>FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\LinqTests\MetadataInferenceTests.cs">
-      <Link>FakeContextTests\LinqTests\MetadataInferenceTests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\QueryByAttribute\QueryByAttributeTests.cs">
-      <Link>FakeContextTests\QueryByAttribute\QueryByAttributeTests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs">
-      <Link>FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs">
-      <Link>RetrieveMultiple\QueryLinkEntityTests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs">
-      <Link>FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs">
-      <Link>FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs">
-      <Link>FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs">
-      <Link>FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\FakeContextTests\WhoAmIRequest\WhoAmITests.cs">
-      <Link>FakeContextTests\WhoAmIRequest\WhoAmITests.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\GeneratedCode.cs">
-      <Link>GeneratedCode.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\AccountNumberPlugin.cs">
-      <Link>PluginsForTesting\AccountNumberPlugin.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\ConfigurationPlugin.cs">
-      <Link>PluginsForTesting\ConfigurationPlugin.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\CustomMockPlugin.cs">
-      <Link>PluginsForTesting\CustomMockPlugin.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\FollowupPlugin.cs">
-      <Link>PluginsForTesting\FollowupPlugin.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\InheritedPlugin.cs">
-      <Link>PluginsForTesting\InheritedPlugin.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\RetrieveServicesPlugin.cs">
-      <Link>PluginsForTesting\RetrieveServicesPlugin.cs</Link>
-    </Compile>
-    <Compile Include="..\FakeXrmEasy.Tests\PluginsForTesting\TestContextPlugin.cs">
-      <Link>PluginsForTesting\TestContextPlugin.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -210,6 +114,7 @@
       <Name>FakeXrmEasy.2013</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems" Label="Shared" />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

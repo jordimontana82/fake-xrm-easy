@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>3d747ba8-0c4c-456b-8c3b-f4320e256e55</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>FakeXrmEasy.Tests</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\AddActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\AddActivityWithConstant.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\CreateTaskActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextMockTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestCodeActivities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestCreate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestCreateQuery.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestDelete.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestPlugins.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestRetrieve.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestUpdate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeTracingServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\MetadataInferenceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QueryByAttribute\QueryByAttributeTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WhoAmIRequest\WhoAmITests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GeneratedCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\AccountNumberPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\ConfigurationPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\CustomMockPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\FollowupPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\InheritedPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\RetrieveServicesPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestContextPlugin.cs" />
+  </ItemGroup>
+</Project>

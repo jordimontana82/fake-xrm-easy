@@ -44,12 +44,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy.Tests.2016", "F
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FakeXrmEasy.Shared", "FakeXrmEasy.Shared\FakeXrmEasy.Shared.shproj", "{D659CC6B-7192-4236-AE49-92881F9BE563}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FakeXrmEasy.Tests.Shared", "FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.shproj", "{3D747BA8-0C4C-456B-8C3B-F4320E256E55}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{112188e6-c759-4b2e-b5ae-54e722e26806}*SharedItemsImports = 4
+		FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems*{3f49c92f-f830-4e59-8042-6a7720367c19}*SharedItemsImports = 4
+		FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems*{3d747ba8-0c4c-456b-8c3b-f4320e256e55}*SharedItemsImports = 13
+		FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems*{590b304f-64cd-4112-b067-f3f8db6b09d3}*SharedItemsImports = 4
 		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{08798ee6-7d8c-478e-a102-9424ad5dd321}*SharedItemsImports = 4
 		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{efd34e08-a235-462e-a853-bd9559112c15}*SharedItemsImports = 4
+		FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems*{5211b83c-12a0-423f-b8cf-61f9c650f525}*SharedItemsImports = 4
 		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{d659cc6b-7192-4236-ae49-92881f9be563}*SharedItemsImports = 13
+		FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems*{19a1f076-fbe5-42fd-9792-b98d90615b6f}*SharedItemsImports = 4
 		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{1ff34479-d38a-4b6b-86a7-b48182403437}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
