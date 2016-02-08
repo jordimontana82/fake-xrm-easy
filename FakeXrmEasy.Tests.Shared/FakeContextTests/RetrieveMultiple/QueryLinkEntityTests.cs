@@ -409,5 +409,67 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var result = fakedService.RetrieveMultiple(query);
             Assert.Empty(result.Entities);
         }
+
+        [Fact]
+        public static void Should_Not_Fail_On_Conditions_In_Link_Entities()
+        {
+            var fakedContext = new XrmFakedContext();
+            var fakedService = fakedContext.GetFakedOrganizationService();
+
+            var testEntity1 = new Entity("entity1")
+            {
+                Attributes = new AttributeCollection
+                {
+                    {"entity1attr", "test1" }
+                }
+            };
+            var testEntity2 = new Entity("entity2")
+            {
+                Attributes = new AttributeCollection
+                {
+                    {"entity2attr", "test2" }
+                }
+            };
+
+            testEntity1.Id = fakedService.Create(testEntity1);
+            testEntity2.Id = fakedService.Create(testEntity2);
+
+            var testRelation = new XrmFakedRelationship
+            {
+                IntersectEntity = "TestIntersectEntity",
+                Entity1LogicalName = "entity1",
+                Entity1Attribute = "entity1attr",
+                Entity2LogicalName = "entity2",
+                Entity2Attribute = "entity2attr"
+            };
+            fakedContext.AddRelationship(testRelation.Entity2LogicalName, testRelation);
+            fakedService.Associate(testEntity1.LogicalName, testEntity1.Id, new Relationship(testRelation.Entity2LogicalName), new EntityReferenceCollection { testEntity2.ToEntityReference() });
+
+            var query = new QueryExpression
+            {
+                EntityName = "entity1",
+                Criteria = new FilterExpression { FilterOperator = LogicalOperator.And },
+                ColumnSet = new ColumnSet(true)
+            };
+
+            var link = new LinkEntity
+            {
+                JoinOperator = JoinOperator.Natural,
+                LinkFromEntityName = "entity1",
+                LinkFromAttributeName = "entity1attr",
+                LinkToEntityName = "entity2",
+                LinkToAttributeName = "entity2attr",
+                LinkCriteria = new FilterExpression
+                {
+                    FilterOperator = LogicalOperator.And,
+                    Conditions = { new ConditionExpression { AttributeName = "entity2attr", Operator = ConditionOperator.Equal, Values = { "test2" } } }
+                }
+            };
+            query.LinkEntities.Add(link);
+
+            var result = fakedService.RetrieveMultiple(query);
+            Assert.NotEmpty(result.Entities);
+            Assert.Equal(1, result.Entities.Count);
+        }
     }
 }

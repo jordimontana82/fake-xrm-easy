@@ -17,6 +17,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
         public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
         {
             var associateRequest = request as AssociateRequest;
+            var service = ctx.GetFakedOrganizationService();
 
             if (associateRequest == null)
             {
@@ -47,8 +48,9 @@ namespace FakeXrmEasy.FakeMessageExecutors
                         }
                 };
 
-                association.Id = Guid.NewGuid();
-                ctx.AddEntity(association);
+                service.Create(association);
+
+
             }
 
             return new AssociateResponse ();
