@@ -7,6 +7,8 @@ using FakeXrmEasy;
 using Microsoft.Xrm.Sdk.Query;
 
 using System.Collections.Generic;
+using System.Reflection;
+using Crm;
 using Microsoft.Xrm.Sdk;
 
 namespace FakeXrmEasy.Tests
@@ -62,9 +64,33 @@ namespace FakeXrmEasy.Tests
             Assert.True(context.Data["account"].Count == 1);
         }
 
+        [Fact]
+        public void When_Querying_Using_LinQ_Results_Should_Appear()
+        {
+            var context = new XrmFakedContext();
 
-        
+            var account = new Account
+            {
+                Id = Guid.NewGuid()
+            };
 
-        
+            var contact = new Contact
+            {
+                Id = Guid.NewGuid(),
+                Attributes = new AttributeCollection
+                {
+                    { "accountid", account.ToEntityReference() }
+                }
+            };
+
+            context.Initialize(new Entity[] { account, contact });
+
+            var contactResult = context.CreateQuery<Contact>().SingleOrDefault(con => con.Id == contact.Id);
+            Assert.NotNull(contactResult);
+        }
+
+
+
+
     }
 }
