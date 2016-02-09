@@ -125,14 +125,6 @@ namespace FakeXrmEasy
             switch (le.JoinOperator)
             {
                 case JoinOperator.Inner:
-                    query = query.Join(inner,
-                                    outerKey => outerKey.KeySelector(le.LinkFromAttributeName),
-                                    innerKey => innerKey.KeySelector(le.LinkToAttributeName),
-                                    (outerEl, innerEl) => outerEl
-                                                            .ProjectAttributes(previousColumnSet, context)
-                                                            .JoinAttributes(innerEl, le.Columns, leAlias));
-
-                    break;
                 case JoinOperator.Natural:
                     query = query.Join(inner,
                                     outerKey => outerKey.KeySelector(le.LinkFromAttributeName),
@@ -154,7 +146,7 @@ namespace FakeXrmEasy
 
 
                     break;
-                default:
+                default: //This shouldn't be reached as there are only 3 types of Join...
                     throw new PullRequestException(string.Format("The join operator {0} is currently not supported. Feel free to implement and send a PR.", le.JoinOperator));
 
             }
