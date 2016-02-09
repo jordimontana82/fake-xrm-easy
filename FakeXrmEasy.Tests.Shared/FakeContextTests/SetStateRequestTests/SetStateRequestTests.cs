@@ -43,5 +43,50 @@ namespace FakeXrmEasy.Tests.FakeContextTests.SetStateRequestTests
             Assert.Equal((int) contact.StateCode.Value, 69);
             Assert.Equal((int) contact.StatusCode.Value, 6969);
         }
+
+        [Fact]
+        public void Should_set_a_statecode_by_default_when_an_entity_record_is_added_to_the_context()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+            var service = context.GetFakedOrganizationService();
+
+            var c = new Contact()
+            {
+                Id = Guid.NewGuid()
+            };
+            context.Initialize(new[] { c });
+
+            //Retrieve record after update
+            var contact = (from con in context.CreateQuery<Contact>()
+                           where con.Id == c.Id
+                           select con).FirstOrDefault();
+
+            Assert.Equal((int)contact.StateCode.Value, 0); //Active
+        }
+
+        [Fact]
+        public void Should_not_override_a_statecode_already_initialized()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+            var service = context.GetFakedOrganizationService();
+
+            var c = new Contact()
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            c["statecode"] = new OptionSetValue(69); //As the StateCode is read only in the early bound entity, this is the only way of updating it
+             
+            context.Initialize(new[] { c });
+
+            //Retrieve record after update
+            var contact = (from con in context.CreateQuery<Contact>()
+                           where con.Id == c.Id
+                           select con).FirstOrDefault();
+
+            Assert.Equal((int)contact.StateCode.Value, 69); //Set
+        }
     }
 }

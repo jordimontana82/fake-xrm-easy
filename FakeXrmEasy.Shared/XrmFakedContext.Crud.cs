@@ -240,6 +240,9 @@ namespace FakeXrmEasy
 
             if (!e.Attributes.ContainsKey("modifiedby"))
                 e["modifiedby"] = CallerId;
+
+            if (!e.Attributes.ContainsKey("statecode"))
+                e["statecode"] = new OptionSetValue(0); //Active by default
         }
 
 
