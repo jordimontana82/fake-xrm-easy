@@ -60,6 +60,15 @@ namespace FakeXrmEasy
         {
             Type typeParameter = typeof(T);
 
+            if(ProxyTypesAssembly == null)
+            {
+                //Try to guess proxy types assembly
+                var asm = Assembly.GetAssembly(typeof(T));
+                if(asm != null)
+                {
+                    ProxyTypesAssembly = asm;
+                }
+            }
             string sLogicalName = "";
 
             if (typeParameter.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
