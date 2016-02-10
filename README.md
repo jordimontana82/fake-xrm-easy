@@ -20,7 +20,6 @@ This is section is in progress, if you wanna contribute, please [get in touch](h
 
 ##Roadmap / Backlog
 
-*  Add Associate / Disassociate fake messages
 *  Add change log
 *  Add integration tests
 *  Increase test coverage
