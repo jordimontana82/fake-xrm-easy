@@ -11,6 +11,7 @@ using Microsoft.Xrm.Sdk;
 using System.ServiceModel;
 using Crm;
 using System.Reflection;
+using Microsoft.Xrm.Sdk.Client;
 
 namespace FakeXrmEasy.Tests
 {
@@ -145,6 +146,53 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(account.Name, "Devil Customer");
         }
 
+        [Fact]
+        public void When_updating_an_entity_using_organization_context_changes_should_be_saved()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
 
+            var existingAccount = new Account() { Id = Guid.NewGuid(), Name = "Super Great Customer", AccountNumber = "69" };
+
+            context.Initialize(new List<Entity>()
+            {
+                existingAccount
+            });
+
+            var service = context.GetFakedOrganizationService();
+
+            using (var ctx = new OrganizationServiceContext(service))
+            {
+                existingAccount.Name = "Super Great Customer Name Updated!";
+
+                ctx.Attach(existingAccount);
+                ctx.UpdateObject(existingAccount);
+                ctx.SaveChanges();
+            }
+            
+            //Make other account wasn't updated
+            var account = context.CreateQuery<Account>().Where(e => e.Id == existingAccount.Id).FirstOrDefault();
+            Assert.Equal(account.Name, "Super Great Customer Name Updated!");
+        }
+
+        [Fact]
+        public void When_updating_a_not_existing_entity_using_organization_context_exception_should_be_thrown()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var existingAccount = new Account() { Id = Guid.NewGuid(), Name = "Super Great Customer", AccountNumber = "69" };
+
+            var service = context.GetFakedOrganizationService();
+
+            using (var ctx = new OrganizationServiceContext(service))
+            {
+                existingAccount.Name = "Super Great Customer Name Updated!";
+
+                ctx.Attach(existingAccount);
+                ctx.UpdateObject(existingAccount);
+                Assert.Throws<SaveChangesException>(() => ctx.SaveChanges());
+            }
+        }
     }
 }
