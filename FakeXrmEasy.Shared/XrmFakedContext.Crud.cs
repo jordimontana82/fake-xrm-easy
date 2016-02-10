@@ -44,11 +44,24 @@ namespace FakeXrmEasy
                         throw new InvalidOperationException("The columnset parameter must not be null.");
                     }
 
+                    // Don't fail with invalid operation exception, if no record of this entity exists, but entity is known
                     if (!context.Data.ContainsKey(entityName))
-                        throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.", entityName));
+                    {
+                        if (context.ProxyTypesAssembly == null)
+                        {
+                            throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.",
+                            entityName));
+                        }
 
+                        if (!context.ProxyTypesAssembly.GetTypes().Any(type => context.FindReflectedType(entityName) != null))
+                        {
+                            throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.",
+                            entityName));
+                        }
+                    }
+                    
                     //Entity logical name exists, so , check if the requested entity exists
-                    if (context.Data[entityName] != null
+                    if (context.Data.ContainsKey(entityName) && context.Data[entityName] != null
                         && context.Data[entityName].ContainsKey(id))
                     {
                         //Entity found => return only the subset of columns specified or all of them
@@ -65,7 +78,7 @@ namespace FakeXrmEasy
                     else
                     {
                         //Entity not found in the context => return null
-                        return null;
+                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("{0} With Id = {1} Does Not Exist", entityName, id.ToString("D")));
                     }
                 });
         }

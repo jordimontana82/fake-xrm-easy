@@ -9,6 +9,7 @@ using Microsoft.Xrm.Sdk.Query;
 using System.Collections.Generic;
 using Microsoft.Xrm.Sdk;
 using System.Reflection;
+using System.ServiceModel;
 using Crm;
 
 namespace FakeXrmEasy.Tests
@@ -77,8 +78,7 @@ namespace FakeXrmEasy.Tests
 
             var service = context.GetFakedOrganizationService();
 
-            var result = service.Retrieve("account", Guid.NewGuid(), new ColumnSet());
-            Assert.Equal(result, null);
+            Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Retrieve("account", Guid.NewGuid(), new ColumnSet()));
         }
 
         [Fact]
@@ -160,6 +160,16 @@ namespace FakeXrmEasy.Tests
             var result = service.Retrieve("account", guid, new ColumnSet(new string[] { "name" }));
 
             Assert.True(result is Account);
+        }
+
+        [Fact]
+        public void When_retrieving_entity_that_does_not_exist_with_proxy_types_entity_name_should_be_known()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var service = context.GetFakedOrganizationService();
+            Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Retrieve("account", Guid.NewGuid(), new ColumnSet(true)));
         }
     }
 }
