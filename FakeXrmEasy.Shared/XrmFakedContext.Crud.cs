@@ -97,18 +97,22 @@ namespace FakeXrmEasy
                         throw new InvalidOperationException("The entity must not be null");
                     }
 
-                    if (e.Id != Guid.Empty)
-                    {
-                        throw new InvalidOperationException("The Id property must not be initialized");
-                    }
-
                     if (string.IsNullOrWhiteSpace(e.LogicalName))
                     {
                         throw new InvalidOperationException("The LogicalName property must not be empty");
                     }
 
+                    if (e.Id != Guid.Empty && context.Data.ContainsKey(e.LogicalName) &&
+                        context.Data[e.LogicalName].ContainsKey(e.Id))
+                    {
+                        throw new InvalidOperationException(string.Format("There is already a record of entity {0} with id {1}, can't create with this Id.", e.LogicalName, e.Id));
+                    }
+
                     //Add entity to the context
-                    e.Id = Guid.NewGuid();
+                    if (e.Id == Guid.Empty)
+                    {
+                        e.Id = Guid.NewGuid(); 
+                    }
                     context.AddEntity(e);
 
                     return e.Id;

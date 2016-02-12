@@ -25,19 +25,7 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(ex.Message, "The entity must not be null");
         }
 
-        [Fact]
-        public void When_an_entity_is_created_with_a_non_empty_guid_an_exception_is_thrown()
-        {
-            var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
-
-            var e = new Entity("account") { Id = Guid.NewGuid() };
-
-            var ex = Assert.Throws<InvalidOperationException>(() => service.Create(e));
-            Assert.Equal(ex.Message, "The Id property must not be initialized");
-        }
-
-        [Fact]
+       [Fact]
         public void When_an_entity_is_created_with_an_empty_logical_name_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
@@ -65,32 +53,54 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
-        public void When_Querying_Using_LinQ_Results_Should_Appear()
+        public void When_Creating_Without_Id_It_should_Be_set_Automatically()
         {
             var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
 
             var account = new Account
             {
-                Id = Guid.NewGuid()
+                Name = "TestAcc"
             };
 
-            var contact = new Contact
-            {
-                Id = Guid.NewGuid(),
-                Attributes = new AttributeCollection
-                {
-                    { "accountid", account.ToEntityReference() }
-                }
-            };
+            account.Id = service.Create(account);
 
-            context.Initialize(new Entity[] { account, contact });
-
-            var contactResult = context.CreateQuery<Contact>().SingleOrDefault(con => con.Id == contact.Id);
-            Assert.NotNull(contactResult);
+            Assert.NotEqual(Guid.Empty, account.Id);
         }
 
+        [Fact]
+        public void When_Creating_With_Id_It_should_Be_set()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+            var accId = Guid.NewGuid();
 
+            var account = new Account
+            {
+                Name = "TestAcc",
+                Id = accId
+            };
 
+            var createdId = service.Create(account);
 
+            Assert.Equal(accId, createdId);
+        }
+
+        [Fact]
+        public void When_Creating_With_Already_Existing_Id_Exception_Should_Be_Thrown()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+            var accId = Guid.NewGuid();
+
+            var account = new Account
+            {
+                Name = "TestAcc",
+                Id = accId
+            };
+            service.Create(account);
+
+            Assert.Throws<InvalidOperationException>(() => service.Create(account));
+        }
     }
 }

@@ -106,5 +106,29 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(contact.Count, 0);
         }
 
+        [Fact]
+        public void When_Querying_Using_LinQ_Results_Should_Appear()
+        {
+            var context = new XrmFakedContext();
+
+            var account = new Account
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contact = new Contact
+            {
+                Id = Guid.NewGuid(),
+                Attributes = new AttributeCollection
+                {
+                    { "accountid", account.ToEntityReference() }
+                }
+            };
+
+            context.Initialize(new Entity[] { account, contact });
+
+            var contactResult = context.CreateQuery<Contact>().SingleOrDefault(con => con.Id == contact.Id);
+            Assert.NotNull(contactResult);
+        }
     }
 }
