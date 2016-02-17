@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Crm;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Client;
 
 namespace FakeXrmEasy.Tests
 {
@@ -101,6 +102,44 @@ namespace FakeXrmEasy.Tests
             service.Create(account);
 
             Assert.Throws<InvalidOperationException>(() => service.Create(account));
+        }
+
+        [Fact]
+        public void When_Creating_Using_Organization_Context_Record_Should_Be_Created()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var account = new Account() { Id = Guid.NewGuid(), Name = "Super Great Customer", AccountNumber = "69" };
+
+            var service = context.GetFakedOrganizationService();
+
+            using (var ctx = new OrganizationServiceContext(service))
+            {
+                ctx.AddObject(account);
+                ctx.SaveChanges();
+            }
+
+            Assert.NotNull(service.Retrieve(Account.EntityLogicalName, account.Id, new ColumnSet(true)));
+        }
+
+        [Fact]
+        public void When_Creating_Using_Organization_Context_Without_Saving_Changes_Record_Should_Not_Be_Created()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var account = new Account() { Id = Guid.NewGuid(), Name = "Super Great Customer", AccountNumber = "69" };
+
+            var service = context.GetFakedOrganizationService();
+
+            using (var ctx = new OrganizationServiceContext(service))
+            {
+                ctx.AddObject(account);
+
+                var retrievedAccount = ctx.CreateQuery<Account>().SingleOrDefault(acc => acc.Id == account.Id);
+                Assert.Null(retrievedAccount);
+            }
         }
     }
 }
