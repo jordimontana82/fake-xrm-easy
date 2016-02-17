@@ -11,6 +11,8 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AssociateRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\CreateRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\DeleteRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\DisassociateRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\IFakeMessageExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveAttributeRequestExecutor.cs" />

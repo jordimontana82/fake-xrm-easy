@@ -63,7 +63,9 @@ namespace FakeXrmEasy
             AddFakeMessageExecutor<SetStateRequest>(new SetStateRequestExecutor());
             AddFakeMessageExecutor<AssociateRequest>(new AssociateRequestExecutor());
             AddFakeMessageExecutor<DisassociateRequest>(new DisassociateRequestExecutor());
+            AddFakeMessageExecutor<CreateRequest>(new CreateRequestExecutor());
             AddFakeMessageExecutor<UpdateRequest>(new UpdateRequestExecutor());
+            AddFakeMessageExecutor<DeleteRequest>(new DeleteRequestExecutor());
 
             Relationships = new Dictionary<string, XrmFakedRelationship>();
         }
