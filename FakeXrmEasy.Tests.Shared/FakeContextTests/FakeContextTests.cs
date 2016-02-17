@@ -9,6 +9,7 @@ using Microsoft.Xrm.Sdk;
 using System.Linq;
 using System.Threading;
 using FakeXrmEasy.Tests.PluginsForTesting;
+using Crm;
 
 namespace FakeXrmEasy.Tests
 {
@@ -162,5 +163,28 @@ namespace FakeXrmEasy.Tests
             Assert.NotEqual(oldModifiedOn, newModifiedOn);
         }
 
+        [Fact]
+        public void When_using_typed_entities_ProxyTypesAssembly_is_not_mandatory()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Jordi" };
+            context.Initialize(new List<Entity>() { c });
+
+            //Linq 2 Query Expression
+            using(var ctx = new XrmServiceContext(service))
+            {
+                var contacts = (from con in ctx.CreateQuery<Contact>()
+                               select con).ToList();
+
+                Assert.Equal(contacts.Count, 1);
+            }
+
+            //Query faked context directly
+            Assert.DoesNotThrow(() => context.CreateQuery<Contact>());
+
+            
+        }
     }
 }
