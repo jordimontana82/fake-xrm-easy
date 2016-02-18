@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>FakeXrmEasy</id>
+    <id>FakeXrmEasy.2013</id>
     <version>1.9.0</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
@@ -28,4 +28,7 @@
       <frameworkAssembly assemblyName="System.Runtime.Serialization" targetFramework="net40" />
     </frameworkAssemblies>
   </metadata>
+  <files>
+    <file src="..\Publish\FakeXrmEasy.2013\FakeXrmEasy.dll" target="lib\net452\FakeXrmEasy.dll" />
+  </files>
 </package>
