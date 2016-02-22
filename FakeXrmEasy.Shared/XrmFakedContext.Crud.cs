@@ -10,6 +10,8 @@ using Microsoft.Xrm.Sdk.Messages;
 using System.Dynamic;
 using System.Linq.Expressions;
 using FakeXrmEasy.Extensions;
+using Microsoft.Xrm.Sdk.Client;
+using System.Reflection;
 
 namespace FakeXrmEasy
 {
@@ -202,6 +204,23 @@ namespace FakeXrmEasy
                             string.Format("{0} with Id {1} Does Not Exist", entityName, id));
                     }
                 });
+        }
+
+        protected static void FakeEnableProxyTypes(XrmFakedContext context, OrganizationServiceProxy fakedService)
+        {
+            A.CallTo(() => fakedService.EnableProxyTypes(A<Assembly>._))
+                .Invokes((Assembly a) =>
+                {
+                    context.ProxyTypesAssembly = a;
+                });
+
+            A.CallTo(() => fakedService.EnableProxyTypes())
+                .Invokes(() =>
+                {
+                    //Do nothing, we implicitily allow proxy types
+
+                });
+
         }
         #endregion
 

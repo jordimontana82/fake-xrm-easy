@@ -136,6 +136,32 @@ namespace FakeXrmEasy
             return GetFakedOrganizationService(this);
         }
 
+        public OrganizationServiceProxy GetFakedOrganizationServiceProxy()
+        {
+            return GetFakedOrganizationServiceProxy(this);
+        }
+
+        public OrganizationServiceProxy GetFakedOrganizationServiceProxy(XrmFakedContext context)
+        {
+            var fakedServiceProxy = A.Fake<OrganizationServiceProxy>();
+
+            //Fake CRUD methods
+            FakeRetrieve(context, fakedServiceProxy);
+            FakeCreate(context, fakedServiceProxy);
+            FakeUpdate(context, fakedServiceProxy);
+            FakeDelete(context, fakedServiceProxy);
+
+            //Fake / Intercept Retrieve Multiple Requests
+            FakeRetrieveMultiple(context, fakedServiceProxy);
+
+            //Fake / Intercept other requests
+            FakeExecute(context, fakedServiceProxy);
+            FakeAssociate(context, fakedServiceProxy);
+            FakeDisassociate(context, fakedServiceProxy);
+
+            return fakedServiceProxy;
+        }
+
         /// <summary>
         /// Defines a faked organization service that intercepts CRUD operations to make them work against
         /// the faked context
