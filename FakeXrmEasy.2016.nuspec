@@ -1,27 +1,30 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>FakeXrmEasy.2015</id>
+    <id>FakeXrmEasy.2016</id>
     <version>1.9.1</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
     <projectUrl>http://dynamicsvalue.com/home?source=nuget</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>Utilities to streamline unit testing in Dynamics CRM 2015 by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
+    <description>Utilities to streamline unit testing in Dynamics CRM 2016 by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
     <releaseNotes>
       Add OrganizationServiceProxy fake.
     </releaseNotes>
     <copyright>Copyright 2014-2016</copyright>
-    <tags>xrm dynamics crm 2015 unit testing mock mocking fake fakes</tags>
+    <tags>xrm dynamics crm 2016 unit testing mock mocking fake fakes</tags>
     <dependencies>
       <dependency id="FakeItEasy" version="1.25.3" />
-      <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="7.1.1" />
-      <dependency id="Microsoft.CrmSdk.Workflow" version="7.1.1" />
+      <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="8.0.1" />
+      <dependency id="Microsoft.CrmSdk.Workflow" version="8.0.1" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Activities" targetFramework="net452" />
       <frameworkAssembly assemblyName="System.Runtime.Serialization" targetFramework="net452" />
     </frameworkAssemblies>
   </metadata>
+  <files>
+    <file src="..\Publish\FakeXrmEasy.2016\FakeXrmEasy.dll" target="lib\net452\FakeXrmEasy.dll" />
+  </files>
 </package>

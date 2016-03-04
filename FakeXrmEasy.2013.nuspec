@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>FakeXrmEasy</id>
-    <version>1.9.1</version>
+    <id>FakeXrmEasy.2013</id>
+    <version>1.9.0</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
@@ -10,7 +10,10 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Utilities to streamline unit testing in Dynamics CRM by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
     <releaseNotes>
-      Add OrganizationServiceProxy fake.
+      Add StateCode by default when an entity is added to the context.
+      Implemented Associate / Disassociate requests.
+      Refactoring.
+      Various fixes.
     </releaseNotes>
     <copyright>Copyright 2014-2016</copyright>
     <tags>xrm dynamics crm unit testing mock mocking fake fakes 2011</tags>
@@ -25,4 +28,7 @@
       <frameworkAssembly assemblyName="System.Runtime.Serialization" targetFramework="net40" />
     </frameworkAssemblies>
   </metadata>
+  <files>
+    <file src="..\Publish\FakeXrmEasy.2013\FakeXrmEasy.dll" target="lib\net452\FakeXrmEasy.dll" />
+  </files>
 </package>
