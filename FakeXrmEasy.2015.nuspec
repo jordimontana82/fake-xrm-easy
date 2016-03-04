@@ -26,5 +26,6 @@
   </metadata>
   <files>
     <file src="..\Publish\FakeXrmEasy.2015\FakeXrmEasy.dll" target="lib\net452\FakeXrmEasy.dll" />
+    <file src="..\Install-Scripts\2015\Install.ps1" target="tools\Install.ps1" />
   </files>
 </package>
