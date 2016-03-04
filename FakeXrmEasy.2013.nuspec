@@ -29,6 +29,6 @@
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src="..\Publish\FakeXrmEasy.2013\FakeXrmEasy.dll" target="lib\net452\FakeXrmEasy.dll" />
+    <file src="..\Publish\FakeXrmEasy.2013\FakeXrmEasy.dll" target="lib\net40\FakeXrmEasy.dll" />
   </files>
 </package>
