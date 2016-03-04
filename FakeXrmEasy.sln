@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		FakeXrmEasy.2013.nuspec = FakeXrmEasy.2013.nuspec
 		FakeXrmEasy.2015.nuspec = FakeXrmEasy.2015.nuspec
 		FakeXrmEasy.2016.nuspec = FakeXrmEasy.2016.nuspec
+		Install.ps1 = Install.ps1
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 		System.Activities.dll = System.Activities.dll
@@ -53,6 +54,28 @@ EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FakeXrmEasy.Shared", "FakeXrmEasy.Shared\FakeXrmEasy.Shared.shproj", "{D659CC6B-7192-4236-AE49-92881F9BE563}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FakeXrmEasy.Tests.Shared", "FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.shproj", "{3D747BA8-0C4C-456B-8C3B-F4320E256E55}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Install-Scripts", "Install-Scripts", "{7B1103ED-3843-4670-A8DB-F462B4C8FBE2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2011", "2011", "{567B5E0A-4A07-4C25-850B-2A94D3640E09}"
+	ProjectSection(SolutionItems) = preProject
+		Install-scripts\2011\Install.ps1 = Install-scripts\2011\Install.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2013", "2013", "{BE9266F9-B556-4D08-8F2F-620336EFCB0C}"
+	ProjectSection(SolutionItems) = preProject
+		Install-scripts\2013\Install.ps1 = Install-scripts\2013\Install.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2015", "2015", "{D195513F-CEAE-408B-9197-10149D596773}"
+	ProjectSection(SolutionItems) = preProject
+		Install-scripts\2015\Install.ps1 = Install-scripts\2015\Install.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2016", "2016", "{4E6ACD78-CFB2-4A44-86FC-3D77E609555E}"
+	ProjectSection(SolutionItems) = preProject
+		Install-scripts\2016\Install.ps1 = Install-scripts\2016\Install.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -110,5 +133,10 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F2B94F3A-7821-4BE1-8BAC-2B7FA07FEA93} = {FF0FD95B-2DB2-4E05-A1AB-4FBFB515C7F8}
+		{7B1103ED-3843-4670-A8DB-F462B4C8FBE2} = {FF0FD95B-2DB2-4E05-A1AB-4FBFB515C7F8}
+		{567B5E0A-4A07-4C25-850B-2A94D3640E09} = {7B1103ED-3843-4670-A8DB-F462B4C8FBE2}
+		{BE9266F9-B556-4D08-8F2F-620336EFCB0C} = {7B1103ED-3843-4670-A8DB-F462B4C8FBE2}
+		{D195513F-CEAE-408B-9197-10149D596773} = {7B1103ED-3843-4670-A8DB-F462B4C8FBE2}
+		{4E6ACD78-CFB2-4A44-86FC-3D77E609555E} = {7B1103ED-3843-4670-A8DB-F462B4C8FBE2}
 	EndGlobalSection
 EndGlobal
