@@ -4,7 +4,7 @@
 open Fake
 open Fake.AssemblyInfoFile
 open Fake.Git
-open Fake.Testing.XUnit
+open Fake.Testing.XUnit2
 open System.IO
 
 let projectName           = "FakeXrmEasy"
@@ -87,77 +87,79 @@ Target "BuildFakeXrmEasy" (fun _->
 )
 
 Target "BuildFakeXrmEasy.2013" (fun _->
+    let properties =
+        [ ("DefineConstants", "FAKE_XRM_EASY_2013") ]
     !! @"FakeXrmEasy.2013\*.csproj"
-      |> MSBuildRelease FakeXrmEasy2013BuildDir "Build"
+      |> MSBuild FakeXrmEasy2013BuildDir "Rebuild" (properties)
       |> Log "Build - Output: "
 )
 
 Target "BuildFakeXrmEasy.2015" (fun _->
+    let properties =
+        [ ("DefineConstants", "FAKE_XRM_EASY_2015") ]
     !! @"FakeXrmEasy.2015\*.csproj"
-      |> MSBuildRelease FakeXrmEasy2015BuildDir "Build"
+      |> MSBuild FakeXrmEasy2015BuildDir "Rebuild" (properties)
       |> Log "Build - Output: "
 )
 
 Target "BuildFakeXrmEasy.2016" (fun _->
+    let properties =
+        [ ("DefineConstants", "FAKE_XRM_EASY_2015") ]
     !! @"FakeXrmEasy.2016\*.csproj"
-      |> MSBuildRelease FakeXrmEasy2016BuildDir "Build"
-      |> Log "Build - Output: "
-)
-
-Target "BuildFakeXrmEasy.Shared" (fun _->
-    !! @"FakeXrmEasy.Shared\*.csproj"
-      |> MSBuildRelease FakeXrmEasySharedBuildDir "Build"
+      |> MSBuild FakeXrmEasy2016BuildDir "Rebuild" (properties)
       |> Log "Build - Output: "
 )
 
 Target "BuildFakeXrmEasy.Tests" (fun _->
+    let properties =
+        [ ("DefineConstants", "") ]
     !! @"FakeXrmEasy.Tests\*.csproj"
-      |> MSBuildRelease FakeXrmEasyTestsBuildDir "Build"
+      |> MSBuild FakeXrmEasyTestsBuildDir "Rebuild" (properties)
       |> Log "Build - Output: "
 )
 
 Target "BuildFakeXrmEasy.Tests.2013" (fun _->
+    let properties =
+        [ ("DefineConstants", "FAKE_XRM_EASY_2013") ]
     !! @"FakeXrmEasy.Tests.2013\*.csproj"
-      |> MSBuildRelease FakeXrmEasyTests2013BuildDir "Build"
+      |> MSBuild FakeXrmEasyTests2013BuildDir "Rebuild" (properties)
       |> Log "Build - Output: "
 )
 
 Target "BuildFakeXrmEasy.Tests.2015" (fun _->
+    let properties =
+        [ ("DefineConstants", "FAKE_XRM_EASY_2015") ]
     !! @"FakeXrmEasy.Tests.2015\*.csproj"
-      |> MSBuildRelease FakeXrmEasyTests2015BuildDir "Build"
+      |> MSBuild FakeXrmEasyTests2015BuildDir "Rebuild" (properties)
       |> Log "Build - Output: "
 )
 
 Target "BuildFakeXrmEasy.Tests.2016" (fun _->
+    let properties =
+        [ ("DefineConstants", "FAKE_XRM_EASY_2016") ]
     !! @"FakeXrmEasy.Tests.2016\*.csproj"
-      |> MSBuildRelease FakeXrmEasyTests2016BuildDir "Build"
-      |> Log "Build - Output: "
-)
-
-Target "BuildFakeXrmEasy.Tests.Shared" (fun _->
-    !! @"FakeXrmEasy.Tests.Shared\*.csproj"
-      |> MSBuildRelease FakeXrmEasyTestsSharedBuildDir "Build"
+      |> MSBuild FakeXrmEasyTests2016BuildDir "Rebuild" (properties)
       |> Log "Build - Output: "
 )
 
 Target "Test.2011" (fun _ ->
     !! (testDir @@ "\FakeXrmEasy.Tests\FakeXrmEasy.Tests.dll")
-      |> xUnit (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.html") })
+      |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.2011.html") })
 )
 
 Target "Test.2013" (fun _ ->
     !! (testDir @@ "\FakeXrmEasy.Tests.2013\FakeXrmEasy.Tests.dll")
-      |> xUnit (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.html") })
+      |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.2013.html") })
 )
 
 Target "Test.2015" (fun _ ->
-    !! (testDir @@ "\FakeXrmEasy.Tests.2015\FakeXrmEasy.Tests.dll")
-      |> xUnit (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.html") })
+    !! (testDir @@ "\FakeXrmEasy.Tests.2015\FakeXrmEasy.Tests.2015.dll")
+      |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.2015.html") })
 )
 
 Target "Test.2016" (fun _ ->
-    !! (testDir @@ "\FakeXrmEasy.Tests.2016\FakeXrmEasy.Tests.dll")
-      |> xUnit (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.html") })
+    !! (testDir @@ "\FakeXrmEasy.Tests.2016\FakeXrmEasy.Tests.2016.dll")
+      |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.2016.html") })
 )
 
 Target "NuGet" (fun _ ->
@@ -240,12 +242,10 @@ Target "Publish" (fun _ ->
   ==> "BuildFakeXrmEasy.2013"
   ==> "BuildFakeXrmEasy.2015"
   ==> "BuildFakeXrmEasy.2016"
-//  ==> "BuildFakeXrmEasy.Shared"
   ==> "BuildFakeXrmEasy.Tests"
   ==> "BuildFakeXrmEasy.Tests.2013"
   ==> "BuildFakeXrmEasy.Tests.2015"
   ==> "BuildFakeXrmEasy.Tests.2016"
-//  ==> "BuildFakeXrmEasy.Tests.Shared"
   ==> "Test.2011"
   ==> "Test.2013"
   ==> "Test.2015"
