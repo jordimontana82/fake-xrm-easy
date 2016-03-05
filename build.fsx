@@ -38,7 +38,7 @@ let nugetDir                = @".\nuget\"
 let nugetDeployDir          = @"[Enter_NuGet_Url]"
 let packagesDir             = @".\packages\"
 
-let mutable version         = "1.9"
+let mutable version         = "1.9.2"
 let mutable build           = buildVersion
 let mutable nugetVersion    = ""
 let mutable asmVersion      = ""
@@ -167,35 +167,43 @@ Target "NuGet" (fun _ ->
 
     "FakeXrmEasy.2011.nuspec"
      |> NuGet (fun p -> 
-           {p with               
+           {p with  
+               Project = "FakeXrmEasy"           
                Version = version
                NoPackageAnalysis = true
                ToolPath = @".\tools\nuget\Nuget.exe"                             
-               OutputPath = nugetDir })
+               OutputPath = nugetDir
+               Publish = true })
 
     "FakeXrmEasy.2013.nuspec"
      |> NuGet (fun p -> 
-           {p with               
+           {p with 
+               Project = "FakeXrmEasy.2013"                  
                Version = version
                NoPackageAnalysis = true
                ToolPath = @".\tools\nuget\Nuget.exe"                             
-               OutputPath = nugetDir })
+               OutputPath = nugetDir
+               Publish = true })
 
     "FakeXrmEasy.2015.nuspec"
      |> NuGet (fun p -> 
-           {p with               
+           {p with
+               Project = "FakeXrmEasy.2015"                   
                Version = version
                NoPackageAnalysis = true
                ToolPath = @".\tools\nuget\Nuget.exe"                             
-               OutputPath = nugetDir })
+               OutputPath = nugetDir
+               Publish = true })
 
     "FakeXrmEasy.2016.nuspec"
      |> NuGet (fun p -> 
-           {p with               
+           {p with     
+               Project = "FakeXrmEasy.2016"              
                Version = version
                NoPackageAnalysis = true
                ToolPath = @".\tools\nuget\Nuget.exe"                             
-               OutputPath = nugetDir })
+               OutputPath = nugetDir
+               Publish = true })
 )
 
 Target "PublishNuGet" (fun _ ->

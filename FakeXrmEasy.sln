@@ -24,7 +24,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		FakeXrmEasy.2013.nuspec = FakeXrmEasy.2013.nuspec
 		FakeXrmEasy.2015.nuspec = FakeXrmEasy.2015.nuspec
 		FakeXrmEasy.2016.nuspec = FakeXrmEasy.2016.nuspec
-		Install.ps1 = Install.ps1
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 		System.Activities.dll = System.Activities.dll
