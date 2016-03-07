@@ -9,9 +9,7 @@
     <projectUrl>http://dynamicsvalue.com/home?source=nuget</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Utilities to streamline unit testing in Dynamics CRM by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
-    <releaseNotes>
-      Add OrganizationServiceProxy fake.
-    </releaseNotes>
+    <releaseNotes>@releaseNotes@</releaseNotes>
     <copyright>Copyright 2014-2016</copyright>
     <tags>xrm dynamics crm unit testing mock mocking fake fakes 2011</tags>
     <dependencies>
