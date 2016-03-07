@@ -471,5 +471,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             Assert.NotEmpty(result.Entities);
             Assert.Equal(1, result.Entities.Count);
         }
+
+
     }
 }

@@ -18,7 +18,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryByAttributeTests
     public class Tests
     {
         [Fact]
-        public static void When_a_query_by_attribute_is_executed_when_one_attribute_right_result_is_returned()
+        public static void When_a_query_by_attribute_is_executed_with_one_attribute_right_result_is_returned()
         {
             var context = new XrmFakedContext();
             var account = new Account() {Id = Guid.NewGuid(), Name = "Test"};
@@ -43,6 +43,29 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryByAttributeTests
 
             Assert.True(entityList.Count == 1);
             Assert.Equal(entityList[0]["name"].ToString(), "Test");
+        }
+
+        [Fact]
+        public static void When_a_query_by_attribute_is_executed_with_one_null_attribute_it_is_not_returned_as_an_attribute_key()
+        {
+            var fakedContext = new XrmFakedContext();
+            var fakedService = fakedContext.GetFakedOrganizationService();
+
+            var contact = new Contact
+            {
+                Id = Guid.NewGuid(),
+                FirstName = null,
+                LastName = "asdf"
+            };
+
+            fakedContext.Initialize(new List<Entity> { contact });
+
+            QueryByAttribute query = new QueryByAttribute("contact");
+            query.ColumnSet = new ColumnSet("firstname", "lastname");
+            var results = fakedService.RetrieveMultiple(query);
+
+            Assert.True(results.Entities[0].Attributes.ContainsKey("lastname"));
+            Assert.False(results.Entities[0].Attributes.ContainsKey("firstname"));
         }
     }
 }

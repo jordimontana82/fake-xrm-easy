@@ -69,7 +69,7 @@ namespace FakeXrmEasy.Extensions
 
                 foreach (var attKey in qe.ColumnSet.Columns)
                 {
-                    if (e.Attributes.ContainsKey(attKey))
+                    if (e.Attributes.ContainsKey(attKey) && e[attKey] != null)
                         projected[attKey] = e[attKey];
                     else
                     {
@@ -88,7 +88,7 @@ namespace FakeXrmEasy.Extensions
                     {
                         var sAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
                         var linkedAttKey = sAlias + "." + attKey;
-                        if (e.Attributes.ContainsKey(linkedAttKey) || le.Columns.AllColumns)
+                        if (e.Attributes.ContainsKey(linkedAttKey) && e[linkedAttKey] != null || le.Columns.AllColumns)
                             projected[linkedAttKey] = e[linkedAttKey];
                     }
                 }
