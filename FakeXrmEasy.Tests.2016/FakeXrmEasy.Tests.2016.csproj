@@ -94,17 +94,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="buildNugetPackages.bat" />
-    <None Include="build\FakeXrmEasy.2016.dll.nuspec" />
-    <None Include="build\tools\Install.ps1" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="build\nuget.exe" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="build\lib\net452\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\FakeXrmEasy.2016\FakeXrmEasy.2016.csproj">
       <Project>{08798ee6-7d8c-478e-a102-9424ad5dd321}</Project>

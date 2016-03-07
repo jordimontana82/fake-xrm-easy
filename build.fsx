@@ -38,12 +38,15 @@ let nugetDir                = @".\nuget\"
 let nugetDeployDir          = @"[Enter_NuGet_Url]"
 let packagesDir             = @".\packages\"
 
-let mutable version         = "1.9.2"
+let mutable previousVersion = "1.9.2"
+let mutable version         = "1.9.3"
 let mutable build           = buildVersion
 let mutable nugetVersion    = ""
 let mutable asmVersion      = ""
 let mutable asmInfoVersion  = ""
 let mutable setupVersion    = ""
+
+let mutable releaseNotes    = "https://github.com/jordimontana82/fake-xrm-easy/compare/v" + previousVersion + "...v" + version
 
 let gitbranch = Git.Information.getBranchName "."
 let sha = Git.Information.getCurrentHash()
@@ -173,6 +176,7 @@ Target "NuGet" (fun _ ->
                NoPackageAnalysis = true
                ToolPath = @".\tools\nuget\Nuget.exe"                             
                OutputPath = nugetDir
+               ReleaseNotes = releaseNotes
                Publish = true })
 
     "FakeXrmEasy.2013.nuspec"
@@ -183,6 +187,7 @@ Target "NuGet" (fun _ ->
                NoPackageAnalysis = true
                ToolPath = @".\tools\nuget\Nuget.exe"                             
                OutputPath = nugetDir
+               ReleaseNotes = releaseNotes
                Publish = true })
 
     "FakeXrmEasy.2015.nuspec"
@@ -193,6 +198,7 @@ Target "NuGet" (fun _ ->
                NoPackageAnalysis = true
                ToolPath = @".\tools\nuget\Nuget.exe"                             
                OutputPath = nugetDir
+               ReleaseNotes = releaseNotes
                Publish = true })
 
     "FakeXrmEasy.2016.nuspec"
@@ -203,6 +209,7 @@ Target "NuGet" (fun _ ->
                NoPackageAnalysis = true
                ToolPath = @".\tools\nuget\Nuget.exe"                             
                OutputPath = nugetDir
+               ReleaseNotes = releaseNotes
                Publish = true })
 )
 

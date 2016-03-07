@@ -90,23 +90,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="bin\Debug\" />
-    <Folder Include="bin\Release\" />
-    <Folder Include="build\lib\net40\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="buildNugetPackages.bat" />
-    <None Include="build\FakeXrmEasy.2013.dll.nuspec" />
-    <None Include="build\tools\Install.ps1" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="bin\coretools\CrmSvcUtil.exe" />
-    <Content Include="bin\coretools\CrmSvcUtil.xml" />
-    <Content Include="bin\coretools\Microsoft.Xrm.Sdk.dll" />
-    <Content Include="bin\coretools\SolutionPackager.exe" />
-    <Content Include="build\nuget.exe" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FakeXrmEasy.2013\FakeXrmEasy.2013.csproj">

@@ -94,9 +94,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="buildNugetPackages.bat" />
-    <None Include="build\FakeXrmEasy.2015.dll.nuspec" />
-    <None Include="build\tools\Install.ps1" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -105,12 +102,7 @@
       <Name>FakeXrmEasy.2015</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="build\nuget.exe" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="build\lib\net452\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="..\FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems" Label="Shared" />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

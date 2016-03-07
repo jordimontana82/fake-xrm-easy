@@ -75,10 +75,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="buildNugetPackages.bat" />
-    <None Include="build\FakeXrmEasy.1.0.0.nupkg" />
-    <None Include="build\FakeXrmEasy.dll.nuspec" />
-    <None Include="build\tools\Install.ps1" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -86,10 +82,6 @@
       <Project>{1ff34479-d38a-4b6b-86a7-b48182403437}</Project>
       <Name>FakeXrmEasy</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="build\lib\net40\FakeXrmEasy.dll" />
-    <Content Include="build\nuget.exe" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="..\FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems" Label="Shared" />
