@@ -682,7 +682,7 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
-        public void When_doing_a_crm_linq_query_with_an_intersect_entity_and_joins_right_and_where_clauses_result_is_returned()
+        public void When_doing_a_crm_linq_query_with_an_intersect_entity_and_joins_and_where_clauses_right_result_is_returned()
         {
             var fakedContext = new XrmFakedContext();
             fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
@@ -716,6 +716,42 @@ namespace FakeXrmEasy.Tests
                                join u in ctx.CreateQuery<SystemUser>() on sr.SystemUserId equals u.SystemUserId
                                where u.FirstName == "Jordi"
                                where r.Name == "System Administrator"
+                               select sr).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_an_intersect_entity_and_2_levels_of_joins_and_where_clauses_right_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var user = new SystemUser() { Id = Guid.NewGuid(), FirstName = "Jordi" };
+            var systemRole = new SystemUserRoles() { Id = Guid.NewGuid() };
+            var parentRole = new Role() { Id = Guid.NewGuid(), Name = "System Administrator" };
+            var role = new Role() { Id = Guid.NewGuid(), Name = "Sys Admin" };
+
+            role["parentroleid"] = parentRole.ToEntityReference();
+            systemRole["systemuserid"] = user.ToEntityReference();
+            systemRole["roleid"] = role.ToEntityReference();
+
+            
+            fakedContext.Initialize(new List<Entity>() {
+                user, systemRole, role, parentRole
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from sr in ctx.CreateQuery<SystemUserRoles>()
+                               join r in ctx.CreateQuery<Role>() on sr.RoleId equals r.RoleId
+                               join r2 in ctx.CreateQuery<Role>() on r.ParentRoleId.Id equals r2.RoleId
+                               join u in ctx.CreateQuery<SystemUser>() on sr.SystemUserId equals u.SystemUserId
+                               where u.FirstName == "Jordi"
+                               where r2.Name == "System Administrator"
                                select sr).ToList();
 
                 Assert.True(matches.Count == 1);

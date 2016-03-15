@@ -179,12 +179,22 @@ namespace FakeXrmEasy.Extensions
                     return e.Id;
                 }
                 return Guid.Empty; //Atrribute is null or doesn´t exists so it can´t be joined
-            } 
+            }
 
-            if (e[sAttributeName] is EntityReference) 
-                return (e[sAttributeName] as EntityReference).Id;
+            object keyValue = null;
+            if(e[sAttributeName] is AliasedValue)
+            {
+                keyValue = (e[sAttributeName] as AliasedValue).Value;
+            }
+            else
+            {
+                keyValue = e[sAttributeName];
+            }
+
+            if (keyValue is EntityReference) 
+                return (keyValue as EntityReference).Id;
             if (e[sAttributeName] is Guid)
-                return ((Guid)e[sAttributeName]);
+                return ((Guid)keyValue);
 
             return Guid.Empty;
         }

@@ -38,12 +38,12 @@ let nugetDir                = @".\nuget\"
 let nugetDeployDir          = @"[Enter_NuGet_Url]"
 let packagesDir             = @".\packages\"
 
-let mutable previousVersion = "1.9.2"
-let mutable version         = "1.9.3"
+let mutable previousVersion = "1.9.3"
+let mutable version         = "1.9.4"
 let mutable build           = buildVersion
-let mutable nugetVersion    = ""
-let mutable asmVersion      = ""
-let mutable asmInfoVersion  = ""
+let mutable nugetVersion    = version
+let mutable asmVersion      = version
+let mutable asmInfoVersion  = version
 let mutable setupVersion    = ""
 
 let mutable releaseNotes    = "https://github.com/jordimontana82/fake-xrm-easy/compare/v" + previousVersion + "...v" + version

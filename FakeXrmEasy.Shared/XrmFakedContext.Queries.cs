@@ -118,7 +118,7 @@ namespace FakeXrmEasy
             return Data[s].Values.AsQueryable();
         }
 
-        public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet) {
+        public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, string linkFromAlias = "") {
             
             var leAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
             context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName);
@@ -131,12 +131,21 @@ namespace FakeXrmEasy
                 le.Columns.AllColumns = true;   //Add all columns in the joined entity, otherwise we can't filter by related attributes, then the Select will actually choose which ones we need
             }
 
+            if(string.IsNullOrWhiteSpace(linkFromAlias))
+            {
+                linkFromAlias = le.LinkFromAttributeName;
+            }
+            else
+            {
+                linkFromAlias += "." + le.LinkFromAttributeName;
+            }
+
             switch (le.JoinOperator)
             {
                 case JoinOperator.Inner:
                 case JoinOperator.Natural:
                     query = query.Join(inner,
-                                    outerKey => outerKey.KeySelector(le.LinkFromAttributeName),
+                                    outerKey => outerKey.KeySelector(linkFromAlias),
                                     innerKey => innerKey.KeySelector(le.LinkToAttributeName),
                                     (outerEl, innerEl) => outerEl
                                                             .ProjectAttributes(previousColumnSet, context)
@@ -163,7 +172,7 @@ namespace FakeXrmEasy
             //Process nested linked entities recursively
             foreach (LinkEntity nestedLinkedEntity in le.LinkEntities)
             {
-                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, query, le.Columns);
+                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, query, le.Columns, le.EntityAlias);
             }
             return query;
         }
