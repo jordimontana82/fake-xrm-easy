@@ -652,6 +652,77 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_doing_a_crm_linq_query_with_an_intersect_entity_and_joins_right_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var user = new SystemUser() { Id = Guid.NewGuid() };
+            var systemRole = new SystemUserRoles() { Id = Guid.NewGuid() };
+            var role = new Role() { Id = Guid.NewGuid() };
+
+            systemRole["systemuserid"] = user.ToEntityReference();
+            systemRole["roleid"] = role.ToEntityReference();
+
+            fakedContext.Initialize(new List<Entity>() {
+                user, systemRole, role
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from sr in ctx.CreateQuery<SystemUserRoles>()
+                               join r in ctx.CreateQuery<Role>() on sr.RoleId equals r.RoleId
+                               join u in ctx.CreateQuery<SystemUser>() on sr.SystemUserId equals u.SystemUserId
+                               select sr).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_an_intersect_entity_and_joins_right_and_where_clauses_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var user = new SystemUser() { Id = Guid.NewGuid(), FirstName = "Jordi" };
+            var systemRole = new SystemUserRoles() { Id = Guid.NewGuid()  };
+            var role = new Role() { Id = Guid.NewGuid() , Name = "System Administrator" };
+
+            systemRole["systemuserid"] = user.ToEntityReference();
+            systemRole["roleid"] = role.ToEntityReference();
+
+
+            var anotherUser = new SystemUser() { Id = Guid.NewGuid(), FirstName = "FakeUser" };
+            var anotherSystemRole = new SystemUserRoles() { Id = Guid.NewGuid() };
+            var anotherRole = new Role() { Id = Guid.NewGuid(), Name = "Basic Access" };
+
+            anotherSystemRole["systemuserid"] = anotherUser.ToEntityReference();
+            anotherSystemRole["roleid"] = anotherRole.ToEntityReference();
+
+            fakedContext.Initialize(new List<Entity>() {
+                user, systemRole, role,
+                anotherUser, anotherSystemRole, anotherRole
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from sr in ctx.CreateQuery<SystemUserRoles>()
+                               join r in ctx.CreateQuery<Role>() on sr.RoleId equals r.RoleId
+                               join u in ctx.CreateQuery<SystemUser>() on sr.SystemUserId equals u.SystemUserId
+                               where u.FirstName == "Jordi"
+                               where r.Name == "System Administrator"
+                               select sr).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
+
+        [Fact]
         public void When_doing_a_crm_linq_query_with_a_leftjoin_right_result_is_returned()
         {
             var fakedContext = new XrmFakedContext();
