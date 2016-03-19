@@ -210,13 +210,13 @@ namespace FakeXrmEasy
                 .ReturnsLazily((OrganizationRequest req) =>
                 {
 
+                    if (context.ExecutionMocks.ContainsKey(req.GetType()))
+                    {
+                        return context.ExecutionMocks[req.GetType()].Invoke(req);
+                    }
                     if (context.FakeMessageExecutors.ContainsKey(req.GetType()))
                     {
                         return context.FakeMessageExecutors[req.GetType()].Execute(req, context);
-                    }
-                    else if (context.ExecutionMocks.ContainsKey(req.GetType()))
-                    {
-                        return context.ExecutionMocks[req.GetType()].Invoke(req);
                     }
 
                     throw PullRequestException.NotImplementedOrganizationRequest(req.GetType());
