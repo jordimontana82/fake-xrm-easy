@@ -93,7 +93,10 @@ namespace FakeXrmEasy
 
         public void AddExecutionMock<T>(ServiceRequestExecution mock) where T : OrganizationRequest
         {
-            ExecutionMocks.Add(typeof (T), mock);
+            if (!ExecutionMocks.ContainsKey(typeof(T)))
+                ExecutionMocks.Add(typeof(T), mock);
+            else
+                ExecutionMocks[typeof(T)] = mock;
         }
 
         public void RemoveExecutionMock<T>() where T : OrganizationRequest
@@ -103,7 +106,10 @@ namespace FakeXrmEasy
 
         public void AddFakeMessageExecutor<T>(IFakeMessageExecutor executor) where T : OrganizationRequest
         {
-            FakeMessageExecutors.Add(typeof(T), executor);
+            if (!FakeMessageExecutors.ContainsKey(typeof(T)))
+                FakeMessageExecutors.Add(typeof(T), executor);
+            else
+                FakeMessageExecutors[typeof(T)] = executor;
         }
 
         public void RemoveFakeMessageExecutor<T>() where T : OrganizationRequest
