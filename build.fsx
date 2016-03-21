@@ -107,7 +107,7 @@ Target "BuildFakeXrmEasy.2015" (fun _->
 
 Target "BuildFakeXrmEasy.2016" (fun _->
     let properties =
-        [ ("DefineConstants", "FAKE_XRM_EASY_2015") ]
+        [ ("DefineConstants", "FAKE_XRM_EASY_2016") ]
     !! @"FakeXrmEasy.2016\*.csproj"
       |> MSBuild FakeXrmEasy2016BuildDir "Rebuild" (properties)
       |> Log "Build - Output: "
