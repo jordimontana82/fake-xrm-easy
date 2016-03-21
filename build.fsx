@@ -77,9 +77,10 @@ Target "BuildVersions" (fun _ ->
     SetBuildNumber nugetVersion
 )
 Target "AssemblyInfo" (fun _ ->
-    BulkReplaceAssemblyInfoVersions "src/" (fun f ->
+    BulkReplaceAssemblyInfoVersions "." (fun f ->
                                               {f with
                                                   AssemblyVersion = asmVersion
+                                                  AssemblyFileVersion = asmVersion
                                                   AssemblyInformationalVersion = asmInfoVersion})
 )
 
