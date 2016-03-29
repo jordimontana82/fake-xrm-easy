@@ -17,7 +17,7 @@ If you have any kind of questions, or anything you would like to discuss, please
 
 ##Like it?
 
-Great! Help us to maintain & improve this project better by taking this short [survey](https://es.surveymonkey.com/r/TK8PXLK)
+Great! Help us to better maintain & improve this project by taking this short [survey](https://es.surveymonkey.com/r/TK8PXLK)
 
 ##Contributing
 
