@@ -15,6 +15,10 @@ For a general overview of the framework and samples please refer to [this](http:
 
 If you have any kind of questions, or anything you would like to discuss, please do not hesitate to send me an email and I'll be happy to discuss.
 
+##Like it?
+
+Great! Help us to maintain & improve this project better by taking this short [survey](https://es.surveymonkey.com/r/TK8PXLK)
+
 ##Contributing
 
 Please consider the below guidelines for contributing to the project:
