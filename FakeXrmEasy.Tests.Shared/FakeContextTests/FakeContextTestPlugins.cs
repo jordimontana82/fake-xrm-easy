@@ -213,5 +213,22 @@ namespace FakeXrmEasy.Tests
             var fakedContext = new XrmFakedContext();
             var fakedPlugin = fakedContext.ExecutePluginWithTarget<MyPlugin>(new Entity());
         }
+
+        [Fact]
+        public void When_executing_a_plugin_primaryentityname_exists_in_the_context()
+        {
+            var context = new XrmFakedContext();
+
+            var pluginContext = context.GetDefaultPluginContext();
+            pluginContext.PrimaryEntityName = "Account";
+            pluginContext.MessageName = "Create";
+            pluginContext.Stage = 20;
+
+            var entity = new Entity();
+            context.ExecutePluginWith<PreAccountCreate>(pluginContext);
+
+            Assert.True(true);
+        }
+
     }
 }
