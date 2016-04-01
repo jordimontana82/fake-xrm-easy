@@ -167,5 +167,65 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             Assert.Equal(1, service.RetrieveMultiple(qe).Entities.Count);
         }
+
+        [Fact]
+        public void When_executing_a_query_expression_equals_operator_is_case_insensitive()
+        {
+            var context = new XrmFakedContext();
+
+            var service = context.GetFakedOrganizationService();
+            service.Create(new Contact { FirstName = "Jimmy" });
+
+            var qe = new QueryExpression("contact");
+            qe.Criteria.AddCondition("firstname", ConditionOperator.Equal, "jimmy");
+
+            Assert.Equal(1, service.RetrieveMultiple(qe).Entities.Count);
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_begins_with_operator_is_case_insensitive()
+        {
+            var context = new XrmFakedContext();
+
+            var service = context.GetFakedOrganizationService();
+            service.Create(new Contact { FirstName = "Jimmy" });
+
+            var qe = new QueryExpression("contact");
+            qe.Criteria.AddCondition("firstname", ConditionOperator.BeginsWith, "jim");
+
+            Assert.Equal(1, service.RetrieveMultiple(qe).Entities.Count);
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_ends_with_operator_is_case_insensitive()
+        {
+            var context = new XrmFakedContext();
+
+            var service = context.GetFakedOrganizationService();
+            service.Create(new Contact { FirstName = "JimmY" });
+
+            var qe = new QueryExpression("contact");
+            qe.Criteria.AddCondition("firstname", ConditionOperator.EndsWith, "y");
+
+            Assert.Equal(1, service.RetrieveMultiple(qe).Entities.Count);
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_attributes_returned_are_case_sensitive()
+        {
+            //So Where clauses shouldn't affect the Select clause
+            var context = new XrmFakedContext();
+
+            var service = context.GetFakedOrganizationService();
+            service.Create(new Contact { FirstName = "JimmY" });
+
+            var qe = new QueryExpression("contact");
+            qe.Criteria.AddCondition("firstname", ConditionOperator.EndsWith, "y");
+            qe.ColumnSet = new ColumnSet(true);
+
+            var entities = service.RetrieveMultiple(qe).Entities;
+            Assert.Equal(1, entities.Count);
+            Assert.Equal("JimmY", entities[0]["firstname"]);
+        }
     }
 }

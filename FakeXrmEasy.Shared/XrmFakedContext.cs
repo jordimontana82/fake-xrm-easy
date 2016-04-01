@@ -67,6 +67,7 @@ namespace FakeXrmEasy
             AddFakeMessageExecutor<UpdateRequest>(new UpdateRequestExecutor());
             AddFakeMessageExecutor<DeleteRequest>(new DeleteRequestExecutor());
             AddFakeMessageExecutor<AssignRequest>(new AssignRequestExecutor());
+            AddFakeMessageExecutor<ExecuteMultipleRequest>(new ExecuteMultipleRequestExecutor());
 #if FAKE_XRM_EASY_2016
             AddFakeMessageExecutor<ExecuteTransactionRequest>(new ExecuteTransactionExecutor());
 #endif

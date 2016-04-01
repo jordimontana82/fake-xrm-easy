@@ -334,6 +334,10 @@ namespace FakeXrmEasy
                 {
                     return Expression.Constant(dtDateTimeConversion, typeof(DateTime));
                 }
+                else
+                {
+                    return GetCaseInsensitiveExpression(Expression.Constant(value, typeof(string)));
+                }
             }
             return Expression.Constant(value);
         }
@@ -378,7 +382,8 @@ namespace FakeXrmEasy
             {
                 return Expression.Convert(input, typeof(DateTime));
             }
-            return GetAppropiateCastExpressionDefault(input, value); //Non datetime string
+
+            return GetCaseInsensitiveExpression(GetAppropiateCastExpressionDefault(input, value)); //Non datetime string
         }
 
         protected static Expression GetAppropiateCastExpressionDefault(Expression input, object value)
@@ -507,25 +512,32 @@ namespace FakeXrmEasy
             var computedCondition = new ConditionExpression(c.AttributeName, c.Operator, c.Values.Select(x => "%" + x.ToString()).ToList() );
             return TranslateConditionExpressionLike(computedCondition, getAttributeValueExpr, containsAttributeExpr);
         }
+
+        protected static Expression GetCaseInsensitiveExpression(Expression e)
+        {
+            return Expression.Call(e,
+                                typeof(string).GetMethod("ToLowerInvariant", new Type[] { }));
+        }
+
         protected static Expression TranslateConditionExpressionLike(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             Expression convertedValueToStr = Expression.Convert(getAttributeValueExpr, typeof(string));
 
-            Expression convertedValueToStrAndToLower =
-                Expression.Call(convertedValueToStr,
-                                typeof(string).GetMethod("ToLowerInvariant", new Type[] { }));
+            Expression convertedValueToStrAndToLower = GetCaseInsensitiveExpression(convertedValueToStr);
 
-                                
             string sLikeOperator = "%";
             foreach (object value in c.Values)
             {
                 var strValue = value.ToString();
                 string sMethod = "";
+
                 if (strValue.EndsWith(sLikeOperator) && strValue.StartsWith(sLikeOperator))
                     sMethod = "Contains";
+
                 else if (strValue.StartsWith(sLikeOperator))
                     sMethod = "EndsWith";
+
                 else
                     sMethod = "StartsWith";
 
