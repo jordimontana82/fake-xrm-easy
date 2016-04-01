@@ -209,9 +209,9 @@ namespace FakeXrmEasy
                 foreach (var order in qe.Orders)
                 {
                     if (order.OrderType == OrderType.Ascending)
-                        query = query.OrderBy(e => e.Attributes[order.AttributeName]);
+                        query = query.OrderBy(e => e.Attributes[order.AttributeName], new XrmOrderByAttributeComparer());
                     else
-                        query = query.OrderByDescending(e => e.Attributes[order.AttributeName]);
+                        query = query.OrderByDescending(e => e.Attributes[order.AttributeName], new XrmOrderByAttributeComparer());
                 }
             }
             return query;
