@@ -24,6 +24,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "You need to pass a value for 'Settings' in execute multiple request");
             }
 
+            if (executeMultipleRequest.Requests == null)
+            {
+                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "You need to pass a value for 'Requests' in execute multiple request");
+            }
+
             var service = ctx.GetFakedOrganizationService();
 
             var response = new ExecuteMultipleResponse();
