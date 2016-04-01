@@ -171,5 +171,22 @@ namespace FakeXrmEasy.Tests
             var service = context.GetFakedOrganizationService();
             Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Retrieve("account", Guid.NewGuid(), new ColumnSet(true)));
         }
+
+        [Fact]
+        public void When_retrieving_entity_by_name_where_case_does_not_match_should_still_be_returned()
+        {
+            var context = new XrmFakedContext
+            {
+                ProxyTypesAssembly = Assembly.GetAssembly(typeof(XrmServiceContext))
+            };
+
+            var service = context.GetFakedOrganizationService();
+            service.Create(new Contact { FirstName = "Jimmy" });
+
+            var qe = new QueryExpression("contact");
+            qe.Criteria.AddCondition("firstname", ConditionOperator.Equal, "jimmy");
+
+            Assert.Equal(1, service.RetrieveMultiple(qe).Entities.Count);
+        }
     }
 }
