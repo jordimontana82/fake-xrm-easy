@@ -337,6 +337,25 @@ namespace FakeXrmEasy
 
         protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
         {
+            if(ProxyTypesAssembly != null)
+            {
+                //Check if attribute exists in the early bound type 
+                var earlyBoundType = FindReflectedType(sEntityName);
+                if(earlyBoundType != null)
+                {
+                    //Get that type properties
+                    var attributeFound = earlyBoundType
+                        .GetProperties()
+                        .Where(pi => pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true).Length > 0)
+                        .Where(pi => (pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true)[0] as AttributeLogicalNameAttribute).LogicalName.Equals(sAttributeName))
+                        .FirstOrDefault();
+
+                    return attributeFound != null;
+                }
+                return false;
+            }
+
+            //Otherwise just checks if exists as an attribute
             return AttributeMetadata.ContainsKey(sEntityName) &&
                     AttributeMetadata[sEntityName].ContainsKey(sAttributeName);
         }

@@ -9,6 +9,11 @@ namespace FakeXrmEasy
     {
         public int Compare(Object objectA, Object objectB)
         {
+            if (objectA == null && objectB == null) return 0;  //Equal
+
+            if (objectA == null) return -1;
+            if (objectB == null) return 1;
+
             Type attributeType = objectA.GetType();
 
             if (attributeType == typeof(OptionSetValue))

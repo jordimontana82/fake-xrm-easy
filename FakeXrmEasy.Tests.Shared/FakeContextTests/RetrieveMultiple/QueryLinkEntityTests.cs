@@ -6,6 +6,7 @@ using Microsoft.Xrm.Sdk;
 using Xunit;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using System.Reflection;
 
 namespace FakeXrmEasy.Tests.FakeContextTests
 {
@@ -470,6 +471,54 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var result = fakedService.RetrieveMultiple(query);
             Assert.NotEmpty(result.Entities);
             Assert.Equal(1, result.Entities.Count);
+        }
+
+        [Fact]
+        public void When_querying_by_an_attribute_which_wasnt_initialised_null_value_is_returned_for_early_bound_and_not_an_exception()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var service = ctx.GetFakedOrganizationService();
+            ctx.Initialize(new List<Entity>() {
+                new Contact() {
+                    Id = Guid.NewGuid(), LastName = "Mcdonald" }
+            });
+
+            var name = "Mcdonald";
+
+            using (var context = new XrmServiceContext(service))
+            {
+                var contacts = (from c in context.ContactSet
+                                where c.FirstName == name || c.LastName == name
+                                select new Contact { Id = c.Id, FirstName = c.FirstName, LastName = c.LastName }).ToList();
+
+                Assert.Equal(1, contacts.Count);
+                Assert.Null(contacts[0].FirstName);
+            }
+        }
+
+        [Fact]
+        public void When_sorting_by_an_attribute_which_wasnt_initialised_an_exception_is_not_thrown()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var service = ctx.GetFakedOrganizationService();
+            ctx.Initialize(new List<Entity>() {
+                new Contact() { Id = Guid.NewGuid(), FirstName = "Ronald", LastName = "Mcdonald" },
+                new Contact() { Id = Guid.NewGuid(), LastName = "Jordan" }
+            });
+
+            using (var context = new XrmServiceContext(service))
+            {
+                var contacts = (from c in context.ContactSet
+                                orderby c.FirstName
+                                select new Contact { Id = c.Id, FirstName = c.FirstName, LastName = c.LastName }).ToList();
+
+                Assert.Equal(2, contacts.Count);
+                Assert.Null(contacts[0].FirstName);
+            }
         }
 
 
