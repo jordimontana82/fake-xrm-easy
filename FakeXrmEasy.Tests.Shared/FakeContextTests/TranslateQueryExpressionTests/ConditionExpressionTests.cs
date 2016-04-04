@@ -54,6 +54,27 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
         }
 
         [Fact]
+        public void When_executing_a_query_expression_with_in_operator_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "McDonald"; contact1["firstname"] = "First 1";
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "King"; contact2["firstname"] = "First 2";
+            var contact3 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "King"; contact2["firstname"] = "First 2";
+
+            context.Initialize(new List<Entity>() { contact1, contact2 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+            qe.ColumnSet = new ColumnSet(true);
+            qe.Criteria = new FilterExpression(LogicalOperator.And);
+            var condition = new ConditionExpression("fullname", ConditionOperator.In, new string[] { "McDonald", "King"});
+            qe.Criteria.AddCondition(condition);
+
+            var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
+
+            Assert.True(result.Count() == 2);
+        }
+
+        [Fact]
         public void When_executing_a_query_expression_with_endswith_operator_right_result_is_returned()
         {
             var context = new XrmFakedContext();

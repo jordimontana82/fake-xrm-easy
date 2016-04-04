@@ -317,6 +317,11 @@ namespace FakeXrmEasy
                                 TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression),
                                 TranslateConditionExpressionLessThan(c, getNonBasicValueExpr, containsAttributeExpression));
 
+                case ConditionOperator.In:
+                    return TranslateConditionExpressionIn(c, getNonBasicValueExpr, containsAttributeExpression);
+                case ConditionOperator.NotIn:
+                    return Expression.Not(TranslateConditionExpressionIn(c, getNonBasicValueExpr, containsAttributeExpression));
+
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.Operator.ToString()));
 
@@ -454,6 +459,24 @@ namespace FakeXrmEasy
                             GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr,value),
                             GetAppropiateTypedValue(value)));
                 
+
+            }
+            return Expression.AndAlso(
+                            containsAttributeExpr,
+                            Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                expOrValues));
+        }
+
+        protected static Expression TranslateConditionExpressionIn(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+            foreach (object value in c.Values)
+            {
+
+                expOrValues = Expression.Or(expOrValues, Expression.Equal(
+                            GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr, value),
+                            GetAppropiateTypedValue(value)));
+
 
             }
             return Expression.AndAlso(
