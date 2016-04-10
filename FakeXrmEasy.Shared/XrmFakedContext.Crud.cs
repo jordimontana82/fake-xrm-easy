@@ -301,9 +301,18 @@ namespace FakeXrmEasy
                 Data[e.LogicalName].Add(e.Id, e);
             }
 
+            
             //Update metadata for that entity
             if (!AttributeMetadata.ContainsKey(e.LogicalName))
                 AttributeMetadata.Add(e.LogicalName, new Dictionary<string, string>());
+
+
+            //Automatically detect proxy types assembly if an early bound type was used.
+            if(ProxyTypesAssembly == null && 
+                e.GetType().IsSubclassOf(typeof(Entity)))
+            {
+                ProxyTypesAssembly = Assembly.GetAssembly(e.GetType());
+            }
 
             //Update attribute metadata
             if (ProxyTypesAssembly != null)

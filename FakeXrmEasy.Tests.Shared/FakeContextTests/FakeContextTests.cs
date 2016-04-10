@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using FakeXrmEasy.Tests.PluginsForTesting;
 using Crm;
+using System.Reflection;
 
 namespace FakeXrmEasy.Tests
 {
@@ -173,10 +174,10 @@ namespace FakeXrmEasy.Tests
             context.Initialize(new List<Entity>() { c });
 
             //Linq 2 Query Expression
-            using(var ctx = new XrmServiceContext(service))
+            using (var ctx = new XrmServiceContext(service))
             {
                 var contacts = (from con in ctx.CreateQuery<Contact>()
-                               select con).ToList();
+                                select con).ToList();
 
                 Assert.Equal(contacts.Count, 1);
             }
@@ -184,7 +185,24 @@ namespace FakeXrmEasy.Tests
             //Query faked context directly
             Assert.DoesNotThrow(() => context.CreateQuery<Contact>());
 
-            
+
+        }
+
+        [Fact]
+        public void When_initializing_the_entities_a_proxy_types_assembly_is_not_mandatory()
+        {
+            //This will make tests much more simple as we won't need to specificy the ProxyTypesAssembly every single time if 
+            //we use early bound entities
+
+            var assembly = Assembly.GetAssembly(typeof(Contact));
+
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Jordi" };
+            context.Initialize(new List<Entity>() { c });
+
+            Assert.Equal(assembly, context.ProxyTypesAssembly);
         }
     }
 }
