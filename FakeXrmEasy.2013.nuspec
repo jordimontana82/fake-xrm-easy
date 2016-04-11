@@ -7,11 +7,12 @@
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
     <projectUrl>http://dynamicsvalue.com/home?source=nuget</projectUrl>
+    <iconUrl>http://dynamicsvalue.com/images/fakexrmeasy.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>Utilities to streamline unit testing in Dynamics CRM by faking the IOrganizationService using FakeItEasy and make it work against an In-Memory context.</description>
+    <description>Utilities to streamline unit testing in Dynamics CRM 2013 by faking the IOrganizationService against an In-Memory context which runs blazingly fast.</description>
     <releaseNotes>@releaseNotes@</releaseNotes>
     <copyright>Copyright 2014-2016</copyright>
-    <tags>xrm dynamics crm unit testing mock mocking fake fakes 2011</tags>
+    <tags>dynamics crm 2013 unit testing xrm mock mocking fake fakes</tags>
     <dependencies>
       <dependency id="FakeItEasy" version="1.25.1" />
       <dependency id="Microsoft.Xrm.Sdk.2011" version="5.0.18" />
