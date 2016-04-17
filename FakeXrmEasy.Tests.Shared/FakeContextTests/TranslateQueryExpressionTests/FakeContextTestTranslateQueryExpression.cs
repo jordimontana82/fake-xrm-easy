@@ -594,5 +594,65 @@ namespace FakeXrmEasy.Tests
         }
         #endregion
 
+        [Fact]
+        public void When_using_joins_attribute_projection_shouldnt_affect_column_sets()
+        {
+            var context = new XrmFakedContext();
+
+            Entity invoice_entity = new Entity("invoice");
+            invoice_entity.Id = Guid.NewGuid();
+
+            //create the onlinePayment structure
+            int opstatus_completed = 108550002;
+            int opstatus_new = 108550000;
+
+            Entity op_entity = new Entity("new_onlinepayment");
+            op_entity.Id = Guid.NewGuid();
+            //op_entity.Attributes.Add("new_ps", new OptionSetValue(opstatus_new));
+            op_entity.Attributes.Add("statuscode", new OptionSetValue(1));
+            op_entity.Attributes.Add("new_amount", null);
+            op_entity.Attributes.Add("new_invoiceid", new EntityReference("invoice", invoice_entity.Id));
+            op_entity.Attributes.Add("new_pproviderid", new EntityReference("new_paymentprovider", Guid.NewGuid()));
+
+            //create pmr
+            Entity pmr_entity = new Entity("new_invoicepaymentmethod");
+            pmr_entity.Id = Guid.NewGuid();
+            pmr_entity.Attributes.Add("new_paymentvalue", new Money(100));
+            pmr_entity.Attributes.Add("statuscode", new OptionSetValue(1));
+            pmr_entity.Attributes.Add("statecode", new OptionSetValue(0));
+            pmr_entity.Attributes.Add("new_invoicepaymentmethodid", pmr_entity.Id);
+            pmr_entity.Attributes.Add("new_invoiceid", new EntityReference("invoice", invoice_entity.Id));
+
+            //create joining entity
+            Entity opi_entity = new Entity("new_onlinepaymentitem");
+            opi_entity.Id = Guid.NewGuid();
+            opi_entity.Attributes.Add("new_onlinepaymentid", new EntityReference("new_onlinepayment", op_entity.Id));
+            opi_entity.Attributes.Add("new_invoicepaymentmethodid", new EntityReference("new_invoicepaymentmethod", pmr_entity.Id));
+            opi_entity.Attributes.Add("statuscode", new OptionSetValue(1));
+            opi_entity.Attributes.Add("statecode", new OptionSetValue(0));
+
+            //create these objects in crm
+            context.Initialize(new List<Entity>() { invoice_entity, pmr_entity, op_entity, opi_entity });
+
+            //create the mock service
+            IOrganizationService service = context.GetFakedOrganizationService();
+
+            QueryExpression query = new QueryExpression("new_onlinepaymentitem");
+            query.Criteria.AddCondition("new_onlinepaymentid", ConditionOperator.Equal, op_entity.Id);
+
+            LinkEntity LinkPayments = new LinkEntity(
+                "new_onlinepaymentitem", "new_invoicepaymentmethod",
+                "new_invoicepaymentmethodid", "new_invoicepaymentmethodid",
+                JoinOperator.Inner);
+            LinkPayments.LinkCriteria.AddCondition("statecode", ConditionOperator.Equal, 0);
+            LinkPayments.LinkCriteria.AddCondition("statuscode", ConditionOperator.Equal, 1);
+            query.LinkEntities.Add(LinkPayments);
+
+            query.ColumnSet = new ColumnSet("new_invoicepaymentmethodid");
+
+            EntityCollection paymentitems = service.RetrieveMultiple(query);
+            Assert.True(paymentitems.Entities.Count == 1);
+        }
+
     }
 }

@@ -148,7 +148,7 @@ namespace FakeXrmEasy
                                     outerKey => outerKey.KeySelector(linkFromAlias),
                                     innerKey => innerKey.KeySelector(le.LinkToAttributeName),
                                     (outerEl, innerEl) => outerEl
-                                                            .ProjectAttributes(previousColumnSet, context)
+                                                            //.ProjectAttributes(previousColumnSet, context)
                                                             .JoinAttributes(innerEl, le.Columns, leAlias));
 
                     break;
@@ -159,7 +159,7 @@ namespace FakeXrmEasy
                                     (outerEl, innerElemsCol) => new { outerEl, innerElemsCol })
                                                 .SelectMany(x => x.innerElemsCol.DefaultIfEmpty()
                                                             , (x, y) => x.outerEl
-                                                                            .ProjectAttributes(previousColumnSet, context)
+                                                                            //.ProjectAttributes(previousColumnSet, context)
                                                                             .JoinAttributes(y, le.Columns, leAlias));
 
 
