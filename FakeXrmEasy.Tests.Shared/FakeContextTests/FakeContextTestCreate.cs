@@ -141,5 +141,41 @@ namespace FakeXrmEasy.Tests
                 Assert.Null(retrievedAccount);
             }
         }
+
+        [Fact]
+        public void When_creating_a_record_using_early_bound_entities_primary_key_should_be_populated()
+        {
+            var context = new XrmFakedContext();
+
+            var c = new Contact();
+
+            IOrganizationService service = context.GetFakedOrganizationService();
+            var id = service.Create(c);
+
+            //Retrieve the record created
+            var contact = (from con in context.CreateQuery<Contact>()
+                          select con).FirstOrDefault();
+
+            Assert.True(contact.Attributes.ContainsKey("contactid"));
+
+        }
+
+        [Fact]
+        public void When_creating_a_record_using_dynamic_entities_primary_key_should_be_populated()
+        {
+            var context = new XrmFakedContext();
+
+            Entity e = new Entity("new_myentity");
+
+            IOrganizationService service = context.GetFakedOrganizationService();
+            var id = service.Create(e);
+
+            //Retrieve the record created
+            var record = (from r in context.CreateQuery("new_myentity")
+                          select r).FirstOrDefault();
+
+            Assert.True(record.Attributes.ContainsKey("new_myentityid"));
+
+        }
     }
 }

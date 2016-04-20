@@ -113,7 +113,14 @@ namespace FakeXrmEasy
                     //Add entity to the context
                     if (e.Id == Guid.Empty)
                     {
-                        e.Id = Guid.NewGuid(); 
+                        e.Id = Guid.NewGuid();
+
+                        //Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
+                        if (!e.GetType().IsSubclassOf(typeof(Entity)))
+                        {
+                            var primaryKeyAttribute = string.Format("{0}id", e.LogicalName);
+                            e[primaryKeyAttribute] = e.Id;
+                        }
                     }
                     context.AddEntity(e);
 
