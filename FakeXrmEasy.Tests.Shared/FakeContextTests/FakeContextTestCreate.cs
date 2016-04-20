@@ -157,7 +157,7 @@ namespace FakeXrmEasy.Tests
                           select con).FirstOrDefault();
 
             Assert.True(contact.Attributes.ContainsKey("contactid"));
-
+            Assert.Equal(id, contact["contactid"]);
         }
 
         [Fact]
@@ -175,6 +175,7 @@ namespace FakeXrmEasy.Tests
                           select r).FirstOrDefault();
 
             Assert.True(record.Attributes.ContainsKey("new_myentityid"));
+            Assert.Equal(id, record["new_myentityid"]);
 
         }
     }
