@@ -36,8 +36,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         {
             var ctx = new XrmFakedContext();
 
-            Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<entity></entity>"));
-            Assert.DoesNotThrow(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<entity name='contact'></entity>"));
+            Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity></entity></fetch>"));
+            Assert.DoesNotThrow(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'></entity></fetch>"));
         }
 
         [Fact]
@@ -66,17 +66,41 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ctx = new XrmFakedContext();
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<thisdoesntexist></thisdoesntexist>"));
         }
-
+        
         [Fact]
-        public void When_translating_a_fetch_xml_expression_all_attributes_is_translated_to_all_columns()
+        public void When_translating_a_fetch_xml_expression_queryexpression_name_matches_entity_node()
         {
-            Assert.True(false);
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                              </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.EntityName.Equals("contact"));
         }
 
         [Fact]
         public void When_translating_a_fetch_xml_expression_attributes_are_translated_to_a_list_of_columns()
         {
-            Assert.True(false);
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                              </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.ColumnSet != null);
+            Assert.Equal(false, query.ColumnSet.AllColumns);
+            Assert.Equal(3, query.ColumnSet.Columns.Count);
+            Assert.True(query.ColumnSet.Columns.Contains("fullname"));
+            Assert.True(query.ColumnSet.Columns.Contains("telephone1"));
+            Assert.True(query.ColumnSet.Columns.Contains("contactid"));
         }
     }
 }

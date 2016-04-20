@@ -184,14 +184,14 @@ namespace FakeXrmEasy
                     return true;
 
                 case "entity":
-                    return elem.Attributes().Where(a => a.Name.LocalName.Equals("name")).FirstOrDefault() != null;
+                    return RetrieveAttributeFromElement(elem, "name") != null;
 
                 case "attribute":
-                    return elem.Attributes().Where(a => a.Name.LocalName.Equals("name")).FirstOrDefault() != null;
+                    return RetrieveAttributeFromElement(elem, "name") != null;
 
                 case "order":
-                    return elem.Attributes().Where(a => a.Name.LocalName.Equals("attribute")).FirstOrDefault() != null
-                           && elem.Attributes().Where(a => a.Name.LocalName.Equals("descending")).FirstOrDefault() != null;
+                    return RetrieveAttributeFromElement(elem, "attribute") != null
+                           && RetrieveAttributeFromElement(elem, "descending") != null;
 
                 case "condition":
                     return false;
@@ -201,6 +201,28 @@ namespace FakeXrmEasy
             }
         }
 
+        protected static XElement RetrieveFetchXmlNode(XDocument xlDoc, string sName)
+        {
+            return xlDoc.Descendants().Where(e => e.Name.LocalName.Equals(sName)).FirstOrDefault();
+        }
+
+        protected static XAttribute RetrieveAttributeFromElement(XElement elem, string sAttribute)
+        {
+            return elem.Attributes().Where(a => a.Name.LocalName.Equals(sAttribute)).FirstOrDefault();
+        }
+
+        public static ColumnSet TranslateFetchXmlAttributesToColumnSet(XDocument xlDoc)
+        {
+            var attributes = xlDoc.Elements()   //fetch
+                                .Elements()     //entity
+                                .Elements()     //child nodes of entity
+                                .Where(el => el.Name.LocalName.Equals("attribute"))
+                                .Select(el => RetrieveAttributeFromElement(el, "name").Value)
+                                .ToList()
+                                .ToArray();
+
+            return new ColumnSet(attributes);
+        }
         public static QueryExpression TranslateFetchXmlToQueryExpression(XrmFakedContext context, string fetchXml)
         {
             XDocument xlDoc = null;
@@ -221,7 +243,14 @@ namespace FakeXrmEasy
             {
                 throw new Exception("Root node must be fetch");
             }
-            return null;
+
+            var entityNode = RetrieveFetchXmlNode(xlDoc, "entity");
+            var query = new QueryExpression(RetrieveAttributeFromElement(entityNode, "name").Value);
+
+            var columnSet = TranslateFetchXmlAttributesToColumnSet(xlDoc);
+            query.ColumnSet = columnSet;
+
+            return query;
         }
 
         public static IQueryable<Entity> TranslateQueryExpressionToLinq(XrmFakedContext context, QueryExpression qe)
@@ -263,15 +292,6 @@ namespace FakeXrmEasy
             }
             return query;
         }
-
-        //protected static Expression<Func<object, object, bool>> AreValuesEqual = (object o1, object o2) =>
-        //{
-        //    if (o1 is EntityReference && o2 is Guid)
-        //    {
-        //        return (o1 as EntityReference).Id.Equals((Guid) o2);
-        //    }
-        //    return o1 == o2;
-        //};
 
         protected static Expression TranslateConditionExpression(ConditionExpression c, ParameterExpression entity)
         {
