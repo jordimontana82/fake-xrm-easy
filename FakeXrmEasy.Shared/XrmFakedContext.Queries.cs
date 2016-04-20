@@ -13,6 +13,7 @@ using FakeXrmEasy.Extensions;
 using System.Reflection;
 using Microsoft.Xrm.Sdk.Client;
 using System.Globalization;
+using System.Xml.Linq;
 
 namespace FakeXrmEasy
 {
@@ -174,7 +175,55 @@ namespace FakeXrmEasy
             }
             return query;
         }
-        
+
+        protected static bool IsFetchXmlNodeValid(XElement elem)
+        {
+            switch(elem.Name.LocalName)
+            {
+                case "fetch":
+                    return true;
+
+                case "entity":
+                    return elem.Attributes().Where(a => a.Name.LocalName.Equals("name")).FirstOrDefault() != null;
+
+                case "attribute":
+                    return elem.Attributes().Where(a => a.Name.LocalName.Equals("name")).FirstOrDefault() != null;
+
+                case "order":
+                    return elem.Attributes().Where(a => a.Name.LocalName.Equals("attribute")).FirstOrDefault() != null
+                           && elem.Attributes().Where(a => a.Name.LocalName.Equals("descending")).FirstOrDefault() != null;
+
+                case "condition":
+                    return false;
+
+                default:
+                    throw new Exception(string.Format("Node {0} is not a valid FetchXml node", elem.Name.LocalName));
+            }
+        }
+
+        public static QueryExpression TranslateFetchXmlToQueryExpression(XrmFakedContext context, string fetchXml)
+        {
+            XDocument xlDoc = null;
+            try {
+                xlDoc = XDocument.Parse(fetchXml);
+            }
+            catch
+            {
+                throw new Exception("FetchXml must be a valid XML document");
+            }
+
+            //Validate nodes
+            if (!xlDoc.Descendants().All(el => IsFetchXmlNodeValid(el)))
+                throw new Exception("At least some node is not valid");
+
+            //Root node
+            if (!xlDoc.Root.Name.LocalName.Equals("fetch"))
+            {
+                throw new Exception("Root node must be fetch");
+            }
+            return null;
+        }
+
         public static IQueryable<Entity> TranslateQueryExpressionToLinq(XrmFakedContext context, QueryExpression qe)
         {
             if (qe == null) return null;
