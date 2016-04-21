@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\XmlExtensionsForFetchXml.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AssignRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AssociateRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\CreateRequestExecutor.cs" />

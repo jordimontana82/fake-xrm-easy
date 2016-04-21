@@ -14,6 +14,7 @@ using System.Reflection;
 using Microsoft.Xrm.Sdk.Client;
 using System.Globalization;
 using System.Xml.Linq;
+using FakeXrmEasy.Extensions.FetchXml;
 
 namespace FakeXrmEasy
 {
@@ -180,24 +181,28 @@ namespace FakeXrmEasy
         {
             switch(elem.Name.LocalName)
             {
+                case "filter":
+                    return elem.GetAttribute("type") != null;
+
                 case "fetch":
                     return true;
 
                 case "entity":
-                    return RetrieveAttributeFromElement(elem, "name") != null;
+                    return elem.GetAttribute("name") != null;
 
                 case "all-attributes":
                     return true;
 
                 case "attribute":
-                    return RetrieveAttributeFromElement(elem, "name") != null;
+                    return elem.GetAttribute("name") != null;
 
                 case "order":
-                    return RetrieveAttributeFromElement(elem, "attribute") != null
-                           && RetrieveAttributeFromElement(elem, "descending") != null;
+                    return elem.GetAttribute("attribute") != null
+                           && elem.GetAttribute("descending") != null;
 
                 case "condition":
-                    return false;
+                    return elem.GetAttribute("attribute") != null
+                           && elem.GetAttribute("operator") != null;
 
                 default:
                     throw new Exception(string.Format("Node {0} is not a valid FetchXml node", elem.Name.LocalName));
@@ -209,55 +214,7 @@ namespace FakeXrmEasy
             return xlDoc.Descendants().Where(e => e.Name.LocalName.Equals(sName)).FirstOrDefault();
         }
 
-        protected static XAttribute RetrieveAttributeFromElement(XElement elem, string sAttribute)
-        {
-            return elem.Attributes().Where(a => a.Name.LocalName.Equals(sAttribute)).FirstOrDefault();
-        }
 
-        public static ColumnSet TranslateFetchXmlAttributesToColumnSet(XDocument xlDoc)
-        {
-            //Check if all-attributes exist
-            var allAttributes = xlDoc.Elements()   //fetch
-                    .Elements()     //entity
-                    .Elements()     //child nodes of entity
-                    .Where(el => el.Name.LocalName.Equals("all-attributes"))
-                    .FirstOrDefault();
-
-            if(allAttributes != null)
-            {
-                return new ColumnSet(true);
-            }
-
-            var attributes = xlDoc.Elements()   //fetch
-                                .Elements()     //entity
-                                .Elements()     //child nodes of entity
-                                .Where(el => el.Name.LocalName.Equals("attribute"))
-                                .Select(el => RetrieveAttributeFromElement(el, "name").Value)
-                                .ToList()
-                                .ToArray();
-
-
-            return new ColumnSet(attributes);
-        }
-
-        public static List<OrderExpression> TranslateFetchXmlOrderBy(XDocument xlDoc)
-        {
-            var orderByElements = xlDoc.Elements()   //fetch
-                                .Elements()     //entity
-                                .Elements()     //child nodes of entity
-                                .Where(el => el.Name.LocalName.Equals("order"))
-                                .Select(el =>
-                                        new OrderExpression
-                                        {
-                                            AttributeName = RetrieveAttributeFromElement(el, "attribute").Value,
-                                            OrderType = RetrieveAttributeFromElement(el, "descending").Value.Equals("true") ?
-                                                            OrderType.Descending : OrderType.Ascending
-                                        })
-                                .ToList();
-
-            return orderByElements;
-
-        }
         public static QueryExpression TranslateFetchXmlToQueryExpression(XrmFakedContext context, string fetchXml)
         {
             XDocument xlDoc = null;
@@ -280,16 +237,17 @@ namespace FakeXrmEasy
             }
 
             var entityNode = RetrieveFetchXmlNode(xlDoc, "entity");
-            var query = new QueryExpression(RetrieveAttributeFromElement(entityNode, "name").Value);
+            var query = new QueryExpression(entityNode.GetAttribute("name").Value);
 
-            query.ColumnSet = TranslateFetchXmlAttributesToColumnSet(xlDoc);
+            query.ColumnSet = xlDoc.ToColumnSet();
 
-            var orders = TranslateFetchXmlOrderBy(xlDoc);
+            var orders = xlDoc.ToOrderExpressionList();
             foreach(var order in orders)
             {
                 query.AddOrder(order.AttributeName, order.OrderType);
             }
 
+            query.Criteria = xlDoc.ToCriteria();
             return query;
         }
 
