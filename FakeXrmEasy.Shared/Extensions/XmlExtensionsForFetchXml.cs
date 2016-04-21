@@ -107,6 +107,12 @@ namespace FakeXrmEasy.Extensions.FetchXml
             var attributeName = elem.GetAttribute("attribute").Value;
             ConditionOperator op = ConditionOperator.Equal;
 
+            string value = null;
+            if (elem.GetAttribute("value") != null)
+            {
+                value = elem.GetAttribute("value").Value;
+            }
+
             switch (elem.GetAttribute("operator").Value)
             {
                 case "eq":
@@ -115,13 +121,40 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "ne":
                     op = ConditionOperator.NotEqual;
                     break;
+                case "like":
+                    op = ConditionOperator.Like;
+
+                    if(value != null)
+                    {
+                        if (value.StartsWith("%") && !value.EndsWith("%"))
+                            op = ConditionOperator.EndsWith;
+                        else if (!value.StartsWith("%") && value.EndsWith("%"))
+                            op = ConditionOperator.BeginsWith;
+
+                        value = value.Replace("%", "");
+                    }
+                    break;
+
+                case "not-like":
+                    op = ConditionOperator.NotLike;
+
+                    if (value != null)
+                    {
+                        if (value.StartsWith("%") && !value.EndsWith("%"))
+                            op = ConditionOperator.DoesNotEndWith;
+                        else if (!value.StartsWith("%") && value.EndsWith("%"))
+                            op = ConditionOperator.DoesNotBeginWith;
+
+                        value = value.Replace("%", "");
+                    }
+                    break;
             }
 
             //Process values
             object[] values = null;
-            if(elem.GetAttribute("value") != null)
+            if(value != null)
             {
-                return new ConditionExpression(attributeName, op, (elem.GetAttribute("value").Value));
+                return new ConditionExpression(attributeName, op, value);
             }
 
             return new ConditionExpression(attributeName, op, values);

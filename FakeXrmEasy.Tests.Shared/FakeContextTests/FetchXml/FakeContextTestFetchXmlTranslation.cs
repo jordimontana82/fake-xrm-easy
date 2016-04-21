@@ -234,6 +234,150 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal("Messi", query.Criteria.Conditions[0].Values[0].ToString());
         }
 
+        [Fact]
+        public void When_translating_a_fetch_xml_expression_condition_with_contains_operator_result_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='fullname' operator='like' value='%Messi%' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("fullname", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.Like, query.Criteria.Conditions[0].Operator);
+            Assert.Equal("Messi", query.Criteria.Conditions[0].Values[0].ToString());
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_expression_condition_with_beginswith_operator_result_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='fullname' operator='like' value='Messi%' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("fullname", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.BeginsWith, query.Criteria.Conditions[0].Operator);
+            Assert.Equal("Messi", query.Criteria.Conditions[0].Values[0].ToString());
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_expression_condition_with_endswith_operator_result_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='fullname' operator='like' value='%Messi' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("fullname", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.EndsWith, query.Criteria.Conditions[0].Operator);
+            Assert.Equal("Messi", query.Criteria.Conditions[0].Values[0].ToString());
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_expression_condition_with_does_not_contain_operator_result_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='fullname' operator='not-like' value='%Messi%' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("fullname", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.NotLike, query.Criteria.Conditions[0].Operator);
+            Assert.Equal("Messi", query.Criteria.Conditions[0].Values[0].ToString());
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_expression_condition_with_does_not_beginwith_operator_result_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='fullname' operator='not-like' value='Messi%' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("fullname", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.DoesNotBeginWith, query.Criteria.Conditions[0].Operator);
+            Assert.Equal("Messi", query.Criteria.Conditions[0].Values[0].ToString());
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_expression_condition_with_does_not_end_with_operator_result_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='fullname' operator='not-like' value='%Messi' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("fullname", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.DoesNotEndWith, query.Criteria.Conditions[0].Operator);
+            Assert.Equal("Messi", query.Criteria.Conditions[0].Values[0].ToString());
+        }
+
 
     }
 }
