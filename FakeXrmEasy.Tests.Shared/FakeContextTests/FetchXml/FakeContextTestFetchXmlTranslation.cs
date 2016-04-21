@@ -26,7 +26,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         {
             var ctx = new XrmFakedContext();
 
-            Assert.DoesNotThrow(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch></fetch>"));
+            Assert.DoesNotThrow(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'></entity></fetch>"));
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<attribute></attribute>"));
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<entity></entity>"));
         }
@@ -102,5 +102,89 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.True(query.ColumnSet.Columns.Contains("telephone1"));
             Assert.True(query.ColumnSet.Columns.Contains("contactid"));
         }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_expression_all_attributes_is_translated_to_a_columnset_with_all_columns()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <all-attributes />
+                              </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.ColumnSet != null);
+            Assert.Equal(true, query.ColumnSet.AllColumns);
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_expression_orderby_ascending_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                    <order attribute='fullname' descending='false' />
+                              </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Orders != null);
+            Assert.Equal(1, query.Orders.Count);
+            Assert.Equal("fullname", query.Orders[0].AttributeName);
+            Assert.Equal(Microsoft.Xrm.Sdk.Query.OrderType.Ascending, query.Orders[0].OrderType);
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_expression_orderby_descending_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                    <order attribute='fullname' descending='true' />
+                              </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Orders != null);
+            Assert.Equal(1, query.Orders.Count);
+            Assert.Equal("fullname", query.Orders[0].AttributeName);
+            Assert.Equal(Microsoft.Xrm.Sdk.Query.OrderType.Descending, query.Orders[0].OrderType);
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_expression_2_orderby_elements_are_translated_correctly()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                    <order attribute='fullname' descending='true' />
+                                    <order attribute = 'telephone1' descending = 'false' />
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Orders != null);
+            Assert.Equal(2, query.Orders.Count);
+            Assert.Equal("fullname", query.Orders[0].AttributeName);
+            Assert.Equal(Microsoft.Xrm.Sdk.Query.OrderType.Descending, query.Orders[0].OrderType);
+            Assert.Equal("telephone1", query.Orders[1].AttributeName);
+            Assert.Equal(Microsoft.Xrm.Sdk.Query.OrderType.Ascending, query.Orders[1].OrderType);
+        }
+
+        
     }
 }

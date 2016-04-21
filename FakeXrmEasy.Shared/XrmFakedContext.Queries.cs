@@ -186,6 +186,9 @@ namespace FakeXrmEasy
                 case "entity":
                     return RetrieveAttributeFromElement(elem, "name") != null;
 
+                case "all-attributes":
+                    return true;
+
                 case "attribute":
                     return RetrieveAttributeFromElement(elem, "name") != null;
 
@@ -213,6 +216,18 @@ namespace FakeXrmEasy
 
         public static ColumnSet TranslateFetchXmlAttributesToColumnSet(XDocument xlDoc)
         {
+            //Check if all-attributes exist
+            var allAttributes = xlDoc.Elements()   //fetch
+                    .Elements()     //entity
+                    .Elements()     //child nodes of entity
+                    .Where(el => el.Name.LocalName.Equals("all-attributes"))
+                    .FirstOrDefault();
+
+            if(allAttributes != null)
+            {
+                return new ColumnSet(true);
+            }
+
             var attributes = xlDoc.Elements()   //fetch
                                 .Elements()     //entity
                                 .Elements()     //child nodes of entity
@@ -221,7 +236,27 @@ namespace FakeXrmEasy
                                 .ToList()
                                 .ToArray();
 
+
             return new ColumnSet(attributes);
+        }
+
+        public static List<OrderExpression> TranslateFetchXmlOrderBy(XDocument xlDoc)
+        {
+            var orderByElements = xlDoc.Elements()   //fetch
+                                .Elements()     //entity
+                                .Elements()     //child nodes of entity
+                                .Where(el => el.Name.LocalName.Equals("order"))
+                                .Select(el =>
+                                        new OrderExpression
+                                        {
+                                            AttributeName = RetrieveAttributeFromElement(el, "attribute").Value,
+                                            OrderType = RetrieveAttributeFromElement(el, "descending").Value.Equals("true") ?
+                                                            OrderType.Descending : OrderType.Ascending
+                                        })
+                                .ToList();
+
+            return orderByElements;
+
         }
         public static QueryExpression TranslateFetchXmlToQueryExpression(XrmFakedContext context, string fetchXml)
         {
@@ -247,8 +282,13 @@ namespace FakeXrmEasy
             var entityNode = RetrieveFetchXmlNode(xlDoc, "entity");
             var query = new QueryExpression(RetrieveAttributeFromElement(entityNode, "name").Value);
 
-            var columnSet = TranslateFetchXmlAttributesToColumnSet(xlDoc);
-            query.ColumnSet = columnSet;
+            query.ColumnSet = TranslateFetchXmlAttributesToColumnSet(xlDoc);
+
+            var orders = TranslateFetchXmlOrderBy(xlDoc);
+            foreach(var order in orders)
+            {
+                query.AddOrder(order.AttributeName, order.OrderType);
+            }
 
             return query;
         }
