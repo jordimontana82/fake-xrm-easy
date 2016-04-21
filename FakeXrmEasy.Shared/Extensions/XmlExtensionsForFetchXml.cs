@@ -148,6 +148,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
                         value = value.Replace("%", "");
                     }
                     break;
+
+                default:
+                    throw PullRequestException.FetchXmlOperatorNotImplemented(elem.GetAttribute("operator").Value);
             }
 
             //Process values

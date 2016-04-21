@@ -1,4 +1,7 @@
-﻿using Microsoft.Xrm.Sdk.Query;
+﻿using Crm;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -376,6 +379,75 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal("fullname", query.Criteria.Conditions[0].AttributeName);
             Assert.Equal(ConditionOperator.DoesNotEndWith, query.Criteria.Conditions[0].Operator);
             Assert.Equal("Messi", query.Criteria.Conditions[0].Values[0].ToString());
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_expression_nested_filters_are_correct()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='fullname' operator='not-like' value='%Messi' />
+                                                <filter type='or'>
+                                                    <condition attribute='telephone1' operator='eq' value='123' />
+                                                    <condition attribute='telephone1' operator='eq' value='234' />
+                                                </filter>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal(1, query.Criteria.Filters.Count);
+            Assert.Equal(LogicalOperator.Or, query.Criteria.Filters[0].FilterOperator);
+            Assert.Equal(2, query.Criteria.Filters[0].Conditions.Count);
+        }
+
+        [Fact]
+        public void When_executing_fetchxml_right_result_is_returned()
+        {
+            //This will test a query expression is generated and executed
+
+            var ctx = new XrmFakedContext();
+            ctx.Initialize(new List<Entity>()
+            {
+                new Contact() {Id = Guid.NewGuid(), FirstName = "Leo Messi", Telephone1 = "123" }, //should be returned
+                new Contact() {Id = Guid.NewGuid(), FirstName = "Leo Messi", Telephone1 = "234" }, //should be returned
+                new Contact() {Id = Guid.NewGuid(), FirstName = "Leo", Telephone1 = "789" }, //shouldnt
+                new Contact() {Id = Guid.NewGuid(), FirstName = "Andrés", Telephone1 = "123" }, //shouldnt
+            });
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='firstname' operator='like' value='%Leo%' />
+                                                <filter type='or'>
+                                                    <condition attribute='telephone1' operator='eq' value='123' />
+                                                    <condition attribute='telephone1' operator='eq' value='234' />
+                                                </filter>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+
+            var retrieveMultiple = new RetrieveMultipleRequest()
+            {
+                Query = new FetchExpression(fetchXml)
+            };
+
+            var service = ctx.GetFakedOrganizationService();
+            var response = service.Execute(retrieveMultiple) as RetrieveMultipleResponse;
+
+            Assert.Equal(2, response.EntityCollection.Entities.Count);
         }
 
 

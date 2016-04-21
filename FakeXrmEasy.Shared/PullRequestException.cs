@@ -17,5 +17,10 @@ namespace FakeXrmEasy
         {
             return new PullRequestException(string.Format("The organization request type {0} is not yet supported... but we DO love pull requests so please feel free to submit one! :)", t.ToString()));
         }
+
+        public static PullRequestException FetchXmlOperatorNotImplemented(string op)
+        {
+            return new PullRequestException(string.Format("The fetchxml operator {0} is not yet supported... but we DO love pull requests so please feel free to submit one! :)", op));
+        }
     }
 }
