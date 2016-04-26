@@ -11,6 +11,8 @@ Test any plugin, code activity, or 3rd party app using the OrganizationService e
 
 ##Getting Started
 
+NEW! I'l be uploading video tutorials about how to use Fake Xrm Easy. First one [here] (https://www.youtube.com/watch?v=ZLQ2o2P_xJY)
+
 For a general overview of the framework and samples please refer to [this](http://dynamicsvalue.com/get-started/overview) link. 
 
 If you have any kind of questions, or anything you would like to discuss, please do not hesitate to send me an email and I'll be happy to discuss.
