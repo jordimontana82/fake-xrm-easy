@@ -193,7 +193,7 @@ namespace FakeXrmEasy.Extensions
 
             if (keyValue is EntityReference) 
                 return (keyValue as EntityReference).Id;
-            if (e[sAttributeName] is Guid)
+            if (keyValue is Guid)
                 return ((Guid)keyValue);
 
             return Guid.Empty;
