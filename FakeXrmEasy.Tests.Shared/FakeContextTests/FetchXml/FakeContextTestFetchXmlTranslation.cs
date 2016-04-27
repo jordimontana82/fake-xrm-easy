@@ -410,6 +410,134 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void When_translating_a_linked_entity_right_result_is_returned()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"
+                    <fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true'>
+                      <entity name='account'>
+                        <attribute name='name' />
+                        <attribute name='primarycontactid' />
+                        <attribute name='telephone1' />
+                        <attribute name='accountid' />
+                        <order attribute='name' descending='false' />
+                        <link-entity name='account' from='parentaccountid' to='accountid' alias='ab'>
+                          <filter type='and'>
+                            <condition attribute='name' operator='eq' value='MS' />
+                          </filter>
+                        </link-entity>
+                      </entity>
+                    </fetch>
+                    ";
+
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.LinkEntities != null);
+            Assert.Equal(1, query.LinkEntities.Count);
+            Assert.Equal("account", query.LinkEntities[0].LinkFromEntityName);
+            Assert.Equal("parentaccountid", query.LinkEntities[0].LinkFromAttributeName);
+            Assert.Equal("account", query.LinkEntities[0].LinkToEntityName);
+            Assert.Equal("accountid", query.LinkEntities[0].LinkToAttributeName);
+            Assert.Equal("ab", query.LinkEntities[0].EntityAlias);
+            Assert.True(query.LinkEntities[0].LinkCriteria != null);
+        }
+
+        [Fact]
+        public void When_translating_a_linked_entity_with_columnset_right_result_is_returned()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"
+                    <fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true'>
+                      <entity name='account'>
+                        <attribute name='name' />
+                        <attribute name='primarycontactid' />
+                        <attribute name='telephone1' />
+                        <attribute name='accountid' />
+                        <order attribute='name' descending='false' />
+                        <link-entity name='account' from='parentaccountid' to='accountid' alias='ab'>
+                          <attribute name='telephone2' />
+                        </link-entity>
+                      </entity>
+                    </fetch>
+                    ";
+
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.LinkEntities != null);
+            Assert.Equal(1, query.LinkEntities.Count);
+            Assert.False(query.LinkEntities[0].Columns.AllColumns);
+            Assert.Equal(1, query.LinkEntities[0].Columns.Columns.Count);
+            Assert.Equal("telephone2", query.LinkEntities[0].Columns.Columns[0]);
+        }
+
+        [Fact]
+        public void When_translating_a_linked_entity_with_columnset_with_all_attributes_right_result_is_returned()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"
+                    <fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true'>
+                      <entity name='account'>
+                        <attribute name='name' />
+                        <attribute name='primarycontactid' />
+                        <attribute name='telephone1' />
+                        <attribute name='accountid' />
+                        <order attribute='name' descending='false' />
+                        <link-entity name='account' from='parentaccountid' to='accountid' alias='ab'>
+                          <all-attributes />
+                        </link-entity>
+                      </entity>
+                    </fetch>
+                    ";
+
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.LinkEntities != null);
+            Assert.Equal(1, query.LinkEntities.Count);
+            Assert.True(query.LinkEntities[0].Columns.AllColumns);
+        }
+
+        [Fact]
+        public void When_translating_a_linked_entity_with_filters_right_result_is_returned()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"
+                    <fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true'>
+                      <entity name='account'>
+                        <attribute name='name' />
+                        <attribute name='primarycontactid' />
+                        <attribute name='telephone1' />
+                        <attribute name='accountid' />
+                        <order attribute='name' descending='false' />
+                        <link-entity name='account' from='parentaccountid' to='accountid' alias='ab'>
+                          <all-attributes />
+                          <filter type='and'>
+                                <condition attribute='fullname' operator='not-like' value='%Messi' />
+                                    <filter type='or'>
+                                        <condition attribute='telephone1' operator='eq' value='123' />
+                                        <condition attribute='telephone1' operator='eq' value='234' />
+                                    </filter>
+                            </filter>
+                        </link-entity>
+                      </entity>
+                    </fetch>
+                    ";
+
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.LinkEntities != null);
+            Assert.Equal(1, query.LinkEntities.Count);
+            Assert.True(query.LinkEntities[0].LinkCriteria != null);
+            Assert.Equal(1, query.LinkEntities[0].LinkCriteria.Filters.Count);
+            Assert.Equal(1, query.LinkEntities[0].LinkCriteria.Conditions.Count);
+            Assert.Equal(2, query.LinkEntities[0].LinkCriteria.Filters[0].Conditions.Count);
+        }
+
+
+        [Fact]
         public void When_executing_fetchxml_right_result_is_returned()
         {
             //This will test a query expression is generated and executed

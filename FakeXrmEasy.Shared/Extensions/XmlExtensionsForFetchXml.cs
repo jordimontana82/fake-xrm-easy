@@ -9,18 +9,52 @@ namespace FakeXrmEasy.Extensions.FetchXml
 {
     public static class XmlExtensionsForFetchXml
     {
+        public static bool IsFetchXmlNodeValid(this XElement elem)
+        {
+            switch (elem.Name.LocalName)
+            {
+                case "filter":
+                    return elem.GetAttribute("type") != null;
+
+                case "fetch":
+                    return true;
+
+                case "entity":
+                    return elem.GetAttribute("name") != null;
+
+                case "all-attributes":
+                    return true;
+
+                case "attribute":
+                    return elem.GetAttribute("name") != null;
+
+                case "link-entity":
+                    return elem.GetAttribute("name") != null
+                            && elem.GetAttribute("from") != null
+                            && elem.GetAttribute("to") != null;
+
+                case "order":
+                    return elem.GetAttribute("attribute") != null
+                           && elem.GetAttribute("descending") != null;
+
+                case "condition":
+                    return elem.GetAttribute("attribute") != null
+                           && elem.GetAttribute("operator") != null;
+
+                default:
+                    throw new Exception(string.Format("Node {0} is not a valid FetchXml node or it doesn't have the required attributes", elem.Name.LocalName));
+            }
+        }
+
         public static XAttribute GetAttribute(this XElement elem, string sAttributeName)
         {
             return elem.Attributes().Where(a => a.Name.LocalName.Equals(sAttributeName)).FirstOrDefault();
         }
 
-        public static ColumnSet ToColumnSet(this XDocument xlDoc)
+        public static ColumnSet ToColumnSet(this XElement el)
         {
-            //Check if all-attributes exist
-            var allAttributes = xlDoc.Elements()   //fetch
-                    .Elements()     //entity
-                    .Elements()     //child nodes of entity
-                    .Where(el => el.Name.LocalName.Equals("all-attributes"))
+            var allAttributes = el.Elements()
+                    .Where(e => e.Name.LocalName.Equals("all-attributes"))
                     .FirstOrDefault();
 
             if (allAttributes != null)
@@ -28,17 +62,23 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 return new ColumnSet(true);
             }
 
-            var attributes = xlDoc.Elements()   //fetch
-                                .Elements()     //entity
-                                .Elements()     //child nodes of entity
-                                .Where(el => el.Name.LocalName.Equals("attribute"))
-                                .Select(el => el.GetAttribute("name").Value)
+            var attributes = el.Elements()
+                                .Where(e => e.Name.LocalName.Equals("attribute"))
+                                .Select(e => e.GetAttribute("name").Value)
                                 .ToList()
                                 .ToArray();
 
 
             return new ColumnSet(attributes);
+        }
 
+        public static ColumnSet ToColumnSet(this XDocument xlDoc)
+        {
+            //Check if all-attributes exist
+            return xlDoc.Elements()   //fetch
+                    .Elements()
+                    .FirstOrDefault()
+                    .ToColumnSet();
         }
 
         public static FilterExpression ToCriteria(this XDocument xlDoc)
@@ -49,6 +89,54 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     .Where(el => el.Name.LocalName.Equals("filter"))
                     .Select(el => el.ToFilterExpression())
                     .FirstOrDefault();
+        }
+
+        public static LinkEntity ToLinkEntity(this XElement el)
+        {
+            //Create this node
+            var linkEntity = new LinkEntity();
+
+            linkEntity.LinkFromEntityName = el.GetAttribute("name").Value;
+            linkEntity.LinkFromAttributeName = el.GetAttribute("from").Value;
+            linkEntity.LinkToAttributeName = el.GetAttribute("to").Value;
+            linkEntity.LinkToEntityName = el.Parent.GetAttribute("name").Value;
+
+            if(el.GetAttribute("alias") != null)
+            {
+                linkEntity.EntityAlias = el.GetAttribute("alias").Value;
+            }
+
+            //Process other link entities recursively
+            var convertedLinkEntityNodes = el.Elements()
+                                    .Where(e => e.Name.LocalName.Equals("link-entity"))
+                                    .Select(e => e.ToLinkEntity())
+                                    .ToList();
+
+            foreach(var le in convertedLinkEntityNodes)
+            {
+                linkEntity.LinkEntities.Add(le);
+            }
+
+            //Process column sets
+            linkEntity.Columns = el.ToColumnSet();
+
+            //Process filter
+            linkEntity.LinkCriteria = el.Elements()
+                                        .Where(e => e.Name.LocalName.Equals("filter"))
+                                        .Select(e => e.ToFilterExpression())
+                                        .FirstOrDefault();
+
+            return linkEntity;
+        }
+
+        public static List<LinkEntity> ToLinkEntities(this XDocument xlDoc)
+        {
+            return xlDoc.Elements()   //fetch
+                    .Elements()     //entity
+                    .Elements()     //child nodes of entity
+                    .Where(el => el.Name.LocalName.Equals("link-entity"))
+                    .Select(el => el.ToLinkEntity())
+                    .ToList();
         }
 
         public static List<OrderExpression> ToOrderExpressionList(this XDocument xlDoc)

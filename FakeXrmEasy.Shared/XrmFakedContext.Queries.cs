@@ -177,37 +177,7 @@ namespace FakeXrmEasy
             return query;
         }
 
-        protected static bool IsFetchXmlNodeValid(XElement elem)
-        {
-            switch(elem.Name.LocalName)
-            {
-                case "filter":
-                    return elem.GetAttribute("type") != null;
-
-                case "fetch":
-                    return true;
-
-                case "entity":
-                    return elem.GetAttribute("name") != null;
-
-                case "all-attributes":
-                    return true;
-
-                case "attribute":
-                    return elem.GetAttribute("name") != null;
-
-                case "order":
-                    return elem.GetAttribute("attribute") != null
-                           && elem.GetAttribute("descending") != null;
-
-                case "condition":
-                    return elem.GetAttribute("attribute") != null
-                           && elem.GetAttribute("operator") != null;
-
-                default:
-                    throw new Exception(string.Format("Node {0} is not a valid FetchXml node", elem.Name.LocalName));
-            }
-        }
+        
 
         protected static XElement RetrieveFetchXmlNode(XDocument xlDoc, string sName)
         {
@@ -227,7 +197,7 @@ namespace FakeXrmEasy
             }
 
             //Validate nodes
-            if (!xlDoc.Descendants().All(el => IsFetchXmlNodeValid(el)))
+            if (!xlDoc.Descendants().All(el => el.IsFetchXmlNodeValid()))
                 throw new Exception("At least some node is not valid");
 
             //Root node
@@ -248,6 +218,13 @@ namespace FakeXrmEasy
             }
 
             query.Criteria = xlDoc.ToCriteria();
+
+            var linkedEntities = xlDoc.ToLinkEntities();
+            foreach(var le in linkedEntities)
+            {
+                query.LinkEntities.Add(le);
+            }
+
             return query;
         }
 
