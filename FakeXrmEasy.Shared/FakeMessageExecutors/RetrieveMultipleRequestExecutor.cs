@@ -31,6 +31,21 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 };
                 return response;
             }
+            else if (request.Query is FetchExpression)
+            {
+                var fetchXml = (request.Query as FetchExpression).Query;
+                var queryExpression = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, queryExpression);
+                var response = new RetrieveMultipleResponse
+                {
+                    Results = new ParameterCollection
+                                 {
+                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
+                                 }
+                };
+                return response;
+            }
             else if (request.Query is QueryByAttribute)
             {
                 //We instantiate a QueryExpression to be executed as we have the implementation done already

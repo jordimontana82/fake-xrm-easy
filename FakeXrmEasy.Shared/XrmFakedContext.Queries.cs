@@ -13,6 +13,8 @@ using FakeXrmEasy.Extensions;
 using System.Reflection;
 using Microsoft.Xrm.Sdk.Client;
 using System.Globalization;
+using System.Xml.Linq;
+using FakeXrmEasy.Extensions.FetchXml;
 
 namespace FakeXrmEasy
 {
@@ -174,7 +176,58 @@ namespace FakeXrmEasy
             }
             return query;
         }
+
         
+
+        protected static XElement RetrieveFetchXmlNode(XDocument xlDoc, string sName)
+        {
+            return xlDoc.Descendants().Where(e => e.Name.LocalName.Equals(sName)).FirstOrDefault();
+        }
+
+
+        public static QueryExpression TranslateFetchXmlToQueryExpression(XrmFakedContext context, string fetchXml)
+        {
+            XDocument xlDoc = null;
+            try {
+                xlDoc = XDocument.Parse(fetchXml);
+            }
+            catch
+            {
+                throw new Exception("FetchXml must be a valid XML document");
+            }
+
+            //Validate nodes
+            if (!xlDoc.Descendants().All(el => el.IsFetchXmlNodeValid()))
+                throw new Exception("At least some node is not valid");
+
+            //Root node
+            if (!xlDoc.Root.Name.LocalName.Equals("fetch"))
+            {
+                throw new Exception("Root node must be fetch");
+            }
+
+            var entityNode = RetrieveFetchXmlNode(xlDoc, "entity");
+            var query = new QueryExpression(entityNode.GetAttribute("name").Value);
+
+            query.ColumnSet = xlDoc.ToColumnSet();
+
+            var orders = xlDoc.ToOrderExpressionList();
+            foreach(var order in orders)
+            {
+                query.AddOrder(order.AttributeName, order.OrderType);
+            }
+
+            query.Criteria = xlDoc.ToCriteria();
+
+            var linkedEntities = xlDoc.ToLinkEntities();
+            foreach(var le in linkedEntities)
+            {
+                query.LinkEntities.Add(le);
+            }
+
+            return query;
+        }
+
         public static IQueryable<Entity> TranslateQueryExpressionToLinq(XrmFakedContext context, QueryExpression qe)
         {
             if (qe == null) return null;
@@ -214,15 +267,6 @@ namespace FakeXrmEasy
             }
             return query;
         }
-
-        //protected static Expression<Func<object, object, bool>> AreValuesEqual = (object o1, object o2) =>
-        //{
-        //    if (o1 is EntityReference && o2 is Guid)
-        //    {
-        //        return (o1 as EntityReference).Id.Equals((Guid) o2);
-        //    }
-        //    return o1 == o2;
-        //};
 
         protected static Expression TranslateConditionExpression(ConditionExpression c, ParameterExpression entity)
         {
