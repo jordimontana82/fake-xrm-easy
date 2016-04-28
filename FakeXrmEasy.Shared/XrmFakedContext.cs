@@ -274,47 +274,19 @@ namespace FakeXrmEasy
 
         public static void FakeRetrieveMultiple(XrmFakedContext context, IOrganizationService fakedService)
         {
+            //refactored from RetrieveMultipleExecutor
             A.CallTo(() => fakedService.RetrieveMultiple(A<QueryBase>._))
                 .ReturnsLazily((QueryBase req) =>
                 {
-                    if (req is QueryExpression)
+                    var request = new RetrieveMultipleRequest()
                     {
-                        var query = req as QueryExpression;
-                        var linqQuery = TranslateQueryExpressionToLinq(context, query as QueryExpression);
-                        var response = new RetrieveMultipleResponse
-                        {
-                            Results = new ParameterCollection
-                                 {
-                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
-                                 }
-                        };
-                        return response.EntityCollection;
-                        
-                    }
-                    else if (req is QueryByAttribute)
-                    {
-                        //We instantiate a QueryExpression to be executed as we have the implementation done already
-                        var query = req as QueryByAttribute;
-                        var qe = new QueryExpression(query.EntityName);
+                        Query = req
+                    };
 
-                        qe.ColumnSet = query.ColumnSet;
-                        qe.Criteria = new FilterExpression();
-                        for(var i=0; i < query.Attributes.Count; i++) {
-                            qe.Criteria.AddCondition(new ConditionExpression(query.Attributes[i],ConditionOperator.Equal,query.Values[i]));
-                        }
-                        
-                        //QueryExpression now done... execute it!
-                        var linqQuery = TranslateQueryExpressionToLinq(context, qe as QueryExpression);
-                        var response = new RetrieveMultipleResponse
-                        {
-                            Results = new ParameterCollection
-                                 {
-                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
-                                 }
-                        };
-                        return response.EntityCollection;
-                    }
-                    throw new PullRequestException("Unexpected querybase for RetrieveMultiple");
+                    var executor = new RetrieveMultipleRequestExecutor();
+                    var response = executor.Execute(request, context) as RetrieveMultipleResponse;
+
+                    return response.EntityCollection;
                 });
         }
 

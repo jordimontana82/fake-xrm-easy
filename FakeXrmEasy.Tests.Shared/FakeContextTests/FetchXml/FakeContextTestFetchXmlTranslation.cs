@@ -576,6 +576,11 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var response = service.Execute(retrieveMultiple) as RetrieveMultipleResponse;
 
             Assert.Equal(2, response.EntityCollection.Entities.Count);
+
+            //Executing the same via ExecuteMultiple returns also the same
+            var response2 = service.RetrieveMultiple(retrieveMultiple.Query);
+            Assert.Equal(2, response2.Entities.Count);
+
         }
 
 
