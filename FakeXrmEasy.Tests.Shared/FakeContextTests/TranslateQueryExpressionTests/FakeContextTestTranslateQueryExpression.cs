@@ -26,7 +26,7 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
-        public void When_translating_a_query_from_a_non_existing_entity_an_exception_is_thrown()
+        public void When_translating_a_query_from_a_non_existing_entity_an_empty_list_is_returned_when_using_dynamic_entities()
         {
             var context = new XrmFakedContext();
             var guid1 = Guid.NewGuid();
@@ -41,7 +41,8 @@ namespace FakeXrmEasy.Tests
 
             context.Initialize(data);
             var qe = new QueryExpression() { EntityName = "nonexistingentityname"};
-            Assert.Throws<Exception>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe));
+            var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe);
+            Assert.Equal(0, result.Count());
         }
         
         [Fact]

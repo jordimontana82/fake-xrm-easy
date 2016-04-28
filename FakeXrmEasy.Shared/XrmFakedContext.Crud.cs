@@ -247,11 +247,11 @@ namespace FakeXrmEasy
                     throw new Exception(string.Format("Entity {0} does not exist in the metadata cache", sEntityName));
                 }
             }
-            else if (!Data.ContainsKey(sEntityName))
-            {
-                //No Proxy Types Assembly
-                throw new Exception(string.Format("Entity {0} does not exist in the metadata cache", sEntityName));
-            };
+            //else if (!Data.ContainsKey(sEntityName))
+            //{
+            //    //No Proxy Types Assembly
+            //    throw new Exception(string.Format("Entity {0} does not exist in the metadata cache", sEntityName));
+            //};
         }
 
         protected void ValidateEntity(Entity e)
