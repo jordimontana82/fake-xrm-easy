@@ -38,8 +38,8 @@ let nugetDir                = @".\nuget\"
 let nugetDeployDir          = @"[Enter_NuGet_Url]"
 let packagesDir             = @".\packages\"
 
-let mutable previousVersion = "1.12.2"
-let mutable version         = "1.12.3" //Copy this into previousVersion before publishing packages...
+let mutable previousVersion = "1.12.3"
+let mutable version         = "1.13.0" //Copy this into previousVersion before publishing packages...
 let mutable build           = buildVersion
 let mutable nugetVersion    = version
 let mutable asmVersion      = version
@@ -253,7 +253,8 @@ Target "Publish" (fun _ ->
 "Clean"
   ==> "RestorePackages"
   ==> "BuildVersions"
-  =?> ("AssemblyInfo", not isLocalBuild )
+//  =?> ("AssemblyInfo", not isLocalBuild )
+  ==> "AssemblyInfo"
   ==> "BuildFakeXrmEasy"
   ==> "BuildFakeXrmEasy.2013"
   ==> "BuildFakeXrmEasy.2015"
