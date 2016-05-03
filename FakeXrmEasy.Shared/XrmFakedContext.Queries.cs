@@ -219,6 +219,8 @@ namespace FakeXrmEasy
 
             query.Criteria = xlDoc.ToCriteria();
 
+            query.TopCount = xlDoc.ToTopCount();
+
             var linkedEntities = xlDoc.ToLinkEntities();
             foreach(var le in linkedEntities)
             {
@@ -264,6 +266,12 @@ namespace FakeXrmEasy
                     else
                         query = query.OrderByDescending(e => e.Attributes.ContainsKey(order.AttributeName) ? e.Attributes[order.AttributeName] : null, new XrmOrderByAttributeComparer());
                 }
+            }
+
+            //Apply TopCount
+            if(qe.TopCount != null)
+            {
+                query = query.Take(qe.TopCount.Value);
             }
             return query;
         }

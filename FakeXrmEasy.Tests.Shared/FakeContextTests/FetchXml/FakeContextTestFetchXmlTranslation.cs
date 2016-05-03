@@ -583,6 +583,42 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
         }
 
+        [Fact]
+        public void When_executing_fetchxml_with_count_attribute_only_that_number_of_results_is_returned()
+        {
+            //This will test a query expression is generated and executed
+
+            var ctx = new XrmFakedContext();
+
+            //Arrange
+            var contactList = new List<Entity>();
+            for(var i=0; i < 20; i++)
+            {
+                contactList.Add(new Contact() { Id = Guid.NewGuid() });
+            }
+            ctx.Initialize(contactList);
+
+            //Act
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' count='7'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' /> 
+                                  </entity>
+                            </fetch>";
+
+
+            var retrieveMultiple = new RetrieveMultipleRequest()
+            {
+                Query = new FetchExpression(fetchXml)
+            };
+
+            var service = ctx.GetFakedOrganizationService();
+            var response = service.Execute(retrieveMultiple) as RetrieveMultipleResponse;
+
+            Assert.Equal(7, response.EntityCollection.Entities.Count);
+        }
+
 
     }
 }

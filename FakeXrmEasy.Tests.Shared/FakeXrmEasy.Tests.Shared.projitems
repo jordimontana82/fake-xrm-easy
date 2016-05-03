@@ -38,6 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OrderByTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\PaginationTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WhoAmIRequest\WhoAmITests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GeneratedCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\PreAccountCreate.cs" />

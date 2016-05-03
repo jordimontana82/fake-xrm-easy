@@ -72,6 +72,18 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return new ColumnSet(attributes);
         }
 
+        public static int? ToTopCount(this XElement el)
+        {
+            var countAttr = el.GetAttribute("count");
+            if (countAttr == null) return null;
+
+            int iCount;
+            if (!int.TryParse(countAttr.Value, out iCount))
+                throw new Exception("Count attribute in fetch node must be an integer");
+
+            return iCount;
+        }
+
         public static ColumnSet ToColumnSet(this XDocument xlDoc)
         {
             //Check if all-attributes exist
@@ -79,6 +91,15 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     .Elements()
                     .FirstOrDefault()
                     .ToColumnSet();
+        }
+
+
+        public static int? ToTopCount(this XDocument xlDoc)
+        {
+            //Check if all-attributes exist
+            return xlDoc.Elements()   //fetch
+                    .FirstOrDefault()
+                    .ToTopCount();
         }
 
         public static FilterExpression ToCriteria(this XDocument xlDoc)
