@@ -3,7 +3,7 @@ Fake Xrm Easy: The automated testing framework for Dynamics CRM
 
 [![Build status](https://ci.appveyor.com/api/projects/status/2g8yc8jg817746du?svg=true)](https://ci.appveyor.com/project/Jordi/fake-xrm-easy)
 
-The framework to streamline unit testing in Dynamics CRM by faking the IOrganizationService to work with an In-Memory context. We're planning to incorporate integration tests to give you a full end to end testing experience.
+The framework to streamline unit testing in Dynamics CRM by faking the IOrganizationService to work with an In-Memory context.
 
 The framework supports Dynamics CRM 2011, 2013, 2015, and 2016.
 
@@ -32,6 +32,7 @@ Please consider the below guidelines for contributing to the project:
 ##Roadmap / Backlog
 
 *  Add change log
-*  Add integration tests
+*  ~~Add integration tests~~ Deprioritised in favor of fetch 
+*  FetchXml implementation
 *  Increase test coverage
   
