@@ -353,6 +353,7 @@ namespace FakeXrmEasy
 
         protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
         {
+            //Early bound types
             if(ProxyTypesAssembly != null)
             {
                 //Check if attribute exists in the early bound type 
@@ -371,9 +372,8 @@ namespace FakeXrmEasy
                 return false;
             }
 
-            //Otherwise just checks if exists as an attribute
-            return AttributeMetadata.ContainsKey(sEntityName) &&
-                    AttributeMetadata[sEntityName].ContainsKey(sAttributeName);
+            //Dynamic entities => just return true
+            return true;
         }
 #endregion
 

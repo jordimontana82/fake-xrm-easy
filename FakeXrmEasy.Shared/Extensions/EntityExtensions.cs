@@ -69,15 +69,17 @@ namespace FakeXrmEasy.Extensions
 
                 foreach (var attKey in qe.ColumnSet.Columns)
                 {
-                    if (e.Attributes.ContainsKey(attKey) && e[attKey] != null)
+                    //Check if attribute really exists in metadata
+                    if (!context.AttributeExistsInMetadata(e.LogicalName, attKey))
+                    {
+                        OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
+                    }
+
+                    if (e.Attributes.ContainsKey(attKey))
                         projected[attKey] = e[attKey];
                     else
                     {
-                        //Check if attribute really exists in metadata
-                        if (!context.AttributeExistsInMetadata(e.LogicalName, attKey))
-                        {
-                            OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
-                        }
+                        projected[attKey] = null;
                     }
                 }
 

@@ -217,12 +217,39 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
-        public void When_executing_a_query_expression_with_an_attribute_in_columnset_that_doesnt_exists_descriptive_exception_is_thrown()
+        public void When_executing_a_query_expression_with_an_attribute_in_columnset_that_doesnt_exists_null_value_is_returned_with_dynamic_entities()
         {
             var context = new XrmFakedContext();
             var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1"; contact1["firstname"] = "First 1";
 
             var account = new Entity("account") { Id = Guid.NewGuid() };
+            account["name"] = "Account 1";
+
+            contact1["parentcustomerid"] = account.ToEntityReference(); //Both contacts are related to the same account
+
+            context.Initialize(new List<Entity>() { account, contact1 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+
+            //We only select fullname and parentcustomerid, firstname should not be included
+            qe.ColumnSet = new ColumnSet(new string[] { "this attribute doesnt exists!" });
+
+            Assert.DoesNotThrow(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
+
+            var list = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
+
+            Assert.True(list[0].Attributes.ContainsKey("this attribute doesnt exists!"));
+            Assert.Equal(null, list[0].Attributes["this attribute doesnt exists!"]);
+
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_with_an_attribute_in_columnset_that_doesnt_exists_exception_is_raised_with_early_bound_entities()
+        {
+            var context = new XrmFakedContext();
+            var contact1 = new Contact() { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1"; contact1["firstname"] = "First 1";
+
+            var account = new Account() { Id = Guid.NewGuid() };
             account["name"] = "Account 1";
 
             contact1["parentcustomerid"] = account.ToEntityReference(); //Both contacts are related to the same account
