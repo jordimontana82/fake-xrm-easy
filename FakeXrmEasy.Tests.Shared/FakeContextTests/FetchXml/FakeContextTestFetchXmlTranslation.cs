@@ -619,6 +619,37 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(7, response.EntityCollection.Entities.Count);
         }
 
+        [Fact]
+        public void When_filtering_by_a_guid_attribute_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            var accountId = Guid.NewGuid();
+            var license1 = new Entity("pl_license");
+            license1.Id = Guid.NewGuid();
+            license1.Attributes["pl_no"] = 1;
+            license1.Attributes["pl_accountid"] = new EntityReference("account", accountId);
+
+            var license2 = new Entity("pl_license");
+            license2.Id = Guid.NewGuid();
+            license2.Attributes["pl_no"] = 2;
+            license2.Attributes["pl_accountid"] = new EntityReference("account", accountId);
+
+            context.Initialize(new List<Entity> { license1, license2 });
+
+            var fetchXml =
+                 "<fetch>" +
+                 "  <entity name='pl_license'>" +
+                 "     <attribute name='pl_no'/>" +
+                 "     <filter type='and'>" +
+                 "         <condition attribute='pl_accountid' operator='eq' value='{0}' />" +
+                 "     </filter>" +
+                 "  </entity>" +
+                 "</fetch>";
+            fetchXml = string.Format(fetchXml, accountId);
+            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            Assert.Equal(rows.Entities.Count, 2);
+        }
+
 
     }
 }

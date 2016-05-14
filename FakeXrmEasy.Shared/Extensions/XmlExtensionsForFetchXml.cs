@@ -266,11 +266,22 @@ namespace FakeXrmEasy.Extensions.FetchXml
             object[] values = null;
             if(value != null)
             {
-                return new ConditionExpression(attributeName, op, value);
+                return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value));
             }
 
             return new ConditionExpression(attributeName, op, values);
 
+        }
+
+        public static object GetConditionExpressionValueCast(string value)
+        {
+            //Try parsing a guid
+            Guid gOut = Guid.Empty;
+            if (Guid.TryParse(value, out gOut))
+                return gOut;
+
+            //Default case
+            return value;
         }
     }
 }
