@@ -51,6 +51,7 @@ namespace FakeXrmEasy
             A.CallTo(() => context.Stage).ReturnsLazily(() => ctx.Stage);
             A.CallTo(() => context.PrimaryEntityName).ReturnsLazily(() => ctx.PrimaryEntityName);
             A.CallTo(() => context.SecondaryEntityName).ReturnsLazily(() => ctx.SecondaryEntityName);
+            A.CallTo(() => context.SharedVariables).ReturnsLazily(() => ctx.SharedVariables);
 
             //Create message will pass an Entity as the target but this is not always true
             //For instance, a Delete request will receive an EntityReference

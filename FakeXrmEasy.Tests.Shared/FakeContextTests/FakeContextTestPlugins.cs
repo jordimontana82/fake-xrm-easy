@@ -230,5 +230,16 @@ namespace FakeXrmEasy.Tests
             Assert.True(true);
         }
 
+        [Fact]
+        public void When_getting_a_default_context_shared_variables_can_be_accessed_from_a_plugin()
+        {
+            var context = new XrmFakedContext();
+
+            var pluginContext = context.GetDefaultPluginContext();
+            pluginContext.SharedVariables.Add("key", "somevalue");
+
+            Assert.DoesNotThrow(() =>context.ExecutePluginWith<TestSharedVariablesPropertyPlugin>(pluginContext));
+        }
+
     }
 }
