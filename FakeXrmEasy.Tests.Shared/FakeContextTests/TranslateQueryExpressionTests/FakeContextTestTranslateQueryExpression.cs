@@ -682,5 +682,52 @@ namespace FakeXrmEasy.Tests
             Assert.True(paymentitems.Entities.Count == 1);
         }
 
+        [Fact]
+        public void When_querying_nested_link_entities_with_dynamic_entities_right_result_is_returned()
+        {
+            // create a contact
+            var contact = new Entity
+            {
+                LogicalName = "contact",
+                Id = Guid.NewGuid(),
+            };
+
+            // link a child to the contact
+            var child = new Entity
+            {
+                LogicalName = "child",
+                Id = Guid.NewGuid(),
+                Attributes = new AttributeCollection { { "contactid", new EntityReference("contact", contact.Id) } }
+            };
+
+            // link a pet to the child
+            var pet = new Entity
+            {
+                LogicalName = "pet",
+                Id = Guid.NewGuid(),
+                Attributes = new AttributeCollection { { "childid", new EntityReference("child", child.Id) } }
+            };
+
+            // initialise
+            var context = new XrmFakedContext();
+            context.Initialize(new[] { contact, child, pet });
+            var service = context.GetFakedOrganizationService();
+
+            // 1st Query: join contact and child
+            var query1 = new QueryExpression("contact");
+            var link1 = query1.AddLink("child", "contactid", "contactid", JoinOperator.Inner);
+
+            var count1 = service.RetrieveMultiple(query1).Entities.Count;
+            Assert.Equal(1, count1); // returns 1 record (expected)
+
+            // 2nd Query: join contact and child and pet
+            var query2 = new QueryExpression("contact");
+            var link2 = query2.AddLink("child", "contactid", "contactid", JoinOperator.Inner);
+            var link22 = link2.AddLink("pet", "childid", "childid", JoinOperator.Inner);
+
+            var count2 = service.RetrieveMultiple(query2).Entities.Count;
+            Assert.Equal(1, count2); // returns 0 records (unexpected?)
+        }
+
     }
 }

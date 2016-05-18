@@ -172,7 +172,7 @@ namespace FakeXrmEasy
             //Process nested linked entities recursively
             foreach (LinkEntity nestedLinkedEntity in le.LinkEntities)
             {
-                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, query, le.Columns, le.EntityAlias);
+                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, inner, le.Columns, le.EntityAlias);
             }
             return query;
         }

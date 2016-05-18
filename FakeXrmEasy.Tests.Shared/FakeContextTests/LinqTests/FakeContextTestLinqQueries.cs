@@ -728,10 +728,12 @@ namespace FakeXrmEasy.Tests
             var fakedContext = new XrmFakedContext();
             fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
 
-            var user = new SystemUser() { Id = Guid.NewGuid(), FirstName = "Jordi" };
-            var systemRole = new SystemUserRoles() { Id = Guid.NewGuid() };
             var parentRole = new Role() { Id = Guid.NewGuid(), Name = "System Administrator" };
             var role = new Role() { Id = Guid.NewGuid(), Name = "Sys Admin" };
+            var user = new SystemUser() { Id = Guid.NewGuid(), FirstName = "Jordi" };
+            var systemRole = new SystemUserRoles() { Id = Guid.NewGuid() };
+            
+            
 
             role["parentroleid"] = parentRole.ToEntityReference();
             systemRole["systemuserid"] = user.ToEntityReference();
@@ -748,10 +750,10 @@ namespace FakeXrmEasy.Tests
             {
                 var matches = (from sr in ctx.CreateQuery<SystemUserRoles>()
                                join r in ctx.CreateQuery<Role>() on sr.RoleId equals r.RoleId
-                               join r2 in ctx.CreateQuery<Role>() on r.ParentRoleId.Id equals r2.RoleId
                                join u in ctx.CreateQuery<SystemUser>() on sr.SystemUserId equals u.SystemUserId
+
                                where u.FirstName == "Jordi"
-                               where r2.Name == "System Administrator"
+                               where r.Name == "Sys Admin"
                                select sr).ToList();
 
                 Assert.True(matches.Count == 1);
