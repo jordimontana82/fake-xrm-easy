@@ -15,6 +15,7 @@ using Microsoft.Xrm.Sdk.Client;
 using System.Globalization;
 using System.Xml.Linq;
 using FakeXrmEasy.Extensions.FetchXml;
+using FakeXrmEasy.OrganizationFaults;
 
 namespace FakeXrmEasy
 {
@@ -126,14 +127,19 @@ namespace FakeXrmEasy
             context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName);
             context.EnsureEntityNameExistsInMetadata(le.LinkToEntityName);
 
-            var inner = context.CreateQuery<Entity>(le.LinkToEntityName);
-
-            if(!le.Columns.AllColumns && le.Columns.Columns.Count == 0)
+            if (!context.AttributeExistsInMetadata(le.LinkToEntityName, le.LinkToAttributeName))
             {
-                le.Columns.AllColumns = true;   //Add all columns in the joined entity, otherwise we can't filter by related attributes, then the Select will actually choose which ones we need
+                OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(le.LinkToAttributeName);
             }
 
-            if(string.IsNullOrWhiteSpace(linkFromAlias))
+            var inner = context.CreateQuery<Entity>(le.LinkToEntityName);
+
+            //if (!le.Columns.AllColumns && le.Columns.Columns.Count == 0)
+            //{
+            //    le.Columns.AllColumns = true;   //Add all columns in the joined entity, otherwise we can't filter by related attributes, then the Select will actually choose which ones we need
+            //}
+
+            if (string.IsNullOrWhiteSpace(linkFromAlias))
             {
                 linkFromAlias = le.LinkFromAttributeName;
             }
@@ -147,20 +153,20 @@ namespace FakeXrmEasy
                 case JoinOperator.Inner:
                 case JoinOperator.Natural:
                     query = query.Join(inner,
-                                    outerKey => outerKey.KeySelector(linkFromAlias),
-                                    innerKey => innerKey.KeySelector(le.LinkToAttributeName),
+                                    outerKey => outerKey.KeySelector(linkFromAlias, context),
+                                    innerKey => innerKey.KeySelector(le.LinkToAttributeName, context),
                                     (outerEl, innerEl) => outerEl
-                                                            .JoinAttributes(innerEl, le.Columns, leAlias));
+                                                            .JoinAttributes(innerEl, new ColumnSet(true), leAlias, context));
 
                     break;
                 case JoinOperator.LeftOuter:
                     query = query.GroupJoin(inner,
-                                    outerKey => outerKey.KeySelector(le.LinkFromAttributeName),
-                                    innerKey => innerKey.KeySelector(le.LinkToAttributeName),
+                                    outerKey => outerKey.KeySelector(le.LinkFromAttributeName, context),
+                                    innerKey => innerKey.KeySelector(le.LinkToAttributeName, context),
                                     (outerEl, innerElemsCol) => new { outerEl, innerElemsCol })
                                                 .SelectMany(x => x.innerElemsCol.DefaultIfEmpty()
                                                             , (x, y) => x.outerEl
-                                                                            .JoinAttributes(y, le.Columns, leAlias));
+                                                                            .JoinAttributes(y, new ColumnSet(true), leAlias, context));
 
 
                     break;
@@ -172,7 +178,10 @@ namespace FakeXrmEasy
             //Process nested linked entities recursively
             foreach (LinkEntity nestedLinkedEntity in le.LinkEntities)
             {
-                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, inner, le.Columns, le.EntityAlias);
+                if (string.IsNullOrWhiteSpace(le.EntityAlias))
+                    le.EntityAlias = le.LinkToEntityName;
+
+                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, query, le.Columns, le.EntityAlias);
             }
             return query;
         }

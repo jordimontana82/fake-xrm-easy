@@ -40,25 +40,25 @@ namespace FakeXrmEasy.Tests
             }.AsQueryable();
 
             context.Initialize(data);
-            var qe = new QueryExpression() { EntityName = "nonexistingentityname"};
+            var qe = new QueryExpression() { EntityName = "nonexistingentityname" };
             var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe);
             Assert.Equal(0, result.Count());
         }
-        
+
         [Fact]
         public void When_executing_a_query_expression_with_a_simple_join_right_result_is_returned()
         {
             var context = new XrmFakedContext();
             var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1";
             var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "Contact 2";
-            
+
             var account = new Entity("account") { Id = Guid.NewGuid() };
             account["name"] = "Account 1";
 
             contact1["parentcustomerid"] = account.ToEntityReference(); //Both contacts are related to the same account
             contact2["parentcustomerid"] = account.ToEntityReference();
 
-            context.Initialize(new List<Entity>() { account, contact1, contact2});
+            context.Initialize(new List<Entity>() { account, contact1, contact2 });
 
             var qe = new QueryExpression() { EntityName = "contact" };
             qe.LinkEntities.Add(
@@ -166,7 +166,7 @@ namespace FakeXrmEasy.Tests
 
             var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe);
 
-            Assert.True(result.Count() == 2); 
+            Assert.True(result.Count() == 2);
             var firstContact = result.FirstOrDefault();
             var lastContact = result.LastOrDefault();
 
@@ -269,9 +269,9 @@ namespace FakeXrmEasy.Tests
         public void When_executing_a_query_expression_with_an_attribute_in_columnset_in_a_linked_entity_that_doesnt_exists_descriptive_exception_is_thrown()
         {
             var context = new XrmFakedContext();
-            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1"; contact1["firstname"] = "First 1";
-            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "Contact 2"; contact2["firstname"] = "First 2";
-            var contact3 = new Entity("contact") { Id = Guid.NewGuid() }; contact3["fullname"] = "Contact 3"; contact3["firstname"] = "First 3";
+            var contact1 = new Contact() { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1"; contact1["firstname"] = "First 1";
+            var contact2 = new Contact() { Id = Guid.NewGuid() }; contact2["fullname"] = "Contact 2"; contact2["firstname"] = "First 2";
+            var contact3 = new Contact() { Id = Guid.NewGuid() }; contact3["fullname"] = "Contact 3"; contact3["firstname"] = "First 3";
 
             var account = new Entity("account") { Id = Guid.NewGuid() };
             account["name"] = "Account 1";
@@ -298,7 +298,7 @@ namespace FakeXrmEasy.Tests
             qe.ColumnSet = new ColumnSet(new string[] { "this attribute doesnt exists!" });
 
             var exception = Assert.Throws<FaultException<OrganizationServiceFault>>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
-            Assert.Equal(exception.Detail.ErrorCode, OrganizationServiceFaultQueryBuilderNoAttributeException.ErrorCode); 
+            Assert.Equal(exception.Detail.ErrorCode, OrganizationServiceFaultQueryBuilderNoAttributeException.ErrorCode);
         }
 
         [Fact]
@@ -341,7 +341,7 @@ namespace FakeXrmEasy.Tests
             //Contact 1 attributes = 3 + 5 (the extra five are the CreatedOn, ModifiedOn, CreatedBy, ModifiedBy + StateCode attributes generated automatically
             //+ Attributes from the join(account) = 1 + 5
 
-            Assert.True(firstContact.Attributes.Count == 3 + 1 + 5 * 2); 
+            Assert.True(firstContact.Attributes.Count == 3 + 1 + 5 * 2);
             Assert.True(lastContact.Attributes.Count == 3 + 1 + 5 * 2);  //Contact 2
         }
 
@@ -369,7 +369,8 @@ namespace FakeXrmEasy.Tests
                     LinkToEntityName = "account",
                     LinkFromAttributeName = "parentcustomerid",
                     LinkToAttributeName = "accountid",
-                    JoinOperator = JoinOperator.Inner
+                    JoinOperator = JoinOperator.Inner,
+                    Columns = new ColumnSet(false)
                 }
             );
 
@@ -409,7 +410,7 @@ namespace FakeXrmEasy.Tests
                     LinkFromAttributeName = "parentcustomerid",
                     LinkToAttributeName = "accountid",
                     JoinOperator = JoinOperator.Inner,
-                    Columns = new ColumnSet(new string[] { "name" } )
+                    Columns = new ColumnSet(new string[] { "name" })
                 }
             );
 
@@ -686,26 +687,36 @@ namespace FakeXrmEasy.Tests
         public void When_querying_nested_link_entities_with_dynamic_entities_right_result_is_returned()
         {
             // create a contact
+            var contactId = Guid.NewGuid();
             var contact = new Entity
             {
                 LogicalName = "contact",
-                Id = Guid.NewGuid(),
+                Id = contactId,
+                Attributes = new AttributeCollection { { "contactid", contactId } }
             };
 
             // link a child to the contact
+            var childId = Guid.NewGuid();
             var child = new Entity
             {
                 LogicalName = "child",
-                Id = Guid.NewGuid(),
-                Attributes = new AttributeCollection { { "contactid", new EntityReference("contact", contact.Id) } }
+                Id = childId,
+                Attributes = new AttributeCollection {
+                    { "childid", childId },
+                    { "contactid", new EntityReference("contact", contact.Id) }
+                }
             };
 
             // link a pet to the child
+            var petId = Guid.NewGuid();
             var pet = new Entity
             {
                 LogicalName = "pet",
-                Id = Guid.NewGuid(),
-                Attributes = new AttributeCollection { { "childid", new EntityReference("child", child.Id) } }
+                Id = petId,
+                Attributes = new AttributeCollection {
+                    { "petid", petId }, 
+                    { "childid", new EntityReference("child", child.Id) }
+                }
             };
 
             // initialise
@@ -714,11 +725,11 @@ namespace FakeXrmEasy.Tests
             var service = context.GetFakedOrganizationService();
 
             // 1st Query: join contact and child
-            var query1 = new QueryExpression("contact");
-            var link1 = query1.AddLink("child", "contactid", "contactid", JoinOperator.Inner);
+            //var query1 = new QueryExpression("contact");
+            //var link1 = query1.AddLink("child", "contactid", "contactid", JoinOperator.Inner);
 
-            var count1 = service.RetrieveMultiple(query1).Entities.Count;
-            Assert.Equal(1, count1); // returns 1 record (expected)
+            //var count1 = service.RetrieveMultiple(query1).Entities.Count;
+            //Console.WriteLine(count1); // returns 1 record (expected)
 
             // 2nd Query: join contact and child and pet
             var query2 = new QueryExpression("contact");
@@ -729,5 +740,90 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(1, count2); // returns 0 records (unexpected?)
         }
 
+
+        [Fact]
+        public void When_querying_early_bound_entities_attribute_not_initialised_returns_null_in_joins()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var role = new Role() { Id = Guid.NewGuid() };
+            var parentRole = new Role() { Id = Guid.NewGuid() };
+
+            context.Initialize(new[] { role, parentRole });
+
+            using(var ctx = new XrmServiceContext(service))
+            {
+                var roleResult = (from r in ctx.CreateQuery<Role>()
+                                    join parent in ctx.CreateQuery<Role>() on r.ParentRoleId.Id equals parent.RoleId.Value
+                                   select r).FirstOrDefault();
+
+                Assert.Equal(roleResult, null);
+            }
+
+
+        }
+
+        [Fact]
+        public void When_querying_early_bound_entities_unexisting_attribute_raises_exception_when_selected()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var role = new Role() { Id = Guid.NewGuid() };
+            var parentRole = new Role() { Id = Guid.NewGuid() };
+
+            context.Initialize(new[] { role, parentRole });
+
+            using (var ctx = new XrmServiceContext(service))
+            {
+                var qe = new QueryExpression() { EntityName = "role" };
+                qe.LinkEntities.Add(
+                    new LinkEntity()
+                    {
+                        LinkFromEntityName = "role",
+                        LinkToEntityName = "role",
+                        LinkFromAttributeName = "parentroleid",
+                        LinkToAttributeName = "thisAttributeDoesntExists",
+                        JoinOperator = JoinOperator.Inner,
+                        Columns = new ColumnSet(new string[] { "thisAttributeDoesntExists" })
+                    }
+                );
+                
+                Assert.Throws<FaultException<OrganizationServiceFault>>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
+            }
+        }
+
+        [Fact]
+        public void When_querying_early_bound_entities_unexisting_attribute_raises_exception_when_linked_to()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var role = new Role() { Id = Guid.NewGuid() };
+            var parentRole = new Role() { Id = Guid.NewGuid() };
+
+            context.Initialize(new[] { role, parentRole });
+
+            using (var ctx = new XrmServiceContext(service))
+            {
+                var qe = new QueryExpression() { EntityName = "role" };
+                qe.LinkEntities.Add(
+                    new LinkEntity()
+                    {
+                        LinkFromEntityName = "role",
+                        LinkToEntityName = "role",
+                        LinkFromAttributeName = "parentroleid",
+                        LinkToAttributeName = "thisAttributeDoesntExists",
+                        JoinOperator = JoinOperator.Inner,
+                        Columns = new ColumnSet(new string[] { "roleid" })
+                    }
+                );
+
+                Assert.Throws<FaultException<OrganizationServiceFault>>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
+            }
+        }
+
+       
     }
 }

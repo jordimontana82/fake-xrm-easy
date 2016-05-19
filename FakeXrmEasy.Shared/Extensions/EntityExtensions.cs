@@ -38,6 +38,38 @@ namespace FakeXrmEasy.Extensions
             return ProjectAttributes(e, new QueryExpression() { ColumnSet = columnSet }, context);
         }
 
+        public static void ProjectAttributes(Entity e, Entity projected, LinkEntity le, XrmFakedContext context)
+        {
+            var sAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
+
+            if (le.Columns.AllColumns && le.Columns.Columns.Count == 0)
+            {
+                foreach (var attKey in e.Attributes.Keys)
+                {
+                    if(attKey.StartsWith(sAlias + "."))
+                    {
+                        projected[attKey] = e[attKey];
+                    }
+                }
+            }
+            else
+            {
+                foreach (var attKey in le.Columns.Columns)
+                {
+
+                    var linkedAttKey = sAlias + "." + attKey;
+                    if (e.Attributes.ContainsKey(linkedAttKey))
+                        projected[linkedAttKey] = e[linkedAttKey];
+                }
+            }
+            
+
+            foreach (var nestedLinkedEntity in le.LinkEntities)
+            {
+                ProjectAttributes(e, projected, nestedLinkedEntity, context);
+            }
+        }
+
         public static Entity ProjectAttributes(this Entity e, QueryExpression qe, XrmFakedContext context)
         {
             if (qe.ColumnSet == null) return e;
@@ -86,13 +118,7 @@ namespace FakeXrmEasy.Extensions
                 //Plus attributes from joins
                 foreach(var le in qe.LinkEntities)
                 {
-                    foreach (var attKey in le.Columns.Columns)
-                    {
-                        var sAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
-                        var linkedAttKey = sAlias + "." + attKey;
-                        if (e.Attributes.ContainsKey(linkedAttKey) && e[linkedAttKey] != null || le.Columns.AllColumns)
-                            projected[linkedAttKey] = e[linkedAttKey];
-                    }
+                    ProjectAttributes(e, projected, le, context);
                 }
                 //foreach (var attKey in e.Attributes.Keys)
                 //{
@@ -110,7 +136,7 @@ namespace FakeXrmEasy.Extensions
         /// <param name="otherEntity"></param>
         /// <param name="attributes"></param>
         /// <returns></returns>
-        public static Entity JoinAttributes(this Entity e, Entity otherEntity, ColumnSet columnSet, string alias)
+        public static Entity JoinAttributes(this Entity e, Entity otherEntity, ColumnSet columnSet, string alias, XrmFakedContext context)
         {
             if (otherEntity == null) return e; //Left Join where otherEntity was not matched
 
@@ -126,9 +152,14 @@ namespace FakeXrmEasy.Extensions
                 //Return selected list of attributes
                 foreach (var attKey in columnSet.Columns)
                 {
-                    if (!otherEntity.Attributes.ContainsKey(attKey))
+                    if (!context.AttributeExistsInMetadata(otherEntity.LogicalName, attKey))
                     {
                         OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
+                    }
+
+                    if (!otherEntity.Attributes.ContainsKey(attKey))
+                    {
+                        otherEntity[attKey] = null;
                     }
                     e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
                 }
@@ -136,7 +167,7 @@ namespace FakeXrmEasy.Extensions
             return e;
         }
 
-        public static Entity JoinAttributes(this Entity e, IEnumerable<Entity> otherEntities, ColumnSet columnSet, string alias)
+        public static Entity JoinAttributes(this Entity e, IEnumerable<Entity> otherEntities, ColumnSet columnSet, string alias, XrmFakedContext context)
         {
             foreach (var otherEntity in otherEntities) { 
                 if (columnSet.AllColumns)
@@ -151,9 +182,15 @@ namespace FakeXrmEasy.Extensions
                     //Return selected list of attributes
                     foreach (var attKey in columnSet.Columns)
                     {
-                        if (!otherEntity.Attributes.ContainsKey(attKey))
+                        if (!context.AttributeExistsInMetadata(otherEntity.LogicalName, attKey))
                         {
                             OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
+                        }
+
+                        if (!otherEntity.Attributes.ContainsKey(attKey))
+                        {
+                            otherEntity[attKey] = null;
+                            
                         }
                         e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
                     }
@@ -168,13 +205,13 @@ namespace FakeXrmEasy.Extensions
         /// <param name="e"></param>
         /// <param name="sAttributeName"></param>
         /// <returns></returns>
-        public static Guid KeySelector(this Entity e, string sAttributeName)
+        public static Guid KeySelector(this Entity e, string sAttributeName, XrmFakedContext context)
         {
             sAttributeName = sAttributeName.ToLower();
 
             if (!e.Attributes.ContainsKey(sAttributeName))
             {
-                //Check if it is the primery key
+                //Check if it is the primary key
                 if (sAttributeName.Contains("id") &&
                    e.LogicalName.ToLower().Equals(sAttributeName.Substring(0, sAttributeName.Length - 2)))
                 {

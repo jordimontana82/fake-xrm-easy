@@ -828,25 +828,37 @@ namespace FakeXrmEasy.Tests
 
             var contactId = Guid.NewGuid();
             var accountId = Guid.NewGuid();
+            var accountId2 = Guid.NewGuid();
+
+            var lead = new Lead() { Id = Guid.NewGuid() };
 
             //Contact is related to first account, but because first account is not related to itself then the query must return 0 records
             fakedContext.Initialize(new List<Entity>() {
-                new Account() { Id = accountId },
-                new Account() { Id = Guid.NewGuid(), ParentAccountId = new EntityReference(Account.EntityLogicalName, accountId) },
-                new Contact() { Id = contactId, ParentCustomerId = new EntityReference(Account.EntityLogicalName, accountId),
-                                                NumberOfChildren = 2}
+                lead,
+                new Account() { Id = accountId , Name = "Testing" },
+                new Account() { Id = accountId2,
+                            ParentAccountId = new EntityReference(Account.EntityLogicalName, accountId),
+                            PrimaryContactId = new EntityReference(Contact.EntityLogicalName, contactId) },
+                new Contact() { Id = contactId, NumberOfChildren = 2, OriginatingLeadId = lead.ToEntityReference()}
             });
 
             var service = fakedContext.GetFakedOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
-                var matches = (from c in ctx.CreateQuery<Contact>()
-                               join account in ctx.CreateQuery<Account>() on c.ParentCustomerId.Id equals account.AccountId
-                               join parentAccount in ctx.CreateQuery<Account>() on account.ParentAccountId.Id equals parentAccount.AccountId
-                               select c).ToList();
+                //var matches = (from c in ctx.ContactSet
+                //               join a in ctx.AccountSet on c.ContactId equals a.PrimaryContactId.Id
+                //               join a2 in ctx.AccountSet on a.ParentAccountId.Id equals a2.AccountId
+                //               where c.NumberOfChildren == 2
+                //               where a2.Name == "Testing"
+                //               select a2.Name).ToList();
 
-                Assert.True(matches.Count == 0);
+                var matches = (from a in ctx.AccountSet 
+                               join c in ctx.ContactSet on a.PrimaryContactId.Id  equals c.ContactId
+                               join l in ctx.LeadSet on c.OriginatingLeadId.Id equals l.LeadId
+                               select a).ToList();
+
+                Assert.True(matches.Count == 1);
             }
         }
 
