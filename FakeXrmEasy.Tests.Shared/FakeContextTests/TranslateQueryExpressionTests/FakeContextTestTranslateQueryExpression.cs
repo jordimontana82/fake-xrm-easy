@@ -339,10 +339,10 @@ namespace FakeXrmEasy.Tests
             var lastContact = result.LastOrDefault();
 
             //Contact 1 attributes = 3 + 5 (the extra five are the CreatedOn, ModifiedOn, CreatedBy, ModifiedBy + StateCode attributes generated automatically
-            //+ Attributes from the join(account) = 1 + 5
+            //+ Attributes from the join(account) = id + 1 + 5
 
-            Assert.True(firstContact.Attributes.Count == 3 + 1 + 5 * 2);
-            Assert.True(lastContact.Attributes.Count == 3 + 1 + 5 * 2);  //Contact 2
+            Assert.True(firstContact.Attributes.Count == 3 + 2 + 5 * 2);
+            Assert.True(lastContact.Attributes.Count == 3 + 2 + 5 * 2);  //Contact 2
         }
 
         [Fact]

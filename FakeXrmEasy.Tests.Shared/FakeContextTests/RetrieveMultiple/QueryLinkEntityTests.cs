@@ -521,6 +521,67 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             }
         }
 
+        [Fact]
+        public void Should_Join_With_Linked_Entity()
+        {
+            var contact = new Entity
+            {
+                LogicalName = "contact",
+                Id = Guid.NewGuid(),
+            };
 
+            var child = new Entity
+            {
+                LogicalName = "child",
+                Id = Guid.NewGuid(),
+                Attributes = new AttributeCollection { { "contactid", new EntityReference("contact", contact.Id) } }
+            };
+
+            var context = new XrmFakedContext();
+            context.Initialize(new[] { contact, child });
+            var service = context.GetFakedOrganizationService();
+
+            var query = new QueryExpression("contact");
+            var link = query.AddLink("child", "contactid", "contactid");
+
+            Assert.Equal(1, service.RetrieveMultiple(query).Entities.Count);
+        }
+
+        [Fact]
+        public void Should_Join_With_Nested_Linked_Entity()
+        {
+            var contact = new Entity
+            {
+                LogicalName = "contact",
+                Id = Guid.NewGuid(),
+            };
+
+            var child = new Entity
+            {
+                LogicalName = "child",
+                Id = Guid.NewGuid(),
+                Attributes = new AttributeCollection { { "contactid", new EntityReference("contact", contact.Id) } }
+            };
+
+            var pet = new Entity
+            {
+                LogicalName = "pet",
+                Id = Guid.NewGuid(),
+                Attributes = new AttributeCollection { { "childid", new EntityReference("child", child.Id) } }
+            };
+
+            var context = new XrmFakedContext();
+            context.Initialize(new[] { contact, child, pet });
+            var service = context.GetFakedOrganizationService();
+
+            var query = new QueryExpression("contact");
+            query.ColumnSet = new ColumnSet(true);
+            var link1 = query.AddLink("child", "contactid", "contactid");
+            link1.Columns = new ColumnSet(true);
+            var link2 = link1.AddLink("pet", "childid", "childid");
+            link2.Columns = new ColumnSet(true);
+
+            Assert.Equal(1, service.RetrieveMultiple(query).Entities.Count);
+        }
     }
 }
