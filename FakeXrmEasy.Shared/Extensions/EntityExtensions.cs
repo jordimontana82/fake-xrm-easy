@@ -141,7 +141,8 @@ namespace FakeXrmEasy.Extensions
             if (otherEntity == null) return e; //Left Join where otherEntity was not matched
 
             if (columnSet.AllColumns)
-            {
+            {   
+                e[alias + "." + alias + "id"] = new AliasedValue(alias, alias + "id", otherEntity.Id); // add the primary key
                 foreach (var attKey in otherEntity.Attributes.Keys)
                 {
                     e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
@@ -172,6 +173,7 @@ namespace FakeXrmEasy.Extensions
             foreach (var otherEntity in otherEntities) { 
                 if (columnSet.AllColumns)
                 {
+                    e[alias + "." + alias + "id"] = new AliasedValue(alias, alias + "id", otherEntity.Id); // add the primary key
                     foreach (var attKey in otherEntity.Attributes.Keys)
                     {
                         e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
