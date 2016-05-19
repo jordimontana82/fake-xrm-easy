@@ -48,11 +48,38 @@ namespace FakeXrmEasy.Tests
         {
             var context = new XrmFakedContext();
             IEnumerable<Entity> data = new List<Entity>() {
-                new Entity("account") { Id = Guid.Empty}
+                new Entity("account") { Id = Guid.Empty }
             };
 
             var ex = Assert.Throws<InvalidOperationException>(() => context.Initialize(data));
             Assert.Equal(ex.Message, "An entity with an empty Id can't be added");
+        }
+
+        [Fact]
+        public void When_initializing_the_context_with_a_dynamic_entity_without_a_primary_key_but_id_entity_is_added()
+        {
+            var context = new XrmFakedContext();
+            IEnumerable<Entity> data = new List<Entity>() {
+                new Entity("account") { Id = Guid.NewGuid() }
+            };
+
+            Assert.DoesNotThrow(() => context.Initialize(data));
+            Assert.True(context.Data.Count == 1);
+            Assert.True(context.Data["account"].Count == 1);
+        }
+
+
+        [Fact]
+        public void When_initializing_the_context_with_a_dynamic_entity_with_a_primary_key_is_added_to_the_context()
+        {
+            var context = new XrmFakedContext();
+            IEnumerable<Entity> data = new List<Entity>() {
+                new Entity("account") { Id = Guid.NewGuid(), Attributes = new AttributeCollection { { "accountid", Guid.NewGuid() } }  }
+            };
+
+            Assert.DoesNotThrow(() => context.Initialize(data));
+            Assert.True(context.Data.Count == 1);
+            Assert.True(context.Data["account"].Count == 1);
         }
 
         [Fact]

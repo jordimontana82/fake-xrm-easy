@@ -267,6 +267,15 @@ namespace FakeXrmEasy
                 throw new InvalidOperationException("An entity with an empty Id can't be added");
             }
 
+            //Validate primary key for dynamic entities
+            var primaryKey = string.Format("{0}id", e.LogicalName);
+            if (ProxyTypesAssembly == null &&
+                !e.GetType().IsSubclassOf(typeof(Entity)) &&
+                !e.Attributes.ContainsKey(primaryKey))
+            {
+                e[primaryKey] = e.Id;
+            }
+
             //Add createdon, modifiedon, createdby, modifiedby properties
             if (CallerId == null)
                 CallerId = new EntityReference("systemuser", Guid.NewGuid()); //Create a new instance by default
@@ -291,6 +300,13 @@ namespace FakeXrmEasy
 
         protected internal void AddEntity(Entity e)
         {
+            //Automatically detect proxy types assembly if an early bound type was used.
+            if (ProxyTypesAssembly == null &&
+                e.GetType().IsSubclassOf(typeof(Entity)))
+            {
+                ProxyTypesAssembly = Assembly.GetAssembly(e.GetType());
+            }
+
             ValidateEntity(e);
 
             //Add the entity collection
@@ -312,14 +328,6 @@ namespace FakeXrmEasy
             //Update metadata for that entity
             if (!AttributeMetadata.ContainsKey(e.LogicalName))
                 AttributeMetadata.Add(e.LogicalName, new Dictionary<string, string>());
-
-
-            //Automatically detect proxy types assembly if an early bound type was used.
-            if(ProxyTypesAssembly == null && 
-                e.GetType().IsSubclassOf(typeof(Entity)))
-            {
-                ProxyTypesAssembly = Assembly.GetAssembly(e.GetType());
-            }
 
             //Update attribute metadata
             if (ProxyTypesAssembly != null)
