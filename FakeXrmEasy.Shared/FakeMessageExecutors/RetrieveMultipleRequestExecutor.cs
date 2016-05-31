@@ -22,11 +22,14 @@ namespace FakeXrmEasy.FakeMessageExecutors
             if (request.Query is QueryExpression)
             {
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, request.Query as QueryExpression);
+                var list = linqQuery.ToList();
+                list.ForEach(e => PopulateFormattedValues(e));
+
                 var response = new RetrieveMultipleResponse
                 {
                     Results = new ParameterCollection
                                  {
-                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
+                                    { "EntityCollection", new EntityCollection(list) }
                                  }
                 };
                 return response;
@@ -37,11 +40,14 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 var queryExpression = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
 
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, queryExpression);
+                var list = linqQuery.ToList();
+                list.ForEach(e => PopulateFormattedValues(e));
+
                 var response = new RetrieveMultipleResponse
                 {
                     Results = new ParameterCollection
                                  {
-                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
+                                    { "EntityCollection", new EntityCollection(list) }
                                  }
                 };
                 return response;
@@ -61,17 +67,58 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
                 //QueryExpression now done... execute it!
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe as QueryExpression);
+                var list = linqQuery.ToList();
+                list.ForEach(e => PopulateFormattedValues(e));
+
                 var response = new RetrieveMultipleResponse
                 {
                     Results = new ParameterCollection
                                  {
-                                    { "EntityCollection", new EntityCollection(linqQuery.ToList()) }
+                                    { "EntityCollection", new EntityCollection(list) }
                                  }
                 };
                 return response;
             }
             else
                 throw PullRequestException.NotImplementedOrganizationRequest(request.Query.GetType());
+        }
+
+        /// <summary>
+        /// Populates the formmated values property of this entity record based on the proxy types
+        /// </summary>
+        /// <param name="e"></param>
+        protected void PopulateFormattedValues(Entity e)
+        {
+            //Iterate through attributes and retrieve formatted values based on type
+            foreach(var attKey in e.Attributes.Keys)
+            {
+                var value = e[attKey];
+                string formattedValue = "";
+                if(value != null)
+                {
+                    bool bShouldAdd = false;
+                    formattedValue = GetFormattedValueForValue(value, out bShouldAdd);
+                    if(bShouldAdd)
+                    {
+                        e.FormattedValues.Add(attKey, formattedValue);
+                    } 
+                }
+            }
+        }
+
+        protected string GetFormattedValueForValue(object value, out bool bShouldAddFormattedValue)
+        {
+            bShouldAddFormattedValue = false;
+            string sFormattedValue = "";
+
+            if(value is Enum)
+            {
+                // Retrieve the enum type
+                sFormattedValue = Enum.GetName(value.GetType(), value);
+                bShouldAddFormattedValue = true;
+            }
+
+            return sFormattedValue;
         }
     }
 }

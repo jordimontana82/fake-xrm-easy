@@ -35,6 +35,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FakeContextTestFormattedValues.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OrderByTests.cs" />
