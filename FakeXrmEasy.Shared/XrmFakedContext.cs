@@ -15,6 +15,7 @@ using System.ServiceModel.Description;
 using System.Reflection;
 using Microsoft.Crm.Sdk.Messages;
 using FakeXrmEasy.FakeMessageExecutors;
+using Microsoft.Xrm.Sdk.Metadata;
 
 namespace FakeXrmEasy
 {
@@ -49,12 +50,15 @@ namespace FakeXrmEasy
 
         private Dictionary<string, XrmFakedRelationship> Relationships { get; set; }
 
+        public Dictionary<string, OptionSetMetadata> OptionSetValuesMetadata { get; set; }
+
         public XrmFakedContext()
         {
             AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
             ExecutionMocks = new Dictionary<Type, ServiceRequestExecution>();
             FakeMessageExecutors = new Dictionary<Type, IFakeMessageExecutor>();
+            OptionSetValuesMetadata = new Dictionary<string, OptionSetMetadata>();
 
             //Adding default execution fakes
             AddFakeMessageExecutor<WhoAmIRequest>(new WhoAmIRequestExecutor());
@@ -67,6 +71,10 @@ namespace FakeXrmEasy
             AddFakeMessageExecutor<UpdateRequest>(new UpdateRequestExecutor());
             AddFakeMessageExecutor<DeleteRequest>(new DeleteRequestExecutor());
             AddFakeMessageExecutor<AssignRequest>(new AssignRequestExecutor());
+            AddFakeMessageExecutor<PublishXmlRequest>(new PublishXmlRequestExecutor());
+            AddFakeMessageExecutor<InsertOptionValueRequest>(new InsertOptionValueRequestExecutor());
+
+
             AddFakeMessageExecutor<ExecuteMultipleRequest>(new ExecuteMultipleRequestExecutor());
 #if FAKE_XRM_EASY_2016
             AddFakeMessageExecutor<ExecuteTransactionRequest>(new ExecuteTransactionExecutor());

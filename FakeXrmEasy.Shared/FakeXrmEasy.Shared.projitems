@@ -19,6 +19,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\ExecuteMultipleRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\ExecuteTransactionExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\IFakeMessageExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\InsertOptionValueRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\PublishXmlRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveAttributeRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\SetStateRequestExecutor.cs" />
@@ -37,5 +39,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedRelationship.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedTracingService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmOrderByAttributeComparer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Metadata\" />
   </ItemGroup>
 </Project>
