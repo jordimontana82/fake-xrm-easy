@@ -102,5 +102,22 @@ namespace FakeXrmEasy.Tests
 
             Assert.True(((int)result["result"]).Equals(5 + 69));
         }
+
+        [Fact]
+        public void When_passing_a_custom_workflow_activity_context_injected_property_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var wfContext = fakedContext.GetDefaultWorkflowContext();
+            wfContext.MessageName = "Update";
+
+            //Inputs
+            var inputs = new Dictionary<string, object>();
+
+            CheckContextPropertyActivity codeActivity = new CheckContextPropertyActivity();
+
+            var result = fakedContext.ExecuteCodeActivity<CheckContextPropertyActivity>(wfContext, inputs, codeActivity);
+
+            Assert.True(((string)result["MessageName"]).Equals("Update"));
+        }
     }
 }

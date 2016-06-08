@@ -18,21 +18,49 @@ namespace FakeXrmEasy
 {
     public partial class XrmFakedContext : IXrmFakedContext
     {
+        public XrmFakedWorkflowContext GetDefaultWorkflowContext()
+        {
+            var userId = CallerId != null ? CallerId.Id : Guid.NewGuid();
+            return new XrmFakedWorkflowContext()
+            {
+                Depth = 1,
+                IsExecutingOffline = false,
+                MessageName = "Create",
+                UserId = userId,
+                InitiatingUserId = userId,
+                InputParameters = new ParameterCollection(),
+                OutputParameters = new ParameterCollection(),
+                SharedVariables = new ParameterCollection(),
+                PreEntityImages = new EntityImageCollection(),
+                PostEntityImages = new EntityImageCollection()
+            };
+        }
+
         /// <summary>
         /// Executes a code activity against this context
         /// </summary>
         /// <typeparam name="T"></typeparam>
         public IDictionary<string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new()
         {
-            return this.ExecuteCodeActivity<T>(null, inputs, instance);
+            var wfContext = GetDefaultWorkflowContext();
+            return this.ExecuteCodeActivity<T>(wfContext, inputs, instance);
         }
 
+
+        public IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new()
+        {
+            var wfContext = GetDefaultWorkflowContext();
+            wfContext.PrimaryEntityId = primaryEntity.Id;
+            wfContext.PrimaryEntityName = primaryEntity.LogicalName;
+
+            return this.ExecuteCodeActivity<T>(wfContext, inputs, instance);
+        }
 
         /// <summary>
         /// Executes a code activity passing the primary entity
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new()
+        public IDictionary<string, object> ExecuteCodeActivity<T>(XrmFakedWorkflowContext wfContext, Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new()
         {
             WorkflowInvoker invoker = null;
             WorkflowInstanceExtensionManager mngr = null;
@@ -48,14 +76,7 @@ namespace FakeXrmEasy
                 invoker.Extensions.Add<ITracingService>(() => new XrmFakedTracingService());
                 invoker.Extensions.Add<IWorkflowContext>(() =>
                 {
-                    var fakedWorkflowContext = A.Fake<IWorkflowContext>();
-                    if (primaryEntity != null)
-                    {
-                        A.CallTo(() => fakedWorkflowContext.PrimaryEntityId).ReturnsLazily(() => primaryEntity.Id);
-                        A.CallTo(() => fakedWorkflowContext.PrimaryEntityName).ReturnsLazily(() => primaryEntity.LogicalName);
-                    }
-
-                    return fakedWorkflowContext;
+                    return wfContext;
                 });
                 invoker.Extensions.Add<IOrganizationServiceFactory>(() => {
                     var fakedServiceFactory = A.Fake<IOrganizationServiceFactory>();
@@ -74,28 +95,7 @@ namespace FakeXrmEasy
             catch (TypeLoadException tlex)
             {
                 var typeName = tlex.TypeName != null ? tlex.TypeName : "(null)";
-                //if(string.IsNullOrWhiteSpace(typeName) ||
-                //    typeName.Equals("System.Activities.WorkflowApplication"))
-                //{
-                //    //Try again
-                //    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System.Activities.dll"));
-                //    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Microsoft.Xrm.Sdk.dll"));
-                //    System.Reflection.Assembly.LoadFrom(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Microsoft.Xrm.Sdk.Workflow.dll"));
-                //    try
-                //    {
-                //        return invoker.Invoke(inputs);
-                //    }
-                //    catch (TypeLoadException tlex2)
-                //    {
-                //        if (tlex2.InnerException != null)
-                //            throw new Exception("TypeLoadException with innerexception " + tlex2.InnerException.ToString());
-                //        else
-                //            throw new Exception("TypeLoadException with innerexception null");
-                //    }
-                    
-                //}
-                //else
-                    throw new TypeLoadException("When loading type: " + typeName + "." + tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory + "Debug=" + sDebug);
+                throw new TypeLoadException("When loading type: " + typeName + "." + tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory + "Debug=" + sDebug);
             }
         }
 

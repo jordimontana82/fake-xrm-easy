@@ -38,6 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedPluginExecutionContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedRelationship.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedTracingService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XrmFakedWorkflowContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmOrderByAttributeComparer.cs" />
   </ItemGroup>
   <ItemGroup>

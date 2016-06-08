@@ -9,6 +9,7 @@
     <Import_RootNamespace>FakeXrmEasy.Tests</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\CheckContextPropertyActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\AddActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\AddActivityWithConstant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\CreateTaskActivity.cs" />
