@@ -129,6 +129,16 @@ namespace FakeXrmEasy.Extensions
             }
         }
 
+        public static Entity Clone(this Entity e)
+        {
+            var cloned = new Entity(e.LogicalName);
+            foreach (var attKey in e.Attributes.Keys)
+            {
+                cloned[attKey] = e[attKey];
+            }
+            return cloned;
+        }
+
         /// <summary>
         /// Extension method to join the attributes of entity e and otherEntity
         /// </summary>
@@ -139,6 +149,8 @@ namespace FakeXrmEasy.Extensions
         public static Entity JoinAttributes(this Entity e, Entity otherEntity, ColumnSet columnSet, string alias, XrmFakedContext context)
         {
             if (otherEntity == null) return e; //Left Join where otherEntity was not matched
+
+            otherEntity = otherEntity.Clone(); //To avoid joining entities from/to the same entities, which would cause collection modified exceptions
 
             if (columnSet.AllColumns)
             {
@@ -157,11 +169,15 @@ namespace FakeXrmEasy.Extensions
                         OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
                     }
 
-                    if (!otherEntity.Attributes.ContainsKey(attKey))
+                    if (otherEntity.Attributes.ContainsKey(attKey))
                     {
-                        otherEntity[attKey] = null;
+                        e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
                     }
-                    e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
+                    else
+                    {
+                        e[alias + "." + attKey] = new AliasedValue(alias, attKey, null);
+                    }
+                    
                 }
             }
             return e;
@@ -169,12 +185,14 @@ namespace FakeXrmEasy.Extensions
 
         public static Entity JoinAttributes(this Entity e, IEnumerable<Entity> otherEntities, ColumnSet columnSet, string alias, XrmFakedContext context)
         {
-            foreach (var otherEntity in otherEntities) { 
+            foreach (var otherEntity in otherEntities) {
+                var otherClonedEntity = otherEntity.Clone(); //To avoid joining entities from/to the same entities, which would cause collection modified exceptions
+
                 if (columnSet.AllColumns)
                 {
-                    foreach (var attKey in otherEntity.Attributes.Keys)
+                    foreach (var attKey in otherClonedEntity.Attributes.Keys)
                     {
-                        e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
+                        e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherClonedEntity[attKey]);
                     }
                 }
                 else
@@ -187,12 +205,13 @@ namespace FakeXrmEasy.Extensions
                             OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
                         }
 
-                        if (!otherEntity.Attributes.ContainsKey(attKey))
+                        if (otherClonedEntity.Attributes.ContainsKey(attKey))
                         {
-                            otherEntity[attKey] = null;
-                            
+                            e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherClonedEntity[attKey]);
                         }
-                        e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
+                        else {
+                            e[alias + "." + attKey] = new AliasedValue(alias, attKey, null);
+                        }
                     }
                 }
             }

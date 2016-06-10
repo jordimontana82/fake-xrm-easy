@@ -698,12 +698,15 @@ namespace FakeXrmEasy
             //If we reach this point, it means we are translating filters at the Link Entity level (2011),
             //Therefore we need to prepend the alias attribute because the code to generate attributes for Joins (JoinAttribute extension) is common across versions
             
-            foreach(var ce in le.LinkCriteria.Conditions)
+            if(le.LinkCriteria != null)
             {
-                var entityAlias = !string.IsNullOrEmpty(le.EntityAlias) ? le.EntityAlias : le.LinkToEntityName;
-                ce.AttributeName = entityAlias + "." + ce.AttributeName;
+                foreach (var ce in le.LinkCriteria.Conditions)
+                {
+                    var entityAlias = !string.IsNullOrEmpty(le.EntityAlias) ? le.EntityAlias : le.LinkToEntityName;
+                    ce.AttributeName = entityAlias + "." + ce.AttributeName;
+                }
             }
-
+            
             return TranslateFilterExpressionToExpression(le.LinkCriteria, entity);
         }
 
