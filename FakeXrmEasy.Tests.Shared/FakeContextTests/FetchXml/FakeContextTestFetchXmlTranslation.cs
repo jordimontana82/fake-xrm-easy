@@ -650,6 +650,56 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(rows.Entities.Count, 2);
         }
 
+        [Fact]
+        public void When_querying_the_same_entity_records_with_joins_no_collection_modified_exception_is_thrown()
+        {
+            var fakedContext = new XrmFakedContext { };
+            var service = fakedContext.GetFakedOrganizationService();
+
+            var entityAccount = new Account { Id = Guid.NewGuid(), Name = "My First Faked Account yeah!", LogicalName = "account" };
+            var entityContact = new Contact { Id = Guid.NewGuid(), ParentCustomerId = entityAccount.ToEntityReference() };
+
+            var entityBusinessUnit = new BusinessUnit { Name = "TestBU", BusinessUnitId = Guid.NewGuid() };
+
+            var initiatingUser = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "TestUser",
+                DomainName = "TestDomain",
+                BusinessUnitId = entityBusinessUnit.ToEntityReference()
+            };
+
+            fakedContext.Initialize(new List<Entity>() {
+               entityBusinessUnit,entityAccount,entityContact,initiatingUser
+            });
+
+
+            var fetchXml = @"
+                    <fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                      <entity name='systemuser'>
+                        <attribute name='fullname' />
+                         <attribute name='systemuserid' />
+                         <attribute name='businessunitid' />
+                         <filter type='and'>
+                          <condition attribute='systemuserid' operator='eq' uitype='systemuser' value='#userId#' />
+                         </filter>
+                            <link-entity name='businessunit' from='businessunitid' to='businessunitid' alias='bu' intersect='true' >
+                                <attribute name='name' />
+                            </link-entity>
+                      </entity>
+                    </fetch>
+                ";
+
+            var UserRequest = new RetrieveMultipleRequest { Query = new FetchExpression(fetchXml.Replace("#userId#", initiatingUser.Id.ToString())) };
+            var response = ((RetrieveMultipleResponse)service.Execute(UserRequest));
+
+            var entities = response.EntityCollection.Entities;
+            Assert.True(entities.Count == 1);
+            Assert.True(entities[0].Attributes.ContainsKey("bu.name"));
+            Assert.IsType<AliasedValue>(entities[0]["bu.name"]);
+            Assert.Equal("TestBU", (entities[0]["bu.name"] as AliasedValue).Value.ToString());
+        }
+
 
     }
 }

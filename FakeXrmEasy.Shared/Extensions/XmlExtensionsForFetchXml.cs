@@ -117,10 +117,10 @@ namespace FakeXrmEasy.Extensions.FetchXml
             //Create this node
             var linkEntity = new LinkEntity();
 
-            linkEntity.LinkFromEntityName = el.GetAttribute("name").Value;
+            linkEntity.LinkFromEntityName = el.Parent.GetAttribute("name").Value;
             linkEntity.LinkFromAttributeName = el.GetAttribute("from").Value;
             linkEntity.LinkToAttributeName = el.GetAttribute("to").Value;
-            linkEntity.LinkToEntityName = el.Parent.GetAttribute("name").Value;
+            linkEntity.LinkToEntityName = el.GetAttribute("name").Value;  
 
             if(el.GetAttribute("alias") != null)
             {
