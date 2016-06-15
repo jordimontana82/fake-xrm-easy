@@ -6,10 +6,10 @@ Fake Xrm Easy: The automated testing framework for Dynamics CRM
 
 |Crm Version|NuGet|
 |-----------|-----|
-|2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.14.3)](https://www.nuget.org/packages/fakexrmeasy.2016)|
-|2015|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2015?v=1.14.3)](https://www.nuget.org/packages/fakexrmeasy.2015)|
-|2013|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2013?v=1.14.3)](https://www.nuget.org/packages/fakexrmeasy.2013)|
-|2011|[![Nuget](https://buildstats.info/nuget/fakexrmeasy?v=1.14.3)](https://www.nuget.org/packages/fakexrmeasy)|
+|2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.14.4)](https://www.nuget.org/packages/fakexrmeasy.2016)|
+|2015|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2015?v=1.14.4)](https://www.nuget.org/packages/fakexrmeasy.2015)|
+|2013|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2013?v=1.14.4)](https://www.nuget.org/packages/fakexrmeasy.2013)|
+|2011|[![Nuget](https://buildstats.info/nuget/fakexrmeasy?v=1.14.4)](https://www.nuget.org/packages/fakexrmeasy)|
 
 The framework to streamline unit testing in Dynamics CRM by faking the IOrganizationService to work with an In-Memory context.
 
@@ -39,8 +39,8 @@ Please consider the below guidelines for contributing to the project:
 
 ##Roadmap / Backlog
 
-*  Add change log
-*  ~~Add integration tests~~ Deprioritised in favor of fetch 
-*  FetchXml implementation
+*  FetchXml implementation:
+*     TO DO:  Add support for arithmetic operators and date operators
+*     TO DO:  Add support for FetchXml aggregations
 *  Increase test coverage
   
