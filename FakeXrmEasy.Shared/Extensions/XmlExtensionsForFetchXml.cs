@@ -255,6 +255,12 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "not-in":
                     op = ConditionOperator.NotIn;
                     break;
+                case "null":
+                    op = ConditionOperator.Null;
+                    break;
+                case "not-null":
+                    op = ConditionOperator.NotNull;
+                    break;
                 case "like":
                     op = ConditionOperator.Like;
 

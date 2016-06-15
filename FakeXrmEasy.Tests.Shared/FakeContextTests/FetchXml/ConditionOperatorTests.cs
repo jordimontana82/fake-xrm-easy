@@ -29,13 +29,14 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="not-in" />
 
         TODO:
-
+    
+      <xs:enumeration value="null" />
+      <xs:enumeration value="not-null" />
       <xs:enumeration value="gt" />
       <xs:enumeration value="ge" />
       <xs:enumeration value="le" />
       <xs:enumeration value="lt" />
-      <xs:enumeration value="null" />
-      <xs:enumeration value="not-null" />
+
 
       <xs:enumeration value="between" />
       <xs:enumeration value="not-between" />
@@ -478,6 +479,54 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(ConditionOperator.NotIn, query.Criteria.Conditions[0].Operator);
             Assert.Equal("Messi", query.Criteria.Conditions[0].Values[0].ToString());
             Assert.Equal("Iniesta", query.Criteria.Conditions[0].Values[1].ToString());
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Null()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='fullname' operator='null' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("fullname", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.Null, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(0, query.Criteria.Conditions[0].Values.Count);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_NotNull()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='fullname' operator='not-null' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("fullname", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.NotNull, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(0, query.Criteria.Conditions[0].Values.Count);
         }
     }
 }
