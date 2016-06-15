@@ -16,6 +16,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "filter":
                     return elem.GetAttribute("type") != null;
 
+                case "value":
                 case "fetch":
                     return true;
 
@@ -209,6 +210,11 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return filterExpression;
         }
 
+        public static object ToValue(this XElement elem)
+        {
+            return GetConditionExpressionValueCast(elem.Value);
+        }
+
         public static ConditionExpression ToConditionExpression(this XElement elem)
         {
             var conditionExpression = new ConditionExpression();
@@ -228,7 +234,26 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     op = ConditionOperator.Equal;
                     break;
                 case "ne":
+                case "neq":
                     op = ConditionOperator.NotEqual;
+                    break;
+                case "begins-with":
+                    op = ConditionOperator.BeginsWith;
+                    break;
+                case "not-begin-with":
+                    op = ConditionOperator.DoesNotBeginWith;
+                    break;
+                case "ends-with":
+                    op = ConditionOperator.EndsWith;
+                    break;
+                case "not-end-with":
+                    op = ConditionOperator.DoesNotEndWith;
+                    break;
+                case "in":
+                    op = ConditionOperator.In;
+                    break;
+                case "not-in":
+                    op = ConditionOperator.NotIn;
                     break;
                 case "like":
                     op = ConditionOperator.Like;
@@ -264,7 +289,17 @@ namespace FakeXrmEasy.Extensions.FetchXml
 
             //Process values
             object[] values = null;
-            if(value != null)
+
+            //Find values inside the condition expression, if apply
+            values = elem
+                        .Elements() //child nodes of this filter
+                        .Where(el => el.Name.LocalName.Equals("value"))
+                        .Select(el => el.ToValue())
+                        .ToArray();
+
+
+            //Otherwise, a single value was used
+            if (value != null)
             {
                 return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value));
             }
