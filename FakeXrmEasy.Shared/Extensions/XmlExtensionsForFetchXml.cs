@@ -103,17 +103,33 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     .ToTopCount();
         }
 
-        public static FilterExpression ToCriteria(this XDocument xlDoc)
+        public static FilterExpression ToCriteria(this XDocument xlDoc, XrmFakedContext ctx)
         {
             return xlDoc.Elements()   //fetch
                     .Elements()     //entity
                     .Elements()     //child nodes of entity
                     .Where(el => el.Name.LocalName.Equals("filter"))
-                    .Select(el => el.ToFilterExpression())
+                    .Select(el => el.ToFilterExpression(ctx))
                     .FirstOrDefault();
         }
 
-        public static LinkEntity ToLinkEntity(this XElement el)
+        public static string GetAssociatedEntityNameForConditionExpression(this XElement el)
+        {
+            
+            while(el != null)
+            {
+                var parent = el.Parent;
+                if(parent.Name.LocalName.Equals("entity") || parent.Name.LocalName.Equals("link-entity"))
+                {
+                    return parent.GetAttribute("name").Value;
+                }
+                el = parent;
+            }
+
+            return null;
+        }
+
+        public static LinkEntity ToLinkEntity(this XElement el, XrmFakedContext ctx)
         {
             //Create this node
             var linkEntity = new LinkEntity();
@@ -131,7 +147,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             //Process other link entities recursively
             var convertedLinkEntityNodes = el.Elements()
                                     .Where(e => e.Name.LocalName.Equals("link-entity"))
-                                    .Select(e => e.ToLinkEntity())
+                                    .Select(e => e.ToLinkEntity(ctx))
                                     .ToList();
 
             foreach(var le in convertedLinkEntityNodes)
@@ -145,19 +161,19 @@ namespace FakeXrmEasy.Extensions.FetchXml
             //Process filter
             linkEntity.LinkCriteria = el.Elements()
                                         .Where(e => e.Name.LocalName.Equals("filter"))
-                                        .Select(e => e.ToFilterExpression())
+                                        .Select(e => e.ToFilterExpression(ctx))
                                         .FirstOrDefault();
 
             return linkEntity;
         }
 
-        public static List<LinkEntity> ToLinkEntities(this XDocument xlDoc)
+        public static List<LinkEntity> ToLinkEntities(this XDocument xlDoc, XrmFakedContext ctx)
         {
             return xlDoc.Elements()   //fetch
                     .Elements()     //entity
                     .Elements()     //child nodes of entity
                     .Where(el => el.Name.LocalName.Equals("link-entity"))
-                    .Select(el => el.ToLinkEntity())
+                    .Select(el => el.ToLinkEntity(ctx))
                     .ToList();
         }
 
@@ -179,7 +195,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return orderByElements;
         }
 
-        public static FilterExpression ToFilterExpression(this XElement elem)
+        public static FilterExpression ToFilterExpression(this XElement elem, XrmFakedContext ctx)
         {
             var filterExpression = new FilterExpression();
 
@@ -190,7 +206,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             var otherFilters = elem
                         .Elements() //child nodes of this filter
                         .Where(el => el.Name.LocalName.Equals("filter"))
-                        .Select(el => el.ToFilterExpression())
+                        .Select(el => el.ToFilterExpression(ctx))
                         .ToList();
 
 
@@ -198,7 +214,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             var conditions = elem
                         .Elements() //child nodes of this filter
                         .Where(el => el.Name.LocalName.Equals("condition"))
-                        .Select(el => el.ToConditionExpression())
+                        .Select(el => el.ToConditionExpression(ctx))
                         .ToList();
 
             foreach (var c in conditions)
@@ -210,12 +226,12 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return filterExpression;
         }
 
-        public static object ToValue(this XElement elem)
+        public static object ToValue(this XElement elem, XrmFakedContext ctx, string sEntityName, string sAttributeName)
         {
-            return GetConditionExpressionValueCast(elem.Value);
+            return GetConditionExpressionValueCast(elem.Value, ctx, sEntityName, sAttributeName);
         }
 
-        public static ConditionExpression ToConditionExpression(this XElement elem)
+        public static ConditionExpression ToConditionExpression(this XElement elem, XrmFakedContext ctx)
         {
             var conditionExpression = new ConditionExpression();
 
@@ -289,6 +305,23 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     }
                     break;
 
+                case "gt":
+                    op = ConditionOperator.GreaterThan;
+                    break;
+
+                case "gte":
+                    op = ConditionOperator.GreaterEqual;
+                    break;
+
+                case "lt":
+                    op = ConditionOperator.LessThan;
+                    break;
+
+                case "lte":
+                    op = ConditionOperator.LessEqual;
+                    break;
+
+
                 default:
                     throw PullRequestException.FetchXmlOperatorNotImplemented(elem.GetAttribute("operator").Value);
             }
@@ -296,30 +329,51 @@ namespace FakeXrmEasy.Extensions.FetchXml
             //Process values
             object[] values = null;
 
+            var entityName = GetAssociatedEntityNameForConditionExpression(elem);
+
             //Find values inside the condition expression, if apply
             values = elem
                         .Elements() //child nodes of this filter
                         .Where(el => el.Name.LocalName.Equals("value"))
-                        .Select(el => el.ToValue())
+                        .Select(el => el.ToValue(ctx, entityName, attributeName))
                         .ToArray();
 
 
             //Otherwise, a single value was used
             if (value != null)
             {
-                return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value));
+                
+                return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName));
             }
 
             return new ConditionExpression(attributeName, op, values);
 
         }
 
-        public static object GetConditionExpressionValueCast(string value)
+        public static object GetConditionExpressionValueCast(string value, XrmFakedContext ctx, string sEntityName, string sAttributeName)
         {
             //Try parsing a guid
             Guid gOut = Guid.Empty;
             if (Guid.TryParse(value, out gOut))
                 return gOut;
+
+            //Try checking if it is a numeric value, cause, from the fetchxml it 
+            //would be impossible to know the real typed based on the string value only
+            // ex: "123" might compared as a string, or, as an int, it will depend on the attribute
+            //    data type, therefore, in this case we do need to use proxy types
+
+            bool bIsNumeric = false;
+            double dblValue = 0.0;
+
+            if (double.TryParse(value, out dblValue))
+                return dblValue;
+            else
+            {
+                if (ctx.ProxyTypesAssembly == null)
+                    throw new PullRequestException("When using arithmetic operators in Fetch a ProxyTypesAssembly must be used in order to guess types");
+
+
+            }
 
             //Default case
             return value;

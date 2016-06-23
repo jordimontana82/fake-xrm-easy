@@ -1,4 +1,5 @@
-﻿using Microsoft.Xrm.Sdk.Query;
+﻿using Crm;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,11 +28,11 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="not-end-with" />
       <xs:enumeration value="in" />
       <xs:enumeration value="not-in" />
+      <xs:enumeration value="null" />
+      <xs:enumeration value="not-null" />
 
         TODO:
     
-      <xs:enumeration value="null" />
-      <xs:enumeration value="not-null" />
       <xs:enumeration value="gt" />
       <xs:enumeration value="ge" />
       <xs:enumeration value="le" />
@@ -527,6 +528,110 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal("fullname", query.Criteria.Conditions[0].AttributeName);
             Assert.Equal(ConditionOperator.NotNull, query.Criteria.Conditions[0].Operator);
             Assert.Equal(0, query.Criteria.Conditions[0].Values.Count);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Gt()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='address1_longitude' operator='gt' value='1.2345' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var ct = new Contact();
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("address1_longitude", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.GreaterThan, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(1.2345, query.Criteria.Conditions[0].Values[0]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Gte()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='address1_longitude' operator='gte' value='1.2345' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var ct = new Contact();
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("address1_longitude", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.GreaterEqual, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(1.2345, query.Criteria.Conditions[0].Values[0]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Lt()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='address1_longitude' operator='lt' value='1.2345' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var ct = new Contact();
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("address1_longitude", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.LessThan, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(1.2345, query.Criteria.Conditions[0].Values[0]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Lte()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='address1_longitude' operator='lte' value='1.2345' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var ct = new Contact();
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("address1_longitude", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.LessEqual, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(1.2345, query.Criteria.Conditions[0].Values[0]);
         }
     }
 }
