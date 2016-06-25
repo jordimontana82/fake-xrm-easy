@@ -445,7 +445,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             if(bIsNumeric)
             {
                 if (ctx.ProxyTypesAssembly == null)
-                    throw new Exception("When using arithmetic operators in Fetch a ProxyTypesAssembly must be used in order to guess types");
+                    throw new Exception("When using arithmetic values in Fetch a ProxyTypesAssembly must be used in order to know which types to cast values to.");
 
                 //We have proxy types so get appropiate type value based on entity name and attribute type
                 var reflectedType = ctx.FindReflectedType(sEntityName);

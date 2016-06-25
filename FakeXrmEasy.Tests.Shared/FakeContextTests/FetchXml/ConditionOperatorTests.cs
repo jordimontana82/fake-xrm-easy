@@ -581,6 +581,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         public void FetchXml_Operator_Gte()
         {
             var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
                               <entity name='contact'>
                                     <attribute name='fullname' />
@@ -607,6 +609,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         public void FetchXml_Operator_Lt()
         {
             var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
                               <entity name='contact'>
                                     <attribute name='fullname' />
@@ -633,6 +637,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         public void FetchXml_Operator_Lte()
         {
             var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
                               <entity name='contact'>
                                     <attribute name='fullname' />

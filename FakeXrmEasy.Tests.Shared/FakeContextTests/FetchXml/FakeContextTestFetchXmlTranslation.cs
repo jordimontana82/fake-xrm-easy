@@ -4,6 +4,7 @@ using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Xunit;
 
@@ -195,6 +196,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         public void When_translating_a_fetch_xml_expression_nested_filters_are_correct()
         {
             var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
                               <entity name='contact'>
                                     <attribute name='fullname' />
@@ -313,6 +316,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         public void When_translating_a_linked_entity_with_filters_right_result_is_returned()
         {
             var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
             var fetchXml = @"
                     <fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true'>
                       <entity name='account'>
