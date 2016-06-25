@@ -2,6 +2,7 @@
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Xunit;
 
@@ -531,7 +532,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
-        public void FetchXml_Operator_Gt()
+        public void FetchXml_Operator_Arithmetic_Requires_Proxy_Types_Test()
         {
             var ctx = new XrmFakedContext();
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
@@ -545,7 +546,27 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                                   </entity>
                             </fetch>";
 
-            var ct = new Contact();
+            Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml));
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Gt()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='address1_longitude' operator='gt' value='1.2345' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            
 
             var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
 

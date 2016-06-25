@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Xrm.Sdk;
 
 namespace FakeXrmEasy.Extensions.FetchXml
 {
@@ -350,6 +351,70 @@ namespace FakeXrmEasy.Extensions.FetchXml
 
         }
 
+        public static object GetValueBasedOnType(Type t, string value)
+        {
+            if(t == typeof(int) 
+                || t == typeof(int?)
+                || t == typeof(OptionSetValue))
+            {
+                int intValue = 0;
+                if(int.TryParse(value, out intValue))
+                {
+                    return intValue;
+                }
+                else
+                {
+                    throw new Exception("Integer value expected");
+                }
+            }
+
+            else if (t == typeof(decimal) 
+                || t == typeof(decimal?)
+                || t == typeof(Money))
+            {
+                decimal decValue = 0;
+                if (decimal.TryParse(value, out decValue))
+                {
+                    return decValue;
+                }
+                else
+                {
+                    throw new Exception("Decimal value expected");
+                }
+            }
+
+            else if (t == typeof(double)
+                || t == typeof(double?))
+            {
+                double dblValue = 0;
+                if (double.TryParse(value, out dblValue))
+                {
+                    return dblValue;
+                }
+                else
+                {
+                    throw new Exception("Double value expected");
+                }
+            }
+
+            else if (t == typeof(float)
+                || t == typeof(float?))
+            {
+                float fltValue = 0;
+                if (float.TryParse(value, out fltValue))
+                {
+                    return fltValue;
+                }
+                else
+                {
+                    throw new Exception("Float value expected");
+                }
+            }
+
+            //Otherwise, return the string
+            return value;
+        }
+
         public static object GetConditionExpressionValueCast(string value, XrmFakedContext ctx, string sEntityName, string sAttributeName)
         {
             //Try parsing a guid
@@ -364,18 +429,45 @@ namespace FakeXrmEasy.Extensions.FetchXml
 
             bool bIsNumeric = false;
             double dblValue = 0.0;
+            decimal decValue = 0.0m;
+            int intValue = 0;
 
             if (double.TryParse(value, out dblValue))
-                return dblValue;
-            else
+                bIsNumeric = true;
+
+            if (decimal.TryParse(value, out decValue))
+                bIsNumeric = true;
+
+            if (int.TryParse(value, out intValue))
+                bIsNumeric = true;
+
+
+            if(bIsNumeric)
             {
                 if (ctx.ProxyTypesAssembly == null)
-                    throw new PullRequestException("When using arithmetic operators in Fetch a ProxyTypesAssembly must be used in order to guess types");
+                    throw new Exception("When using arithmetic operators in Fetch a ProxyTypesAssembly must be used in order to guess types");
 
-
+                //We have proxy types so get appropiate type value based on entity name and attribute type
+                var reflectedType = ctx.FindReflectedType(sEntityName);
+                if (reflectedType != null)
+                {
+                    var attributeType = ctx.FindReflectedAttributeType(reflectedType, sAttributeName);
+                    if(attributeType != null)
+                    {
+                        try
+                        {
+                            return GetValueBasedOnType(attributeType, value);
+                        }
+                        catch(Exception e)
+                        {
+                            throw new Exception(string.Format("When trying to parse value for entity {0} and attribute {1}: {2}", sEntityName, sAttributeName, e.Message));
+                        }
+                        
+                    }
+                }
             }
 
-            //Default case
+            //Default value
             return value;
         }
     }

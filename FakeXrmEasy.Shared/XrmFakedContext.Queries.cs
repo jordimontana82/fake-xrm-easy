@@ -53,6 +53,22 @@ namespace FakeXrmEasy
             
         }
 
+        protected internal Type FindReflectedAttributeType(Type earlyBoundType, string sAttributeName)
+        {
+            //Get that type properties
+            var attributeInfo = earlyBoundType
+                .GetProperties()
+                .Where(pi => pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true).Length > 0)
+                .Where(pi => (pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true)[0] as AttributeLogicalNameAttribute).LogicalName.Equals(sAttributeName))
+                .FirstOrDefault();
+
+            if(attributeInfo == null)
+            {
+                throw new Exception(string.Format("XrmFakedContext.FindReflectedAttributeType: Attribute {0} not found for type {1}" + sAttributeName, earlyBoundType.ToString()));
+            }
+
+            return attributeInfo.PropertyType;
+        }
 
         public IQueryable<Entity> CreateQuery(string entityLogicalName)
         {
@@ -226,11 +242,11 @@ namespace FakeXrmEasy
                 query.AddOrder(order.AttributeName, order.OrderType);
             }
 
-            query.Criteria = xlDoc.ToCriteria();
+            query.Criteria = xlDoc.ToCriteria(context);
 
             query.TopCount = xlDoc.ToTopCount();
 
-            var linkedEntities = xlDoc.ToLinkEntities();
+            var linkedEntities = xlDoc.ToLinkEntities(context);
             foreach(var le in linkedEntities)
             {
                 query.LinkEntities.Add(le);
