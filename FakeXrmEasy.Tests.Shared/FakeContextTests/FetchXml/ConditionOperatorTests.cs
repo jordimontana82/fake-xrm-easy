@@ -36,10 +36,10 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="le" />
       <xs:enumeration value="lt" />
 
-    
+      <xs:enumeration value="on" />
 
     TODO:
-      <xs:enumeration value="on" />
+
       <xs:enumeration value="on-or-before" />
       <xs:enumeration value="on-or-after" />
 
@@ -744,6 +744,63 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(2, collection.Entities.Count);
             Assert.Equal(1.23, collection.Entities[0]["address1_longitude"]);
             Assert.Equal(1.2345, collection.Entities[1]["address1_longitude"]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_On_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='on' value='2014-11-23' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
+
+            var date = query.Criteria.Conditions[0].Values[0] as DateTime?;
+
+            Assert.Equal(ConditionOperator.On, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(2014, date.Value.Year);
+            Assert.Equal(11, date.Value.Month);
+            Assert.Equal(23, date.Value.Day);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_On_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='on' value='2014-11-23' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var date = new DateTime(2014, 11, 23);
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date };
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(1) };
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            var retrievedDate = collection.Entities[0]["anniversary"] as DateTime?;
+            Assert.Equal(2014, retrievedDate.Value.Year);
+            Assert.Equal(11, retrievedDate.Value.Month);
+            Assert.Equal(23, retrievedDate.Value.Day);
         }
     }
 }

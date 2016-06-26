@@ -397,6 +397,12 @@ namespace FakeXrmEasy
                 case ConditionOperator.NotIn:
                     return Expression.Not(TranslateConditionExpressionIn(c, getNonBasicValueExpr, containsAttributeExpression));
 
+                case ConditionOperator.On:
+                    return TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression);
+
+                case ConditionOperator.NotOn:
+                    return Expression.Not(TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression));
+
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.Operator.ToString()));
 
@@ -559,6 +565,24 @@ namespace FakeXrmEasy
                             Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
                                 expOrValues));
         }
+
+        //protected static Expression TranslateConditionExpressionOn(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        //{
+        //    BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+        //    foreach (object value in c.Values)
+        //    {
+
+        //        expOrValues = Expression.Or(expOrValues, Expression.Equal(
+        //                    GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr, value),
+        //                    GetAppropiateTypedValue(value)));
+
+
+        //    }
+        //    return Expression.AndAlso(
+        //                    containsAttributeExpr,
+        //                    Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+        //                        expOrValues));
+        //}
 
         protected static Expression TranslateConditionExpressionGreaterThan(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
