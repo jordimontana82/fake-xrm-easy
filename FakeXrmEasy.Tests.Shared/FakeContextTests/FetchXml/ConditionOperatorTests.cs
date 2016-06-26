@@ -36,6 +36,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="le" />
       <xs:enumeration value="lt" />
 
+    
 
     TODO:
       <xs:enumeration value="on" />
@@ -532,7 +533,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
-        public void FetchXml_Operator_Gt()
+        public void FetchXml_Operator_Gt_Translation()
         {
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
@@ -548,7 +549,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                                   </entity>
                             </fetch>";
 
-            
+
 
             var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
 
@@ -560,7 +561,33 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
-        public void FetchXml_Operator_Ge()
+        public void FetchXml_Operator_Gt_Execution()
+        {
+            var ctx = new XrmFakedContext();
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='address1_longitude' />
+                                        <filter type='and'>
+                                            <condition attribute='address1_longitude' operator='gt' value='1.2345' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.23 };
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.33 };
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.2345 };
+            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            Assert.Equal(1.33, collection.Entities[0]["address1_longitude"]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Ge_Translation()
         {
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
@@ -588,7 +615,34 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
-        public void FetchXml_Operator_Lt()
+        public void FetchXml_Operator_Ge_Execution()
+        {
+            var ctx = new XrmFakedContext();
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='address1_longitude' />
+                                        <filter type='and'>
+                                            <condition attribute='address1_longitude' operator='ge' value='1.2345' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.23 };
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.33 };
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.2345 };
+            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(2, collection.Entities.Count);
+            Assert.Equal(1.33, collection.Entities[0]["address1_longitude"]);
+            Assert.Equal(1.2345, collection.Entities[1]["address1_longitude"]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Lt_Translation()
         {
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
@@ -616,7 +670,33 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
-        public void FetchXml_Operator_Le()
+        public void FetchXml_Operator_Lt_Execution()
+        {
+            var ctx = new XrmFakedContext();
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='address1_longitude' />
+                                        <filter type='and'>
+                                            <condition attribute='address1_longitude' operator='lt' value='1.2345' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.23 };
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.33 };
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.2345 };
+            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            Assert.Equal(1.23, collection.Entities[0]["address1_longitude"]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Le_Translation()
         {
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
@@ -632,8 +712,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                                   </entity>
                             </fetch>";
 
-            var ct = new Contact();
-
             var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
 
             Assert.True(query.Criteria != null);
@@ -641,6 +719,31 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal("address1_longitude", query.Criteria.Conditions[0].AttributeName);
             Assert.Equal(ConditionOperator.LessEqual, query.Criteria.Conditions[0].Operator);
             Assert.Equal(1.2345, query.Criteria.Conditions[0].Values[0]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Le_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='address1_longitude' />
+                                        <filter type='and'>
+                                            <condition attribute='address1_longitude' operator='le' value='1.2345' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.23 };
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.33 };
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.2345 };
+            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(2, collection.Entities.Count);
+            Assert.Equal(1.23, collection.Entities[0]["address1_longitude"]);
+            Assert.Equal(1.2345, collection.Entities[1]["address1_longitude"]);
         }
     }
 }

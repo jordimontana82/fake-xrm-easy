@@ -322,6 +322,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     op = ConditionOperator.LessEqual;
                     break;
 
+                case "on":
+                    op = ConditionOperator.On;
+                    break;
 
                 default:
                     throw PullRequestException.FetchXmlOperatorNotImplemented(elem.GetAttribute("operator").Value);
