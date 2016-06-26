@@ -40,7 +40,8 @@ Please consider the below guidelines for contributing to the project:
 ##Roadmap / Backlog
 
 *  FetchXml implementation:
-*     TO DO:  Add support for arithmetic operators and date operators
+*     DONE: Add support for arithmetic operators
+*     TO DO:  Adding support for date operators
 *     TO DO:  Add support for FetchXml aggregations
 *  Increase test coverage
   
