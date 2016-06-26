@@ -310,7 +310,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     op = ConditionOperator.GreaterThan;
                     break;
 
-                case "gte":
+                case "ge":
                     op = ConditionOperator.GreaterEqual;
                     break;
 
@@ -318,7 +318,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     op = ConditionOperator.LessThan;
                     break;
 
-                case "lte":
+                case "le":
                     op = ConditionOperator.LessEqual;
                     break;
 
@@ -358,8 +358,13 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 || t == typeof(OptionSetValue))
             {
                 int intValue = 0;
-                if(int.TryParse(value, out intValue))
+                
+                if (int.TryParse(value, out intValue))
                 {
+                    if (t == typeof(OptionSetValue))
+                    {
+                        return new OptionSetValue(intValue);
+                    }
                     return intValue;
                 }
                 else
@@ -368,13 +373,36 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 }
             }
 
+            else if (t == typeof(Guid)
+                || t == typeof(Guid?)
+                || t == typeof(EntityReference))
+            {
+                Guid gValue = Guid.Empty;
+
+                if (Guid.TryParse(value, out gValue))
+                {
+                    if (t == typeof(EntityReference))
+                    {
+                        return new EntityReference() { Id = gValue };
+                    }
+                    return gValue;
+                }
+                else
+                {
+                    throw new Exception("Guid value expected");
+                }
+            }
             else if (t == typeof(decimal) 
                 || t == typeof(decimal?)
                 || t == typeof(Money))
             {
                 decimal decValue = 0;
-                if (decimal.TryParse(value, out decValue))
+                if(decimal.TryParse(value, out decValue))
                 {
+                    if (t == typeof(Money))
+                    {
+                        return new Money(decValue);
+                    }
                     return decValue;
                 }
                 else
@@ -411,12 +439,49 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 }
             }
 
+            else if (t == typeof(DateTime)
+                || t == typeof(DateTime?))
+            {
+                DateTime dtValue = DateTime.MinValue;
+                if (DateTime.TryParse(value, out dtValue))
+                {
+                    return dtValue;
+                }
+                else
+                {
+                    throw new Exception("DateTime value expected");
+                }
+            }
+
             //Otherwise, return the string
             return value;
         }
 
         public static object GetConditionExpressionValueCast(string value, XrmFakedContext ctx, string sEntityName, string sAttributeName)
         {
+            if (ctx.ProxyTypesAssembly != null)
+            {
+                //We have proxy types so get appropiate type value based on entity name and attribute type
+                var reflectedType = ctx.FindReflectedType(sEntityName);
+                if (reflectedType != null)
+                {
+                    var attributeType = ctx.FindReflectedAttributeType(reflectedType, sAttributeName);
+                    if (attributeType != null)
+                    {
+                        try
+                        {
+                            return GetValueBasedOnType(attributeType, value);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new Exception(string.Format("When trying to parse value for entity {0} and attribute {1}: {2}", sEntityName, sAttributeName, e.Message));
+                        }
+
+                    }
+                }
+            }
+
+
             //Try parsing a guid
             Guid gOut = Guid.Empty;
             if (Guid.TryParse(value, out gOut))
@@ -428,6 +493,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             //    data type, therefore, in this case we do need to use proxy types
 
             bool bIsNumeric = false;
+            bool bIsDateTime = false;
             double dblValue = 0.0;
             decimal decValue = 0.0m;
             int intValue = 0;
@@ -441,30 +507,13 @@ namespace FakeXrmEasy.Extensions.FetchXml
             if (int.TryParse(value, out intValue))
                 bIsNumeric = true;
 
+            DateTime dtValue = DateTime.MinValue;
+            if (DateTime.TryParse(value, out dtValue))
+                bIsDateTime = true;
 
-            if(bIsNumeric)
+            if(bIsNumeric || bIsDateTime)
             {
-                if (ctx.ProxyTypesAssembly == null)
-                    throw new Exception("When using arithmetic values in Fetch a ProxyTypesAssembly must be used in order to know which types to cast values to.");
-
-                //We have proxy types so get appropiate type value based on entity name and attribute type
-                var reflectedType = ctx.FindReflectedType(sEntityName);
-                if (reflectedType != null)
-                {
-                    var attributeType = ctx.FindReflectedAttributeType(reflectedType, sAttributeName);
-                    if(attributeType != null)
-                    {
-                        try
-                        {
-                            return GetValueBasedOnType(attributeType, value);
-                        }
-                        catch(Exception e)
-                        {
-                            throw new Exception(string.Format("When trying to parse value for entity {0} and attribute {1}: {2}", sEntityName, sAttributeName, e.Message));
-                        }
-                        
-                    }
-                }
+                throw new Exception("When using arithmetic values in Fetch a ProxyTypesAssembly must be used in order to know which types to cast values to."); 
             }
 
             //Default value

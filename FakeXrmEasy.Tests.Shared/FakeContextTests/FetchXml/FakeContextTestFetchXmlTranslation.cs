@@ -329,7 +329,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                         <link-entity name='account' from='parentaccountid' to='accountid' alias='ab'>
                           <all-attributes />
                           <filter type='and'>
-                                <condition attribute='fullname' operator='not-like' value='%Messi' />
+                                <condition attribute='name' operator='not-like' value='%Messi' />
                                     <filter type='or'>
                                         <condition attribute='telephone1' operator='eq' value='123' />
                                         <condition attribute='telephone1' operator='eq' value='234' />

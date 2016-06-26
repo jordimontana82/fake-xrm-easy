@@ -37,7 +37,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                               <entity name='contact'>
                                     <attribute name='fullname' />
                                         <filter type='and'>
-                                            <condition attribute='address1_longitude' operator='lte' value='1.2345' />
+                                            <condition attribute='address1_longitude' operator='le' value='1.2345' />
                                         </filter>
                                   </entity>
                             </fetch>";
@@ -57,7 +57,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                               <entity name='contact'>
                                     <attribute name='fullname' />
                                         <filter type='and'>
-                                            <condition attribute='accountid' operator='eq' value='1234' />
+                                            <condition attribute='accountid' operator='eq' value='71831D66-8820-446A-BCEB-BCE14D12B216' />
                                         </filter>
                                   </entity>
                             </fetch>";
@@ -72,11 +72,12 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
 
+
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
                               <entity name='contact'>
                                     <attribute name='fullname' />
                                         <filter type='and'>
-                                            <condition attribute='address2_addressid' operator='eq' value='1234' />
+                                            <condition attribute='address2_addressid' operator='eq' value='71831D66-8820-446A-BCEB-BCE14D12B216' />
                                         </filter>
                                   </entity>
                             </fetch>";
@@ -175,7 +176,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                               <entity name='contact'>
                                     <attribute name='fullname' />
                                         <filter type='and'>
-                                            <condition attribute='anniversary' operator='eq' value='2014-11-23' />
+                                            <condition attribute='anniversary' operator='on' value='2014-11-23' />
                                         </filter>
                                   </entity>
                             </fetch>";

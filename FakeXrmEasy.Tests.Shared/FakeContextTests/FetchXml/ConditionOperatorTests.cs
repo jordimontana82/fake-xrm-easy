@@ -31,14 +31,16 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="not-in" />
       <xs:enumeration value="null" />
       <xs:enumeration value="not-null" />
-
-        TODO:
-    
       <xs:enumeration value="gt" />
       <xs:enumeration value="ge" />
       <xs:enumeration value="le" />
       <xs:enumeration value="lt" />
 
+
+    TODO:
+      <xs:enumeration value="on" />
+      <xs:enumeration value="on-or-before" />
+      <xs:enumeration value="on-or-after" />
 
       <xs:enumeration value="between" />
       <xs:enumeration value="not-between" />
@@ -54,9 +56,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="last-month" />
       <xs:enumeration value="this-month" />
       <xs:enumeration value="next-month" />
-      <xs:enumeration value="on" />
-      <xs:enumeration value="on-or-before" />
-      <xs:enumeration value="on-or-after" />
+
       <xs:enumeration value="last-year" />
       <xs:enumeration value="this-year" />
       <xs:enumeration value="next-year" />
@@ -560,7 +560,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
-        public void FetchXml_Operator_Gte()
+        public void FetchXml_Operator_Ge()
         {
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
@@ -571,7 +571,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                                     <attribute name='telephone1' />
                                     <attribute name='contactid' />
                                         <filter type='and'>
-                                            <condition attribute='address1_longitude' operator='gte' value='1.2345' />
+                                            <condition attribute='address1_longitude' operator='ge' value='1.2345' />
                                         </filter>
                                   </entity>
                             </fetch>";
@@ -616,7 +616,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
-        public void FetchXml_Operator_Lte()
+        public void FetchXml_Operator_Le()
         {
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
@@ -627,7 +627,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                                     <attribute name='telephone1' />
                                     <attribute name='contactid' />
                                         <filter type='and'>
-                                            <condition attribute='address1_longitude' operator='lte' value='1.2345' />
+                                            <condition attribute='address1_longitude' operator='le' value='1.2345' />
                                         </filter>
                                   </entity>
                             </fetch>";
