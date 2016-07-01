@@ -5,6 +5,7 @@ using System.Text;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Xrm.Sdk;
+using System.Globalization;
 
 namespace FakeXrmEasy.Extensions.FetchXml
 {
@@ -400,7 +401,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 || t == typeof(Money))
             {
                 decimal decValue = 0;
-                if(decimal.TryParse(value, out decValue))
+                if(decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out decValue))
                 {
                     if (t == typeof(Money))
                     {
@@ -418,7 +419,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 || t == typeof(double?))
             {
                 double dblValue = 0;
-                if (double.TryParse(value, out dblValue))
+                if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out dblValue))
                 {
                     return dblValue;
                 }
@@ -432,7 +433,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 || t == typeof(float?))
             {
                 float fltValue = 0;
-                if (float.TryParse(value, out fltValue))
+                if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out fltValue))
                 {
                     return fltValue;
                 }
