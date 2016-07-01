@@ -37,10 +37,16 @@ namespace FakeXrmEasy.FakeMessageExecutors
             else if (request.Query is FetchExpression)
             {
                 var fetchXml = (request.Query as FetchExpression).Query;
-                var queryExpression = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+                var xmlDoc = XrmFakedContext.ParseFetchXml(fetchXml);
+                var queryExpression = XrmFakedContext.TranslateFetchXmlDocumentToQueryExpression(ctx, xmlDoc);
 
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, queryExpression);
                 var list = linqQuery.ToList();
+
+                if(XrmFakedContext.IsAggregateFetchXml(xmlDoc))
+                {
+                    list = XrmFakedContext.ProcessAggregateFetchXml(ctx, xmlDoc, list);
+                }
                 list.ForEach(e => PopulateFormattedValues(e));
 
                 var response = new RetrieveMultipleResponse

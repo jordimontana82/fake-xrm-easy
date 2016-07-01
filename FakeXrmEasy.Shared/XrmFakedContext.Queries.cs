@@ -8,6 +8,7 @@ using Microsoft.Xrm.Sdk.Query;
 using System.ServiceModel;
 using Microsoft.Xrm.Sdk.Messages;
 using System.Dynamic;
+using System.Linq;
 using System.Linq.Expressions;
 using FakeXrmEasy.Extensions;
 using System.Reflection;
@@ -209,18 +210,187 @@ namespace FakeXrmEasy
             return xlDoc.Descendants().Where(e => e.Name.LocalName.Equals(sName)).FirstOrDefault();
         }
 
-
-        public static QueryExpression TranslateFetchXmlToQueryExpression(XrmFakedContext context, string fetchXml)
-        {
-            XDocument xlDoc = null;
-            try {
-                xlDoc = XDocument.Parse(fetchXml);
+        public static XDocument ParseFetchXml(string fetchXml)
+        {            
+            try
+            {
+                return XDocument.Parse(fetchXml);                
             }
             catch
             {
                 throw new Exception("FetchXml must be a valid XML document");
             }
+        }
+        
+        public static bool IsAggregateFetchXml(XDocument xmlDoc)
+        {
+            var attr = xmlDoc.Root.GetAttribute("aggregate");
+            return attr != null && Convert.ToBoolean(attr.Value);
+        }
 
+        public static List<Entity> ProcessAggregateFetchXml(XrmFakedContext ctx, XDocument xmlDoc, List<Entity> resultOfQuery)
+        {
+            // Validate that <all-attributes> is not present,
+            // that all attributes have groupby or aggregate, and an alias,
+            // and that there is exactly 1 groupby.
+            if(RetrieveFetchXmlNode(xmlDoc, "all-attributes") != null)
+            {
+                throw new Exception("Can't have <all-attributes /> present when using aggregate");
+            }
+
+            var ns = xmlDoc.Root.GetDefaultNamespace();
+
+            var aggregates = new List<FetchAggregate>();
+            var groups = new List<FetchGrouping>();
+            
+
+            foreach(var attr in xmlDoc.Descendants(ns + "attribute"))
+            {
+                var alias = attr.GetAttribute("alias")?.Value;
+                var logicalName = attr.GetAttribute("name")?.Value;
+                if(string.IsNullOrEmpty("alias"))
+                {
+                    throw new Exception("Missing alias for attribute in aggregate fetch xml");
+                }
+                if (string.IsNullOrEmpty("name"))
+                {
+                    throw new Exception("Missing name for attribute in aggregate fetch xml");
+                }
+
+                if (Convert.ToBoolean(attr.GetAttribute("groupby")?.Value))
+                {
+                    //TODO: Date grouping
+                    groups.Add(new SimpleValueGroup()
+                    {
+                        OutputAlias = alias,
+                        Attribute = logicalName
+                    });
+                }
+                else
+                {
+                    var agrFn = attr.GetAttribute("aggregate")?.Value;
+                    switch(agrFn?.ToLower())
+                    {
+                        case "count":
+                            aggregates.Add(new CountAggregate()
+                            {
+                                OutputAlias = alias,
+                                Attribute = logicalName
+                            });
+                            break;
+
+                        //TODO: Min
+                        //TODO: Max
+                        //TODO: Avg
+                        //TODO: Sum
+                        //TODO: Distinct count
+
+                        default:
+                            throw new Exception("Unknown aggregate function '" + agrFn + "'");
+                    }                    
+                }
+            }
+
+
+            // Group by the groupBy-attribute            
+            var grouped = resultOfQuery.GroupBy(e =>
+            {
+                return groups
+                    .Select(g => g.Process(e))
+                    .ToArray();
+            }, new ArrayComparer());
+
+            // Perform aggregates in each group
+            var result = new List<Entity>();
+            foreach(var g in grouped)
+            {
+                var firstInGroup = g.First();
+
+                var ent = new Entity();
+                ent.LogicalName = firstInGroup.LogicalName;
+                
+                // Find the group values
+                for(var rule = 0; rule < groups.Count; ++rule)
+                {
+                    ent[groups[rule].OutputAlias] = new AliasedValue(null, groups[rule].Attribute, g.Key[rule]);
+                }
+
+                // Aggregate the remaining values
+                foreach(var agg in aggregates)
+                {
+                    ent[agg.OutputAlias] = new AliasedValue(null, agg.Attribute, agg.Process(g));
+                }
+                
+                result.Add(ent);
+            }
+
+            // TODO: order
+
+            return result;
+        }
+
+        abstract class FetchAggregate
+        {
+            public string Attribute { get; set; }
+            public string OutputAlias { get; set; }
+            public object Process(IEnumerable<Entity> entities)
+            {                
+                return AggregateValues(entities.Select(e =>
+                    e.Contains(Attribute) ? e[Attribute] : null
+                ));
+            }
+
+            public abstract object AggregateValues(IEnumerable<object> values);
+        }
+
+        class CountAggregate : FetchAggregate
+        {
+            public override object AggregateValues(IEnumerable<object> values)
+            {
+                return values.Count();
+            }
+        }
+
+        abstract class FetchGrouping
+        {
+            public string Attribute { get; set; }
+            public string OutputAlias { get; set; }
+            public IComparable Process(Entity entity)
+            {
+                var attr = entity.Contains(Attribute) ? entity[Attribute] : null;
+                return FindGroupValue(attr);
+            }
+            public abstract IComparable FindGroupValue(object attributeValue);
+        }
+
+        class ArrayComparer : IEqualityComparer<IComparable[]>
+        {
+            public bool Equals(IComparable[] x, IComparable[] y)
+            {
+                return x.SequenceEqual(y);
+            }
+
+            public int GetHashCode(IComparable[] obj)
+            {
+                return string.Join(",", obj as IEnumerable<IComparable>).GetHashCode();
+            }
+        }
+
+        class SimpleValueGroup : FetchGrouping
+        {
+            public override IComparable FindGroupValue(object attributeValue)
+            {
+                return attributeValue as IComparable;
+            }
+        }
+       
+        public static QueryExpression TranslateFetchXmlToQueryExpression(XrmFakedContext context, string fetchXml)
+        {
+            return TranslateFetchXmlDocumentToQueryExpression(context, ParseFetchXml(fetchXml));
+        }
+
+        public static QueryExpression TranslateFetchXmlDocumentToQueryExpression(XrmFakedContext context, XDocument xlDoc)
+        { 
             //Validate nodes
             if (!xlDoc.Descendants().All(el => el.IsFetchXmlNodeValid()))
                 throw new Exception("At least some node is not valid");

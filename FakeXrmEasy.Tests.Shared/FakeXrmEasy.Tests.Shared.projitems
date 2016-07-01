@@ -25,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestUpdate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeTracingServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\AggregateTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\ConditionOperatorTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\FakeContextTestFetchXmlTranslation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\TypeConversionTests.cs" />
