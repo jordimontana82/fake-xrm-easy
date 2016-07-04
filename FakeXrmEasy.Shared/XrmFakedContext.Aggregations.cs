@@ -257,7 +257,7 @@ namespace FakeXrmEasy
                 }
                 if (valType == typeof(Money))
                 {
-                    return lst.Sum(x => (x as Money)?.Value ?? 0m);
+                    return new Money(lst.Sum(x => (x as Money)?.Value ?? 0m));
                 }
 
                 if (valType == typeof(int) || valType == typeof(int?))
@@ -345,7 +345,7 @@ namespace FakeXrmEasy
                     case DateGroupType.DateTime:
                         return d;
                     case DateGroupType.Day:
-                        return d?.DayOfYear;
+                        return d?.Day;
                     case DateGroupType.Week:
                         var cal = System.Globalization.DateTimeFormatInfo.InvariantInfo;
                         return cal.Calendar.GetWeekOfYear(d.Value, cal.CalendarWeekRule, cal.FirstDayOfWeek);
