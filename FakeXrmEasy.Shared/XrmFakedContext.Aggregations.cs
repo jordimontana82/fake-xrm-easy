@@ -47,7 +47,7 @@ namespace FakeXrmEasy
                     throw new Exception("Missing name for attribute in aggregate fetch xml");
                 }
 
-                if (Convert.ToBoolean(attr.GetAttribute("groupby")?.Value))
+                if (attr.IsAttributeTrue("groupby"))
                 {
                     var dategrouping = attr.GetAttribute("dategrouping")?.Value;
                     if (dategrouping != null)
@@ -87,9 +87,8 @@ namespace FakeXrmEasy
                         case "count":
                             newAgr = new CountAggregate();
                             break;
-                        case "countcolumn":
-                            var distinct = attr.GetAttribute("distinct")?.Value;
-                            if (distinct != null && Convert.ToBoolean(distinct))
+                        case "countcolumn":                            
+                            if (attr.IsAttributeTrue("distinct"))
                             {
                                 newAgr = new CountDistinctAggregate();
                             }
@@ -156,10 +155,8 @@ namespace FakeXrmEasy
                 {
                     throw new Exception("An alias is required for an order clause for an aggregate Query.");
                 }
-
-                var descending = Convert.ToBoolean(order.GetAttribute("descending")?.Value);
-
-                if (descending)
+                
+                if (order.IsAttributeTrue("descending"))
                     result = result.OrderByDescending(e => e.Attributes.ContainsKey(alias) ? e.Attributes[alias] : null, new XrmOrderByAttributeComparer());
                 else
                     result = result.OrderBy(e => e.Attributes.ContainsKey(alias) ? e.Attributes[alias] : null, new XrmOrderByAttributeComparer());
