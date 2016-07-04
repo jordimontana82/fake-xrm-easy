@@ -1,5 +1,6 @@
 ﻿using FakeXrmEasy.Extensions.FetchXml;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,6 @@ namespace FakeXrmEasy
 {
     public partial class XrmFakedContext
     {
-        internal static bool IsAggregateFetchXml(XDocument xmlDoc)
-        {
-            var attr = xmlDoc.Root.GetAttribute("aggregate");
-            return attr != null && Convert.ToBoolean(attr.Value);
-        }
-
         internal static List<Entity> ProcessAggregateFetchXml(XrmFakedContext ctx, XDocument xmlDoc, List<Entity> resultOfQuery)
         {
             // Validate that <all-attributes> is not present,
@@ -24,8 +19,14 @@ namespace FakeXrmEasy
             {
                 throw new Exception("Can't have <all-attributes /> present when using aggregate");
             }
+            
+            var ns = xmlDoc.Root.Name.Namespace;
 
-            var ns = xmlDoc.Root.GetDefaultNamespace();
+            var entityName = RetrieveFetchXmlNode(xmlDoc, "entity")?.GetAttribute("name")?.Value;
+            if(string.IsNullOrEmpty(entityName))
+            {
+                throw new Exception("Can't find entity name for aggregate query");
+            }
 
             var aggregates = new List<FetchAggregate>();
             var groups = new List<FetchGrouping>();
@@ -75,11 +76,18 @@ namespace FakeXrmEasy
                 else
                 {
                     var agrFn = attr.GetAttribute("aggregate")?.Value;
-                    FetchAggregate newAgr = null;
+                    if(string.IsNullOrEmpty(agrFn))
+                    {
+                        throw new Exception("Attributes must have be aggregated or grouped by when using aggregation");
+                    }
 
+                    FetchAggregate newAgr = null;
                     switch (agrFn?.ToLower())
                     {
                         case "count":
+                            newAgr = new CountAggregate();
+                            break;
+                        case "countcolumn":
                             var distinct = attr.GetAttribute("distinct")?.Value;
                             if (distinct != null && Convert.ToBoolean(distinct))
                             {
@@ -87,7 +95,7 @@ namespace FakeXrmEasy
                             }
                             else
                             {
-                                newAgr = new CountAggregate();
+                                newAgr = new CountColumnAggregate();
                             }
                             break;
 
@@ -108,14 +116,76 @@ namespace FakeXrmEasy
                             throw new Exception("Unknown aggregate function '" + agrFn + "'");
                     }
 
-
                     newAgr.OutputAlias = alias;
                     newAgr.Attribute = logicalName;
                     aggregates.Add(newAgr);
                 }
             }
 
+            List<Entity> aggregateResult;
 
+            if (groups.Any())
+            {
+                aggregateResult = ProcessGroupedAggregate(entityName, resultOfQuery, aggregates, groups);
+            } else
+            {
+                aggregateResult = new List<Entity>();
+                var ent = ProcessAggregatesForSingleGroup(entityName, resultOfQuery, aggregates);
+                aggregateResult.Add(ent);
+            }
+            
+            return OrderAggregateResult(xmlDoc, aggregateResult.AsQueryable());            
+        }
+
+        private static List<Entity> OrderAggregateResult(XDocument xmlDoc, IQueryable<Entity> result)
+        {
+            var ns = xmlDoc.Root.Name.Namespace;
+            foreach(var order in 
+                xmlDoc.Root.Element(ns + "entity")
+                .Elements(ns + "order"))
+            {
+                
+                var alias = order.GetAttribute("alias")?.Value;
+
+                // These error is also thrown by CRM
+                if (order.GetAttribute("attribute") != null)
+                {
+                    throw new Exception("An attribute cannot be specified for an order clause for an aggregate Query. Use an alias");
+                }
+                if(string.IsNullOrEmpty("alias"))
+                {
+                    throw new Exception("An alias is required for an order clause for an aggregate Query.");
+                }
+
+                var descending = Convert.ToBoolean(order.GetAttribute("descending")?.Value);
+
+                if (descending)
+                    result = result.OrderByDescending(e => e.Attributes.ContainsKey(alias) ? e.Attributes[alias] : null, new XrmOrderByAttributeComparer());
+                else
+                    result = result.OrderBy(e => e.Attributes.ContainsKey(alias) ? e.Attributes[alias] : null, new XrmOrderByAttributeComparer());
+            }
+
+            return result.ToList();
+        }
+
+        private static Entity ProcessAggregatesForSingleGroup(string entityName, IEnumerable<Entity> entities, IList<FetchAggregate> aggregates)
+        {
+            var ent = new Entity(entityName);
+
+            foreach (var agg in aggregates)
+            {
+                var val = agg.Process(entities);
+                if (val != null)
+                {
+                    ent[agg.OutputAlias] = new AliasedValue(null, agg.Attribute, val);
+                }
+            }
+
+            return ent;
+        }
+
+        private static List<Entity> ProcessGroupedAggregate(string entityName, IList<Entity> resultOfQuery, IList<FetchAggregate> aggregates, IList<FetchGrouping> groups)
+        {
             // Group by the groupBy-attribute            
             var grouped = resultOfQuery.GroupBy(e =>
             {
@@ -130,25 +200,20 @@ namespace FakeXrmEasy
             {
                 var firstInGroup = g.First();
 
-                var ent = new Entity();
-                ent.LogicalName = firstInGroup.LogicalName;
+                // Find the aggregates values in the group
+                var ent = ProcessAggregatesForSingleGroup(entityName, g, aggregates);
 
                 // Find the group values
                 for (var rule = 0; rule < groups.Count; ++rule)
                 {
-                    ent[groups[rule].OutputAlias] = new AliasedValue(null, groups[rule].Attribute, g.Key[rule]);
+                    if (g.Key[rule] != null)
+                    {
+                        ent[groups[rule].OutputAlias] = new AliasedValue(null, groups[rule].Attribute, g.Key[rule]);
+                    }
                 }
-
-                // Aggregate the remaining values
-                foreach (var agg in aggregates)
-                {
-                    ent[agg.OutputAlias] = new AliasedValue(null, agg.Attribute, agg.Process(g));
-                }
-
+                
                 result.Add(ent);
             }
-
-            // TODO: order
 
             return result;
         }
@@ -175,11 +240,19 @@ namespace FakeXrmEasy
             }
         }
 
+        class CountColumnAggregate : FetchAggregate
+        {
+            public override object AggregateValues(IEnumerable<object> values)
+            {
+                return values.Where(x => x != null).Count();
+            }
+        }
+
         class CountDistinctAggregate : FetchAggregate
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
-                return values.Distinct().Count();
+                return values.Where(x => x != null).Distinct().Count();
             }
         }
 
@@ -187,6 +260,19 @@ namespace FakeXrmEasy
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
+                var lst = values.ToList();
+                // TODO: Check these cases in CRM proper
+                if (lst.Count == 0) return null;
+                if (lst.All(x => x == null)) return null;
+
+                var firstValue = lst.Where(x => x != null).First();
+                var valType = firstValue.GetType();
+
+                if (valType == typeof(Money))
+                {
+                    return new Money(values.Select(x => (x as Money)?.Value ?? 0m).Min());
+                }
+
                 return values.Select(x => x ?? 0).Min();
             }
         }
@@ -195,6 +281,19 @@ namespace FakeXrmEasy
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
+                var lst = values.ToList();
+                // TODO: Check these cases in CRM proper
+                if (lst.Count == 0) return null;
+                if (lst.All(x => x == null)) return null;
+
+                var firstValue = lst.Where(x => x != null).First();
+                var valType = firstValue.GetType();
+
+                if(valType == typeof(Money))
+                {
+                    return new Money(values.Select(x => (x as Money)?.Value ?? 0m).Max());
+                }
+
                 return values.Select(x => x ?? 0).Max();
             }
         }
@@ -217,7 +316,7 @@ namespace FakeXrmEasy
                 }
                 if (valType == typeof(Money))
                 {
-                    return lst.Average(x => (x as Money)?.Value ?? 0m);
+                    return new Money(lst.Average(x => (x as Money)?.Value ?? 0m));
                 }
 
                 if (valType == typeof(int) || valType == typeof(int?))

@@ -55,12 +55,14 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
-        public void When_translating_a_fetch_xml_order_node_must_have_2_attributes()
+        public void When_translating_a_fetch_xml_order_node_must_have_attribute()
         {
+            // For (non-aggregate) fetchxml,
+            // the order tag must have an attribute specified,
+            // and may have the 'descending' attribute specified.
             var ctx = new XrmFakedContext();
 
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'><order></order></entity></fetch>"));
-            Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'><order attribute=''></order></entity></fetch>"));
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'><order descending=''></order></entity></fetch>"));
             Assert.DoesNotThrow(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'><order attribute='firstname' descending='true'></order></entity></fetch>"));
         }

@@ -15,6 +15,7 @@ using System.Reflection;
 using Microsoft.Xrm.Sdk.Client;
 using System.Globalization;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using FakeXrmEasy.Extensions.FetchXml;
 using FakeXrmEasy.OrganizationFaults;
 
@@ -228,7 +229,7 @@ namespace FakeXrmEasy
         }
 
         public static QueryExpression TranslateFetchXmlDocumentToQueryExpression(XrmFakedContext context, XDocument xlDoc)
-        { 
+        {
             //Validate nodes
             if (!xlDoc.Descendants().All(el => el.IsFetchXmlNodeValid()))
                 throw new Exception("At least some node is not valid");
@@ -244,10 +245,14 @@ namespace FakeXrmEasy
 
             query.ColumnSet = xlDoc.ToColumnSet();
 
-            var orders = xlDoc.ToOrderExpressionList();
-            foreach(var order in orders)
+            // Ordering is done after grouping/aggregation
+            if (!xlDoc.IsAggregateFetchXml())
             {
-                query.AddOrder(order.AttributeName, order.OrderType);
+                var orders = xlDoc.ToOrderExpressionList();
+                foreach (var order in orders)
+                {
+                    query.AddOrder(order.AttributeName, order.OrderType);
+                }
             }
 
             query.Criteria = xlDoc.ToCriteria(context);
@@ -302,12 +307,13 @@ namespace FakeXrmEasy
             }
 
             //Apply TopCount
-            if(qe.TopCount != null)
+            if (qe.TopCount != null)
             {
                 query = query.Take(qe.TopCount.Value);
             }
             return query;
         }
+        
 
         protected static Expression TranslateConditionExpression(ConditionExpression c, ParameterExpression entity)
         {

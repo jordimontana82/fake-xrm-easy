@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FakeXrmEasy.Extensions.FetchXml;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -43,7 +44,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, queryExpression);
                 var list = linqQuery.ToList();
 
-                if(XrmFakedContext.IsAggregateFetchXml(xmlDoc))
+                if(xmlDoc.IsAggregateFetchXml())
                 {
                     list = XrmFakedContext.ProcessAggregateFetchXml(ctx, xmlDoc, list);
                 }
@@ -122,6 +123,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 // Retrieve the enum type
                 sFormattedValue = Enum.GetName(value.GetType(), value);
                 bShouldAddFormattedValue = true;
+            }
+
+            else if(value is AliasedValue)
+            {
+                return GetFormattedValueForValue((value as AliasedValue)?.Value, out bShouldAddFormattedValue);
             }
 
             return sFormattedValue;
