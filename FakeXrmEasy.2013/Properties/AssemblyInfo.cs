@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("FakeXrmEasy.2013")]
-[assembly: AssemblyDescription("FakeXrmEasy for Dynamics CRM 2013")]
+[assembly: AssemblyDescription("http://dynamicsvalue.com")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("FakeXrmEasy.2013")]

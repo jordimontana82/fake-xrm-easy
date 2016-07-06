@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("FakeXrmEasy")]
-[assembly: AssemblyDescription("https://it-gems.com/fake-xrm-easy.html")]
+[assembly: AssemblyDescription("http://dynamicsvalue.com")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("FakeXrmEasy")]
