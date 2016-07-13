@@ -425,6 +425,20 @@ namespace FakeXrmEasy
                     return GetCaseInsensitiveExpression(Expression.Constant(value, typeof(string)));
                 }
             }
+            else if(value is EntityReference) {
+                var cast = (value as EntityReference).Id;
+                return Expression.Constant(cast);
+            }
+            else if (value is OptionSetValue)
+            {
+                var cast = (value as OptionSetValue).Value;
+                return Expression.Constant(cast);
+            }
+            else if (value is Money)
+            {
+                var cast = (value as Money).Value;
+                return Expression.Constant(cast);
+            }
             return Expression.Constant(value);
         }
 
@@ -447,11 +461,11 @@ namespace FakeXrmEasy
 
         protected static Expression GetAppropiateCastExpressionBasedOnValueInherentType(Expression input, object value)
         {
-            if (value is Guid)
+            if (value is Guid || value is EntityReference)
                 return GetAppropiateCastExpressionBasedGuid(input); //Could be compared against an EntityReference
-            if (value is int)
+            if (value is int || value is OptionSetValue)
                 return GetAppropiateCastExpressionBasedOnInt(input); //Could be compared against an OptionSet
-            if (value is decimal)
+            if (value is decimal || value is Money)
                 return GetAppropiateCastExpressionBasedOnDecimal(input); //Could be compared against a Money
             if (value is bool)
                 return GetAppropiateCastExpressionBasedOnBoolean(input); //Could be a BooleanManagedProperty

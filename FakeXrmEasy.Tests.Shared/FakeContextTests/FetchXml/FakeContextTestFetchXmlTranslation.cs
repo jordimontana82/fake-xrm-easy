@@ -466,6 +466,103 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void When_filtering_by_a_guid_attribute_and_using_proxy_types_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var contactId1 = Guid.NewGuid();
+            var contactId2 = Guid.NewGuid();
+
+            var account1 = new Account();
+            account1.Id = Guid.NewGuid();
+            account1.PrimaryContactId = new EntityReference(Contact.EntityLogicalName, contactId1);
+
+            var account2 = new Account();
+            account2.Id = Guid.NewGuid();
+            account2.PrimaryContactId = new EntityReference(Contact.EntityLogicalName, contactId2);
+
+            context.Initialize(new List<Entity> { account1, account2 });
+
+            var fetchXml =
+                 "<fetch>" +
+                 "  <entity name='account'>" +
+                 "     <attribute name='name'/>" +
+                 "     <filter type='and'>" +
+                 "         <condition attribute='primarycontactid' operator='eq' value='{0}' />" +
+                 "     </filter>" +
+                 "  </entity>" +
+                 "</fetch>";
+            fetchXml = string.Format(fetchXml, contactId1);
+            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            Assert.Equal(rows.Entities.Count, 1);
+        }
+
+        [Fact]
+        public void When_filtering_by_an_optionsetvalue_attribute_and_using_proxy_types_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var contactId1 = Guid.NewGuid();
+            var contactId2 = Guid.NewGuid();
+
+            var account1 = new Account();
+            account1.Id = Guid.NewGuid();
+            account1.IndustryCode = new OptionSetValue(2);
+
+            var account2 = new Account();
+            account2.Id = Guid.NewGuid();
+            account2.IndustryCode = new OptionSetValue(3);
+
+            context.Initialize(new List<Entity> { account1, account2 });
+
+            var fetchXml =
+                 "<fetch>" +
+                 "  <entity name='account'>" +
+                 "     <attribute name='name'/>" +
+                 "     <filter type='and'>" +
+                 "         <condition attribute='industrycode' operator='eq' value='3' />" +
+                 "     </filter>" +
+                 "  </entity>" +
+                 "</fetch>";
+            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            Assert.Equal(rows.Entities.Count, 1);
+        }
+
+        [Fact]
+        public void When_filtering_by_a_money_attribute_and_using_proxy_types_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var contactId1 = Guid.NewGuid();
+            var contactId2 = Guid.NewGuid();
+
+            var account1 = new Account();
+            account1.Id = Guid.NewGuid();
+            account1.MarketCap = new Money(123.45m);
+
+            var account2 = new Account();
+            account2.Id = Guid.NewGuid();
+            account2.MarketCap = new Money(223.45m);
+
+            context.Initialize(new List<Entity> { account1, account2 });
+
+            var fetchXml =
+                 "<fetch>" +
+                 "  <entity name='account'>" +
+                 "     <attribute name='name'/>" +
+                 "     <filter type='and'>" +
+                 "         <condition attribute='marketcap' operator='eq' value='123.45' />" +
+                 "     </filter>" +
+                 "  </entity>" +
+                 "</fetch>";
+            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            Assert.Equal(rows.Entities.Count, 1);
+        }
+
+        [Fact]
         public void When_querying_the_same_entity_records_with_joins_no_collection_modified_exception_is_thrown()
         {
             var fakedContext = new XrmFakedContext { };
