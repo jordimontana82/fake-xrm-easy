@@ -355,17 +355,18 @@ namespace FakeXrmEasy.Extensions.FetchXml
 
         }
 
+        
         public static object GetValueBasedOnType(Type t, string value)
         {
             if(t == typeof(int) 
                 || t == typeof(int?)
-                || t == typeof(OptionSetValue))
+                || t.IsOptionSet())
             {
                 int intValue = 0;
                 
                 if (int.TryParse(value, out intValue))
                 {
-                    if (t == typeof(OptionSetValue))
+                    if (t.IsOptionSet())
                     {
                         return new OptionSetValue(intValue);
                     }

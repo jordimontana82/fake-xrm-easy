@@ -190,8 +190,28 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(23, dtTime.Value.Day);
         }
 
-        
 
+        [Fact]
+        public void Conversion_to_enum_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Incident));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' >
+              <entity name='incident' >
+                <attribute name='incidentid' />
+                <attribute name='statecode' />  
+                <order attribute='createdon' descending='true' /> 
+                 <filter type='and' > 
+                  <condition attribute='statecode' operator='neq' value='2' /> 
+                </filter>
+              </entity>
+            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+            Assert.IsType<OptionSetValue>(query.Criteria.Conditions[0].Values[0]);
+            Assert.Equal(2, (query.Criteria.Conditions[0].Values[0] as OptionSetValue).Value);
+        }
 
     }
 }

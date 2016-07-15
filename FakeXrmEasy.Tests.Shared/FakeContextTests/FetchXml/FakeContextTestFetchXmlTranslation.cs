@@ -531,6 +531,45 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void When_filtering_by_an_enum_attribute_and_using_proxy_types_right_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext { };
+
+            var entityAccount = new Account { Id = Guid.NewGuid(), Name = "Test Account", LogicalName = "account" };
+            var entityContact = new Contact { Id = Guid.NewGuid(), ParentCustomerId = entityAccount.ToEntityReference(), EMailAddress1 = "test@sample.com" };
+
+            var entityCase = new Incident
+            {
+                Id = Guid.NewGuid(),
+                PrimaryContactId = entityContact.ToEntityReference(),
+                CustomerId = entityAccount.ToEntityReference(),
+                Title = "Unit Test Case"
+            };
+
+            entityCase["statecode"] = new OptionSetValue((int) IncidentState.Active);
+
+            fakedContext.Initialize(new List<Entity>() {
+               entityAccount,entityContact, entityCase
+            });
+
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' >
+              <entity name='incident' >
+                <attribute name='incidentid' />
+                <attribute name='statecode' /> 
+                <order attribute='createdon' descending='true' /> 
+                 <filter type='and' > 
+                  <condition attribute='statecode' operator='neq' value='2' /> 
+                </filter>
+              </entity>
+            </fetch>";
+
+            var rows = fakedContext.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            Assert.Equal(rows.Entities.Count, 1);
+
+        }
+
+        [Fact]
         public void When_filtering_by_a_money_attribute_and_using_proxy_types_right_result_is_returned()
         {
             var context = new XrmFakedContext();
