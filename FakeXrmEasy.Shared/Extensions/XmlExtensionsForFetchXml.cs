@@ -326,7 +326,21 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "on":
                     op = ConditionOperator.On;
                     break;
-
+                case "on-or-before":
+                    op = ConditionOperator.OnOrBefore;
+                    break;
+                case "on-or-after":
+                    op = ConditionOperator.OnOrAfter;
+                    break;
+                case "today":
+                    op = ConditionOperator.Today;
+                    break;
+                case "yesterday":
+                    op = ConditionOperator.Yesterday;
+                    break;
+                case "tomorrow":
+                    op = ConditionOperator.Tomorrow;
+                    break;
                 default:
                     throw PullRequestException.FetchXmlOperatorNotImplemented(elem.GetAttribute("operator").Value);
             }

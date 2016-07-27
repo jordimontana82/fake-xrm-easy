@@ -351,6 +351,9 @@ namespace FakeXrmEasy
             switch (c.Operator)
             {
                 case ConditionOperator.Equal:
+                case ConditionOperator.Today:
+                case ConditionOperator.Yesterday:
+                case ConditionOperator.Tomorrow:
                     return TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.BeginsWith:
@@ -402,6 +405,15 @@ namespace FakeXrmEasy
 
                 case ConditionOperator.NotOn:
                     return Expression.Not(TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression));
+
+                case ConditionOperator.OnOrAfter:
+                    return Expression.Or(
+                               TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression),
+                               TranslateConditionExpressionGreaterThan(c, getNonBasicValueExpr, containsAttributeExpression));
+                case ConditionOperator.OnOrBefore:
+                    return Expression.Or(
+                                TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression),
+                                TranslateConditionExpressionLessThan(c, getNonBasicValueExpr, containsAttributeExpression));
 
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.Operator.ToString()));
@@ -547,15 +559,41 @@ namespace FakeXrmEasy
         protected static Expression TranslateConditionExpressionEqual(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
-            foreach (object value in c.Values)
+
+            object unaryOperatorValue = null;
+
+            switch(c.Operator)
             {
-
-                expOrValues = Expression.Or(expOrValues, Expression.Equal(
-                            GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr,value),
-                            GetAppropiateTypedValue(value)));
-                
-
+                case ConditionOperator.Today:
+                    unaryOperatorValue = DateTime.Today;
+                    break;
+                case ConditionOperator.Yesterday:
+                    unaryOperatorValue = DateTime.Today.AddDays(-1);
+                    break;
+                case ConditionOperator.Tomorrow:
+                    unaryOperatorValue = DateTime.Today.AddDays(1);
+                    break;
             }
+            if (unaryOperatorValue != null)
+            {
+                //c.Values empty in this case
+                expOrValues = Expression.Equal(
+                                GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr, unaryOperatorValue),
+                                GetAppropiateTypedValue(unaryOperatorValue));
+            }
+            else
+            {
+                foreach (object value in c.Values)
+                {
+
+                    expOrValues = Expression.Or(expOrValues, Expression.Equal(
+                                GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr, value),
+                                GetAppropiateTypedValue(value)));
+
+
+                }
+            }
+            
             return Expression.AndAlso(
                             containsAttributeExpr,
                             Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),

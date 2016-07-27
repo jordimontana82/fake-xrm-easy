@@ -35,20 +35,17 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="ge" />
       <xs:enumeration value="le" />
       <xs:enumeration value="lt" />
-
       <xs:enumeration value="on" />
-
-    TODO:
-
       <xs:enumeration value="on-or-before" />
       <xs:enumeration value="on-or-after" />
-
-      <xs:enumeration value="between" />
-      <xs:enumeration value="not-between" />
-
       <xs:enumeration value="yesterday" />
       <xs:enumeration value="today" />
       <xs:enumeration value="tomorrow" />
+
+    TODO:
+
+      <xs:enumeration value="between" />
+      <xs:enumeration value="not-between" />
       <xs:enumeration value="last-seven-days" />
       <xs:enumeration value="next-seven-days" />
       <xs:enumeration value="last-week" />
@@ -108,6 +105,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="not-under"/>
       <xs:enumeration value="above" />
       <xs:enumeration value="eq-or-above" />
+
     </xs:restriction>
   </xs:simpleType>
       
@@ -801,6 +799,146 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(2014, retrievedDate.Value.Year);
             Assert.Equal(11, retrievedDate.Value.Month);
             Assert.Equal(23, retrievedDate.Value.Day);
+        }
+
+
+        [Fact]
+        public void FetchXml_Operator_On_Or_Before_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='on-or-before' value='2014-11-23' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var date = new DateTime(2014, 11, 23);
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(-1) }; //Should be returned
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(1) }; //Shouldnt
+            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(2, collection.Entities.Count);
+            var retrievedDateFirst = collection.Entities[0]["anniversary"] as DateTime?;
+            var retrievedDateSecond = collection.Entities[1]["anniversary"] as DateTime?;
+            Assert.Equal(23, retrievedDateFirst.Value.Day);
+            Assert.Equal(22, retrievedDateSecond.Value.Day);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_On_Or_After_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='on-or-after' value='2014-11-23' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var date = new DateTime(2014, 11, 23);
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(-1) }; //Shouldnt
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(1) }; //Should be returned
+            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(2, collection.Entities.Count);
+            var retrievedDateFirst = collection.Entities[0]["anniversary"] as DateTime?;
+            var retrievedDateSecond = collection.Entities[1]["anniversary"] as DateTime?;
+            Assert.Equal(23, retrievedDateFirst.Value.Day);
+            Assert.Equal(24, retrievedDateSecond.Value.Day);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Today_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='today' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var date = DateTime.Today;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(-1) }; //Shouldnt
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+
+            var retrievedDate = collection.Entities[0]["anniversary"] as DateTime?;
+            Assert.Equal(retrievedDate, DateTime.Today);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Yesterday_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='yesterday' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var date = DateTime.Today;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt 
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(-1) }; //Should be returned
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+
+            var retrievedDate = collection.Entities[0]["anniversary"] as DateTime?;
+            Assert.Equal(retrievedDate, DateTime.Today.AddDays(-1));
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Tomorrow_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='tomorrow' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var date = DateTime.Today;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt 
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(1) }; //Should be returned
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+
+            var retrievedDate = collection.Entities[0]["anniversary"] as DateTime?;
+            Assert.Equal(retrievedDate, DateTime.Today.AddDays(1));
         }
     }
 }
