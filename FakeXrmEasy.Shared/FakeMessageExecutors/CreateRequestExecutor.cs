@@ -16,12 +16,16 @@ namespace FakeXrmEasy.FakeMessageExecutors
         public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
         {
             var createRequest = (CreateRequest)request;
-            
+
             var service = ctx.GetFakedOrganizationService();
 
-            service.Create(createRequest.Target);
+            var guid = service.Create(createRequest.Target);
 
-            return new CreateResponse();
+            return new CreateResponse()
+            {
+                ResponseName = "Create",
+                Results = new ParameterCollection { { "id", guid } }
+            };
         }
     }
 }
