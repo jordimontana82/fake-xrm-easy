@@ -38,6 +38,7 @@ let nugetDir                = @".\nuget\"
 let nugetDeployDir          = @"[Enter_NuGet_Url]"
 let packagesDir             = @".\packages\"
 
+let nuGetCommandLine           = @".\tools\nuget\nuget286.exe"
 let mutable previousVersion = "1.15.3"
 let mutable version         = "1.15.4" //Copy this into previousVersion before publishing packages...
 let mutable build           = buildVersion
@@ -175,7 +176,7 @@ Target "NuGet" (fun _ ->
                Project = "FakeXrmEasy"           
                Version = version
                NoPackageAnalysis = true
-               ToolPath = @".\tools\nuget\Nuget.exe"                             
+               ToolPath = nuGetCommandLine                            
                OutputPath = nugetDir
                ReleaseNotes = releaseNotes
                Publish = true })
@@ -186,7 +187,7 @@ Target "NuGet" (fun _ ->
                Project = "FakeXrmEasy.2013"                  
                Version = version
                NoPackageAnalysis = true
-               ToolPath = @".\tools\nuget\Nuget.exe"                             
+               ToolPath = nuGetCommandLine                            
                OutputPath = nugetDir
                ReleaseNotes = releaseNotes
                Publish = true })
@@ -197,7 +198,7 @@ Target "NuGet" (fun _ ->
                Project = "FakeXrmEasy.2015"                   
                Version = version
                NoPackageAnalysis = true
-               ToolPath = @".\tools\nuget\Nuget.exe"                             
+               ToolPath = nuGetCommandLine                            
                OutputPath = nugetDir
                ReleaseNotes = releaseNotes
                Publish = true })
@@ -208,7 +209,7 @@ Target "NuGet" (fun _ ->
                Project = "FakeXrmEasy.2016"              
                Version = version
                NoPackageAnalysis = true
-               ToolPath = @".\tools\nuget\Nuget.exe"                             
+               ToolPath = nuGetCommandLine                            
                OutputPath = nugetDir
                ReleaseNotes = releaseNotes
                Publish = true })
