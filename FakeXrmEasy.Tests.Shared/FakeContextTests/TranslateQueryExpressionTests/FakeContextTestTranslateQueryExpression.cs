@@ -823,7 +823,6 @@ namespace FakeXrmEasy.Tests
                 Assert.Throws<FaultException<OrganizationServiceFault>>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
             }
         }
-
-       
+      
     }
 }

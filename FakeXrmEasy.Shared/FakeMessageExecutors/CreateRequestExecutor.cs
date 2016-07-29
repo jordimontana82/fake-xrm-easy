@@ -19,9 +19,17 @@ namespace FakeXrmEasy.FakeMessageExecutors
             
             var service = ctx.GetFakedOrganizationService();
 
-            service.Create(createRequest.Target);
+            var id = service.Create(createRequest.Target);
 
-            return new CreateResponse();
+            var response = new CreateResponse()
+            {
+                Results = new ParameterCollection
+                                 {
+                                    { "id", id }
+                                 }
+            };
+            return response;
+
         }
     }
 }
