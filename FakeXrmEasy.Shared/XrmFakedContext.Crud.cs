@@ -61,7 +61,7 @@ namespace FakeXrmEasy
                             entityName));
                         }
                     }
-                    
+
                     //Entity logical name exists, so , check if the requested entity exists
                     if (context.Data.ContainsKey(entityName) && context.Data[entityName] != null
                         && context.Data[entityName].ContainsKey(id))
@@ -73,7 +73,7 @@ namespace FakeXrmEasy
                         {
                             //Return the subset of columns requested only
                             var foundEntity = context.Data[entityName][id];
-                            Entity projected = foundEntity.ProjectAttributes(columnSet,context);
+                            Entity projected = foundEntity.ProjectAttributes(columnSet, context);
                             return projected;
                         }
                     }
@@ -234,10 +234,10 @@ namespace FakeXrmEasy
         #region Other protected methods
         protected void EnsureEntityNameExistsInMetadata(string sEntityName)
         {
-			if(Relationships.Values.Any(value => new[]{value.Entity1LogicalName, value.Entity2LogicalName, value.IntersectEntity}.Contains(sEntityName, StringComparer.InvariantCultureIgnoreCase)))
-			{
-				return;
-			}
+            if (Relationships.Values.Any(value => new[] { value.Entity1LogicalName, value.Entity2LogicalName, value.IntersectEntity }.Contains(sEntityName, StringComparer.InvariantCultureIgnoreCase)))
+            {
+                return;
+            }
             //Entity metadata is checked differently when we are using a ProxyTypesAssembly => we can infer that from the generated types assembly
             if (ProxyTypesAssembly != null)
             {
@@ -324,7 +324,7 @@ namespace FakeXrmEasy
                 Data[e.LogicalName].Add(e.Id, e);
             }
 
-            
+
             //Update metadata for that entity
             if (!AttributeMetadata.ContainsKey(e.LogicalName))
                 AttributeMetadata.Add(e.LogicalName, new Dictionary<string, string>());
@@ -343,9 +343,9 @@ namespace FakeXrmEasy
                             AttributeMetadata[e.LogicalName].Add(p.Name, p.Name);
                     }
                 }
-                else 
+                else
                     throw new Exception(string.Format("Couldnt find reflected type for {0}", e.LogicalName));
-                    
+
             }
             else
             {
@@ -357,16 +357,42 @@ namespace FakeXrmEasy
                         AttributeMetadata[e.LogicalName].Add(attKey, attKey);
                 }
             }
+
+            if (e.RelatedEntities.Count > 0)
+            {
+                foreach (var relationshipSet in e.RelatedEntities)
+                {
+                    Relationship relationship = relationshipSet.Key;
+                    foreach (var relatedEntity in relationshipSet.Value.Entities)
+                    {
+                        AddEntity(relatedEntity);
+                    }
+
+                    if (FakeMessageExecutors.ContainsKey(typeof(AssociateRequest)))
+                    {
+                        var entityReferenceCollection = new EntityReferenceCollection(relationshipSet.Value.Entities.Select(en => en.ToEntityReference()).ToList());
+                        var request = new AssociateRequest()
+                        {
+                            Target = new EntityReference() { Id = e.Id, LogicalName = e.LogicalName },
+                            Relationship = relationship,
+                            RelatedEntities = entityReferenceCollection
+                        };
+                        FakeMessageExecutors[typeof(AssociateRequest)].Execute(request, this);
+                    }
+                    else
+                        throw PullRequestException.NotImplementedOrganizationRequest(typeof(AssociateRequest));
+                }
+            }
         }
 
         protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
         {
             //Early bound types
-            if(ProxyTypesAssembly != null)
+            if (ProxyTypesAssembly != null)
             {
                 //Check if attribute exists in the early bound type 
                 var earlyBoundType = FindReflectedType(sEntityName);
-                if(earlyBoundType != null)
+                if (earlyBoundType != null)
                 {
                     //Get that type properties
                     var attributeFound = earlyBoundType
@@ -383,7 +409,7 @@ namespace FakeXrmEasy
             //Dynamic entities => just return true
             return true;
         }
-#endregion
+        #endregion
 
     }
 }
