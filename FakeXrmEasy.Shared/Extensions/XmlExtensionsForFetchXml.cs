@@ -341,6 +341,12 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "tomorrow":
                     op = ConditionOperator.Tomorrow;
                     break;
+                case "between":
+                    op = ConditionOperator.Between;
+                    break;
+                case "not-between":
+                    op = ConditionOperator.NotBetween;
+                    break;
                 default:
                     throw PullRequestException.FetchXmlOperatorNotImplemented(elem.GetAttribute("operator").Value);
             }

@@ -383,17 +383,13 @@ namespace FakeXrmEasy
                     return TranslateConditionExpressionGreaterThan(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.GreaterEqual:
-                    return Expression.Or(
-                                TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression),
-                                TranslateConditionExpressionGreaterThan(c, getNonBasicValueExpr, containsAttributeExpression));
+                    return TranslateConditionExpressionGreaterThanOrEqual(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.LessThan:
                     return TranslateConditionExpressionLessThan(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.LessEqual:
-                    return Expression.Or(
-                                TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression),
-                                TranslateConditionExpressionLessThan(c, getNonBasicValueExpr, containsAttributeExpression));
+                    return TranslateConditionExpressionLessThanOrEqual(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.In:
                     return TranslateConditionExpressionIn(c, getNonBasicValueExpr, containsAttributeExpression);
@@ -414,6 +410,20 @@ namespace FakeXrmEasy
                     return Expression.Or(
                                 TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression),
                                 TranslateConditionExpressionLessThan(c, getNonBasicValueExpr, containsAttributeExpression));
+
+                case ConditionOperator.Between:
+                    if(c.Values.Count != 2)
+                    {
+                        throw new Exception("Between operator requires exactly 2 values.");
+                    }
+                    return TranslateConditionExpressionBetween(c, getNonBasicValueExpr, containsAttributeExpression);
+
+                case ConditionOperator.NotBetween:
+                    if (c.Values.Count != 2)
+                    {
+                        throw new Exception("Not-Between operator requires exactly 2 values.");
+                    }
+                    return Expression.Not(TranslateConditionExpressionBetween(c, getNonBasicValueExpr, containsAttributeExpression));
 
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.Operator.ToString()));
@@ -636,6 +646,13 @@ namespace FakeXrmEasy
         //                        expOrValues));
         //}
 
+        protected static Expression TranslateConditionExpressionGreaterThanOrEqual(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            return Expression.Or(
+                                TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpr),
+                                TranslateConditionExpressionGreaterThan(c, getAttributeValueExpr, containsAttributeExpr));
+
+        }
         protected static Expression TranslateConditionExpressionGreaterThan(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
@@ -652,6 +669,13 @@ namespace FakeXrmEasy
                                 expOrValues));
         }
 
+        protected static Expression TranslateConditionExpressionLessThanOrEqual(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            return Expression.Or(
+                                TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpr),
+                                TranslateConditionExpressionLessThan(c, getAttributeValueExpr, containsAttributeExpr));
+
+        }
         protected static Expression TranslateConditionExpressionLessThan(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
@@ -666,6 +690,30 @@ namespace FakeXrmEasy
                             containsAttributeExpr,
                             Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
                                 expOrValues));
+        }
+
+        protected static Expression TranslateConditionExpressionBetween(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            object value1, value2;
+            value1 = c.Values[0];
+            value2 = c.Values[1];
+
+            //Between the range... 
+            var exp = Expression.And(
+                Expression.GreaterThanOrEqual(
+                            GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr, value1),
+                            GetAppropiateTypedValue(value1)),
+
+                Expression.LessThanOrEqual(
+                            GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr, value2),
+                            GetAppropiateTypedValue(value2)));
+
+
+            //and... attribute exists too
+            return Expression.AndAlso(
+                            containsAttributeExpr,
+                            Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                exp));
         }
 
         protected static Expression TranslateConditionExpressionNull(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)

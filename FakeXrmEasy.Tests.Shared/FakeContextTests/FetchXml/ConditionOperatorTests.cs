@@ -41,11 +41,11 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="yesterday" />
       <xs:enumeration value="today" />
       <xs:enumeration value="tomorrow" />
+      <xs:enumeration value="between" />
+      <xs:enumeration value="not-between" />
 
     TODO:
 
-      <xs:enumeration value="between" />
-      <xs:enumeration value="not-between" />
       <xs:enumeration value="last-seven-days" />
       <xs:enumeration value="next-seven-days" />
       <xs:enumeration value="last-week" />
@@ -939,6 +939,186 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             var retrievedDate = collection.Entities[0]["anniversary"] as DateTime?;
             Assert.Equal(retrievedDate, DateTime.Today.AddDays(1));
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Between_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='between'>
+                                                <value>2013-05-17 00:00:00</value>
+				                                <value>2013-05-20 14:40:00</value>
+                                            </condition>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.Between, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(new DateTime(2013,5,17), query.Criteria.Conditions[0].Values[0]);
+            Assert.Equal(new DateTime(2013, 5, 20, 14, 40, 0), query.Criteria.Conditions[0].Values[1]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Between_Execution_Without_Exact_Values_Raises_Exception()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetFakedOrganizationService();
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='between'>
+                                            </condition>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            Assert.Throws<Exception>(() => service.RetrieveMultiple(new FetchExpression(fetchXml)));
+
+            fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='between'>
+                                                <value>2013-05-17 00:00:00</value>
+                                            </condition>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            Assert.Throws<Exception>(() => service.RetrieveMultiple(new FetchExpression(fetchXml)));
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Between_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='between'>
+                                                <value>2013-05-17 00:00:00</value>
+				                                <value>2013-05-20 14:40:00</value>
+                                            </condition>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var date = DateTime.Today;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt 
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(2013,05,19) }; //Should be returned
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+
+            var retrievedDate = collection.Entities[0]["anniversary"] as DateTime?;
+            Assert.Equal(retrievedDate, new DateTime(2013, 05, 19));
+        }
+
+        [Fact]
+        public void FetchXml_Operator_NotBetween_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='not-between'>
+                                                <value>2013-05-17 00:00:00</value>
+				                                <value>2013-05-20 14:40:00</value>
+                                            </condition>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.NotBetween, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(new DateTime(2013, 5, 17), query.Criteria.Conditions[0].Values[0]);
+            Assert.Equal(new DateTime(2013, 5, 20, 14, 40, 0), query.Criteria.Conditions[0].Values[1]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_NotBetween_Execution_Without_Exact_Values_Raises_Exception()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetFakedOrganizationService();
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='not-between'>
+                                            </condition>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            Assert.Throws<Exception>(() => service.RetrieveMultiple(new FetchExpression(fetchXml)));
+
+            fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='not-between'>
+                                                <value>2013-05-17 00:00:00</value>
+                                            </condition>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            Assert.Throws<Exception>(() => service.RetrieveMultiple(new FetchExpression(fetchXml)));
+        }
+
+        [Fact]
+        public void FetchXml_Operator_NotBetween_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='not-between'>
+                                                <value>2013-05-17 00:00:00</value>
+				                                <value>2013-05-20 14:40:00</value>
+                                            </condition>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var date = DateTime.Today;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Should
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(2013, 05, 19) }; //Shouldnt
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+
+            var retrievedDate = collection.Entities[0]["anniversary"] as DateTime?;
+            Assert.Equal(retrievedDate, date);
         }
     }
 }

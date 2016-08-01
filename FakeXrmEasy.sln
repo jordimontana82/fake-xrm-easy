@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy", "FakeXrmEasy\FakeXrmEasy.csproj", "{1FF34479-D38A-4B6B-86A7-B48182403437}"
 EndProject
@@ -25,6 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		FakeXrmEasy.2015.nuspec = FakeXrmEasy.2015.nuspec
 		FakeXrmEasy.2016.nuspec = FakeXrmEasy.2016.nuspec
 		LICENSE.md = LICENSE.md
+		tools\nuget\nuget286.exe = tools\nuget\nuget286.exe
 		README.md = README.md
 		System.Activities.dll = System.Activities.dll
 		System.ServiceModel.Internals.dll = System.ServiceModel.Internals.dll
