@@ -220,11 +220,11 @@ namespace FakeXrmEasy.Tests
             ctx.AddRelationship("order_details",
                 new XrmFakedRelationship()
                 {
-                    Entity1LogicalName = SalesOrder.EntityLogicalName,
-                    Entity1Attribute = "salesorderid",
+                    Entity1LogicalName = SalesOrder.EntityLogicalName,  //Referenced
+                    Entity1Attribute = "salesorderid",              //Pk
                     Entity2LogicalName = SalesOrderDetail.EntityLogicalName,
-                    Entity2Attribute = "salesorderdetailid",
-                    IntersectEntity =  "salesorderdetail"
+                    Entity2Attribute = "salesorderid",              //Lookup attribute
+                    RelationshipType = XrmFakedRelationship.enmFakeRelationshipType.OneToMany
                 });
 
 
@@ -248,11 +248,12 @@ namespace FakeXrmEasy.Tests
                 Target = order
             };
 
-            var id = service.Execute(request);
+            var id = (service.Execute(request) as CreateResponse).id;
             var createdOrderDetails = ctx.CreateQuery<SalesOrderDetail>().ToList();
 
             Assert.Equal(createdOrderDetails.Count, 2);
-
+            Assert.Equal(createdOrderDetails[0].SalesOrderId.Id, id);
+            Assert.Equal(createdOrderDetails[1].SalesOrderId.Id, id);
         }
     }
 }

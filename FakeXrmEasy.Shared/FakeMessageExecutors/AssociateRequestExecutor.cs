@@ -38,18 +38,33 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new Exception("Association without target is invalid!");
             }
 
-            foreach (var relatedEntity in associateRequest.RelatedEntities)
+            foreach (var relatedEntityReference in associateRequest.RelatedEntities)
             {
-                var association = new Entity(fakeRelationShip.IntersectEntity)
+                if (fakeRelationShip.RelationshipType == XrmFakedRelationship.enmFakeRelationshipType.ManyToMany)
                 {
-                    Attributes = new AttributeCollection
+                    var association = new Entity(fakeRelationShip.IntersectEntity)
+                    {
+                        Attributes = new AttributeCollection
                         {
                             { fakeRelationShip.Entity1Attribute, associateRequest.Target.Id },
-                            { fakeRelationShip.Entity2Attribute, relatedEntity.Id }
+                            { fakeRelationShip.Entity2Attribute, relatedEntityReference.Id }
                         }
-                };
+                    };
 
-                service.Create(association);
+                    service.Create(association);
+                }
+                else
+                {
+                    //One to many
+                    //Get entity to update
+                    var entityToUpdate = new Entity(relatedEntityReference.LogicalName)
+                    {
+                        Id = relatedEntityReference.Id
+                    };
+
+                    entityToUpdate[fakeRelationShip.Entity2Attribute] = associateRequest.Target;
+                    service.Update(entityToUpdate);
+                }
 
 
             }
