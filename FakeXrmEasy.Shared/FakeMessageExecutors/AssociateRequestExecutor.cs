@@ -24,10 +24,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new Exception("Only associate request can be processed!");
             }
 
-            var relationShipName = associateRequest.Relationship.SchemaName;
-            var relationShip = ctx.GetRelationship(relationShipName);
+            var associateRelationship = associateRequest.Relationship;
+            var relationShipName = associateRelationship.SchemaName;
+            var fakeRelationShip = ctx.GetRelationship(relationShipName);
 
-            if (relationShip == null)
+            if (fakeRelationShip == null)
             {
                 throw new Exception(string.Format("Relationship {0} does not exist in the metadata cache", relationShipName));
             }
@@ -39,12 +40,12 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             foreach (var relatedEntity in associateRequest.RelatedEntities)
             {
-                var association = new Entity(relationShip.IntersectEntity)
+                var association = new Entity(fakeRelationShip.IntersectEntity)
                 {
                     Attributes = new AttributeCollection
                         {
-                            { relationShip.Entity1Attribute, associateRequest.Target.Id },
-                            { relationShip.Entity2Attribute, relatedEntity.Id }
+                            { fakeRelationShip.Entity1Attribute, associateRequest.Target.Id },
+                            { fakeRelationShip.Entity2Attribute, relatedEntity.Id }
                         }
                 };
 

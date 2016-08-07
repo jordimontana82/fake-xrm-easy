@@ -40,7 +40,7 @@ namespace FakeXrmEasy.Tests
             };
 
             var ex = Assert.Throws<InvalidOperationException>(() => context.Initialize(data));
-            Assert.Equal(ex.Message, "An entity must not have a null or empty LogicalName property.");
+            Assert.Equal(ex.Message, "The LogicalName property must not be empty");
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace FakeXrmEasy.Tests
             };
 
             var ex = Assert.Throws<InvalidOperationException>(() => context.Initialize(data));
-            Assert.Equal(ex.Message, "An entity with an empty Id can't be added");
+            Assert.Equal(ex.Message, "The Id property must not be empty");
         }
 
         [Fact]

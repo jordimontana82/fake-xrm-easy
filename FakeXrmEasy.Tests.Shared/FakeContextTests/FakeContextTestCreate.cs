@@ -11,6 +11,7 @@ using System.Reflection;
 using Crm;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
+using Microsoft.Xrm.Sdk.Messages;
 
 namespace FakeXrmEasy.Tests
 {
@@ -176,6 +177,81 @@ namespace FakeXrmEasy.Tests
 
             Assert.True(record.Attributes.ContainsKey("new_myentityid"));
             Assert.Equal(id, record["new_myentityid"]);
+
+        }
+
+        [Fact]
+        public void When_related_entities_are_used_without_relationship_info_exception_is_raised()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetFakedOrganizationService();
+
+            var order = new SalesOrder();
+
+            var orderItems = new EntityCollection(new List<Entity>()
+            {
+                new SalesOrderDetail(),
+                new SalesOrderDetail()
+            });
+
+            // Add related order items so it can be created in one request
+            order.RelatedEntities.Add(new Relationship
+            {
+                PrimaryEntityRole = EntityRole.Referenced,
+                SchemaName = "order_details"
+            }, orderItems);
+
+            var request = new CreateRequest
+            {
+                Target = order
+            };
+
+            var exception = Assert.Throws<Exception>(() => service.Execute(request));
+            Assert.Equal(exception.Message, "Relationship order_details does not exist in the metadata cache");
+            
+        }
+
+        [Fact]
+        public void When_related_entities_and_relationship_are_used_child_entities_are_created()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetFakedOrganizationService();
+
+            ctx.AddRelationship("order_details",
+                new XrmFakedRelationship()
+                {
+                    Entity1LogicalName = SalesOrder.EntityLogicalName,
+                    Entity1Attribute = "salesorderid",
+                    Entity2LogicalName = SalesOrderDetail.EntityLogicalName,
+                    Entity2Attribute = "salesorderdetailid",
+                    IntersectEntity =  "salesorderdetail"
+                });
+
+
+            var order = new SalesOrder();
+
+            var orderItems = new EntityCollection(new List<Entity>()
+            {
+                new SalesOrderDetail(),
+                new SalesOrderDetail()
+            });
+
+            // Add related order items so it can be created in one request
+            order.RelatedEntities.Add(new Relationship
+            {
+                PrimaryEntityRole = EntityRole.Referenced,
+                SchemaName = "order_details"
+            }, orderItems);
+
+            var request = new CreateRequest
+            {
+                Target = order
+            };
+
+            var id = service.Execute(request);
+            var createdOrderDetails = ctx.CreateQuery<SalesOrderDetail>().ToList();
+
+            Assert.Equal(createdOrderDetails.Count, 2);
 
         }
     }

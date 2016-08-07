@@ -96,7 +96,7 @@ namespace FakeXrmEasy
 
             foreach (var e in entities)
             {
-                AddEntity(e);
+                AddEntityWithDefaults(e);
             }
         }
 

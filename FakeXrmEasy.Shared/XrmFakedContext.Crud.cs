@@ -94,36 +94,8 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Create(A<Entity>._))
                 .ReturnsLazily((Entity e) =>
                 {
-                    if (e == null)
-                    {
-                        throw new InvalidOperationException("The entity must not be null");
-                    }
-
-                    if (string.IsNullOrWhiteSpace(e.LogicalName))
-                    {
-                        throw new InvalidOperationException("The LogicalName property must not be empty");
-                    }
-
-                    if (e.Id != Guid.Empty && context.Data.ContainsKey(e.LogicalName) &&
-                        context.Data[e.LogicalName].ContainsKey(e.Id))
-                    {
-                        throw new InvalidOperationException(string.Format("There is already a record of entity {0} with id {1}, can't create with this Id.", e.LogicalName, e.Id));
-                    }
-
-                    //Add entity to the context
-                    if (e.Id == Guid.Empty)
-                    {
-                        e.Id = Guid.NewGuid();
-
-                        //Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
-                        if (!e.GetType().IsSubclassOf(typeof(Entity)))
-                        {
-                            var primaryKeyAttribute = string.Format("{0}id", e.LogicalName);
-                            e[primaryKeyAttribute] = e.Id;
-                        }
-                    }
-                    context.AddEntity(e);
-
+                    context.CreateEntity(e);
+           
                     return e.Id;
                 });
 
@@ -134,22 +106,9 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Update(A<Entity>._))
                 .Invokes((Entity e) =>
                 {
-                    if (e == null)
-                    {
-                        throw new InvalidOperationException("The entity must not be null");
-                    }
+                    context.ValidateEntity(e);
 
-                    if (e.Id == Guid.Empty)
-                    {
-                        throw new InvalidOperationException("The Id property must not be empty");
-                    }
-
-                    if (string.IsNullOrWhiteSpace(e.LogicalName))
-                    {
-                        throw new InvalidOperationException("The LogicalName property must not be empty");
-                    }
-
-                    //The entity record must exist in the context
+                    //Update specific validations: The entity record must exist in the context
                     if (context.Data.ContainsKey(e.LogicalName) &&
                         context.Data[e.LogicalName].ContainsKey(e.Id))
                     {
@@ -254,19 +213,8 @@ namespace FakeXrmEasy
             //};
         }
 
-        protected void ValidateEntity(Entity e)
+        protected void AddEntityDefaultAttributes(Entity e)
         {
-            //Validate the entity
-            if (string.IsNullOrWhiteSpace(e.LogicalName))
-            {
-                throw new InvalidOperationException("An entity must not have a null or empty LogicalName property.");
-            }
-
-            if (e.Id == Guid.Empty)
-            {
-                throw new InvalidOperationException("An entity with an empty Id can't be added");
-            }
-
             //Validate primary key for dynamic entities
             var primaryKey = string.Format("{0}id", e.LogicalName);
             if (ProxyTypesAssembly == null &&
@@ -297,6 +245,91 @@ namespace FakeXrmEasy
                 e["statecode"] = new OptionSetValue(0); //Active by default
         }
 
+        protected void ValidateEntity(Entity e)
+        {
+            if (e == null)
+            {
+                throw new InvalidOperationException("The entity must not be null");
+            }
+
+            //Validate the entity
+            if (string.IsNullOrWhiteSpace(e.LogicalName))
+            {
+                throw new InvalidOperationException("The LogicalName property must not be empty");
+            }
+
+            if (e.Id == Guid.Empty)
+            {
+                throw new InvalidOperationException("The Id property must not be empty");
+            }
+        }
+
+        protected internal void CreateEntity(Entity e)
+        {
+            if (e == null)
+            {
+                throw new InvalidOperationException("The entity must not be null");
+            }
+
+            if (e.Id == Guid.Empty)
+            {
+                e.Id = Guid.NewGuid(); //Add default guid if none present
+
+                ValidateEntity(e);
+
+                //Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
+                if (!e.GetType().IsSubclassOf(typeof(Entity)))
+                {
+                    var primaryKeyAttribute = string.Format("{0}id", e.LogicalName);
+                    e[primaryKeyAttribute] = e.Id;
+                }
+            }
+            else
+            {
+                ValidateEntity(e);
+            }
+
+            //Create specific validations
+            if (e.Id != Guid.Empty && Data.ContainsKey(e.LogicalName) &&
+                Data[e.LogicalName].ContainsKey(e.Id))
+            {
+                throw new InvalidOperationException(string.Format("There is already a record of entity {0} with id {1}, can't create with this Id.", e.LogicalName, e.Id));
+            }
+
+            AddEntityWithDefaults(e);
+
+            if (e.RelatedEntities.Count > 0)
+            {
+                foreach (var relationshipSet in e.RelatedEntities)
+                {
+                    Relationship relationship = relationshipSet.Key;
+                    foreach (var relatedEntity in relationshipSet.Value.Entities)
+                    {
+                        CreateEntity(relatedEntity);
+                    }
+
+                    if (FakeMessageExecutors.ContainsKey(typeof(AssociateRequest)))
+                    {
+                        var entityReferenceCollection = new EntityReferenceCollection(relationshipSet.Value.Entities.Select(en => en.ToEntityReference()).ToList());
+                        var request = new AssociateRequest()
+                        {
+                            Target = new EntityReference() { Id = e.Id, LogicalName = e.LogicalName },
+                            Relationship = relationship,
+                            RelatedEntities = entityReferenceCollection
+                        };
+                        FakeMessageExecutors[typeof(AssociateRequest)].Execute(request, this);
+                    }
+                    else
+                        throw PullRequestException.NotImplementedOrganizationRequest(typeof(AssociateRequest));
+                }
+            }
+        }
+
+        protected internal void AddEntityWithDefaults(Entity e)
+        {
+            AddEntityDefaultAttributes(e);
+            AddEntity(e);
+        }
 
         protected internal void AddEntity(Entity e)
         {
@@ -307,7 +340,7 @@ namespace FakeXrmEasy
                 ProxyTypesAssembly = Assembly.GetAssembly(e.GetType());
             }
 
-            ValidateEntity(e);
+            ValidateEntity(e); //Entity must have a logical name and an Id
 
             //Add the entity collection
             if (!Data.ContainsKey(e.LogicalName))
@@ -358,31 +391,7 @@ namespace FakeXrmEasy
                 }
             }
 
-            if (e.RelatedEntities.Count > 0)
-            {
-                foreach (var relationshipSet in e.RelatedEntities)
-                {
-                    Relationship relationship = relationshipSet.Key;
-                    foreach (var relatedEntity in relationshipSet.Value.Entities)
-                    {
-                        AddEntity(relatedEntity);
-                    }
-
-                    if (FakeMessageExecutors.ContainsKey(typeof(AssociateRequest)))
-                    {
-                        var entityReferenceCollection = new EntityReferenceCollection(relationshipSet.Value.Entities.Select(en => en.ToEntityReference()).ToList());
-                        var request = new AssociateRequest()
-                        {
-                            Target = new EntityReference() { Id = e.Id, LogicalName = e.LogicalName },
-                            Relationship = relationship,
-                            RelatedEntities = entityReferenceCollection
-                        };
-                        FakeMessageExecutors[typeof(AssociateRequest)].Execute(request, this);
-                    }
-                    else
-                        throw PullRequestException.NotImplementedOrganizationRequest(typeof(AssociateRequest));
-                }
-            }
+            
         }
 
         protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
