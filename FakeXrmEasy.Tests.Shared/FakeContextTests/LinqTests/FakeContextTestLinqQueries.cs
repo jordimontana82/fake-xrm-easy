@@ -682,6 +682,44 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_doing_a_crm_linq_query_with_aliases_with_uppercase_chars_right_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+
+            var contact = new Contact() { Id = Guid.NewGuid(), FirstName = "Chuck" };
+            var parentAccount = new Account() {
+                Id = Guid.NewGuid(),
+                PrimaryContactId = contact.ToEntityReference()
+            };
+            var account = new Account() {
+                Id = Guid.NewGuid(),
+                ParentAccountId = parentAccount.ToEntityReference()
+            };
+
+            fakedContext.Initialize(new List<Entity>() {
+                contact, parentAccount, account
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from childAccount in ctx.CreateQuery<Account>()
+                               join childsParentAccount in ctx.CreateQuery<Account>() on childAccount.ParentAccountId.Id equals childsParentAccount.AccountId
+                               join primaryContact in ctx.CreateQuery<Contact>() on childsParentAccount.PrimaryContactId.Id equals primaryContact.ContactId
+                               select new
+                               {
+                                   Name = primaryContact.FirstName
+                               }).ToList();
+
+                Assert.True(matches.Count == 1);
+                Assert.Equal(matches[0].Name, "Chuck");
+            }
+        }
+
+        [Fact]
         public void When_doing_a_crm_linq_query_with_an_intersect_entity_and_joins_and_where_clauses_right_result_is_returned()
         {
             var fakedContext = new XrmFakedContext();

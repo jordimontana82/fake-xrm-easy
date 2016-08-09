@@ -226,7 +226,17 @@ namespace FakeXrmEasy.Extensions
         /// <returns></returns>
         public static Guid KeySelector(this Entity e, string sAttributeName, XrmFakedContext context)
         {
-            sAttributeName = sAttributeName.ToLower();
+            if(sAttributeName.Contains("."))
+            {
+                //Do not lowercase the alias prefix
+                var splitted = sAttributeName.Split('.');
+                sAttributeName = string.Format("{0}.{1}", splitted[0], splitted[1].ToLower());
+            }
+            else
+            {
+                sAttributeName = sAttributeName.ToLower();
+            }
+            
 
             if (!e.Attributes.ContainsKey(sAttributeName))
             {
