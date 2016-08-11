@@ -812,7 +812,7 @@ namespace FakeXrmEasy.Tests
             {
                 Id = Guid.NewGuid(),
                 PrimaryContactId = contact.ToEntityReference(),
-                Name = "Child Account",
+                Name = "Parent Account",
                 Address1_Name = "Address1",
                 Address2_Name = "Address2"
             };
@@ -836,6 +836,52 @@ namespace FakeXrmEasy.Tests
                                select new
                                {
                                    Name = account.Name,
+                                   Account = childsParentAccount
+                               }).ToList();
+
+                Assert.True(matches.Count == 1);
+                Assert.Equal(matches[0].Account.Attributes.Count, 6 + 4); //6 = default attributes
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_and_selecting_an_entire_object_between_joins_all_attributes_are_returned_2()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+
+            var contact = new Contact() { Id = Guid.NewGuid(), FirstName = "Chuck" };
+            var parentAccount = new Account()
+            {
+                Id = Guid.NewGuid(),
+                PrimaryContactId = contact.ToEntityReference(),
+                Name = "Parent Account",
+                Address1_Name = "Address1",
+                Address2_Name = "Address2"
+            };
+            var account = new Account()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Child Account",
+                ParentAccountId = parentAccount.ToEntityReference(),
+            };
+
+            fakedContext.Initialize(new List<Entity>() {
+                contact, parentAccount, account
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from childAccount in ctx.CreateQuery<Account>()
+                               join childsParentAccount in ctx.CreateQuery<Account>() on childAccount.ParentAccountId.Id equals childsParentAccount.AccountId
+                               join primaryContact in ctx.CreateQuery<Contact>() on childsParentAccount.PrimaryContactId.Id equals primaryContact.ContactId
+                               select new
+                               {
+                                   Name = childAccount.Name,
+                                   ParentAccountName = childsParentAccount.Name,
                                    Account = childsParentAccount
                                }).ToList();
 

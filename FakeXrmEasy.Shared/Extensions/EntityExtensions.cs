@@ -42,7 +42,7 @@ namespace FakeXrmEasy.Extensions
         {
             var sAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
 
-            if (le.Columns.AllColumns && le.Columns.Columns.Count == 0)
+            if (le.Columns.AllColumns)
             {
                 foreach (var attKey in e.Attributes.Keys)
                 {
