@@ -811,15 +811,15 @@ namespace FakeXrmEasy.Tests
             var parentAccount = new Account()
             {
                 Id = Guid.NewGuid(),
-                PrimaryContactId = contact.ToEntityReference()
+                PrimaryContactId = contact.ToEntityReference(),
+                Name = "Child Account",
+                Address1_Name = "Address1",
+                Address2_Name = "Address2"
             };
             var account = new Account()
             {
                 Id = Guid.NewGuid(),
                 ParentAccountId = parentAccount.ToEntityReference(),
-                Name = "Child Account",
-                Address1_Name ="Address1",
-                Address2_Name = "Address2"
             };
 
             fakedContext.Initialize(new List<Entity>() {
@@ -855,15 +855,16 @@ namespace FakeXrmEasy.Tests
             var parentAccount = new Account()
             {
                 Id = Guid.NewGuid(),
-                PrimaryContactId = contact.ToEntityReference()
+                PrimaryContactId = contact.ToEntityReference(),
+                Name = "Child Account",
+                Address1_Name = "Address1",
+                Address2_Name = "Address2"
             };
             var account = new Account()
             {
                 Id = Guid.NewGuid(),
                 ParentAccountId = parentAccount.ToEntityReference(),
-                Name = "Child Account",
-                Address1_Name = "Address1",
-                Address2_Name = "Address2"
+
             };
 
             fakedContext.Initialize(new List<Entity>() {
