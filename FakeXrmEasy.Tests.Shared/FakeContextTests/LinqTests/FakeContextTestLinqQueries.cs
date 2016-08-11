@@ -720,6 +720,175 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_doing_a_crm_linq_query_and_selecting_an_entire_object_all_attributes_are_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+
+            var contact = new Contact() { Id = Guid.NewGuid(), FirstName = "Chuck" };
+            var parentAccount = new Account()
+            {
+                Id = Guid.NewGuid(),
+                PrimaryContactId = contact.ToEntityReference()
+            };
+            var account = new Account()
+            {
+                Id = Guid.NewGuid(),
+                ParentAccountId = parentAccount.ToEntityReference()
+            };
+
+            fakedContext.Initialize(new List<Entity>() {
+                contact, parentAccount, account
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from childAccount in ctx.CreateQuery<Account>()
+                               join childsParentAccount in ctx.CreateQuery<Account>() on childAccount.ParentAccountId.Id equals childsParentAccount.AccountId
+                               join primaryContact in ctx.CreateQuery<Contact>() on childsParentAccount.PrimaryContactId.Id equals primaryContact.ContactId
+                               select new
+                               {
+                                   Contact = primaryContact
+                               }).ToList();
+
+                Assert.True(matches.Count == 1);
+                Assert.Equal(matches[0].Contact.Attributes.Count, 6 + 1);
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_and_selecting_an_entire_object_and_a_subset_of_the_attributes_all_attributes_are_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+
+            var contact = new Contact() { Id = Guid.NewGuid(), FirstName = "Chuck" };
+            var parentAccount = new Account()
+            {
+                Id = Guid.NewGuid(),
+                PrimaryContactId = contact.ToEntityReference()
+            };
+            var account = new Account()
+            {
+                Id = Guid.NewGuid(),
+                ParentAccountId = parentAccount.ToEntityReference()
+            };
+
+            fakedContext.Initialize(new List<Entity>() {
+                contact, parentAccount, account
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from childAccount in ctx.CreateQuery<Account>()
+                               join childsParentAccount in ctx.CreateQuery<Account>() on childAccount.ParentAccountId.Id equals childsParentAccount.AccountId
+                               join primaryContact in ctx.CreateQuery<Contact>() on childsParentAccount.PrimaryContactId.Id equals primaryContact.ContactId
+                               select new
+                               {
+                                   Name = primaryContact.FirstName,
+                                   Contact = primaryContact
+                               }).ToList();
+
+                Assert.True(matches.Count == 1);
+                Assert.Equal(matches[0].Contact.Attributes.Count, 6 + 1);
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_and_selecting_an_entire_object_between_joins_all_attributes_are_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+
+            var contact = new Contact() { Id = Guid.NewGuid(), FirstName = "Chuck" };
+            var parentAccount = new Account()
+            {
+                Id = Guid.NewGuid(),
+                PrimaryContactId = contact.ToEntityReference()
+            };
+            var account = new Account()
+            {
+                Id = Guid.NewGuid(),
+                ParentAccountId = parentAccount.ToEntityReference(),
+                Name = "Child Account",
+                Address1_Name ="Address1",
+                Address2_Name = "Address2"
+            };
+
+            fakedContext.Initialize(new List<Entity>() {
+                contact, parentAccount, account
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from childAccount in ctx.CreateQuery<Account>()
+                               join childsParentAccount in ctx.CreateQuery<Account>() on childAccount.ParentAccountId.Id equals childsParentAccount.AccountId
+                               join primaryContact in ctx.CreateQuery<Contact>() on childsParentAccount.PrimaryContactId.Id equals primaryContact.ContactId
+                               select new
+                               {
+                                   Name = account.Name,
+                                   Account = childsParentAccount
+                               }).ToList();
+
+                Assert.True(matches.Count == 1);
+                Assert.Equal(matches[0].Account.Attributes.Count, 6 + 4); //6 = default attributes
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_and_selecting_an_entire_object_plus_some_attributes_of_the_same_object_between_joins_all_attributes_are_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+
+            var contact = new Contact() { Id = Guid.NewGuid(), FirstName = "Chuck" };
+            var parentAccount = new Account()
+            {
+                Id = Guid.NewGuid(),
+                PrimaryContactId = contact.ToEntityReference()
+            };
+            var account = new Account()
+            {
+                Id = Guid.NewGuid(),
+                ParentAccountId = parentAccount.ToEntityReference(),
+                Name = "Child Account",
+                Address1_Name = "Address1",
+                Address2_Name = "Address2"
+            };
+
+            fakedContext.Initialize(new List<Entity>() {
+                contact, parentAccount, account
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from childAccount in ctx.CreateQuery<Account>()
+                               join childsParentAccount in ctx.CreateQuery<Account>() on childAccount.ParentAccountId.Id equals childsParentAccount.AccountId
+                               join primaryContact in ctx.CreateQuery<Contact>() on childsParentAccount.PrimaryContactId.Id equals primaryContact.ContactId
+                               select new
+                               {
+                                   Name = childsParentAccount.Name,
+                                   Account = childsParentAccount
+                               }).ToList();
+
+                Assert.True(matches.Count == 1);
+                Assert.Equal(matches[0].Account.Attributes.Count, 6 + 4); //6 = default attributes
+            }
+        }
+
+        [Fact]
         public void When_doing_a_crm_linq_query_with_an_intersect_entity_and_joins_and_where_clauses_right_result_is_returned()
         {
             var fakedContext = new XrmFakedContext();
