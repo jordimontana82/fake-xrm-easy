@@ -19,7 +19,7 @@ Drive your development by unit testing any plugin, code activity, or 3rd party a
 
 ##Getting Started
 
-NEW! I'l be uploading video tutorials about how to use Fake Xrm Easy. First one [here] (https://www.youtube.com/watch?v=ZLQ2o2P_xJY)
+NEW! Check out video tutorials about how to use Fake Xrm Easy. First one [here] (https://www.youtube.com/watch?v=ZLQ2o2P_xJY)
 
 For a general overview of the framework and samples please refer to [this](https://dynamicsvalue.com/get-started/overview) link. 
 

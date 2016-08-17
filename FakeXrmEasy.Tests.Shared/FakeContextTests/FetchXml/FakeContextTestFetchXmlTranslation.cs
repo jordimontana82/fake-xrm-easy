@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using Xunit;
+using System.Linq;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 {
@@ -249,9 +250,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.True(query.LinkEntities != null);
             Assert.Equal(1, query.LinkEntities.Count);
             Assert.Equal("account", query.LinkEntities[0].LinkFromEntityName);
-            Assert.Equal("parentaccountid", query.LinkEntities[0].LinkFromAttributeName);
+            Assert.Equal("accountid", query.LinkEntities[0].LinkFromAttributeName);
             Assert.Equal("account", query.LinkEntities[0].LinkToEntityName);
-            Assert.Equal("accountid", query.LinkEntities[0].LinkToAttributeName);
+            Assert.Equal("parentaccountid", query.LinkEntities[0].LinkToAttributeName);
             Assert.Equal("ab", query.LinkEntities[0].EntityAlias);
             Assert.True(query.LinkEntities[0].LinkCriteria != null);
         }
@@ -652,5 +653,79 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
 
+        [Fact]
+        public void When_querying_fetchxml_with_linked_entities_linked_entity_properties_match_the_equivalent_linq_expression()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var contact = new Contact()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Lionel"
+            };
+
+            var account = new Account()
+            {
+                Id = Guid.NewGuid(),
+                PrimaryContactId = contact.ToEntityReference()
+            };
+
+            context.Initialize(new List<Entity>
+            {
+                contact, account    
+            });
+
+            var fetchXml = @"
+                    <fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                      <entity name='account'>
+                        <attribute name='name' />
+                        <attribute name='primarycontactid' />
+                        <attribute name='telephone1' />
+                        <attribute name='accountid' />
+                        <order attribute='name' descending='false' />
+                        <link-entity name='contact' from='contactid' to='primarycontactid' alias='aa'>
+                          <attribute name='firstname' />
+                          <filter type='and'>
+                            <condition attribute='firstname' operator='eq' value='Lionel' />
+                          </filter>
+                        </link-entity>
+                      </entity>
+                    </fetch>
+                ";
+
+
+            //Equivalent linq query
+            using(var ctx = new XrmServiceContext(service))
+            {
+                var linqQuery = (from a in ctx.CreateQuery<Account>()
+                                 join c in ctx.CreateQuery<Contact>() on a.PrimaryContactId.Id equals c.ContactId
+                                 where c.FirstName == "Lionel"
+                                 select new
+                                 {
+                                     Account = a,
+                                     Contact = c
+                                 }).ToList();
+
+            }
+
+            var queryExpression = XrmFakedContext.TranslateFetchXmlToQueryExpression(context, fetchXml);
+            Assert.True(queryExpression.LinkEntities.Count == 1);
+
+            var linkedEntity = queryExpression.LinkEntities[0];
+            Assert.Equal(linkedEntity.LinkFromAttributeName, "primarycontactid");
+            Assert.Equal(linkedEntity.LinkToAttributeName, "contactid");
+
+
+
+            var request = new RetrieveMultipleRequest { Query = new FetchExpression(fetchXml) };
+            var response = ((RetrieveMultipleResponse)service.Execute(request));
+
+            var entities = response.EntityCollection.Entities;
+            Assert.True(entities.Count == 1);
+            Assert.True(entities[0].Attributes.ContainsKey("aa.firstname"));
+            Assert.IsType<AliasedValue>(entities[0]["aa.firstname"]);
+            Assert.Equal("Lionel", (entities[0]["aa.firstname"] as AliasedValue).Value.ToString());
+        }
     }
 }

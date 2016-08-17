@@ -137,8 +137,8 @@ namespace FakeXrmEasy.Extensions.FetchXml
             var linkEntity = new LinkEntity();
 
             linkEntity.LinkFromEntityName = el.Parent.GetAttribute("name").Value;
-            linkEntity.LinkFromAttributeName = el.GetAttribute("from").Value;
-            linkEntity.LinkToAttributeName = el.GetAttribute("to").Value;
+            linkEntity.LinkFromAttributeName = el.GetAttribute("to").Value;
+            linkEntity.LinkToAttributeName = el.GetAttribute("from").Value;
             linkEntity.LinkToEntityName = el.GetAttribute("name").Value;  
 
             if(el.GetAttribute("alias") != null)
