@@ -715,7 +715,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var linkedEntity = queryExpression.LinkEntities[0];
             Assert.Equal(linkedEntity.LinkFromAttributeName, "primarycontactid");
             Assert.Equal(linkedEntity.LinkToAttributeName, "contactid");
-
+            Assert.Equal(linkedEntity.JoinOperator, JoinOperator.Inner);
 
 
             var request = new RetrieveMultipleRequest { Query = new FetchExpression(fetchXml) };
@@ -726,6 +726,61 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.True(entities[0].Attributes.ContainsKey("aa.firstname"));
             Assert.IsType<AliasedValue>(entities[0]["aa.firstname"]);
             Assert.Equal("Lionel", (entities[0]["aa.firstname"] as AliasedValue).Value.ToString());
+        }
+
+        [Fact]
+        public void When_querying_fetchxml_with_linked_entities_with_left_outer_join_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var contact = new Contact()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Lionel"
+            };
+
+            var account = new Account() {  Id = Guid.NewGuid(),  PrimaryContactId = contact.ToEntityReference() };
+            var account2 = new Account()  { Id = Guid.NewGuid(), PrimaryContactId = null };
+
+            context.Initialize(new List<Entity>
+            {
+                contact, account, account2
+            });
+
+            var fetchXml = @"
+                    <fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                      <entity name='account'>
+                        <attribute name='name' />
+                        <attribute name='primarycontactid' />
+                        <attribute name='telephone1' />
+                        <attribute name='accountid' />
+                        <order attribute='name' descending='false' />
+                        <link-entity name='contact' from='contactid' to='primarycontactid' alias='aa' link-type='outer'>
+                          <attribute name='firstname' />
+                        </link-entity>
+                        <filter type='and'>
+                            <condition attribute='statecode' operator='eq' value='0' />
+                        </filter>
+                      </entity>
+                    </fetch>
+                ";
+
+            //Translated correctly
+            var queryExpression = XrmFakedContext.TranslateFetchXmlToQueryExpression(context, fetchXml);
+            Assert.True(queryExpression.LinkEntities.Count == 1);
+
+            var linkedEntity = queryExpression.LinkEntities[0];
+            Assert.Equal(linkedEntity.JoinOperator, JoinOperator.LeftOuter);
+
+            //Executed correctly
+            var request = new RetrieveMultipleRequest { Query = new FetchExpression(fetchXml) };
+            var response = ((RetrieveMultipleResponse)service.Execute(request));
+
+            var entities = response.EntityCollection.Entities;
+            Assert.True(entities.Count == 2);
+            Assert.Equal("Lionel", (entities[0]["aa.firstname"] as AliasedValue).Value.ToString());
+            Assert.False(entities[1].Attributes.ContainsKey("aa.firstname"));
         }
     }
 }

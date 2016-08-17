@@ -216,9 +216,9 @@ namespace FakeXrmEasy
             try {
                 xlDoc = XDocument.Parse(fetchXml);
             }
-            catch
+            catch (Exception ex)
             {
-                throw new Exception("FetchXml must be a valid XML document");
+                throw new Exception(string.Format("FetchXml must be a valid XML document: {0}", ex.ToString()));
             }
 
             //Validate nodes

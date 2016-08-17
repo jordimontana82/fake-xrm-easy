@@ -146,11 +146,25 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 linkEntity.EntityAlias = el.GetAttribute("alias").Value;
             }
 
+            //Join operator
+            if (el.GetAttribute("link-type") != null)
+            {
+                switch(el.GetAttribute("link-type").Value)
+                {
+                    case "outer":
+                        linkEntity.JoinOperator = JoinOperator.LeftOuter;
+                        break;
+                    default:
+                        linkEntity.JoinOperator = JoinOperator.Inner;
+                        break;
+                }
+            }
+
             //Process other link entities recursively
             var convertedLinkEntityNodes = el.Elements()
-                                    .Where(e => e.Name.LocalName.Equals("link-entity"))
-                                    .Select(e => e.ToLinkEntity(ctx))
-                                    .ToList();
+                                .Where(e => e.Name.LocalName.Equals("link-entity"))
+                                .Select(e => e.ToLinkEntity(ctx))
+                                .ToList();
 
             foreach(var le in convertedLinkEntityNodes)
             {
