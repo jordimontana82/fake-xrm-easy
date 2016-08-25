@@ -231,5 +231,17 @@ namespace FakeXrmEasy.Tests
 
             Assert.Equal(assembly, context.ProxyTypesAssembly);
         }
+
+        [Fact]
+        public void When_using_proxy_types_entity_names_are_validated()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Jordi" };
+            context.Initialize(new List<Entity>() { c });
+
+            Assert.Throws<Exception>(() => service.Create(new Entity("thisDoesntExist")));
+        }
     }
 }
