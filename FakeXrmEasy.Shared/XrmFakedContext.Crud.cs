@@ -172,22 +172,22 @@ namespace FakeXrmEasy
                 });
         }
 
-        protected static void FakeEnableProxyTypes(XrmFakedContext context, OrganizationServiceProxy fakedService)
-        {
-            A.CallTo(() => fakedService.EnableProxyTypes(A<Assembly>._))
-                .Invokes((Assembly a) =>
-                {
-                    context.ProxyTypesAssembly = a;
-                });
+        //protected static void FakeEnableProxyTypes(XrmFakedContext context, OrganizationServiceProxy fakedService)
+        //{
+        //    A.CallTo(() => fakedService.EnableProxyTypes(A<Assembly>._))
+        //        .Invokes((Assembly a) =>
+        //        {
+        //            context.ProxyTypesAssembly = a;
+        //        });
 
-            A.CallTo(() => fakedService.EnableProxyTypes())
-                .Invokes(() =>
-                {
-                    //Do nothing, we implicitily allow proxy types
+        //    A.CallTo(() => fakedService.EnableProxyTypes())
+        //        .Invokes(() =>
+        //        {
+        //            //Do nothing, we implicitily allow proxy types
 
-                });
+        //        });
 
-        }
+        //}
         #endregion
 
         #region Other protected methods

@@ -23,12 +23,12 @@ namespace FakeXrmEasy
         /// <returns></returns>
         IOrganizationService GetFakedOrganizationService();
 
-        /// <summary>
-        /// Returns a faked organization service proxy that will execute CRUD in-memory operations and other requests against this faked context 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        OrganizationServiceProxy GetFakedOrganizationServiceProxy();
+        ///// <summary>
+        ///// Returns a faked organization service proxy that will execute CRUD in-memory operations and other requests against this faked context 
+        ///// </summary>
+        ///// <param name="context"></param>
+        ///// <returns></returns>
+        //OrganizationServiceProxy GetFakedOrganizationServiceProxy();
 
         /// <summary>
         /// Receives a strong-typed entity type and returns a Queryable of that type
