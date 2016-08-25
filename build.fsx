@@ -6,6 +6,8 @@ open Fake.AssemblyInfoFile
 open Fake.Git
 open Fake.Testing.XUnit2
 open System.IO
+open Fake.OpenCoverHelper
+open Fake.ReportGeneratorHelper
 
 let projectName           = "FakeXrmEasy"
 
@@ -86,8 +88,10 @@ Target "AssemblyInfo" (fun _ ->
 )
 
 Target "BuildFakeXrmEasy" (fun _->
+    let properties =
+        [ ("DefineConstants", "FAKE_XRM_EASY") ]
     !! @"FakeXrmEasy\*.csproj"
-      |> MSBuildRelease FakeXrmEasyBuildDir "Build"
+      |> MSBuild FakeXrmEasyBuildDir "Rebuild" (properties)
       |> Log "Build - Output: "
 )
 
@@ -251,10 +255,67 @@ Target "Publish" (fun _ ->
         |> CopyTo FakeXrmEasy2016DeployDir
 )
 
+Target "CodeCoverage.2011" (fun _ ->
+    OpenCover (fun p -> { p with 
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
+                                Register = RegisterType.RegisterUser
+                                WorkingDir = (testDir @@ "\FakeXrmEasy.Tests")
+                                Filter = "+[FakeXrmEasy*]* -[*.Tests*]*"
+                                Output = "../coverage.2011.xml"
+                        }) "FakeXrmEasy.Tests.dll"
+    
+)
+
+Target "CodeCoverage.2013" (fun _ ->
+    OpenCover (fun p -> { p with 
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
+                                Register = RegisterType.RegisterUser
+                                WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.2013")
+                                Filter = "+[FakeXrmEasy*]* -[*.Tests*]*"
+                                Output = "../coverage.2013.xml"
+                        }) "FakeXrmEasy.Tests.dll"
+    
+)
+
+Target "CodeCoverage.2015" (fun _ ->
+    OpenCover (fun p -> { p with 
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
+                                Register = RegisterType.RegisterUser
+                                WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.2015")
+                                Filter = "+[FakeXrmEasy*]* -[*.Tests*]*"
+                                Output = "../coverage.2015.xml"
+                        }) "FakeXrmEasy.Tests.2015.dll"
+    
+)
+
+Target "CodeCoverage.2016" (fun _ ->
+    OpenCover (fun p -> { p with 
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
+                                Register = RegisterType.RegisterUser
+                                WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.2016")
+                                Filter = "+[FakeXrmEasy*]* -[*.Tests*]*"
+                                Output = "../coverage.2016.xml"
+                        }) "FakeXrmEasy.Tests.2016.dll"
+    
+)
+
+Target "ReportCodeCoverage" (fun _ ->
+    ReportGenerator (fun p -> { p with 
+                                    ExePath = "./packages/ReportGenerator.2.4.5.0/tools/ReportGenerator"
+                                    WorkingDir = (testDir @@ "\FakeXrmEasy.Tests")
+                                    TargetDir = "../reports"
+                                    ReportTypes = [ReportGeneratorReportType.Html; ReportGeneratorReportType.Badges ]
+                               }) [ "..\coverage.2011.xml";  "..\coverage.2013.xml";  "..\coverage.2015.xml";  "..\coverage.2016.xml" ]
+    
+)
+
 "Clean"
   ==> "RestorePackages"
   ==> "BuildVersions"
-//  =?> ("AssemblyInfo", not isLocalBuild )
   ==> "AssemblyInfo"
   ==> "BuildFakeXrmEasy"
   ==> "BuildFakeXrmEasy.2013"
@@ -268,8 +329,14 @@ Target "Publish" (fun _ ->
   ==> "Test.2013"
   ==> "Test.2015"
   ==> "Test.2016"
-  ==> "Publish"
-  ==> "NuGet"
-  ==> "PublishNuGet"
+  ==> "CodeCoverage.2011"
+  ==> "CodeCoverage.2013"
+  ==> "CodeCoverage.2015"
+  ==> "CodeCoverage.2016"
+  ==> "ReportCodeCoverage"
+//  ==> "Publish"
+//  ==> "NuGet"
+//  ==> "PublishNuGet"
   
-RunTargetOrDefault "NuGet"
+RunTargetOrDefault "ReportCodeCoverage"
+//RunTargetOrDefault "NuGet"
