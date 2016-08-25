@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\AddActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\AddActivityWithConstant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\CreateTaskActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssignRequestTests\AssignRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssociateRequestTests\AssociateRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ExecuteMultipleRequestTests\ExecuteMultipleRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextMockTests.cs" />

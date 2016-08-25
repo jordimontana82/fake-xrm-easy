@@ -8,7 +8,7 @@ using Microsoft.Xrm.Sdk.Messages;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
-    internal class AssignRequestExecutor : IFakeMessageExecutor
+    public class AssignRequestExecutor : IFakeMessageExecutor
     {
         public bool CanExecute(OrganizationRequest request)
         {

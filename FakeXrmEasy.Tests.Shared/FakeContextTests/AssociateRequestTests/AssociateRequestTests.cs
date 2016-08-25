@@ -19,7 +19,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AssociateRequestTests
         }
 
         [Fact]
-        public void When_can_execute_is_called_with_a_null_request_exception_is_thrown()
+        public void When_execute_is_called_with_a_null_request_exception_is_thrown()
         {
             var context = new XrmFakedContext();
             var executor = new AssociateRequestExecutor();
@@ -28,7 +28,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AssociateRequestTests
         }
 
         [Fact]
-        public void When_can_execute_is_called_with_a_null_target_exception_is_thrown()
+        public void When_execute_is_called_with_a_null_target_exception_is_thrown()
         {
             var context = new XrmFakedContext();
             var executor = new AssociateRequestExecutor();
