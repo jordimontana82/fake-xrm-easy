@@ -436,6 +436,33 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void When_executing_fetchxml_with_a_not_integer_count_attribute_exception_is_thrown()
+        {
+            //This will test a query expression is generated and executed
+
+            var ctx = new XrmFakedContext();
+
+            //Arrange
+            //Act
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' count='asd'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' /> 
+                                  </entity>
+                            </fetch>";
+
+
+            var retrieveMultiple = new RetrieveMultipleRequest()
+            {
+                Query = new FetchExpression(fetchXml)
+            };
+
+            var service = ctx.GetFakedOrganizationService();
+            Assert.Throws<Exception>(() => service.Execute(retrieveMultiple));
+        }
+
+        [Fact]
         public void When_filtering_by_a_guid_attribute_right_result_is_returned()
         {
             var context = new XrmFakedContext();
