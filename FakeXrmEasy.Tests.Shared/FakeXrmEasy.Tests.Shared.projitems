@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\CreateTaskActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssignRequestTests\AssignRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssociateRequestTests\AssociateRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\DeleteRequestTests\DeleteRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ExecuteMultipleRequestTests\ExecuteMultipleRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ExecuteTransationTests\ExecuteTransactionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextMockTests.cs" />
