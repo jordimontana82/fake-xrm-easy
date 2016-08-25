@@ -157,7 +157,7 @@ Target "Test.2011" (fun _ ->
 )
 
 Target "Test.2013" (fun _ ->
-    !! (testDir @@ "\FakeXrmEasy.Tests.2013\FakeXrmEasy.Tests.dll")
+    !! (testDir @@ "\FakeXrmEasy.Tests.2013\FakeXrmEasy.Tests.2013.dll")
       |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.2013.html") })
 )
 
@@ -275,7 +275,7 @@ Target "CodeCoverage.2013" (fun _ ->
                                 WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.2013")
                                 Filter = "+[FakeXrmEasy*]* -[*.Tests*]*"
                                 Output = "../coverage.2013.xml"
-                        }) "FakeXrmEasy.Tests.dll"
+                        }) "FakeXrmEasy.Tests.2013.dll"
     
 )
 
