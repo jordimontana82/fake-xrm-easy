@@ -243,5 +243,32 @@ namespace FakeXrmEasy.Tests
 
             Assert.Throws<Exception>(() => service.Create(new Entity("thisDoesntExist")));
         }
+
+        [Fact]
+        public void When_initialising_the_context_once_exception_is_not_thrown()
+        {
+            var context = new XrmFakedContext();
+            var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Lionel" };
+            Assert.DoesNotThrow(() => context.Initialize(new List<Entity>() { c }));
+        }
+
+        [Fact]
+        public void When_initialising_the_context_twice_exception_is_thrown()
+        {
+            var context = new XrmFakedContext();
+            var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Lionel" };
+            Assert.DoesNotThrow(() => context.Initialize(new List<Entity>() { c }));
+            Assert.Throws<Exception>(() => context.Initialize(new List<Entity>() { c }));
+        }
+
+        [Fact]
+        public void When_getting_a_fake_service_reference_it_uses_a_singleton_pattern()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+            var service2 = context.GetFakedOrganizationService();
+
+            Assert.Equal(service, service2);
+        }
     }
 }

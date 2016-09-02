@@ -28,6 +28,9 @@ namespace FakeXrmEasy
     {
         protected Dictionary<string, Dictionary<string, string>> AttributeMetadata { get; set; }
 
+        protected internal IOrganizationService _service { get; set; }
+        protected internal bool _initialised { get; set; }
+
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
 
         public Assembly ProxyTypesAssembly { get; set; }
@@ -89,6 +92,11 @@ namespace FakeXrmEasy
         /// <param name="col"></param>
         public void Initialize(IEnumerable<Entity> entities)
         {
+            if(_initialised)
+            {
+                throw new Exception("Initialize should be called only once per unit test execution and XrmFakedContext instance.");
+            }
+
             if (entities == null)
             {
                 throw new InvalidOperationException("The entities parameter must be not null");
@@ -98,6 +106,8 @@ namespace FakeXrmEasy
             {
                 AddEntityWithDefaults(e);
             }
+
+            _initialised = true;
         }
 
         public void AddExecutionMock<T>(ServiceRequestExecution mock) where T : OrganizationRequest
@@ -189,10 +199,10 @@ namespace FakeXrmEasy
         /// <returns></returns>
         protected IOrganizationService GetFakedOrganizationService(XrmFakedContext context)
         {
-            //if (context == null) //Impossible to reproduce as this method is protected and called from an instance
-            //{
-            //    throw new InvalidOperationException("The faked context must not be null.");
-            //}
+            if(context._service != null)
+            {
+                return context._service;
+            } 
 
             var fakedService = A.Fake<IOrganizationService>();
 
@@ -210,6 +220,7 @@ namespace FakeXrmEasy
             FakeAssociate(context, fakedService);
             FakeDisassociate(context, fakedService);
 
+            context._service = fakedService;
             return fakedService;
         }
 
