@@ -18,6 +18,7 @@
       <dependency id="Microsoft.Xrm.Sdk.2011" version="5.0.18" />
       <dependency id="Microsoft.Xrm.Sdk.Workflow.2011" version="5.0.18" />
       <dependency id="Microsoft.Crm.Sdk.Proxy.2011" version="5.0.18" />
+      <dependency id="Microsoft.Xrm.Client.2011" version="5.0.18" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Activities" targetFramework="net40" />

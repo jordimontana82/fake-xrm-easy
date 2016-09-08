@@ -39,7 +39,7 @@ namespace FakeXrmEasy
                 throw new Exception("The connectionString property must not be blank");
             }
 
-#if FAKE_XRM_EASY_2016
+#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2013
             
             return null; // TO DO
 #else

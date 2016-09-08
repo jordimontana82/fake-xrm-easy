@@ -17,6 +17,7 @@
       <dependency id="FakeItEasy" version="1.25.3" />
       <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="7.1.1" />
       <dependency id="Microsoft.CrmSdk.Workflow" version="7.1.1" />
+      <dependency id="Microsoft.CrmSdk.Extensions" version="7.1.0.1" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Activities" targetFramework="net452" />
