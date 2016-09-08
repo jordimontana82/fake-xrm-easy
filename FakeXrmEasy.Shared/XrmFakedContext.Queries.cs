@@ -19,7 +19,7 @@ using FakeXrmEasy.OrganizationFaults;
 
 namespace FakeXrmEasy
 {
-    public partial class XrmFakedContext : IXrmFakedContext
+    public partial class XrmFakedContext : IXrmContext
     {
         protected internal Type FindReflectedType(string sLogicalName)
         {

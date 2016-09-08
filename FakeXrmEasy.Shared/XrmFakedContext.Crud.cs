@@ -15,7 +15,7 @@ using System.Reflection;
 
 namespace FakeXrmEasy
 {
-    public partial class XrmFakedContext : IXrmFakedContext
+    public partial class XrmFakedContext : IXrmContext
     {
 
         #region CRUD

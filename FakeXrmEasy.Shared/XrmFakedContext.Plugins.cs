@@ -13,7 +13,7 @@ using FakeXrmEasy.Extensions;
 
 namespace FakeXrmEasy
 {
-    public partial class XrmFakedContext : IXrmFakedContext
+    public partial class XrmFakedContext : IXrmContext
     {
         public XrmFakedPluginExecutionContext GetDefaultPluginContext()
         {

@@ -16,7 +16,7 @@ using System.Activities.Hosting;
 
 namespace FakeXrmEasy
 {
-    public partial class XrmFakedContext : IXrmFakedContext
+    public partial class XrmFakedContext : IXrmContext
     {
         public XrmFakedWorkflowContext GetDefaultWorkflowContext()
         {

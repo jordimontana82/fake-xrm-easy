@@ -8,7 +8,7 @@ using System.Activities;
 
 namespace FakeXrmEasy
 {
-    public interface IXrmFakedContext
+    public interface IXrmContext
     {
         /// <summary>
         /// Receives a list of entities, that are used to initialize the context with those
@@ -17,9 +17,14 @@ namespace FakeXrmEasy
         void Initialize(IEnumerable<Entity> entities);
 
         /// <summary>
-        /// Returns a faked organization service that will execute CRUD in-memory operations and other requests against this faked context 
+        /// Returns an instance of an organization service 
         /// </summary>
-        /// <param name="context"></param>
+        /// <returns></returns>
+        IOrganizationService GetOrganizationService();
+
+        /// <summary>
+        /// DEPRECATED: Consider using GetOrganizationService instead 
+        /// </summary>
         /// <returns></returns>
         IOrganizationService GetFakedOrganizationService();
 

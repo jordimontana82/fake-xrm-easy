@@ -24,7 +24,7 @@ namespace FakeXrmEasy
     /// how entities are persisted in Tables (with the logical name) and then the records themselves
     /// where the Primary Key is the Guid
     /// </summary>
-    public partial class XrmFakedContext: IXrmFakedContext
+    public partial class XrmFakedContext: IXrmContext
     {
         protected Dictionary<string, Dictionary<string, string>> AttributeMetadata { get; set; }
 
@@ -154,6 +154,11 @@ namespace FakeXrmEasy
             }
 
             return null;
+        }
+
+        public virtual IOrganizationService GetOrganizationService()
+        {
+            return GetFakedOrganizationService(this);
         }
 
         /// <summary>
