@@ -2,9 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xrm.Sdk;
+using System.Configuration;
+
+#if FAKE_XRM_EASY_2016
+using Microsoft.Xrm.Tooling.Connector;
+#else 
 using Microsoft.Xrm.Client;
 using Microsoft.Xrm.Client.Services;
-using System.Configuration;
+#endif
+
 
 namespace FakeXrmEasy
 {
@@ -28,6 +34,11 @@ namespace FakeXrmEasy
             return _service;
         }
 
+        public override void Initialize(IEnumerable<Entity> entities)
+        {
+            //Does nothing...  otherwise it would create records in a real org db
+        }
+
         protected IOrganizationService GetOrgService()
         {
             var connection = ConfigurationManager.ConnectionStrings["fakexrmeasy-connection"];
@@ -39,9 +50,12 @@ namespace FakeXrmEasy
                 throw new Exception("The connectionString property must not be blank");
             }
 
-#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2013
+#if FAKE_XRM_EASY_2016
             
-            return null; // TO DO
+            // Connect to the CRM web service using a connection string.
+            CrmServiceClient client = new Microsoft.Xrm.Tooling.Connector.CrmServiceClient(connection.ConnectionString);
+            return client;
+
 #else
             CrmConnection crmConnection = CrmConnection.Parse(connection.ConnectionString);
             OrganizationService service = new OrganizationService(crmConnection);

@@ -90,7 +90,7 @@ namespace FakeXrmEasy
         /// Initializes the context with the provided entities
         /// </summary>
         /// <param name="col"></param>
-        public void Initialize(IEnumerable<Entity> entities)
+        public virtual void Initialize(IEnumerable<Entity> entities)
         {
             if(_initialised)
             {
