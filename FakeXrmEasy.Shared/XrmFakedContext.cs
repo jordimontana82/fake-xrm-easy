@@ -209,8 +209,14 @@ namespace FakeXrmEasy
                 return context._service;
             } 
 
-            var fakedService = A.Fake<IOrganizationService>();
+            if(context is XrmRealContext)
+            {
+                context._service = context.GetOrganizationService();
+                return context._service;
+            }
 
+            var fakedService = A.Fake<IOrganizationService>();
+            
             //Fake CRUD methods
             FakeRetrieve(context, fakedService);
             FakeCreate(context, fakedService);
@@ -224,9 +230,9 @@ namespace FakeXrmEasy
             FakeExecute(context, fakedService);
             FakeAssociate(context, fakedService);
             FakeDisassociate(context, fakedService);
-
             context._service = fakedService;
-            return fakedService;
+
+            return context._service;
         }
 
         /// <summary>
