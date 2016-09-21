@@ -194,5 +194,32 @@ namespace FakeXrmEasy.Tests
                 Assert.Throws<SaveChangesException>(() => ctx.SaveChanges());
             }
         }
+
+        [Fact]
+        public void Should_Not_Change_Context_Objects_Without_Update()
+        {
+            var entityId = Guid.NewGuid();
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            context.Initialize(new[] {
+                new Entity ("account")
+                {
+                    Id = entityId,
+                    Attributes = new AttributeCollection
+                    {
+                        { "accountname", "Adventure Works" }
+                    }
+                }
+            });
+
+            var firstRetrieve = service.Retrieve("account", entityId, new ColumnSet(true));
+            var secondRetrieve = service.Retrieve("account", entityId, new ColumnSet(true));
+
+            firstRetrieve["accountname"] = "Updated locally";
+
+            Assert.Equal("Updated locally", firstRetrieve["accountname"]);
+            Assert.Equal("Adventure Works", secondRetrieve["accountname"]);
+        }
     }
 }
