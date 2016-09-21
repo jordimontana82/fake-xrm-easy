@@ -200,7 +200,7 @@ namespace FakeXrmEasy.Tests
         {
             var entityId = Guid.NewGuid();
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             context.Initialize(new[] {
                 new Entity ("account")
@@ -220,6 +220,75 @@ namespace FakeXrmEasy.Tests
 
             Assert.Equal("Updated locally", firstRetrieve["accountname"]);
             Assert.Equal("Adventure Works", secondRetrieve["accountname"]);
+        }
+
+        [Fact]
+        public void Should_Not_Change_Context_Early_Bound_Objects_Without_Update()
+        {
+            var entityId = Guid.NewGuid();
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            context.Initialize(new[] {
+                new Account()
+                {
+                    Id = entityId,
+                    Attributes = new AttributeCollection
+                    {
+                        { "accountname", "Adventure Works" }
+                    }
+                }
+            });
+
+            var firstRetrieve = service.Retrieve("account", entityId, new ColumnSet(true));
+            var secondRetrieve = service.Retrieve("account", entityId, new ColumnSet(true));
+
+            firstRetrieve["accountname"] = "Updated locally";
+
+            Assert.Equal("Updated locally", firstRetrieve["accountname"]);
+            Assert.Equal("Adventure Works", secondRetrieve["accountname"]);
+        }
+
+        [Fact]
+        public void Should_Not_Change_Context_Objects_Without_Update_And_Retrieve_Multiple()
+        {
+            var entityId = Guid.NewGuid();
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            context.Initialize(new[] {
+                new Account
+                {
+                    Id = entityId,
+                    Name = "Adventure Works"
+                }
+            });
+
+            Account firstRetrieve, secondRetrieve = null;
+            using (var ctx = new XrmServiceContext(service))
+            {
+                firstRetrieve = ctx.CreateQuery<Account>()
+                                    .Where(a => a.AccountId == entityId)
+                                    .FirstOrDefault();
+
+            }
+
+            using (var ctx = new XrmServiceContext(service))
+            {
+                secondRetrieve = ctx.CreateQuery<Account>()
+                                    .Where(a => a.AccountId == entityId)
+                                    .FirstOrDefault();
+
+            }
+
+
+            firstRetrieve.Name = "Updated locally";
+
+            Assert.False(firstRetrieve == secondRetrieve);
+            Assert.Equal("Updated locally", firstRetrieve.Name);
+            Assert.Equal("Adventure Works", secondRetrieve.Name);
+            
+
         }
     }
 }

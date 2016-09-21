@@ -62,17 +62,20 @@ namespace FakeXrmEasy
                         }
                     }
 
+                    //Return the subset of columns requested only
+                    var reflectedType = context.FindReflectedType(entityName);
+                    
                     //Entity logical name exists, so , check if the requested entity exists
                     if (context.Data.ContainsKey(entityName) && context.Data[entityName] != null
                         && context.Data[entityName].ContainsKey(id))
                     {
                         //Entity found => return only the subset of columns specified or all of them
                         if (columnSet.AllColumns)
-                            return context.Data[entityName][id];
+                            return context.Data[entityName][id].Clone(reflectedType);
                         else
                         {
-                            //Return the subset of columns requested only
-                            var foundEntity = context.Data[entityName][id];
+                            Entity foundEntity = null;
+                            foundEntity = context.Data[entityName][id].Clone(reflectedType);
                             Entity projected = foundEntity.ProjectAttributes(columnSet, context);
                             return projected;
                         }
