@@ -19,5 +19,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             throw PullRequestException.NotImplementedOrganizationRequest(request.GetType());
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(RetrieveAttributeRequest);
+        }
     }
 }

@@ -120,5 +120,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             return sFormattedValue;
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(RetrieveMultipleRequest);
+        }
     }
 }

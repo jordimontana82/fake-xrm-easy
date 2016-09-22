@@ -30,5 +30,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             return new DeleteResponse();
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(DeleteRequest);
+        }
     }
 }

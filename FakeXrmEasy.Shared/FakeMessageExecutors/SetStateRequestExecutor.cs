@@ -32,5 +32,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             return new SetStateResponse();
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(SetStateRequest);
+        }
     }
 }

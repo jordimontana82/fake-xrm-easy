@@ -13,6 +13,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
     public interface IFakeMessageExecutor
     {
         bool CanExecute(OrganizationRequest request);
+        Type GetResponsibleRequestType();
         OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx);
     }
 
