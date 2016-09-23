@@ -167,23 +167,30 @@ namespace FakeXrmEasy.Extensions
                 var original = (attributeValue as Money);
                 return new Money(original.Value);
             }
-            else if (type == typeof(int) || type == typeof(Int64))
+
+            else if (attributeValue.GetType() == typeof (EntityCollection))
+            {
+                var collection = attributeValue as EntityCollection;
+                return new EntityCollection(collection.Entities.Select(e => e.Clone(e.GetType())).ToList());
+            }
+
+            else if (type == typeof (int) || type == typeof (Int64))
                 return attributeValue; //Not a reference type
-            else if (type == typeof(decimal))
+            else if (type == typeof (decimal))
                 return attributeValue; //Not a reference type
-            else if (type == typeof(double))
+            else if (type == typeof (double))
                 return attributeValue; //Not a reference type
-            else if (type == typeof(float))
+            else if (type == typeof (float))
                 return attributeValue; //Not a reference type
-            else if (type == typeof(byte))
+            else if (type == typeof (byte))
                 return attributeValue; //Not a reference type
-            else if (type == typeof(float))
+            else if (type == typeof (float))
                 return attributeValue; //Not a reference type
-            else if (type == typeof(bool))
+            else if (type == typeof (bool))
                 return attributeValue; //Not a reference type
-            else if (type == typeof(Guid))
+            else if (type == typeof (Guid))
                 return attributeValue; //Not a reference type
-            else if (type == typeof(DateTime))
+            else if (type == typeof (DateTime))
                 return attributeValue; //Not a reference type
             else if (attributeValue is Enum)
                 return attributeValue; //Not a reference type
