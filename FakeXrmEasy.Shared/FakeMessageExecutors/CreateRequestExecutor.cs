@@ -27,5 +27,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 Results = new ParameterCollection { { "id", guid } }
             };
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(CreateRequest);
+        }
     }
 }

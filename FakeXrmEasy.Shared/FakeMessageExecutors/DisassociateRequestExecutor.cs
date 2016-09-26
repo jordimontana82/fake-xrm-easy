@@ -61,5 +61,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             return new DisassociateResponse();
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(DisassociateRequest);
+        }
     }
 }
