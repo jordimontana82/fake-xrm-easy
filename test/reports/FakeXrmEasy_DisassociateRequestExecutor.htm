@@ -15,11 +15,11 @@
 <tr><th>Class:</th><td>FakeXrmEasy.FakeMessageExecutors.DisassociateRequestExecutor</td></tr>
 <tr><th>Assembly:</th><td>FakeXrmEasy</td></tr>
 <tr><th>File(s):</th><td><a href="#CUsersJordiSourceReposfakexrmeasyFakeXrmEasySharedFakeMessageExecutorsDisassociateRequestExecutorcs">C:\Users\Jordi\Source\Repos\fake-xrm-easy\FakeXrmEasy.Shared\FakeMessageExecutors\DisassociateRequestExecutor.cs</a></td></tr>
-<tr><th>Covered lines:</th><td>27</td></tr>
+<tr><th>Covered lines:</th><td>30</td></tr>
 <tr><th>Uncovered lines:</th><td>9</td></tr>
-<tr><th>Coverable lines:</th><td>36</td></tr>
-<tr><th>Total lines:</th><td>65</td></tr>
-<tr><th>Line coverage:</th><td>75%</td></tr>
+<tr><th>Coverable lines:</th><td>39</td></tr>
+<tr><th>Total lines:</th><td>70</td></tr>
+<tr><th>Line coverage:</th><td>76.9%</td></tr>
 <tr><th>Branch coverage:</th><td>50%</td></tr>
 </tbody>
 </table>
@@ -29,6 +29,7 @@
 <tbody>
 <tr><td title="System.Boolean FakeXrmEasy.FakeMessageExecutors.DisassociateRequestExecutor::CanExecute(Microsoft.Xrm.Sdk.OrganizationRequest)">CanExecute(...)</td><td>1</td><td>0</td><td>0</td></tr>
 <tr><td title="Microsoft.Xrm.Sdk.OrganizationResponse FakeXrmEasy.FakeMessageExecutors.DisassociateRequestExecutor::Execute(Microsoft.Xrm.Sdk.OrganizationRequest,FakeXrmEasy.XrmFakedContext)">Execute(...)</td><td>7</td><td>80</td><td>55.56</td></tr>
+<tr><td title="System.Type FakeXrmEasy.FakeMessageExecutors.DisassociateRequestExecutor::GetResponsibleRequestType()">GetResponsibleRequestType()</td><td>1</td><td>100</td><td>100</td></tr>
 </tbody>
 </table>
 <h1>File(s)</h1>
@@ -99,10 +100,15 @@
 <tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>61</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '8', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">8</td><td class="rightmargin right"><code>62</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;new&nbsp;DisassociateResponse();</code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '8', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">8</td><td class="rightmargin right"><code>63</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
-<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>64</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
-<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>65</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>64</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>65</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;Type&nbsp;GetResponsibleRequestType()</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '1246', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">1246</td><td class="rightmargin right"><code>66</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '1246', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">1246</td><td class="rightmargin right"><code>67</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;typeof(DisassociateRequest);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '1246', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">1246</td><td class="rightmargin right"><code>68</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>69</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>70</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
 </tbody>
 </table>
-<div class="footer">Generated by: ReportGenerator 2.4.5.0<br />21/09/2016 - 22:22:04<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<div class="footer">Generated by: ReportGenerator 2.4.5.0<br />09/10/2016 - 23:04:09<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
 <script type="text/javascript" src="combined.js"></script>
 </body></html>
