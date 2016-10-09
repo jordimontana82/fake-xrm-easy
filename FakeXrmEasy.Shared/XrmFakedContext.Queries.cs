@@ -499,13 +499,24 @@ namespace FakeXrmEasy
         }
         protected static Expression GetAppropiateCastExpressionBasedOnString(Expression input, object value)
         {
+            var defaultStringExpression = GetCaseInsensitiveExpression(GetAppropiateCastExpressionDefault(input, value));
+
             DateTime dtDateTimeConversion;
             if (DateTime.TryParse(value.ToString(), out dtDateTimeConversion))
             {
                 return Expression.Convert(input, typeof(DateTime));
             }
 
-            return GetCaseInsensitiveExpression(GetAppropiateCastExpressionDefault(input, value)); //Non datetime string
+            int iValue;
+            if(int.TryParse(value.ToString(), out iValue))
+            {
+                return Expression.Condition(Expression.TypeIs(input, typeof(OptionSetValue)),
+                    GetToStringExpression<Int32>(GetAppropiateCastExpressionBasedOnInt(input)),
+                    defaultStringExpression
+                );
+            }
+
+            return defaultStringExpression; 
         }
 
         protected static Expression GetAppropiateCastExpressionDefault(Expression input, object value)
@@ -735,6 +746,10 @@ namespace FakeXrmEasy
             return TranslateConditionExpressionLike(computedCondition, getAttributeValueExpr, containsAttributeExpr);
         }
 
+        protected static Expression GetToStringExpression<T>(Expression e)
+        {
+            return Expression.Call(e, typeof(T).GetMethod("ToString", new Type[] { }));
+        }
         protected static Expression GetCaseInsensitiveExpression(Expression e)
         {
             return Expression.Call(e,
