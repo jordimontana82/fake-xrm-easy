@@ -109,7 +109,7 @@ namespace FakeXrmEasy
 
         public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx,
                                      string unsecureConfiguration,
-                                     string secureConfiguration) where T : IPlugin, new()
+                                     string secureConfiguration) where T : class, IPlugin 
         {
             var fakedServiceProvider = GetFakedServiceProvider(plugCtx);
 

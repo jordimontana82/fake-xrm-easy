@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\CreateTaskActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssignRequestTests\AssignRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssociateRequestTests\AssociateRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\BasePluginTests\BasePluginTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\CloseQuoteRequestTests\CloseQuoteRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\DeleteRequestTests\DeleteRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ExecuteMultipleRequestTests\ExecuteMultipleRequestTests.cs" />
@@ -55,6 +56,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WhoAmIRequest\WhoAmITests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\XrmFakedRelationshipTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GeneratedCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\AccountSetTerritories.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\BasePlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\PreAccountCreate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\AccountNumberPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\ConfigurationPlugin.cs" />
