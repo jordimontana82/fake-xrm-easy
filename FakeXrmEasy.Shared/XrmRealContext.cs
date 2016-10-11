@@ -20,8 +20,22 @@ namespace FakeXrmEasy
     /// </summary>
     public class XrmRealContext: XrmFakedContext, IXrmContext
     {
+        public string ConnectionStringName { get; set; } = "fakexrmeasy-connection";
+
         public XrmRealContext()
         {
+            //Don't setup fakes in this case.
+        }
+
+        public XrmRealContext(string connectionString)
+        {
+            ConnectionStringName = connectionString;
+            //Don't setup fakes in this case.
+        }
+
+        public XrmRealContext(IOrganizationService organizationService)
+        {
+            _service = organizationService;
             //Don't setup fakes in this case.
         }
 
@@ -41,9 +55,9 @@ namespace FakeXrmEasy
 
         protected IOrganizationService GetOrgService()
         {
-            var connection = ConfigurationManager.ConnectionStrings["fakexrmeasy-connection"];
+            var connection = ConfigurationManager.ConnectionStrings[ConnectionStringName];
             if (connection == null)
-                throw new Exception("A connectionstring parameter with name 'fakexrmeasy-connection' must exist");
+                throw new Exception(string.Format("A connectionstring parameter with name '{0}' must exist", ConnectionStringName));
 
             if(string.IsNullOrWhiteSpace(connection.ConnectionString))
             {
