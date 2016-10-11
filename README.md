@@ -3,14 +3,14 @@ Fake Xrm Easy: The automated testing framework for Dynamics CRM
 
 |Build|Line Coverage|Branch Coverage|
 |-----------|-----|-----------------|
-|[![Build status](https://ci.appveyor.com/api/projects/status/2g8yc8jg817746du?svg=true)](https://ci.appveyor.com/project/Jordi/fake-xrm-easy)|[![Line coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_linecoverage.svg?v=1.16.3)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.16.3)|[![Branch coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_branchcoverage.svg?v=1.16.3)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.16.3)|
+|[![Build status](https://ci.appveyor.com/api/projects/status/2g8yc8jg817746du?svg=true)](https://ci.appveyor.com/project/Jordi/fake-xrm-easy)|[![Line coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_linecoverage.svg?v=1.16.4)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.16.4)|[![Branch coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_branchcoverage.svg?v=1.16.4)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.16.4)|
 
 |Crm Version|NuGet|
 |-----------|-----|
-|2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.16.3)](https://www.nuget.org/packages/fakexrmeasy.2016)|
-|2015|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2015?v=1.16.3)](https://www.nuget.org/packages/fakexrmeasy.2015)|
-|2013|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2013?v=1.16.3)](https://www.nuget.org/packages/fakexrmeasy.2013)|
-|2011|[![Nuget](https://buildstats.info/nuget/fakexrmeasy?v=1.16.3)](https://www.nuget.org/packages/fakexrmeasy)|
+|2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.16.4)](https://www.nuget.org/packages/fakexrmeasy.2016)|
+|2015|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2015?v=1.16.4)](https://www.nuget.org/packages/fakexrmeasy.2015)|
+|2013|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2013?v=1.16.4)](https://www.nuget.org/packages/fakexrmeasy.2013)|
+|2011|[![Nuget](https://buildstats.info/nuget/fakexrmeasy?v=1.16.4)](https://www.nuget.org/packages/fakexrmeasy)|
 
 The framework to streamline unit testing in Dynamics CRM by faking the IOrganizationService to work with an In-Memory context.
 
@@ -42,8 +42,8 @@ Please consider the below guidelines for contributing to the project:
 
 *  FetchXml implementation:
 *     DONE: Add support for arithmetic operators
+*     IN PROGRESS:  Add support for FetchXml aggregations
 *     TO DO:  Adding support for date operators...
 	-	Check the [Full list of done / to do condition operators](https://github.com/jordimontana82/fake-xrm-easy/blob/master/FakeXrmEasy.Tests.Shared/FakeContextTests/FetchXml/ConditionOperatorTests.cs#L19-L110) and feel free to add missing ones!
-*     TO DO:  Add support for FetchXml aggregations
 *  Increase test coverage
   
