@@ -287,7 +287,7 @@ namespace FakeXrmEasy
 
             // Compose the expression tree that represents the parameter to the predicate.
             ParameterExpression entity = Expression.Parameter(typeof(Entity));
-            var expTreeBody = TranslateQueryExpressionFiltersToExpression(qe, entity);
+            var expTreeBody = TranslateQueryExpressionFiltersToExpression(context, qe, entity);
             Expression<Func<Entity, bool>> lambda = Expression.Lambda<Func<Entity, bool>>(expTreeBody, entity);
             query = query.Where(lambda);
 
@@ -315,7 +315,7 @@ namespace FakeXrmEasy
         }
         
 
-        protected static Expression TranslateConditionExpression(ConditionExpression c, ParameterExpression entity)
+        protected static Expression TranslateConditionExpression(XrmFakedContext context, ConditionExpression c, ParameterExpression entity)
         {
             Expression attributesProperty = Expression.Property(
                 entity,
@@ -368,7 +368,10 @@ namespace FakeXrmEasy
                 case ConditionOperator.Today:
                 case ConditionOperator.Yesterday:
                 case ConditionOperator.Tomorrow:
-                    return TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression);
+                case ConditionOperator.EqualUserId:
+                    return TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression);
+                case ConditionOperator.NotEqualUserId:
+                    return Expression.Not(TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression));
 
                 case ConditionOperator.BeginsWith:
                 case ConditionOperator.Like:
@@ -379,7 +382,7 @@ namespace FakeXrmEasy
                     return TranslateConditionExpressionContains(c, getNonBasicValueExpr, containsAttributeExpression);
                 
                 case ConditionOperator.NotEqual:
-                    return Expression.Not(TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression));
+                    return Expression.Not(TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression));
 
                 case ConditionOperator.DoesNotBeginWith:
                 case ConditionOperator.DoesNotEndWith:
@@ -397,13 +400,13 @@ namespace FakeXrmEasy
                     return TranslateConditionExpressionGreaterThan(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.GreaterEqual:
-                    return TranslateConditionExpressionGreaterThanOrEqual(c, getNonBasicValueExpr, containsAttributeExpression);
+                    return TranslateConditionExpressionGreaterThanOrEqual(context, c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.LessThan:
                     return TranslateConditionExpressionLessThan(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.LessEqual:
-                    return TranslateConditionExpressionLessThanOrEqual(c, getNonBasicValueExpr, containsAttributeExpression);
+                    return TranslateConditionExpressionLessThanOrEqual(context, c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.In:
                     return TranslateConditionExpressionIn(c, getNonBasicValueExpr, containsAttributeExpression);
@@ -411,18 +414,18 @@ namespace FakeXrmEasy
                     return Expression.Not(TranslateConditionExpressionIn(c, getNonBasicValueExpr, containsAttributeExpression));
 
                 case ConditionOperator.On:
-                    return TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression);
+                    return TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.NotOn:
-                    return Expression.Not(TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression));
+                    return Expression.Not(TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression));
 
                 case ConditionOperator.OnOrAfter:
                     return Expression.Or(
-                               TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression),
+                               TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression),
                                TranslateConditionExpressionGreaterThan(c, getNonBasicValueExpr, containsAttributeExpression));
                 case ConditionOperator.OnOrBefore:
                     return Expression.Or(
-                                TranslateConditionExpressionEqual(c, getNonBasicValueExpr, containsAttributeExpression),
+                                TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression),
                                 TranslateConditionExpressionLessThan(c, getNonBasicValueExpr, containsAttributeExpression));
 
                 case ConditionOperator.Between:
@@ -439,6 +442,9 @@ namespace FakeXrmEasy
                     }
                     return Expression.Not(TranslateConditionExpressionBetween(c, getNonBasicValueExpr, containsAttributeExpression));
 
+                
+                    
+                    
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.Operator.ToString()));
 
@@ -591,7 +597,7 @@ namespace FakeXrmEasy
                                                         typeof(int)),
                                                     Expression.Convert(input, typeof(int)));
         }
-        protected static Expression TranslateConditionExpressionEqual(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        protected static Expression TranslateConditionExpressionEqual(XrmFakedContext context, ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
 
@@ -607,6 +613,10 @@ namespace FakeXrmEasy
                     break;
                 case ConditionOperator.Tomorrow:
                     unaryOperatorValue = DateTime.Today.AddDays(1);
+                    break;
+                case ConditionOperator.EqualUserId:
+                case ConditionOperator.NotEqualUserId:
+                    unaryOperatorValue = context.CallerId.Id;
                     break;
             }
             if (unaryOperatorValue != null)
@@ -671,10 +681,10 @@ namespace FakeXrmEasy
         //                        expOrValues));
         //}
 
-        protected static Expression TranslateConditionExpressionGreaterThanOrEqual(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        protected static Expression TranslateConditionExpressionGreaterThanOrEqual(XrmFakedContext context, ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             return Expression.Or(
-                                TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpr),
+                                TranslateConditionExpressionEqual(context, c, getAttributeValueExpr, containsAttributeExpr),
                                 TranslateConditionExpressionGreaterThan(c, getAttributeValueExpr, containsAttributeExpr));
 
         }
@@ -694,10 +704,10 @@ namespace FakeXrmEasy
                                 expOrValues));
         }
 
-        protected static Expression TranslateConditionExpressionLessThanOrEqual(ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        protected static Expression TranslateConditionExpressionLessThanOrEqual(XrmFakedContext context, ConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             return Expression.Or(
-                                TranslateConditionExpressionEqual(c, getAttributeValueExpr, containsAttributeExpr),
+                                TranslateConditionExpressionEqual(context, c, getAttributeValueExpr, containsAttributeExpr),
                                 TranslateConditionExpressionLessThan(c, getAttributeValueExpr, containsAttributeExpr));
 
         }
@@ -812,7 +822,7 @@ namespace FakeXrmEasy
         
         }
 
-        protected static BinaryExpression TranslateMultipleConditionExpressions(List<ConditionExpression> conditions, LogicalOperator op, ParameterExpression entity)
+        protected static BinaryExpression TranslateMultipleConditionExpressions(XrmFakedContext context, List<ConditionExpression> conditions, LogicalOperator op, ParameterExpression entity)
         {
             BinaryExpression binaryExpression = null;  //Default initialisation depending on logical operator
             if (op == LogicalOperator.And)
@@ -825,16 +835,16 @@ namespace FakeXrmEasy
                 //Build a binary expression  
                 if (op == LogicalOperator.And)
                 {
-                    binaryExpression = Expression.And(binaryExpression, TranslateConditionExpression(c, entity));
+                    binaryExpression = Expression.And(binaryExpression, TranslateConditionExpression(context, c, entity));
                 }
                 else
-                    binaryExpression = Expression.Or(binaryExpression, TranslateConditionExpression(c, entity));
+                    binaryExpression = Expression.Or(binaryExpression, TranslateConditionExpression(context, c, entity));
             }
 
             return binaryExpression;
         }
 
-        protected static BinaryExpression TranslateMultipleFilterExpressions(List<FilterExpression> filters, LogicalOperator op, ParameterExpression entity)
+        protected static BinaryExpression TranslateMultipleFilterExpressions(XrmFakedContext context, List<FilterExpression> filters, LogicalOperator op, ParameterExpression entity)
         {
             BinaryExpression binaryExpression = null;
             if (op == LogicalOperator.And)
@@ -844,7 +854,7 @@ namespace FakeXrmEasy
 
             foreach (var f in filters)
             {
-                var thisFilterLambda = TranslateFilterExpressionToExpression(f, entity);
+                var thisFilterLambda = TranslateFilterExpressionToExpression(context, f, entity);
 
                 //Build a binary expression  
                 if (op == LogicalOperator.And)
@@ -858,7 +868,7 @@ namespace FakeXrmEasy
             return binaryExpression;
         }
 
-        protected static Expression TranslateLinkedEntityFilterExpressionToExpression(LinkEntity le, ParameterExpression entity)
+        protected static Expression TranslateLinkedEntityFilterExpressionToExpression(XrmFakedContext context, LinkEntity le, ParameterExpression entity)
         {
             //In CRM 2011, condition expressions are at the LinkEntity level without an entity name
             //From CRM 2013, condition expressions were moved to outside the LinkEntity object at the QueryExpression level,
@@ -876,15 +886,15 @@ namespace FakeXrmEasy
                 }
             }
             
-            return TranslateFilterExpressionToExpression(le.LinkCriteria, entity);
+            return TranslateFilterExpressionToExpression(context, le.LinkCriteria, entity);
         }
 
-        protected static Expression TranslateQueryExpressionFiltersToExpression(QueryExpression qe, ParameterExpression entity)
+        protected static Expression TranslateQueryExpressionFiltersToExpression(XrmFakedContext context, QueryExpression qe, ParameterExpression entity)
         {
             var linkedEntitiesQueryExpressions = new List<Expression>();
             foreach(var le in qe.LinkEntities)
             {
-                var e = TranslateLinkedEntityFilterExpressionToExpression(le, entity);
+                var e = TranslateLinkedEntityFilterExpressionToExpression(context, le, entity);
                 linkedEntitiesQueryExpressions.Add(e);
             }
 
@@ -897,7 +907,7 @@ namespace FakeXrmEasy
                     andExpression = Expression.And(e, andExpression);
 
                 }
-                var feExpression = TranslateFilterExpressionToExpression(qe.Criteria, entity);
+                var feExpression = TranslateFilterExpressionToExpression(context, qe.Criteria, entity);
                 return Expression.And(andExpression, feExpression);
             }
             else if (linkedEntitiesQueryExpressions.Count > 0)
@@ -914,10 +924,10 @@ namespace FakeXrmEasy
             else
             {
                 //Criteria only
-                return TranslateFilterExpressionToExpression(qe.Criteria, entity);
+                return TranslateFilterExpressionToExpression(context, qe.Criteria, entity);
             }
         }
-        protected static Expression TranslateFilterExpressionToExpression(FilterExpression fe, ParameterExpression entity)
+        protected static Expression TranslateFilterExpressionToExpression(XrmFakedContext context, FilterExpression fe, ParameterExpression entity)
         {
             if (fe == null) return Expression.Constant(true);
 
@@ -925,13 +935,13 @@ namespace FakeXrmEasy
             BinaryExpression filtersLambda = null;
             if (fe.Conditions != null && fe.Conditions.Count > 0)
             {
-                conditionsLambda = TranslateMultipleConditionExpressions(fe.Conditions.ToList(), fe.FilterOperator, entity);
+                conditionsLambda = TranslateMultipleConditionExpressions(context, fe.Conditions.ToList(), fe.FilterOperator, entity);
             }
 
             //Process nested filters recursively
             if (fe.Filters != null && fe.Filters.Count > 0)
             {
-                filtersLambda = TranslateMultipleFilterExpressions(fe.Filters.ToList(), fe.FilterOperator, entity);
+                filtersLambda = TranslateMultipleFilterExpressions(context, fe.Filters.ToList(), fe.FilterOperator, entity);
             }
 
             if (conditionsLambda != null && filtersLambda != null)

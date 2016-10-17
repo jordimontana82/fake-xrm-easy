@@ -43,6 +43,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="tomorrow" />
       <xs:enumeration value="between" />
       <xs:enumeration value="not-between" />
+      <xs:enumeration value="eq-userid" />
+      <xs:enumeration value="ne-userid" />
 
     TODO:
 
@@ -74,8 +76,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="olderthan-x-minutes" />
       <xs:enumeration value="last-x-years" />
       <xs:enumeration value="next-x-years" />
-      <xs:enumeration value="eq-userid" />
-      <xs:enumeration value="ne-userid" />
       <xs:enumeration value="eq-userteams" />
       <xs:enumeration value="eq-useroruserteams" />
       <xs:enumeration value="eq-useroruserhierarchy" />
@@ -1119,6 +1119,100 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             var retrievedDate = collection.Entities[0]["anniversary"] as DateTime?;
             Assert.Equal(retrievedDate, date);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_EqUserId_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='systemuser'>
+                                        <filter type='and'>
+                                            <condition attribute='systemuserid' operator='eq-userid' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("systemuserid", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.EqualUserId, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(0, query.Criteria.Conditions[0].Values.Count);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_EqUserId_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='systemuser'>
+                                        <filter type='and'>
+                                            <condition attribute='systemuserid' operator='eq-userid' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var su1 = new SystemUser() { Id = Guid.NewGuid() }; //Should
+            var su2 = new SystemUser() { Id = Guid.NewGuid() }; //Shouldnt
+            ctx.Initialize(new[] { su1, su2 });
+
+            var service = ctx.GetOrganizationService();
+            ctx.CallerId = su1.ToEntityReference();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            var retrievedUser = collection.Entities[0].Id;
+            Assert.Equal(retrievedUser, su1.Id);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_NeUserId_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='systemuser'>
+                                        <filter type='and'>
+                                            <condition attribute='systemuserid' operator='ne-userid' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("systemuserid", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.NotEqualUserId, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(0, query.Criteria.Conditions[0].Values.Count);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_NeUserId_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='systemuser'>
+                                        <filter type='and'>
+                                            <condition attribute='systemuserid' operator='ne-userid' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var su1 = new SystemUser() { Id = Guid.NewGuid() }; //Shouldnt
+            var su2 = new SystemUser() { Id = Guid.NewGuid() }; //Should
+            ctx.Initialize(new[] { su1, su2 });
+
+            var service = ctx.GetOrganizationService();
+            ctx.CallerId = su1.ToEntityReference();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            var retrievedUser = collection.Entities[0].Id;
+            Assert.Equal(retrievedUser, su2.Id);
         }
     }
 }

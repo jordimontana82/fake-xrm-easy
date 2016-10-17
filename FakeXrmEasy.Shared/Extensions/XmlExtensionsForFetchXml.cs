@@ -380,6 +380,12 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "not-between":
                     op = ConditionOperator.NotBetween;
                     break;
+                case "eq-userid":
+                    op = ConditionOperator.EqualUserId;
+                    break;
+                case "ne-userid":
+                    op = ConditionOperator.NotEqualUserId;
+                    break;
                 default:
                     throw PullRequestException.FetchXmlOperatorNotImplemented(elem.GetAttribute("operator").Value);
             }
