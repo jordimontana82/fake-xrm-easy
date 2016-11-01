@@ -7,7 +7,7 @@ Fake Xrm Easy: The automated testing framework for Dynamics CRM
 
 |Crm Version|NuGet|
 |-----------|-----|
-|2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.17.0)](https://www.nuget.org/packages/fakexrmeasy.2016)|
+|2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.17.1)](https://www.nuget.org/packages/fakexrmeasy.2016)|
 |2015|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2015?v=1.17.1)](https://www.nuget.org/packages/fakexrmeasy.2015)|
 |2013|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2013?v=1.17.1)](https://www.nuget.org/packages/fakexrmeasy.2013)|
 |2011|[![Nuget](https://buildstats.info/nuget/fakexrmeasy?v=1.17.1)](https://www.nuget.org/packages/fakexrmeasy)|
