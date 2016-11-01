@@ -1,4 +1,5 @@
 ﻿using Crm;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
@@ -1214,5 +1215,80 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var retrievedUser = collection.Entities[0].Id;
             Assert.Equal(retrievedUser, su2.Id);
         }
+
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016
+
+        [Fact]
+        public void FetchXml_EntityName_Attribute_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            var quote = new Quote { Id = Guid.NewGuid() };
+
+            string fetchXml =
+                $@"<fetch>
+                    <entity name='quotedetail' >
+                    <link-entity name='product' from='productid' to='productid' link-type='inner' alias='product' >
+                        <attribute name='currentcost' />
+                    </link-entity>
+                    <filter type='and'>
+                        <condition entityname='product' attribute='currentcost' operator='null' />
+                    </filter>
+                    </entity>
+                </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("currentcost", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal("product", query.Criteria.Conditions[0].EntityName);
+            Assert.Equal(ConditionOperator.Null, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(0, query.Criteria.Conditions[0].Values.Count);
+
+        }
+
+        [Fact]
+        public void FetchXml_EntityName_Attribute_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var quote = new Quote { Id = Guid.NewGuid() };
+
+            string fetchXml =
+                $@"<fetch>
+                    <entity name='quotedetail' >
+                    <link-entity name='product' from='productid' to='productid' link-type='inner' alias='product' >
+                        <attribute name='currentcost' />
+                    </link-entity>
+                    <filter type='and'>
+                        <condition attribute='quoteid' operator='eq' value='{quote.Id}' />
+                        <condition entityname='product' attribute='currentcost' operator='null' />
+                    </filter>
+                    </entity>
+                </fetch>";
+
+            var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                CurrentCost = new Money(100)
+            };
+
+            var quoteProduct = new QuoteDetail
+            {
+                Id = Guid.NewGuid(),
+                ProductId = new EntityReference("product", product.Id),
+                Quantity = 4M,
+                QuoteId = new EntityReference("quote", quote.Id)
+            };
+
+            ctx.Initialize(new List<Entity>() {
+                product, quote, quoteProduct
+            });
+
+            var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(0, collection.Entities.Count);
+        }
+#endif
+
     }
 }

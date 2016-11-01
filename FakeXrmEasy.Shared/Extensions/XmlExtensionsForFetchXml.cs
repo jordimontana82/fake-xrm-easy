@@ -270,6 +270,8 @@ namespace FakeXrmEasy.Extensions.FetchXml
         {
             var conditionExpression = new ConditionExpression();
 
+            var conditionEntityName = "";
+
             var attributeName = elem.GetAttribute("attribute").Value;
             ConditionOperator op = ConditionOperator.Equal;
 
@@ -277,6 +279,10 @@ namespace FakeXrmEasy.Extensions.FetchXml
             if (elem.GetAttribute("value") != null)
             {
                 value = elem.GetAttribute("value").Value;
+            }
+            if (elem.GetAttribute("entityname") != null)
+            {
+                conditionEntityName = elem.GetAttribute("entityname").Value;
             }
 
             switch (elem.GetAttribute("operator").Value)
@@ -393,6 +399,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             //Process values
             object[] values = null;
 
+
             var entityName = GetAssociatedEntityNameForConditionExpression(elem);
 
             //Find values inside the condition expression, if apply
@@ -406,15 +413,41 @@ namespace FakeXrmEasy.Extensions.FetchXml
             //Otherwise, a single value was used
             if (value != null)
             {
-                
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016
+                if(string.IsNullOrWhiteSpace(conditionEntityName))
+                {
+                    return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName));
+                }
+                else
+                {
+                    return new ConditionExpression(conditionEntityName, attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName));
+                }
+
+#else
                 return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName));
+           
+#endif
             }
 
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016
+
+            if (string.IsNullOrWhiteSpace(conditionEntityName))
+            {
+                return new ConditionExpression(attributeName, op, values);
+            }
+            else
+            {
+                return new ConditionExpression(conditionEntityName, attributeName, op, values);
+            }
+#else
             return new ConditionExpression(attributeName, op, values);
+#endif
+
+
 
         }
 
-        
+
         public static object GetValueBasedOnType(Type t, string value)
         {
             if(t == typeof(int) 
