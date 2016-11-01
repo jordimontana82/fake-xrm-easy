@@ -196,6 +196,75 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         
 
         [Fact]
+        public void When_translating_a_fetch_xml_filter_default_operator_is_and()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter>
+                                            <condition attribute='fullname' operator='not-like' value='%Messi' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(LogicalOperator.And, query.Criteria.FilterOperator);
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_filter_with_and_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='fullname' operator='not-like' value='%Messi' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(LogicalOperator.And, query.Criteria.FilterOperator);
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_filter_with_or_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='or'>
+                                            <condition attribute='fullname' operator='not-like' value='%Messi' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(LogicalOperator.Or, query.Criteria.FilterOperator);
+        }
+
+        [Fact]
         public void When_translating_a_fetch_xml_expression_nested_filters_are_correct()
         {
             var ctx = new XrmFakedContext();

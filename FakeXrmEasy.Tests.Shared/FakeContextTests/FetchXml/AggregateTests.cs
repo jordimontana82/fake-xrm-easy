@@ -346,6 +346,41 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(0, collection.Entities.First().Attributes.Count);
         }
 
-     
+        [Fact]
+        public void Query_Should_Return_QuoteProduct_Counts()
+        {
+            var context = new XrmFakedContext();
+            var quoteId = Guid.NewGuid();
+
+            context.Initialize(new List<Entity>()
+            {
+                new QuoteDetail()
+                {
+                    Id = Guid.NewGuid(),
+                    ProductId = new EntityReference("product", Guid.NewGuid()),
+                    Quantity = 4M,
+                    QuoteId = new EntityReference("quote", quoteId)
+                }
+            });
+
+            var service = context.GetOrganizationService();
+
+            string fetchXml =
+                $@"<fetch aggregate='true' >
+                <entity name='quotedetail' >
+                <attribute name='productid' alias='ProductCount' aggregate='count' />
+                <filter>
+                    <condition attribute='quoteid' operator='eq' value='{quoteId}' />
+                </filter>
+                </entity>
+            </fetch>";
+
+            EntityCollection collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+
+            Assert.Equal(1, collection.Entities.Count);
+        }
+
+
     }
 }

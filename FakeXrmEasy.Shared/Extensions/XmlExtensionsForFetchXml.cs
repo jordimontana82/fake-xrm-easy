@@ -30,7 +30,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             switch (elem.Name.LocalName)
             {
                 case "filter":
-                    return elem.GetAttribute("type") != null;
+                    return true;
 
                 case "value":
                 case "fetch":
@@ -234,8 +234,16 @@ namespace FakeXrmEasy.Extensions.FetchXml
         {
             var filterExpression = new FilterExpression();
 
-            filterExpression.FilterOperator = elem.GetAttribute("type").Value.Equals("and") ? 
-                                                    LogicalOperator.And : LogicalOperator.Or;
+            var filterType = elem.GetAttribute("type");
+            if(filterType == null)
+            {
+                filterExpression.FilterOperator = LogicalOperator.And; //By default
+            }
+            else
+            {
+                filterExpression.FilterOperator = filterType.Value.Equals("and") ?
+                                                  LogicalOperator.And : LogicalOperator.Or;
+            }
 
             //Process other filters recursively
             var otherFilters = elem
