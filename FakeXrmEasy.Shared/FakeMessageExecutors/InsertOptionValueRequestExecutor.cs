@@ -53,5 +53,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             return new InsertOptionValueResponse();
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(InsertOptionValueRequest);
+        }
     }
 }

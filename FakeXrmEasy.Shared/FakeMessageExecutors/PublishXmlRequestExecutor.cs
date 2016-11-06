@@ -26,5 +26,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             };
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(PublishXmlRequest);
+        }
     }
 }

@@ -32,6 +32,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
             return response;
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(ExecuteTransactionRequest);
+        }
     }
 }
 #endif

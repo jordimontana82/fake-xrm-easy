@@ -94,6 +94,11 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 return request is RetrieveEntityRequest;
             }
 
+            public Type GetResponsibleRequestType()
+            {
+                return typeof(RetrieveEntityRequest);
+            }
+
             public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
             {
                 return new RetrieveEntityResponse { ResponseName = "Successful" };
