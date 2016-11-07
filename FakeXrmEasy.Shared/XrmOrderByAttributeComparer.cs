@@ -71,6 +71,12 @@ namespace FakeXrmEasy
             {
                 return ((bool)objectA).CompareTo((bool)objectB);
             }
+
+            else if(attributeType == typeof(AliasedValue))
+            {
+                return Compare((objectA as AliasedValue)?.Value, (objectB as AliasedValue)?.Value);
+            }
+
             else
             {
                 return 0;

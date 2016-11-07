@@ -94,7 +94,7 @@ namespace FakeXrmEasy
         /// <returns></returns>
         IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx,
                                      string unsecureConfiguration,
-                                     string secureConfiguration) where T : IPlugin, new();
+                                     string secureConfiguration) where T : class, IPlugin;
 
 
         /// <summary>

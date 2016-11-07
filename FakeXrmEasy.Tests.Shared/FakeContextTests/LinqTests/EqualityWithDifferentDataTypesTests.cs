@@ -348,6 +348,57 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
             }
         }
 
+        [Fact]
+        public void When_querying_option_sets_with_string_values_right_result_is_returned()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetOrganizationService();
+
+            ctx.Initialize(new List<Entity>()
+            {
+                new Account() { Id = Guid.NewGuid(), IndustryCode = new OptionSetValue(23) },
+                new Account() { Id = Guid.NewGuid(), IndustryCode = new OptionSetValue(69) }
+            });
+
+            QueryExpression query = new QueryExpression
+            {
+                EntityName = "account",
+                ColumnSet = new ColumnSet(new string[] { "accountid", "industrycode" }),
+            };
+            query.Criteria.AddCondition("industrycode", ConditionOperator.Equal, "23");
+            var result = service.RetrieveMultiple(query);
+
+            Assert.Equal(1, result.Entities.Count);
+            Assert.Equal(23, (result.Entities[0] as Account).IndustryCode.Value);
+        }
+
+        //[Fact]
+        //public void When_querying_enums_with_string_values_right_result_is_returned()
+        //{
+        //    var ctx = new XrmFakedContext();
+        //    var service = ctx.GetOrganizationService();
+
+        //    var inactiveAccount = new Account() { Id = Guid.NewGuid() };
+        //    inactiveAccount["statecode"] = new OptionSetValue((int)AccountState.Inactive);
+
+        //    ctx.Initialize(new List<Entity>()
+        //    {
+        //        new Account() { Id = Guid.NewGuid() }, //Active by default
+        //        inactiveAccount
+        //    });
+
+        //    QueryExpression query = new QueryExpression
+        //    {
+        //        EntityName = "account",
+        //        ColumnSet = new ColumnSet(new string[] { "accountid", "statecode" }),
+        //    };
+        //    query.Criteria.AddCondition("statecode", ConditionOperator.Equal, "inactive");
+        //    var result = service.RetrieveMultiple(query);
+
+        //    Assert.Equal(1, result.Entities.Count);
+        //    Assert.Equal(AccountState.Inactive, (result.Entities[0] as Account).StateCode.Value);
+        //}
+
 
     }
     

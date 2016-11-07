@@ -11,12 +11,26 @@ namespace FakeXrmEasy.Extensions.FetchXml
 {
     public static class XmlExtensionsForFetchXml
     {
+
+        public static bool IsAttributeTrue(this XElement elem, string attributeName)
+        {
+            var val = elem.GetAttribute(attributeName)?.Value;
+
+            return "true".Equals(val, StringComparison.InvariantCultureIgnoreCase)
+                || "1".Equals(val, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public static bool IsAggregateFetchXml(this XDocument doc)
+        {
+            return doc.Root.IsAttributeTrue("aggregate");
+        }
+
         public static bool IsFetchXmlNodeValid(this XElement elem)
         {
             switch (elem.Name.LocalName)
             {
                 case "filter":
-                    return elem.GetAttribute("type") != null;
+                    return true;
 
                 case "value":
                 case "fetch":
@@ -37,8 +51,14 @@ namespace FakeXrmEasy.Extensions.FetchXml
                             && elem.GetAttribute("to") != null;
 
                 case "order":
-                    return elem.GetAttribute("attribute") != null
-                           && elem.GetAttribute("descending") != null;
+                    if (elem.Document.IsAggregateFetchXml())
+                    {
+                        return elem.GetAttribute("alias") != null
+                            && elem.GetAttribute("attribute") == null;
+                    }
+                    else {
+                        return elem.GetAttribute("attribute") != null;                               
+                    }
 
                 case "condition":
                     return elem.GetAttribute("attribute") != null
@@ -203,8 +223,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
                                         new OrderExpression
                                         {
                                             AttributeName = el.GetAttribute("attribute").Value,
-                                            OrderType = el.GetAttribute("descending").Value.Equals("true") ?
-                                                            OrderType.Descending : OrderType.Ascending
+                                            OrderType = el.IsAttributeTrue("descending") ? OrderType.Descending : OrderType.Ascending
                                         })
                                 .ToList();
 
@@ -215,8 +234,16 @@ namespace FakeXrmEasy.Extensions.FetchXml
         {
             var filterExpression = new FilterExpression();
 
-            filterExpression.FilterOperator = elem.GetAttribute("type").Value.Equals("and") ? 
-                                                    LogicalOperator.And : LogicalOperator.Or;
+            var filterType = elem.GetAttribute("type");
+            if(filterType == null)
+            {
+                filterExpression.FilterOperator = LogicalOperator.And; //By default
+            }
+            else
+            {
+                filterExpression.FilterOperator = filterType.Value.Equals("and") ?
+                                                  LogicalOperator.And : LogicalOperator.Or;
+            }
 
             //Process other filters recursively
             var otherFilters = elem
@@ -251,6 +278,8 @@ namespace FakeXrmEasy.Extensions.FetchXml
         {
             var conditionExpression = new ConditionExpression();
 
+            var conditionEntityName = "";
+
             var attributeName = elem.GetAttribute("attribute").Value;
             ConditionOperator op = ConditionOperator.Equal;
 
@@ -258,6 +287,10 @@ namespace FakeXrmEasy.Extensions.FetchXml
             if (elem.GetAttribute("value") != null)
             {
                 value = elem.GetAttribute("value").Value;
+            }
+            if (elem.GetAttribute("entityname") != null)
+            {
+                conditionEntityName = elem.GetAttribute("entityname").Value;
             }
 
             switch (elem.GetAttribute("operator").Value)
@@ -361,12 +394,19 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "not-between":
                     op = ConditionOperator.NotBetween;
                     break;
+                case "eq-userid":
+                    op = ConditionOperator.EqualUserId;
+                    break;
+                case "ne-userid":
+                    op = ConditionOperator.NotEqualUserId;
+                    break;
                 default:
                     throw PullRequestException.FetchXmlOperatorNotImplemented(elem.GetAttribute("operator").Value);
             }
 
             //Process values
             object[] values = null;
+
 
             var entityName = GetAssociatedEntityNameForConditionExpression(elem);
 
@@ -381,15 +421,41 @@ namespace FakeXrmEasy.Extensions.FetchXml
             //Otherwise, a single value was used
             if (value != null)
             {
-                
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016
+                if(string.IsNullOrWhiteSpace(conditionEntityName))
+                {
+                    return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName));
+                }
+                else
+                {
+                    return new ConditionExpression(conditionEntityName, attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName));
+                }
+
+#else
                 return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName));
+           
+#endif
             }
 
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016
+
+            if (string.IsNullOrWhiteSpace(conditionEntityName))
+            {
+                return new ConditionExpression(attributeName, op, values);
+            }
+            else
+            {
+                return new ConditionExpression(conditionEntityName, attributeName, op, values);
+            }
+#else
             return new ConditionExpression(attributeName, op, values);
+#endif
+
+
 
         }
 
-        
+
         public static object GetValueBasedOnType(Type t, string value)
         {
             if(t == typeof(int) 
