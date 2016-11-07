@@ -257,8 +257,8 @@ namespace FakeXrmEasy
                {
                    if (t.Equals(typeof(IOrganizationService)))
                    {
-                       //Return faked organization service
-                       return GetFakedOrganizationService();
+                       //Return faked or real organization service
+                       return GetOrganizationService();
                    }
                    else if (t.Equals(typeof(ITracingService)))
                    {
@@ -274,7 +274,7 @@ namespace FakeXrmEasy
                        A.CallTo(() => fakedServiceFactory.CreateOrganizationService(A<Guid?>._))
                             .ReturnsLazily((Guid? g) =>
                             {
-                                return GetFakedOrganizationService();
+                                return GetOrganizationService();
                             });
                        return fakedServiceFactory;
                    }

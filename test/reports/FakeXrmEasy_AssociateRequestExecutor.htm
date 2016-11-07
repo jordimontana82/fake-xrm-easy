@@ -14,11 +14,11 @@
 <tbody>
 <tr><th>Class:</th><td>FakeXrmEasy.FakeMessageExecutors.AssociateRequestExecutor</td></tr>
 <tr><th>Assembly:</th><td>FakeXrmEasy</td></tr>
-<tr><th>File(s):</th><td><a href="#CUsersJordiSourceReposfakexrmeasyFakeXrmEasySharedFakeMessageExecutorsAssociateRequestExecutorcs">C:\Users\Jordi\Source\Repos\fake-xrm-easy\FakeXrmEasy.Shared\FakeMessageExecutors\AssociateRequestExecutor.cs</a></td></tr>
-<tr><th>Covered lines:</th><td>43</td></tr>
+<tr><th>File(s):</th><td><a href="#CUsersNatrajYegnaramanDocumentsGitHubfakexrmeasyFakeXrmEasySharedFakeMessageExecutorsAssociateRequestExecutorcs">C:\Users\Natraj Yegnaraman\Documents\GitHub\fake-xrm-easy\FakeXrmEasy.Shared\FakeMessageExecutors\AssociateRequestExecutor.cs</a></td></tr>
+<tr><th>Covered lines:</th><td>46</td></tr>
 <tr><th>Uncovered lines:</th><td>0</td></tr>
-<tr><th>Coverable lines:</th><td>43</td></tr>
-<tr><th>Total lines:</th><td>75</td></tr>
+<tr><th>Coverable lines:</th><td>46</td></tr>
+<tr><th>Total lines:</th><td>80</td></tr>
 <tr><th>Line coverage:</th><td>100%</td></tr>
 <tr><th>Branch coverage:</th><td>100%</td></tr>
 </tbody>
@@ -29,10 +29,11 @@
 <tbody>
 <tr><td title="System.Boolean FakeXrmEasy.FakeMessageExecutors.AssociateRequestExecutor::CanExecute(Microsoft.Xrm.Sdk.OrganizationRequest)">CanExecute(...)</td><td>1</td><td>100</td><td>100</td></tr>
 <tr><td title="Microsoft.Xrm.Sdk.OrganizationResponse FakeXrmEasy.FakeMessageExecutors.AssociateRequestExecutor::Execute(Microsoft.Xrm.Sdk.OrganizationRequest,FakeXrmEasy.XrmFakedContext)">Execute(...)</td><td>7</td><td>100</td><td>100</td></tr>
+<tr><td title="System.Type FakeXrmEasy.FakeMessageExecutors.AssociateRequestExecutor::GetResponsibleRequestType()">GetResponsibleRequestType()</td><td>1</td><td>100</td><td>100</td></tr>
 </tbody>
 </table>
 <h1>File(s)</h1>
-<h2 id="CUsersJordiSourceReposfakexrmeasyFakeXrmEasySharedFakeMessageExecutorsAssociateRequestExecutorcs">C:\Users\Jordi\Source\Repos\fake-xrm-easy\FakeXrmEasy.Shared\FakeMessageExecutors\AssociateRequestExecutor.cs</h2>
+<h2 id="CUsersNatrajYegnaramanDocumentsGitHubfakexrmeasyFakeXrmEasySharedFakeMessageExecutorsAssociateRequestExecutorcs">C:\Users\Natraj Yegnaraman\Documents\GitHub\fake-xrm-easy\FakeXrmEasy.Shared\FakeMessageExecutors\AssociateRequestExecutor.cs</h2>
 <table class="lineAnalysis">
 <thead><tr><th></th><th>#</th><th>Line</th><th></th><th>Line coverage</th></tr></thead>
 <tbody>
@@ -109,10 +110,15 @@
 <tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>71</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>72</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;new&nbsp;AssociateResponse&nbsp;();</code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>73</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
-<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>74</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
-<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>75</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>74</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>75</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;Type&nbsp;GetResponsibleRequestType()</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '1242', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">1242</td><td class="rightmargin right"><code>76</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '1242', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">1242</td><td class="rightmargin right"><code>77</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;typeof(AssociateRequest);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '1242', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">1242</td><td class="rightmargin right"><code>78</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>79</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>80</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
 </tbody>
 </table>
-<div class="footer">Generated by: ReportGenerator 2.4.5.0<br />21/09/2016 - 22:22:04<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<div class="footer">Generated by: ReportGenerator 2.4.5.0<br />7/11/2016 - 8:38:16 PM<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
 <script type="text/javascript" src="combined.js"></script>
 </body></html>

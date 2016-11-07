@@ -83,7 +83,7 @@ namespace FakeXrmEasy
                     A.CallTo(() => fakedServiceFactory.CreateOrganizationService(A<Guid?>._))
                          .ReturnsLazily((Guid? g) =>
                          {
-                             return GetFakedOrganizationService();
+                             return GetOrganizationService();
                          });
                     return fakedServiceFactory;
                 });
