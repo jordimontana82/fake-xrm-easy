@@ -297,12 +297,27 @@ namespace FakeXrmEasy
             //Sort results
             if (qe.Orders != null)
             {
-                foreach (var order in qe.Orders)
+                if(qe.Orders.Count > 0)
                 {
+                    IOrderedQueryable<Entity> orderedQuery = null;
+
+                    var order = qe.Orders[0];
                     if (order.OrderType == OrderType.Ascending)
-                        query = query.OrderBy(e => e.Attributes.ContainsKey(order.AttributeName) ? e.Attributes[order.AttributeName] : null, new XrmOrderByAttributeComparer());
+                        orderedQuery = query.OrderBy(e => e.Attributes.ContainsKey(order.AttributeName) ? e[order.AttributeName] : null, new XrmOrderByAttributeComparer());
                     else
-                        query = query.OrderByDescending(e => e.Attributes.ContainsKey(order.AttributeName) ? e.Attributes[order.AttributeName] : null, new XrmOrderByAttributeComparer());
+                        orderedQuery = query.OrderByDescending(e => e.Attributes.ContainsKey(order.AttributeName) ? e[order.AttributeName] : null, new XrmOrderByAttributeComparer());
+
+                    //Subsequent orders should use ThenBy and ThenByDescending
+                    for (var i = 1; i < qe.Orders.Count; i++)
+                    {
+                        var thenOrder = qe.Orders[i];
+                        if (thenOrder.OrderType == OrderType.Ascending)
+                            orderedQuery = orderedQuery.ThenBy(e => e.Attributes.ContainsKey(thenOrder.AttributeName) ? e[thenOrder.AttributeName] : null, new XrmOrderByAttributeComparer());
+                        else
+                            orderedQuery = orderedQuery.ThenByDescending(e => e[thenOrder.AttributeName], new XrmOrderByAttributeComparer());
+                    }
+
+                    query = orderedQuery;
                 }
             }
 
