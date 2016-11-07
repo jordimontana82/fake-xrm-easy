@@ -176,6 +176,27 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
         }
 
         [Fact]
+        public void When_executing_a_query_expression_with_a_null_operator_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "1 Contact";
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = null;
+            var contact3 = new Entity("contact") { Id = Guid.NewGuid() };
+
+            context.Initialize(new List<Entity>() { contact1, contact2, contact3 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+            qe.ColumnSet = new ColumnSet(true);
+            qe.Criteria = new FilterExpression(LogicalOperator.And);
+            var condition = new ConditionExpression("fullname", ConditionOperator.Null);
+            qe.Criteria.AddCondition(condition);
+
+            var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
+
+            Assert.True(result.Count() == 2);
+        }
+
+        [Fact]
         public void When_executing_a_query_expression_like_operator_is_case_insensitive()
         {
             var context = new XrmFakedContext { ProxyTypesAssembly = Assembly.GetExecutingAssembly() };
@@ -248,5 +269,45 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             Assert.Equal(1, entities.Count);
             Assert.Equal("JimmY", entities[0]["firstname"]);
         }
+
+        [Fact]
+        public void When_executing_a_query_expression_with_null_operator_and_early_bound_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            var account1 = new Account() { Id = Guid.NewGuid(), Name = "1 Test" };
+            var account2 = new Account() { Id = Guid.NewGuid(), Name = "2 Test" };
+            var account3 = new Account() { Id = Guid.NewGuid(), Name = "3 Test" };
+            var account4 = new Account() { Id = Guid.NewGuid(), Name = "4 Test" };
+            var account5 = new Account() { Id = Guid.NewGuid(), Name = "5 Test" };
+            var account6 = new Account() { Id = Guid.NewGuid(), Name = "6 Test" };
+            var account7 = new Account() { Id = Guid.NewGuid() };
+            var account8 = new Account() { Id = Guid.NewGuid(), Name = null};
+            var account9 = new Account() { Id = Guid.NewGuid(), Name = "Another name" };
+
+            List<Account> initialAccs = new List<Account>() {
+                account1, account2, account3, account4, account5, account6, account7, account8, account9
+            };
+
+            context.Initialize(initialAccs);
+
+            QueryExpression query = new QueryExpression()
+            {
+                EntityName = "account",
+                ColumnSet = new ColumnSet(true),
+                Criteria = new FilterExpression()
+                {
+                    Conditions =
+                    {
+                        new ConditionExpression("name", ConditionOperator.Null)
+                    }
+                }
+            };
+
+            EntityCollection ec = service.RetrieveMultiple(query);
+            Assert.True(ec.Entities.Count == 2);
+        }
+
     }
 }

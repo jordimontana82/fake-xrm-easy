@@ -1,9 +1,11 @@
-﻿using Microsoft.Xrm.Sdk;
+﻿using Crm;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
+using System.Linq;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 {
@@ -424,6 +426,170 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             var firstResultValue = (bool)results.Entities[0]["new_orderbyfield"];
 
             Assert.Equal(false, firstResultValue);
+        }
+
+        [Fact]
+        public void When_ordering_by_2_columns_simultaneously_right_result_is_returned_asc_desc()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetOrganizationService();
+
+            var account11 = new Account() { Id = Guid.NewGuid(), Name = "11", ImportSequenceNumber = 1, NumberOfEmployees = 1  };
+            var account12 = new Account() { Id = Guid.NewGuid(), Name = "12", ImportSequenceNumber = 1, NumberOfEmployees = 2  };
+            var account21 = new Account() { Id = Guid.NewGuid(), Name = "21", ImportSequenceNumber = 2, NumberOfEmployees = 1  };
+            var account22 = new Account() { Id = Guid.NewGuid(), Name = "22", ImportSequenceNumber = 2, NumberOfEmployees = 2  };
+            var account31 = new Account() { Id = Guid.NewGuid(), Name = "31", ImportSequenceNumber = 3, NumberOfEmployees = 1  };
+            var account32 = new Account() { Id = Guid.NewGuid(), Name = "32", ImportSequenceNumber = 3, NumberOfEmployees = 2  };
+
+            List<Account> initialAccs = new List<Account>() {
+                account12, account22, account21, account32, account11, account31
+            };
+
+            ctx.Initialize(initialAccs);
+
+            QueryExpression query = new QueryExpression()
+            {
+                EntityName = "account",
+                ColumnSet = new ColumnSet(true),
+                Orders =
+                {
+                    new OrderExpression("importsequencenumber", OrderType.Ascending),
+                    new OrderExpression("numberofemployees", OrderType.Descending)
+                }
+            };
+
+            EntityCollection ec = service.RetrieveMultiple(query);
+            var names = ec.Entities.Select(e => e.ToEntity<Account>().Name).ToList();
+
+            Assert.True(names[0].Equals("12"), "Test 12 failed");
+            Assert.True(names[1].Equals("11"), "Test 11 failed");
+            Assert.True(names[2].Equals("22"), "Test 22 failed");
+            Assert.True(names[3].Equals("21"), "Test 21 failed");
+            Assert.True(names[4].Equals("32"), "Test 32 failed");
+            Assert.True(names[5].Equals("31"), "Test 31 failed");
+        }
+
+        [Fact]
+        public void When_ordering_by_2_columns_simultaneously_right_result_is_returned_asc_asc()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetOrganizationService();
+
+            var account11 = new Account() { Id = Guid.NewGuid(), Name = "11", ImportSequenceNumber = 1, NumberOfEmployees = 1 };
+            var account12 = new Account() { Id = Guid.NewGuid(), Name = "12", ImportSequenceNumber = 1, NumberOfEmployees = 2 };
+            var account21 = new Account() { Id = Guid.NewGuid(), Name = "21", ImportSequenceNumber = 2, NumberOfEmployees = 1 };
+            var account22 = new Account() { Id = Guid.NewGuid(), Name = "22", ImportSequenceNumber = 2, NumberOfEmployees = 2 };
+            var account31 = new Account() { Id = Guid.NewGuid(), Name = "31", ImportSequenceNumber = 3, NumberOfEmployees = 1 };
+            var account32 = new Account() { Id = Guid.NewGuid(), Name = "32", ImportSequenceNumber = 3, NumberOfEmployees = 2 };
+
+            List<Account> initialAccs = new List<Account>() {
+                account12, account22, account21, account32, account11, account31
+            };
+
+            ctx.Initialize(initialAccs);
+
+            QueryExpression query = new QueryExpression()
+            {
+                EntityName = "account",
+                ColumnSet = new ColumnSet(true),
+                Orders =
+                {
+                    new OrderExpression("importsequencenumber", OrderType.Ascending),
+                    new OrderExpression("numberofemployees", OrderType.Ascending)
+                }
+            };
+
+            EntityCollection ec = service.RetrieveMultiple(query);
+            var names = ec.Entities.Select(e => e.ToEntity<Account>().Name).ToList();
+
+            Assert.True(names[0].Equals("11"));
+            Assert.True(names[1].Equals("12"));
+            Assert.True(names[2].Equals("21"));
+            Assert.True(names[3].Equals("22"));
+            Assert.True(names[4].Equals("31"));
+            Assert.True(names[5].Equals("32"));
+        }
+
+        [Fact]
+        public void When_ordering_by_2_columns_simultaneously_right_result_is_returned_desc_desc()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetOrganizationService();
+
+            var account11 = new Account() { Id = Guid.NewGuid(), Name = "11", ImportSequenceNumber = 1, NumberOfEmployees = 1 };
+            var account12 = new Account() { Id = Guid.NewGuid(), Name = "12", ImportSequenceNumber = 1, NumberOfEmployees = 2 };
+            var account21 = new Account() { Id = Guid.NewGuid(), Name = "21", ImportSequenceNumber = 2, NumberOfEmployees = 1 };
+            var account22 = new Account() { Id = Guid.NewGuid(), Name = "22", ImportSequenceNumber = 2, NumberOfEmployees = 2 };
+            var account31 = new Account() { Id = Guid.NewGuid(), Name = "31", ImportSequenceNumber = 3, NumberOfEmployees = 1 };
+            var account32 = new Account() { Id = Guid.NewGuid(), Name = "32", ImportSequenceNumber = 3, NumberOfEmployees = 2 };
+
+            List<Account> initialAccs = new List<Account>() {
+                account12, account22, account21, account32, account11, account31
+            };
+
+            ctx.Initialize(initialAccs);
+
+            QueryExpression query = new QueryExpression()
+            {
+                EntityName = "account",
+                ColumnSet = new ColumnSet(true),
+                Orders =
+                {
+                    new OrderExpression("importsequencenumber", OrderType.Descending),
+                    new OrderExpression("numberofemployees", OrderType.Descending)
+                }
+            };
+
+            EntityCollection ec = service.RetrieveMultiple(query);
+            var names = ec.Entities.Select(e => e.ToEntity<Account>().Name).ToList();
+
+            Assert.True(names[0].Equals("32"));
+            Assert.True(names[1].Equals("31"));
+            Assert.True(names[2].Equals("22"));
+            Assert.True(names[3].Equals("21"));
+            Assert.True(names[4].Equals("12"));
+            Assert.True(names[5].Equals("11"));
+        }
+
+        [Fact]
+        public void When_ordering_by_2_columns_simultaneously_right_result_is_returned_desc_asc()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetOrganizationService();
+
+            var account11 = new Account() { Id = Guid.NewGuid(), Name = "11", ImportSequenceNumber = 1, NumberOfEmployees = 1 };
+            var account12 = new Account() { Id = Guid.NewGuid(), Name = "12", ImportSequenceNumber = 1, NumberOfEmployees = 2 };
+            var account21 = new Account() { Id = Guid.NewGuid(), Name = "21", ImportSequenceNumber = 2, NumberOfEmployees = 1 };
+            var account22 = new Account() { Id = Guid.NewGuid(), Name = "22", ImportSequenceNumber = 2, NumberOfEmployees = 2 };
+            var account31 = new Account() { Id = Guid.NewGuid(), Name = "31", ImportSequenceNumber = 3, NumberOfEmployees = 1 };
+            var account32 = new Account() { Id = Guid.NewGuid(), Name = "32", ImportSequenceNumber = 3, NumberOfEmployees = 2 };
+
+            List<Account> initialAccs = new List<Account>() {
+                account12, account22, account21, account32, account11, account31
+            };
+
+            ctx.Initialize(initialAccs);
+
+            QueryExpression query = new QueryExpression()
+            {
+                EntityName = "account",
+                ColumnSet = new ColumnSet(true),
+                Orders =
+                {
+                    new OrderExpression("importsequencenumber", OrderType.Descending),
+                    new OrderExpression("numberofemployees", OrderType.Ascending)
+                }
+            };
+
+            EntityCollection ec = service.RetrieveMultiple(query);
+            var names = ec.Entities.Select(e => e.ToEntity<Account>().Name).ToList();
+
+            Assert.True(names[0].Equals("31"));
+            Assert.True(names[1].Equals("32"));
+            Assert.True(names[2].Equals("21"));
+            Assert.True(names[3].Equals("22"));
+            Assert.True(names[4].Equals("11"));
+            Assert.True(names[5].Equals("12"));
         }
     }
 }
