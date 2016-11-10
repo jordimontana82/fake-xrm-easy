@@ -64,7 +64,7 @@ namespace FakeXrmEasy
 
         public int WorkflowCategory { get; set; }
 
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 
         public int WorkflowMode { get; set; }
 #endif
 

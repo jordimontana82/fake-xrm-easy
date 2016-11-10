@@ -421,7 +421,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             //Otherwise, a single value was used
             if (value != null)
             {
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
                 if(string.IsNullOrWhiteSpace(conditionEntityName))
                 {
                     return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName));
@@ -437,7 +437,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
 #endif
             }
 
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
 
             if (string.IsNullOrWhiteSpace(conditionEntityName))
             {
