@@ -166,7 +166,7 @@ Target "BuildFakeXrmEasy.Tests.365" (fun _->
     let properties =
         [ ("DefineConstants", "FAKE_XRM_EASY_365") ]
     !! @"FakeXrmEasy.Tests.365\*.csproj"
-      |> MSBuild FakeXrmEasyTests2016BuildDir "Rebuild" (properties)
+      |> MSBuild FakeXrmEasyTests365BuildDir "Rebuild" (properties)
       |> Log "Build - Output: "
 )
 

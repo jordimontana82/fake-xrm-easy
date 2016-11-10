@@ -1,20 +1,21 @@
-Fake Xrm Easy: The automated testing framework for Dynamics CRM
+Fake Xrm Easy: The automated testing framework for Dynamics CRM / 365
 ===============================================================
 
 |Build|Line Coverage|Branch Coverage|
 |-----------|-----|-----------------|
-|[![Build status](https://ci.appveyor.com/api/projects/status/2g8yc8jg817746du?svg=true)](https://ci.appveyor.com/project/Jordi/fake-xrm-easy)|[![Line coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_linecoverage.svg?v=1.17.3)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.17.3)|[![Branch coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_branchcoverage.svg?v=1.17.3)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.17.3)|
+|[![Build status](https://ci.appveyor.com/api/projects/status/2g8yc8jg817746du?svg=true)](https://ci.appveyor.com/project/Jordi/fake-xrm-easy)|[![Line coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_linecoverage.svg?v=1.18.0)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.18.0)|[![Branch coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_branchcoverage.svg?v=1.18.0)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.18.0)|
 
 |Crm Version|NuGet|
 |-----------|-----|
-|2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.17.3)](https://www.nuget.org/packages/fakexrmeasy.2016)|
-|2015|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2015?v=1.17.3)](https://www.nuget.org/packages/fakexrmeasy.2015)|
-|2013|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2013?v=1.17.3)](https://www.nuget.org/packages/fakexrmeasy.2013)|
-|2011|[![Nuget](https://buildstats.info/nuget/fakexrmeasy?v=1.17.3)](https://www.nuget.org/packages/fakexrmeasy)|
+|365|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.365?v=1.18.0)](https://www.nuget.org/packages/fakexrmeasy.365)|
+|2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.18.0)](https://www.nuget.org/packages/fakexrmeasy.2016)|
+|2015|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2015?v=1.18.0)](https://www.nuget.org/packages/fakexrmeasy.2015)|
+|2013|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2013?v=1.18.0)](https://www.nuget.org/packages/fakexrmeasy.2013)|
+|2011|[![Nuget](https://buildstats.info/nuget/fakexrmeasy?v=1.18.0)](https://www.nuget.org/packages/fakexrmeasy)|
 
 The framework to streamline unit testing in Dynamics CRM by faking the IOrganizationService to work with an In-Memory context.
 
-The framework supports Dynamics CRM 2011, 2013, 2015, and 2016.
+The framework supports Dynamics 2011, 2013, 2015, 2016 and Dynamics 365.
 
 Drive your development by unit testing any plugin, code activity, or 3rd party app using the OrganizationService easier & faster than ever before.
 
