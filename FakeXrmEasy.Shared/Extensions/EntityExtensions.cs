@@ -202,6 +202,7 @@ namespace FakeXrmEasy.Extensions
         {
             var cloned = new Entity(e.LogicalName);
             cloned.Id = e.Id;
+            cloned.LogicalName = e.LogicalName;
             foreach (var attKey in e.Attributes.Keys)
             {
                 cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
@@ -221,6 +222,8 @@ namespace FakeXrmEasy.Extensions
 
             var cloned = Activator.CreateInstance(t) as Entity;
             cloned.Id = e.Id;
+            cloned.LogicalName = e.LogicalName;
+
             foreach (var attKey in e.Attributes.Keys)
             {
                 cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;

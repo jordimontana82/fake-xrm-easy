@@ -823,6 +823,114 @@ namespace FakeXrmEasy.Tests
                 Assert.Throws<FaultException<OrganizationServiceFault>>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
             }
         }
-      
+
+
+        [Fact]
+        public void When_retrieve_multiple_is_invoked_with_a_service_created_entity_that_entity_is_returned_with_logical_name()
+        {
+            var context = new XrmFakedContext();
+
+            var service = context.GetFakedOrganizationService();
+
+            Entity account1 = new Entity("account");
+            account1.Id = Guid.NewGuid();
+            account1.Attributes.Add("name", "Account1");
+
+            Entity account2 = new Entity("account");
+            account2.Id = Guid.NewGuid();
+            account2.Attributes.Add("name", "Account2");
+
+            service.Create(account1);
+            service.Create(account2);
+
+            QueryExpression query = new QueryExpression { EntityName = "account", ColumnSet = new ColumnSet(true) };
+
+            var result = service.RetrieveMultiple(query);
+
+
+            foreach (var item in result.Entities)
+            {
+                Assert.NotNull(item.LogicalName);
+            }
+        }
+
+        [Fact]
+        public static void Should_Not_Fail_On_Conditions_In_Link_Entities_Multiple()
+        {
+            var fakedContext = new XrmFakedContext();
+            var fakedService = fakedContext.GetOrganizationService();
+
+            fakedContext.AddRelationship("new_invoicepaymentmethod_invoicedetail", 
+                new XrmFakedRelationship("new_invoicepaymentmethod_invoicedetail", 
+                            "invoicedetailid", "new_invoicepaymentmethodid", 
+                            "invoicedetail", 
+                            "new_invoicepaymentmethod"));
+
+            Entity product01 = new Entity("product");
+            product01.Id = Guid.NewGuid();
+            product01.Attributes.Add("name", "Test Product");
+
+            Entity invoicedetail01 = new Entity("invoicedetail");
+            invoicedetail01.Id = Guid.NewGuid();
+            invoicedetail01.Attributes.Add("invoicedetailid", invoicedetail01.Id);
+            invoicedetail01.Attributes.Add("new_productid", new EntityReference("product", product01.Id));
+
+            Entity pmr01 = new Entity("new_invoicepaymentmethod");
+            pmr01.Id = Guid.NewGuid();
+            pmr01.Attributes.Add("new_invoicepaymentmethodid", pmr01.Id);
+            pmr01.Attributes.Add("new_name", "PMR0000000001");
+
+
+            Entity invoicedetail02 = new Entity("invoicedetail");
+            invoicedetail02.Id = Guid.NewGuid();
+            invoicedetail02.Attributes.Add("invoicedetailid", invoicedetail02.Id);
+            invoicedetail02.Attributes.Add("new_productid", new EntityReference("product", product01.Id));
+
+            Entity pmr02 = new Entity("new_invoicepaymentmethod");
+            pmr02.Id = Guid.NewGuid();
+            pmr02.Attributes.Add("new_invoicepaymentmethodid", pmr02.Id);
+            pmr02.Attributes.Add("new_name", "PMR0000000001");
+
+            fakedService.Create(product01);
+
+            fakedService.Create(invoicedetail01);
+            fakedService.Create(invoicedetail02);
+            fakedService.Create(pmr01);
+            fakedService.Create(pmr02);
+
+            fakedService.Associate("invoicedetail", invoicedetail01.Id, new Relationship("new_invoicepaymentmethod_invoicedetail"), new EntityReferenceCollection() { pmr01.ToEntityReference() });
+            fakedService.Associate("invoicedetail", invoicedetail02.Id, new Relationship("new_invoicepaymentmethod_invoicedetail"), new EntityReferenceCollection() { pmr02.ToEntityReference() });
+
+
+            EntityCollection invoiceDetails = new EntityCollection();
+
+            QueryExpression query = new QueryExpression("invoicedetail");
+            query.ColumnSet = new ColumnSet(true);
+            LinkEntity link1 = new LinkEntity();
+            link1.JoinOperator = JoinOperator.Natural;
+            link1.LinkFromEntityName = "invoicedetail";
+            link1.LinkFromAttributeName = "invoicedetailid";
+            link1.LinkToEntityName = "new_invoicepaymentmethod_invoicedetail";
+            link1.LinkToAttributeName = "invoicedetailid";
+
+            LinkEntity link2 = new LinkEntity();
+            link2.JoinOperator = JoinOperator.Natural;
+            link2.LinkFromEntityName = "new_invoicepaymentmethod_invoicedetail";
+            link2.LinkFromAttributeName = "new_invoicepaymentmethodid";
+            link2.LinkToEntityName = "new_invoicepaymentmethod";
+            link2.LinkToAttributeName = "new_invoicepaymentmethodid";
+            link2.LinkCriteria = new FilterExpression(LogicalOperator.And);
+
+            ConditionExpression condition1 = new ConditionExpression("new_invoicepaymentmethodid", ConditionOperator.Equal, pmr02.Id);
+
+            link2.LinkCriteria.Conditions.Add(condition1);
+            link1.LinkEntities.Add(link2);
+            query.LinkEntities.Add(link1);
+
+            invoiceDetails = fakedService.RetrieveMultiple(query);
+
+            Assert.Equal(2, invoiceDetails.Entities.Count);
+        }
+
     }
 }
