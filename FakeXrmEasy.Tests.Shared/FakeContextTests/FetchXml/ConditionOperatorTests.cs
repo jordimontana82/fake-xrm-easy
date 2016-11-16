@@ -1,4 +1,5 @@
 ﻿using Crm;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="tomorrow" />
       <xs:enumeration value="between" />
       <xs:enumeration value="not-between" />
+      <xs:enumeration value="eq-userid" />
+      <xs:enumeration value="ne-userid" />
 
     TODO:
 
@@ -74,8 +77,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="olderthan-x-minutes" />
       <xs:enumeration value="last-x-years" />
       <xs:enumeration value="next-x-years" />
-      <xs:enumeration value="eq-userid" />
-      <xs:enumeration value="ne-userid" />
       <xs:enumeration value="eq-userteams" />
       <xs:enumeration value="eq-useroruserteams" />
       <xs:enumeration value="eq-useroruserhierarchy" />
@@ -1120,5 +1121,174 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var retrievedDate = collection.Entities[0]["anniversary"] as DateTime?;
             Assert.Equal(retrievedDate, date);
         }
+
+        [Fact]
+        public void FetchXml_Operator_EqUserId_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='systemuser'>
+                                        <filter type='and'>
+                                            <condition attribute='systemuserid' operator='eq-userid' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("systemuserid", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.EqualUserId, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(0, query.Criteria.Conditions[0].Values.Count);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_EqUserId_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='systemuser'>
+                                        <filter type='and'>
+                                            <condition attribute='systemuserid' operator='eq-userid' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var su1 = new SystemUser() { Id = Guid.NewGuid() }; //Should
+            var su2 = new SystemUser() { Id = Guid.NewGuid() }; //Shouldnt
+            ctx.Initialize(new[] { su1, su2 });
+
+            var service = ctx.GetOrganizationService();
+            ctx.CallerId = su1.ToEntityReference();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            var retrievedUser = collection.Entities[0].Id;
+            Assert.Equal(retrievedUser, su1.Id);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_NeUserId_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='systemuser'>
+                                        <filter type='and'>
+                                            <condition attribute='systemuserid' operator='ne-userid' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("systemuserid", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.NotEqualUserId, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(0, query.Criteria.Conditions[0].Values.Count);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_NeUserId_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='systemuser'>
+                                        <filter type='and'>
+                                            <condition attribute='systemuserid' operator='ne-userid' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var su1 = new SystemUser() { Id = Guid.NewGuid() }; //Shouldnt
+            var su2 = new SystemUser() { Id = Guid.NewGuid() }; //Should
+            ctx.Initialize(new[] { su1, su2 });
+
+            var service = ctx.GetOrganizationService();
+            ctx.CallerId = su1.ToEntityReference();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            var retrievedUser = collection.Entities[0].Id;
+            Assert.Equal(retrievedUser, su2.Id);
+        }
+
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+
+        [Fact]
+        public void FetchXml_EntityName_Attribute_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            var quote = new Quote { Id = Guid.NewGuid() };
+
+            string fetchXml =
+                $@"<fetch>
+                    <entity name='quotedetail' >
+                    <link-entity name='product' from='productid' to='productid' link-type='inner' alias='product' >
+                        <attribute name='currentcost' />
+                    </link-entity>
+                    <filter type='and'>
+                        <condition entityname='product' attribute='currentcost' operator='null' />
+                    </filter>
+                    </entity>
+                </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("currentcost", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal("product", query.Criteria.Conditions[0].EntityName);
+            Assert.Equal(ConditionOperator.Null, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(0, query.Criteria.Conditions[0].Values.Count);
+
+        }
+
+        [Fact]
+        public void FetchXml_EntityName_Attribute_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var quote = new Quote { Id = Guid.NewGuid() };
+
+            string fetchXml =
+                $@"<fetch>
+                    <entity name='quotedetail' >
+                    <link-entity name='product' from='productid' to='productid' link-type='inner' alias='product' >
+                        <attribute name='currentcost' />
+                    </link-entity>
+                    <filter type='and'>
+                        <condition attribute='quoteid' operator='eq' value='{quote.Id}' />
+                        <condition entityname='product' attribute='currentcost' operator='null' />
+                    </filter>
+                    </entity>
+                </fetch>";
+
+            var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                CurrentCost = new Money(100)
+            };
+
+            var quoteProduct = new QuoteDetail
+            {
+                Id = Guid.NewGuid(),
+                ProductId = new EntityReference("product", product.Id),
+                Quantity = 4M,
+                QuoteId = new EntityReference("quote", quote.Id)
+            };
+
+            ctx.Initialize(new List<Entity>() {
+                product, quote, quoteProduct
+            });
+
+            var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(0, collection.Entities.Count);
+        }
+#endif
+
     }
 }

@@ -48,5 +48,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             return new AssignResponse();
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof (AssignRequest);
+        }
     }
 }

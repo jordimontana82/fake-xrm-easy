@@ -24,5 +24,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             return new UpdateResponse();
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(UpdateRequest);
+        }
     }
 }

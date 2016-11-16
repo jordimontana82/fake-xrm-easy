@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FakeXrmEasy.Extensions.FetchXml;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -37,10 +38,16 @@ namespace FakeXrmEasy.FakeMessageExecutors
             else if (request.Query is FetchExpression)
             {
                 var fetchXml = (request.Query as FetchExpression).Query;
-                var queryExpression = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+                var xmlDoc = XrmFakedContext.ParseFetchXml(fetchXml);
+                var queryExpression = XrmFakedContext.TranslateFetchXmlDocumentToQueryExpression(ctx, xmlDoc);
 
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, queryExpression);
                 var list = linqQuery.ToList();
+
+                if(xmlDoc.IsAggregateFetchXml())
+                {
+                    list = XrmFakedContext.ProcessAggregateFetchXml(ctx, xmlDoc, list);
+                }
                 list.ForEach(e => PopulateFormattedValues(e));
 
                 var response = new RetrieveMultipleResponse
@@ -118,7 +125,17 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 bShouldAddFormattedValue = true;
             }
 
+            else if(value is AliasedValue)
+            {
+                return GetFormattedValueForValue((value as AliasedValue)?.Value, out bShouldAddFormattedValue);
+            }
+
             return sFormattedValue;
+        }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(RetrieveMultipleRequest);
         }
     }
 }

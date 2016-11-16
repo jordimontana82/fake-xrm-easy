@@ -60,29 +60,14 @@ namespace FakeXrmEasy
             AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
             ExecutionMocks = new Dictionary<Type, ServiceRequestExecution>();
-            FakeMessageExecutors = new Dictionary<Type, IFakeMessageExecutor>();
             OptionSetValuesMetadata = new Dictionary<string, OptionSetMetadata>();
 
-            //Adding default execution fakes
-            AddFakeMessageExecutor<WhoAmIRequest>(new WhoAmIRequestExecutor());
-            AddFakeMessageExecutor<RetrieveMultipleRequest>(new RetrieveMultipleRequestExecutor());
-            AddFakeMessageExecutor<RetrieveAttributeRequest>(new RetrieveAttributeRequestExecutor());
-            AddFakeMessageExecutor<SetStateRequest>(new SetStateRequestExecutor());
-            AddFakeMessageExecutor<AssociateRequest>(new AssociateRequestExecutor());
-            AddFakeMessageExecutor<DisassociateRequest>(new DisassociateRequestExecutor());
-            AddFakeMessageExecutor<CreateRequest>(new CreateRequestExecutor());
-            AddFakeMessageExecutor<UpdateRequest>(new UpdateRequestExecutor());
-            AddFakeMessageExecutor<DeleteRequest>(new DeleteRequestExecutor());
-            AddFakeMessageExecutor<AssignRequest>(new AssignRequestExecutor());
-            AddFakeMessageExecutor<PublishXmlRequest>(new PublishXmlRequestExecutor());
-            AddFakeMessageExecutor<InsertOptionValueRequest>(new InsertOptionValueRequestExecutor());
-
-
-            AddFakeMessageExecutor<ExecuteMultipleRequest>(new ExecuteMultipleRequestExecutor());
-#if FAKE_XRM_EASY_2016
-            AddFakeMessageExecutor<ExecuteTransactionRequest>(new ExecuteTransactionExecutor());
-#endif
-
+            FakeMessageExecutors = Assembly.GetExecutingAssembly()
+                .GetTypes()
+                .Where(t => t.GetInterfaces().Contains(typeof (IFakeMessageExecutor)))
+                .Select(t => Activator.CreateInstance(t) as IFakeMessageExecutor)
+                .ToDictionary(t => t.GetResponsibleRequestType(), t => t);
+            
             Relationships = new Dictionary<string, XrmFakedRelationship>();
         }
 
@@ -158,6 +143,11 @@ namespace FakeXrmEasy
 
         public virtual IOrganizationService GetOrganizationService()
         {
+            if (this is XrmRealContext)
+            {
+                _service = GetOrganizationService();
+                return _service;
+            }
             return GetFakedOrganizationService(this);
         }
 
@@ -210,7 +200,7 @@ namespace FakeXrmEasy
             } 
 
             var fakedService = A.Fake<IOrganizationService>();
-
+            
             //Fake CRUD methods
             FakeRetrieve(context, fakedService);
             FakeCreate(context, fakedService);
@@ -224,9 +214,9 @@ namespace FakeXrmEasy
             FakeExecute(context, fakedService);
             FakeAssociate(context, fakedService);
             FakeDisassociate(context, fakedService);
-
             context._service = fakedService;
-            return fakedService;
+
+            return context._service;
         }
 
         /// <summary>

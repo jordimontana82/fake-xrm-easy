@@ -18,6 +18,7 @@ let FakeXrmEasyBuildDir                    = buildDir + @"\FakeXrmEasy"
 let FakeXrmEasy2013BuildDir                = buildDir + @"\FakeXrmEasy.2013"
 let FakeXrmEasy2015BuildDir                = buildDir + @"\FakeXrmEasy.2015"
 let FakeXrmEasy2016BuildDir                = buildDir + @"\FakeXrmEasy.2016"
+let FakeXrmEasy365BuildDir                 = buildDir + @"\FakeXrmEasy.365"
 let FakeXrmEasySharedBuildDir              = buildDir + @"\FakeXrmEasy.Shared"
 
 let testDir              = @".\test"
@@ -26,6 +27,7 @@ let FakeXrmEasyTestsBuildDir               = testDir + @"\FakeXrmEasy.Tests"
 let FakeXrmEasyTests2013BuildDir           = testDir + @"\FakeXrmEasy.Tests.2013"
 let FakeXrmEasyTests2015BuildDir           = testDir + @"\FakeXrmEasy.Tests.2015"
 let FakeXrmEasyTests2016BuildDir           = testDir + @"\FakeXrmEasy.Tests.2016"
+let FakeXrmEasyTests365BuildDir            = testDir + @"\FakeXrmEasy.Tests.365"
 let FakeXrmEasyTestsSharedBuildDir         = testDir + @"\FakeXrmEasy.Tests.Shared"
 
 let deployDir               = @".\Publish"
@@ -34,6 +36,7 @@ let FakeXrmEasyDeployDir                    = deployDir + @"\FakeXrmEasy"
 let FakeXrmEasy2013DeployDir                = deployDir + @"\FakeXrmEasy.2013"
 let FakeXrmEasy2015DeployDir                = deployDir + @"\FakeXrmEasy.2015"
 let FakeXrmEasy2016DeployDir                = deployDir + @"\FakeXrmEasy.2016"
+let FakeXrmEasy365DeployDir                 = deployDir + @"\FakeXrmEasy.365"
 let FakeXrmEasySharedDeployDir              = deployDir + @"\FakeXrmEasy.Shared"
 
 let nugetDir                = @".\nuget\"
@@ -41,8 +44,8 @@ let nugetDeployDir          = @"[Enter_NuGet_Url]"
 let packagesDir             = @".\packages\"
 
 let nuGetCommandLine           = @".\tools\nuget\nuget286.exe"
-let mutable previousVersion = "1.15.10"
-let mutable version         = "1.16.0" //Copy this into previousVersion before publishing packages...
+let mutable previousVersion = "1.17.3"
+let mutable version         = "1.18.0" //Copy this into previousVersion before publishing packages...
 let mutable build           = buildVersion
 let mutable nugetVersion    = version
 let mutable asmVersion      = version
@@ -119,6 +122,14 @@ Target "BuildFakeXrmEasy.2016" (fun _->
       |> Log "Build - Output: "
 )
 
+Target "BuildFakeXrmEasy.365" (fun _->
+    let properties =
+        [ ("DefineConstants", "FAKE_XRM_EASY_365") ]
+    !! @"FakeXrmEasy.365\*.csproj"
+      |> MSBuild FakeXrmEasy365BuildDir "Rebuild" (properties)
+      |> Log "Build - Output: "
+)
+
 Target "BuildFakeXrmEasy.Tests" (fun _->
     let properties =
         [ ("DefineConstants", "") ]
@@ -151,6 +162,14 @@ Target "BuildFakeXrmEasy.Tests.2016" (fun _->
       |> Log "Build - Output: "
 )
 
+Target "BuildFakeXrmEasy.Tests.365" (fun _->
+    let properties =
+        [ ("DefineConstants", "FAKE_XRM_EASY_365") ]
+    !! @"FakeXrmEasy.Tests.365\*.csproj"
+      |> MSBuild FakeXrmEasyTests365BuildDir "Rebuild" (properties)
+      |> Log "Build - Output: "
+)
+
 Target "Test.2011" (fun _ ->
     !! (testDir @@ "\FakeXrmEasy.Tests\FakeXrmEasy.Tests.dll")
       |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.2011.html") })
@@ -169,6 +188,11 @@ Target "Test.2015" (fun _ ->
 Target "Test.2016" (fun _ ->
     !! (testDir @@ "\FakeXrmEasy.Tests.2016\FakeXrmEasy.Tests.2016.dll")
       |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.2016.html") })
+)
+
+Target "Test.365" (fun _ ->
+    !! (testDir @@ "\FakeXrmEasy.Tests.365\FakeXrmEasy.Tests.365.dll")
+      |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.365.html") })
 )
 
 Target "NuGet" (fun _ ->
@@ -217,6 +241,17 @@ Target "NuGet" (fun _ ->
                OutputPath = nugetDir
                ReleaseNotes = releaseNotes
                Publish = true })
+
+    "FakeXrmEasy.365.nuspec"
+     |> NuGet (fun p -> 
+           {p with     
+               Project = "FakeXrmEasy.365"              
+               Version = version
+               NoPackageAnalysis = true
+               ToolPath = nuGetCommandLine                            
+               OutputPath = nugetDir
+               ReleaseNotes = releaseNotes
+               Publish = true })
 )
 
 Target "PublishNuGet" (fun _ ->
@@ -237,6 +272,7 @@ Target "Publish" (fun _ ->
     CreateDir FakeXrmEasy2013DeployDir
     CreateDir FakeXrmEasy2015DeployDir
     CreateDir FakeXrmEasy2016DeployDir
+    CreateDir FakeXrmEasy365DeployDir
 
     !! (FakeXrmEasyBuildDir @@ @"/**/*.* ")
       -- " *.pdb"
@@ -253,6 +289,10 @@ Target "Publish" (fun _ ->
     !! (FakeXrmEasy2016BuildDir @@ @"/**/*.* ")
       -- " *.pdb"
         |> CopyTo FakeXrmEasy2016DeployDir
+
+    !! (FakeXrmEasy365BuildDir @@ @"/**/*.* ")
+      -- " *.pdb"
+        |> CopyTo FakeXrmEasy365DeployDir
 )
 
 Target "CodeCoverage.2011" (fun _ ->
@@ -303,13 +343,25 @@ Target "CodeCoverage.2016" (fun _ ->
     
 )
 
+Target "CodeCoverage.365" (fun _ ->
+    OpenCover (fun p -> { p with 
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
+                                Register = RegisterType.RegisterUser
+                                WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.365")
+                                Filter = "+[FakeXrmEasy*]* -[*.Tests*]*"
+                                Output = "../coverage.365.xml"
+                        }) "FakeXrmEasy.Tests.365.dll"
+    
+)
+
 Target "ReportCodeCoverage" (fun _ ->
     ReportGenerator (fun p -> { p with 
                                     ExePath = "./packages/ReportGenerator.2.4.5.0/tools/ReportGenerator"
                                     WorkingDir = (testDir @@ "\FakeXrmEasy.Tests")
                                     TargetDir = "../reports"
                                     ReportTypes = [ReportGeneratorReportType.Html; ReportGeneratorReportType.Badges ]
-                               }) [ "..\coverage.2011.xml";  "..\coverage.2013.xml";  "..\coverage.2015.xml";  "..\coverage.2016.xml" ]
+                               }) [ "..\coverage.2011.xml";  "..\coverage.2013.xml";  "..\coverage.2015.xml";  "..\coverage.2016.xml"; "..\coverage.365.xml" ]
     
 )
 
@@ -321,18 +373,22 @@ Target "ReportCodeCoverage" (fun _ ->
   ==> "BuildFakeXrmEasy.2013"
   ==> "BuildFakeXrmEasy.2015"
   ==> "BuildFakeXrmEasy.2016"
+  ==> "BuildFakeXrmEasy.365"
   ==> "BuildFakeXrmEasy.Tests"
   ==> "BuildFakeXrmEasy.Tests.2013"
   ==> "BuildFakeXrmEasy.Tests.2015"
   ==> "BuildFakeXrmEasy.Tests.2016"
+  ==> "BuildFakeXrmEasy.Tests.365"
   ==> "Test.2011"
   ==> "Test.2013"
   ==> "Test.2015"
   ==> "Test.2016"
+  ==> "Test.365"
   ==> "CodeCoverage.2011"
   ==> "CodeCoverage.2013"
   ==> "CodeCoverage.2015"
   ==> "CodeCoverage.2016"
+  ==> "CodeCoverage.365"
   ==> "ReportCodeCoverage"
   ==> "Publish"
   ==> "NuGet"

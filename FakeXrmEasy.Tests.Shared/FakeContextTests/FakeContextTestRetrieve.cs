@@ -101,7 +101,7 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
-        public void When_retrieve_is_invoked_with_an_existing_entity_and_all_columns_the_exact_entity_is_returned()
+        public void When_retrieve_is_invoked_with_an_existing_entity_and_all_columns_all_the_attributes_are_returned()
         {
             var context = new XrmFakedContext();
 
@@ -116,7 +116,8 @@ namespace FakeXrmEasy.Tests
             var service = context.GetFakedOrganizationService();
 
             var result = service.Retrieve("account", guid, new ColumnSet(true));
-            Assert.Equal(result, data.FirstOrDefault());
+            Assert.Equal(result.Id, data.FirstOrDefault().Id);
+            Assert.Equal(result.Attributes.Count, data.FirstOrDefault().Attributes.Count);
         }
 
         [Fact]
@@ -170,6 +171,28 @@ namespace FakeXrmEasy.Tests
 
             var service = context.GetFakedOrganizationService();
             Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Retrieve("account", Guid.NewGuid(), new ColumnSet(true)));
+        }
+
+        [Fact]
+        public void Should_Not_Fail_On_Retrieving_Entity_With_Entity_Collection_Attributes()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetFakedOrganizationService();
+
+            var party = new ActivityParty
+            {
+                PartyId = new EntityReference("systemuser", Guid.NewGuid())
+            };
+
+            var email = new Email
+            {
+                Id = Guid.NewGuid(),
+                To = new[] { party }
+            };
+
+            service.Create(email);
+
+            Assert.DoesNotThrow(() => service.Retrieve(email.LogicalName, email.Id, new ColumnSet(true)));
         }
     }
 }

@@ -11,8 +11,10 @@ namespace FakeXrmEasy
         {
             if (objectA == null && objectB == null) return 0;  //Equal
 
-            if (objectA == null) return -1;
-            if (objectB == null) return 1;
+            if (objectA == null)
+                return -1;
+            if (objectB == null)
+                return 1;
 
             Type attributeType = objectA.GetType();
 
@@ -71,6 +73,12 @@ namespace FakeXrmEasy
             {
                 return ((bool)objectA).CompareTo((bool)objectB);
             }
+
+            else if(attributeType == typeof(AliasedValue))
+            {
+                return Compare((objectA as AliasedValue)?.Value, (objectB as AliasedValue)?.Value);
+            }
+
             else
             {
                 return 0;

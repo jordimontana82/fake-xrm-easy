@@ -1,4 +1,4 @@
-﻿#if FAKE_XRM_EASY_2016
+﻿#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
 
 using System;
 
@@ -31,6 +31,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 }
             }
             return response;
+        }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(ExecuteTransactionRequest);
         }
     }
 }

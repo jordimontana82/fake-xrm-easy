@@ -108,7 +108,7 @@ namespace FakeXrmEasy.Extensions
                     }
 
                     if (e.Attributes.ContainsKey(attKey))
-                        projected[attKey] = e[attKey];
+                        projected[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
                     else
                     {
                         projected[attKey] = null;
@@ -129,12 +129,104 @@ namespace FakeXrmEasy.Extensions
             }
         }
 
+        public static object CloneAttribute(object attributeValue)
+        {
+            if (attributeValue == null)
+                return null;
+
+            var type = attributeValue.GetType();
+            if (type == typeof(string))
+                return new string((attributeValue as string).ToCharArray());
+
+            else if (type == typeof(EntityReference))
+            {
+                var original = (attributeValue as EntityReference);
+                var clone = new EntityReference(original.LogicalName, original.Id);
+                clone.Name = CloneAttribute(original.Name) as string;
+                return clone;
+            }
+            else if (type == typeof(BooleanManagedProperty))
+            {
+                var original = (attributeValue as BooleanManagedProperty);
+                return new BooleanManagedProperty(original.Value);
+            }
+
+            else if (type == typeof(OptionSetValue))
+            {
+                var original = (attributeValue as OptionSetValue);
+                return new OptionSetValue(original.Value);
+            }
+            else if (type == typeof(AliasedValue))
+            {
+                var original = (attributeValue as AliasedValue);
+                return new AliasedValue(original.EntityLogicalName, original.AttributeLogicalName, CloneAttribute(original.Value));
+            }
+
+            else if (type == typeof(Money))
+            {
+                var original = (attributeValue as Money);
+                return new Money(original.Value);
+            }
+
+            else if (attributeValue.GetType() == typeof (EntityCollection))
+            {
+                var collection = attributeValue as EntityCollection;
+                return new EntityCollection(collection.Entities.Select(e => e.Clone(e.GetType())).ToList());
+            }
+
+            else if (type == typeof (int) || type == typeof (Int64))
+                return attributeValue; //Not a reference type
+            else if (type == typeof (decimal))
+                return attributeValue; //Not a reference type
+            else if (type == typeof (double))
+                return attributeValue; //Not a reference type
+            else if (type == typeof (float))
+                return attributeValue; //Not a reference type
+            else if (type == typeof (byte))
+                return attributeValue; //Not a reference type
+            else if (type == typeof (float))
+                return attributeValue; //Not a reference type
+            else if (type == typeof (bool))
+                return attributeValue; //Not a reference type
+            else if (type == typeof (Guid))
+                return attributeValue; //Not a reference type
+            else if (type == typeof (DateTime))
+                return attributeValue; //Not a reference type
+            else if (attributeValue is Enum)
+                return attributeValue; //Not a reference type
+
+            throw new Exception(string.Format("Attribute type not supported when trying to clone attribute '{0}'", type.ToString()));
+        }
+
         public static Entity Clone(this Entity e)
         {
             var cloned = new Entity(e.LogicalName);
+            cloned.Id = e.Id;
+            cloned.LogicalName = e.LogicalName;
             foreach (var attKey in e.Attributes.Keys)
             {
-                cloned[attKey] = e[attKey];
+                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
+            }
+            return cloned;
+        }
+
+        public static T Clone<T>(this Entity e) where T: Entity
+        {
+            return (T) e.Clone(typeof(T));
+        }
+
+        public static Entity Clone(this Entity e, Type t)
+        {
+            if (t == null)
+                return e.Clone();
+
+            var cloned = Activator.CreateInstance(t) as Entity;
+            cloned.Id = e.Id;
+            cloned.LogicalName = e.LogicalName;
+
+            foreach (var attKey in e.Attributes.Keys)
+            {
+                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
             }
             return cloned;
         }

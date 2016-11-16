@@ -71,5 +71,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             return new AssociateResponse ();
         }
+
+        public Type GetResponsibleRequestType()
+        {
+            return typeof(AssociateRequest);
+        }
     }
 }
