@@ -3,17 +3,9 @@ using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Xrm.Sdk.Query;
-using System.ServiceModel;
 using Microsoft.Xrm.Sdk.Messages;
-using System.Dynamic;
-using System.Linq.Expressions;
-using FakeXrmEasy.Extensions;
-using Microsoft.Xrm.Sdk.Client;
-using System.ServiceModel.Description;
 using System.Reflection;
-using Microsoft.Crm.Sdk.Messages;
 using FakeXrmEasy.FakeMessageExecutors;
 using Microsoft.Xrm.Sdk.Metadata;
 
@@ -24,17 +16,17 @@ namespace FakeXrmEasy
     /// how entities are persisted in Tables (with the logical name) and then the records themselves
     /// where the Primary Key is the Guid
     /// </summary>
-    public partial class XrmFakedContext: IXrmContext
+    public partial class XrmFakedContext : IXrmContext
     {
         protected Dictionary<string, Dictionary<string, string>> AttributeMetadata { get; set; }
 
-        protected internal IOrganizationService _service { get; set; }
-        protected internal bool _initialised { get; set; }
+        protected internal IOrganizationService Service { get; set; }
+
+        protected internal bool Initialised { get; set; }
 
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
 
         public Assembly ProxyTypesAssembly { get; set; }
-        
 
         /// <summary>
         /// Sets the user to assign the CreatedBy and ModifiedBy properties when entities are added to the context.
@@ -64,20 +56,20 @@ namespace FakeXrmEasy
 
             FakeMessageExecutors = Assembly.GetExecutingAssembly()
                 .GetTypes()
-                .Where(t => t.GetInterfaces().Contains(typeof (IFakeMessageExecutor)))
+                .Where(t => t.GetInterfaces().Contains(typeof(IFakeMessageExecutor)))
                 .Select(t => Activator.CreateInstance(t) as IFakeMessageExecutor)
                 .ToDictionary(t => t.GetResponsibleRequestType(), t => t);
-            
+
             Relationships = new Dictionary<string, XrmFakedRelationship>();
         }
 
         /// <summary>
         /// Initializes the context with the provided entities
         /// </summary>
-        /// <param name="col"></param>
+        /// <param name="entities"></param>
         public virtual void Initialize(IEnumerable<Entity> entities)
         {
-            if(_initialised)
+            if (Initialised)
             {
                 throw new Exception("Initialize should be called only once per unit test execution and XrmFakedContext instance.");
             }
@@ -92,7 +84,7 @@ namespace FakeXrmEasy
                 AddEntityWithDefaults(e);
             }
 
-            _initialised = true;
+            Initialised = true;
         }
 
         public void AddExecutionMock<T>(ServiceRequestExecution mock) where T : OrganizationRequest
@@ -105,7 +97,7 @@ namespace FakeXrmEasy
 
         public void RemoveExecutionMock<T>() where T : OrganizationRequest
         {
-            ExecutionMocks.Remove(typeof (T));
+            ExecutionMocks.Remove(typeof(T));
         }
 
         public void AddFakeMessageExecutor<T>(IFakeMessageExecutor executor) where T : OrganizationRequest
@@ -141,12 +133,44 @@ namespace FakeXrmEasy
             return null;
         }
 
+        public void AddAttributeMapping(string sourceEntityName, string sourceAttributeName, string targetEntityName, string targetAttributeName)
+        {
+            if (string.IsNullOrWhiteSpace(sourceEntityName))
+                throw new ArgumentNullException("sourceEntityName");
+            if (string.IsNullOrWhiteSpace(sourceAttributeName))
+                throw new ArgumentNullException("sourceAttributeName");
+            if (string.IsNullOrWhiteSpace(targetEntityName))
+                throw new ArgumentNullException("targetEntityName");
+            if (string.IsNullOrWhiteSpace(targetAttributeName))
+                throw new ArgumentNullException("targetAttributeName");
+
+            var entityMap = new Entity
+            {
+                LogicalName = "entitymap",
+                Id = Guid.NewGuid(),
+                ["targetentityname"] = targetEntityName,
+                ["sourceentityname"] = sourceEntityName
+            };
+
+            var attributeMap = new Entity
+            {
+                LogicalName = "attributemap",
+                Id = Guid.NewGuid(),
+                ["entitymapid"] = new EntityReference("entitymap", entityMap.Id),
+                ["targetattributename"] = targetAttributeName,
+                ["sourceattributename"] = sourceAttributeName
+            };
+
+            AddEntityWithDefaults(entityMap);
+            AddEntityWithDefaults(attributeMap);
+        }
+
         public virtual IOrganizationService GetOrganizationService()
         {
             if (this is XrmRealContext)
             {
-                _service = GetOrganizationService();
-                return _service;
+                Service = GetOrganizationService();
+                return Service;
             }
             return GetFakedOrganizationService(this);
         }
@@ -194,19 +218,19 @@ namespace FakeXrmEasy
         /// <returns></returns>
         protected IOrganizationService GetFakedOrganizationService(XrmFakedContext context)
         {
-            if(context._service != null)
+            if (context.Service != null)
             {
-                return context._service;
-            } 
+                return context.Service;
+            }
 
             var fakedService = A.Fake<IOrganizationService>();
-            
+
             //Fake CRUD methods
             FakeRetrieve(context, fakedService);
             FakeCreate(context, fakedService);
             FakeUpdate(context, fakedService);
             FakeDelete(context, fakedService);
-            
+
             //Fake / Intercept Retrieve Multiple Requests
             FakeRetrieveMultiple(context, fakedService);
 
@@ -214,9 +238,9 @@ namespace FakeXrmEasy
             FakeExecute(context, fakedService);
             FakeAssociate(context, fakedService);
             FakeDisassociate(context, fakedService);
-            context._service = fakedService;
+            context.Service = fakedService;
 
-            return context._service;
+            return context.Service;
         }
 
         /// <summary>
@@ -260,7 +284,7 @@ namespace FakeXrmEasy
                         };
                         context.FakeMessageExecutors[typeof(AssociateRequest)].Execute(request, context);
                     }
-                    else 
+                    else
                         throw PullRequestException.NotImplementedOrganizationRequest(typeof(AssociateRequest));
                 });
         }
@@ -304,6 +328,6 @@ namespace FakeXrmEasy
                 });
         }
 
-        
+
     }
 }

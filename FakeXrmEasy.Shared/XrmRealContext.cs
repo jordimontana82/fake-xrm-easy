@@ -18,7 +18,7 @@ namespace FakeXrmEasy
     /// Reuse unit test syntax to test against a real CRM organisation
     /// It uses a real CRM organisation service instance
     /// </summary>
-    public class XrmRealContext: XrmFakedContext, IXrmContext
+    public class XrmRealContext : XrmFakedContext, IXrmContext
     {
         public string ConnectionStringName { get; set; } = "fakexrmeasy-connection";
 
@@ -35,17 +35,17 @@ namespace FakeXrmEasy
 
         public XrmRealContext(IOrganizationService organizationService)
         {
-            _service = organizationService;
+            Service = organizationService;
             //Don't setup fakes in this case.
         }
 
         public override IOrganizationService GetOrganizationService()
         {
-            if (_service != null)
-                return _service;
+            if (Service != null)
+                return Service;
 
-            _service = GetOrgService();
-            return _service;
+            Service = GetOrgService();
+            return Service;
         }
 
         public override void Initialize(IEnumerable<Entity> entities)
@@ -59,7 +59,7 @@ namespace FakeXrmEasy
             if (connection == null)
                 throw new Exception(string.Format("A connectionstring parameter with name '{0}' must exist", ConnectionStringName));
 
-            if(string.IsNullOrWhiteSpace(connection.ConnectionString))
+            if (string.IsNullOrWhiteSpace(connection.ConnectionString))
             {
                 throw new Exception("The connectionString property must not be blank");
             }
