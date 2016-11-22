@@ -25,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\InsertOptionValueRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\PublishXmlRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveAttributeRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveEntityRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\ReviseQuoteRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\SetStateRequestExecutor.cs" />
