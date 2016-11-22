@@ -35,6 +35,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\ConditionOperatorTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\FakeContextTestFetchXmlTranslation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\TypeConversionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\InitializeFromRequestTests\InitializeFromRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs">
       <SubType>Code</SubType>
     </Compile>
