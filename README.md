@@ -1,4 +1,4 @@
-Fake Xrm Easy: The automated testing framework for Dynamics CRM and Dynamics 365
+Fake Xrm Easy: TDD for Dynamics CRM and Dynamics 365 made simple
 =================================================================================
 
 |Build|Line Coverage|Branch Coverage|
