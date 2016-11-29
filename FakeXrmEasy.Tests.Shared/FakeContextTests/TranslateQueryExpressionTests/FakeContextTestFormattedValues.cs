@@ -11,6 +11,7 @@ using Microsoft.Xrm.Sdk;
 using System.Reflection;
 using System.ServiceModel;
 using Crm;
+using FakeXrmEasy.Extensions;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 {
@@ -65,6 +66,36 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             }
         }
 
-        
+
+        [Fact]
+        public void When_an_entity_is_returned_formatted_values_are_also_cloned()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var account = new Account() { Id = Guid.NewGuid() };
+            account["statecode"] = new OptionSetValue(0);
+
+
+            var formattedValues = new FormattedValueCollection();
+            formattedValues.Add("statecode", "Active");
+            account.Inject("FormattedValues", formattedValues);
+
+            context.Initialize(new List<Entity>()
+            {
+                account
+            });
+
+            using (var ctx = new XrmServiceContext(service))
+            {
+                var a = (from acc in ctx.CreateQuery<Account>()
+                         select acc).FirstOrDefault();
+
+                Assert.True(a.FormattedValues != null);
+                Assert.True(a.FormattedValues.Contains("statecode"));
+                Assert.Equal("Active", a.FormattedValues["statecode"]);
+            }
+        }
+
     }
 }

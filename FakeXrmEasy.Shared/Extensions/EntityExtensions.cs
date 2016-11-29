@@ -203,6 +203,16 @@ namespace FakeXrmEasy.Extensions
             var cloned = new Entity(e.LogicalName);
             cloned.Id = e.Id;
             cloned.LogicalName = e.LogicalName;
+
+            if (e.FormattedValues != null)
+            {
+                var formattedValues = new FormattedValueCollection();
+                foreach (var key in e.FormattedValues.Keys)
+                    formattedValues.Add(key, e.FormattedValues[key]);
+
+                cloned.Inject("FormattedValues", formattedValues);
+            }
+
             foreach (var attKey in e.Attributes.Keys)
             {
                 cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
@@ -223,6 +233,15 @@ namespace FakeXrmEasy.Extensions
             var cloned = Activator.CreateInstance(t) as Entity;
             cloned.Id = e.Id;
             cloned.LogicalName = e.LogicalName;
+            
+            if(e.FormattedValues != null)
+            {
+                var formattedValues = new FormattedValueCollection();
+                foreach (var key in e.FormattedValues.Keys)
+                    formattedValues.Add(key, e.FormattedValues[key]);
+
+                cloned.Inject("FormattedValues", formattedValues);
+            }
 
             foreach (var attKey in e.Attributes.Keys)
             {
@@ -358,6 +377,18 @@ namespace FakeXrmEasy.Extensions
 
             return Guid.Empty;
         }
+
+        /// <summary>
+        /// Extension method to "hack" internal set properties on sealed classes via reflection
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="property"></param>
+        /// <param name="value"></param>
+        public static void Inject(this Entity e, string property, object value)
+        {
+            e.GetType().GetProperty(property).SetValue(e, value, null);
+        }
+
         
          
     }
