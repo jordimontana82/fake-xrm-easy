@@ -186,6 +186,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy.365", "FakeXrmE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy.Tests.365", "FakeXrmEasy.Tests.365\FakeXrmEasy.Tests.365.csproj", "{2290F5CB-9FF9-42EE-9602-D7222E05DCBA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevToolkitSamples", "DevToolkitSamples\DevToolkitSamples.csproj", "{32303E14-1087-44A1-9DAC-415389C799B7}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{112188e6-c759-4b2e-b5ae-54e722e26806}*SharedItemsImports = 4
@@ -246,6 +248,10 @@ Global
 		{2290F5CB-9FF9-42EE-9602-D7222E05DCBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2290F5CB-9FF9-42EE-9602-D7222E05DCBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2290F5CB-9FF9-42EE-9602-D7222E05DCBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32303E14-1087-44A1-9DAC-415389C799B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32303E14-1087-44A1-9DAC-415389C799B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32303E14-1087-44A1-9DAC-415389C799B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32303E14-1087-44A1-9DAC-415389C799B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -258,5 +264,8 @@ Global
 		{D195513F-CEAE-408B-9197-10149D596773} = {7B1103ED-3843-4670-A8DB-F462B4C8FBE2}
 		{4E6ACD78-CFB2-4A44-86FC-3D77E609555E} = {7B1103ED-3843-4670-A8DB-F462B4C8FBE2}
 		{2AFDE012-E9AE-4BDD-A664-445C121466D1} = {6F09E415-3E7D-468E-A1D4-74A8C43267BB}
+	EndGlobalSection
+	GlobalSection(CRMSolutionProperties) = preSolution
+		SolutionIsBoundToCRM = True
 	EndGlobalSection
 EndGlobal
