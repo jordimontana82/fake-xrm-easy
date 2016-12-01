@@ -278,6 +278,11 @@ namespace FakeXrmEasy
                             });
                        return fakedServiceFactory;
                    }
+                   else if (t.Equals(typeof(IServiceEndpointNotificationService)))
+                   {
+                       var fakedNotificationService = A.Fake<IServiceEndpointNotificationService>();
+                       return fakedNotificationService;
+                   }
                    throw new PullRequestException("The specified service type is not supported");
                });
 
