@@ -43,6 +43,27 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
         }
 
         [Fact]
+        public void When_executing_a_linq_query_with_equals_between_2_strings_with_date_format_right_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var guid = Guid.NewGuid();
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = guid, FirstName = "11.1" }
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var contact = (from c in ctx.CreateQuery<Contact>()
+                               where c.FirstName == "11.1"
+                               select c).FirstOrDefault();
+
+                Assert.True(contact != null);
+            }
+        }
+
+        [Fact]
         public void When_executing_a_linq_query_with_equals_between_2_booleans_result_is_returned()
         {
             var fakedContext = new XrmFakedContext();
