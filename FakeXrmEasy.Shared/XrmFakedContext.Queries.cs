@@ -911,18 +911,28 @@ namespace FakeXrmEasy
                 //Create a new typed expression 
                 var typedExpression = new TypedConditionExpression(c);
 
+                string sAttributeName = c.AttributeName;
+
                 //Find the attribute type if using early bound entities
                 if(context.ProxyTypesAssembly != null)
                 {
 
 #if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 
                     sEntityName = qe.GetEntityNameFromAlias(c.EntityName);
+
+#else
+                    //CRM 2011
+                    if(c.AttributeName.IndexOf(".") >= 0) {
+                        var alias = c.AttributeName.Split('.')[0];
+                        sEntityName = qe.GetEntityNameFromAlias(alias);
+                        sAttributeName = c.AttributeName.Split('.')[1];
+                    }
 #endif
 
                     var earlyBoundType = context.FindReflectedType(sEntityName);
                     if (earlyBoundType != null)
                     {
-                        typedExpression.AttributeType = context.FindReflectedAttributeType(earlyBoundType, c.AttributeName);
+                        typedExpression.AttributeType = context.FindReflectedAttributeType(earlyBoundType, sAttributeName);
                     }
                 }
                 
