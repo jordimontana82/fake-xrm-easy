@@ -14,7 +14,7 @@ namespace FakeXrmEasy.Extensions
                 return qe.EntityName;
 
             var linkedEntity = qe.LinkEntities
-                            .Where(le => le.EntityAlias.Equals(sAlias))
+                            .Where(le => le.EntityAlias != null && le.EntityAlias.Equals(sAlias))
                             .FirstOrDefault();
 
             if(linkedEntity != null)
@@ -22,7 +22,8 @@ namespace FakeXrmEasy.Extensions
                 return linkedEntity.LinkToEntityName;
             }
 
-            return null;
+            //If the alias wasn't found, it means it  could be any of the EntityNames
+            return sAlias;
         } 
     }
 }
