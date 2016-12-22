@@ -500,15 +500,22 @@ namespace FakeXrmEasy
             if (attributeType == null)
                 return GetAppropiateTypedValue(value);
 
+
             //Basic types conversions
             //Special case => datetime is sent as a string
             if (value is string)
             {
+                int iValue;
+
                 DateTime dtDateTimeConversion;
                 if (attributeType.IsDateTime()  //Only convert to DateTime if the attribute's type was DateTime
                     && DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out dtDateTimeConversion))
                 {
                     return Expression.Constant(dtDateTimeConversion, typeof(DateTime));
+                }
+                else if (attributeType.IsOptionSet() && int.TryParse(value.ToString(), out iValue))
+                {
+                    return Expression.Constant(iValue, typeof(int));
                 }
                 else
                 {
