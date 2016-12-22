@@ -590,7 +590,7 @@ namespace FakeXrmEasy
                         return GetAppropiateCastExpressionBasedOnInt(input);
                     if (attributeType == typeof(decimal) || attributeType == typeof(Money))
                         return GetAppropiateCastExpressionBasedOnDecimal(input);
-                    if (attributeType == typeof(bool))
+                    if (attributeType == typeof(bool) || attributeType == typeof(BooleanManagedProperty))
                         return GetAppropiateCastExpressionBasedOnBoolean(input);
                     if (attributeType == typeof(string))
                         return GetAppropiateCastExpressionBasedOnString(input, value);
