@@ -497,12 +497,16 @@ namespace FakeXrmEasy
 
         protected static Expression GetAppropiateTypedValueAndType(object value, Type attributeType)
         {
+            if (attributeType == null)
+                return GetAppropiateTypedValue(value);
+
             //Basic types conversions
             //Special case => datetime is sent as a string
             if (value is string)
             {
                 DateTime dtDateTimeConversion;
-                if (DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out dtDateTimeConversion))
+                if (attributeType.IsDateTime()  //Only convert to DateTime if the attribute's type was DateTime
+                    && DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out dtDateTimeConversion))
                 {
                     return Expression.Constant(dtDateTimeConversion, typeof(DateTime));
                 }
@@ -593,7 +597,7 @@ namespace FakeXrmEasy
                     if (attributeType == typeof(bool) || attributeType == typeof(BooleanManagedProperty))
                         return GetAppropiateCastExpressionBasedOnBoolean(input);
                     if (attributeType == typeof(string))
-                        return GetAppropiateCastExpressionBasedOnString(input, value);
+                        return GetAppropiateCastExpressionBasedOnStringAndType(input, value, attributeType);
                     if(attributeType.IsDateTime())
                         return GetAppropiateCastExpressionBasedOnDateTime(input, value);
 
@@ -622,6 +626,22 @@ namespace FakeXrmEasy
             }
 
             return defaultStringExpression; 
+        }
+
+        protected static Expression GetAppropiateCastExpressionBasedOnStringAndType(Expression input, object value, Type attributeType)
+        {
+            var defaultStringExpression = GetCaseInsensitiveExpression(GetAppropiateCastExpressionDefault(input, value));
+
+            int iValue;
+            if (attributeType.IsOptionSet() && int.TryParse(value.ToString(), out iValue))
+            {
+                return Expression.Condition(Expression.TypeIs(input, typeof(OptionSetValue)),
+                    GetToStringExpression<Int32>(GetAppropiateCastExpressionBasedOnInt(input)),
+                    defaultStringExpression
+                );
+            }
+
+            return defaultStringExpression;
         }
 
         protected static Expression GetAppropiateCastExpressionBasedOnDateTime(Expression input, object value)
@@ -723,7 +743,7 @@ namespace FakeXrmEasy
                 //c.Values empty in this case
                 expOrValues = Expression.Equal(
                                 GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, unaryOperatorValue),
-                                GetAppropiateTypedValue(unaryOperatorValue));
+                                GetAppropiateTypedValueAndType(unaryOperatorValue, c.AttributeType));
             }
             else
             {
@@ -732,7 +752,7 @@ namespace FakeXrmEasy
 
                     expOrValues = Expression.Or(expOrValues, Expression.Equal(
                                 GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, value),
-                                GetAppropiateTypedValue(value)));
+                                GetAppropiateTypedValueAndType(value, c.AttributeType)));
 
 
                 }
@@ -754,7 +774,7 @@ namespace FakeXrmEasy
 
                 expOrValues = Expression.Or(expOrValues, Expression.Equal(
                             GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value),
-                            GetAppropiateTypedValue(value)));
+                            GetAppropiateTypedValueAndType(value, tc.AttributeType)));
 
 
             }
@@ -801,7 +821,7 @@ namespace FakeXrmEasy
                 expOrValues = Expression.Or(expOrValues,
                         Expression.GreaterThan(
                             GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value),
-                            GetAppropiateTypedValue(value)));
+                            GetAppropiateTypedValueAndType(value, tc.AttributeType)));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
@@ -828,7 +848,7 @@ namespace FakeXrmEasy
                 expOrValues = Expression.Or(expOrValues,
                         Expression.LessThan(
                             GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value),
-                            GetAppropiateTypedValue(value)));
+                            GetAppropiateTypedValueAndType(value, tc.AttributeType)));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
@@ -848,11 +868,11 @@ namespace FakeXrmEasy
             var exp = Expression.And(
                 Expression.GreaterThanOrEqual(
                             GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value1),
-                            GetAppropiateTypedValue(value1)),
+                            GetAppropiateTypedValueAndType(value1, tc.AttributeType)),
 
                 Expression.LessThanOrEqual(
                             GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value2),
-                            GetAppropiateTypedValue(value2)));
+                            GetAppropiateTypedValueAndType(value2, tc.AttributeType)));
 
 
             //and... attribute exists too
