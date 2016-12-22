@@ -594,8 +594,10 @@ namespace FakeXrmEasy
                         return GetAppropiateCastExpressionBasedOnBoolean(input);
                     if (attributeType == typeof(string))
                         return GetAppropiateCastExpressionBasedOnString(input, value);
+                    if(attributeType.IsDateTime())
+                        return GetAppropiateCastExpressionBasedOnDateTime(input, value);
 
-                return GetAppropiateCastExpressionDefault(input, value); //any other type
+                    return GetAppropiateCastExpressionDefault(input, value); //any other type
                 }
             
             return GetAppropiateCastExpressionBasedOnValueInherentType(input, value); //Dynamic entities
@@ -620,6 +622,19 @@ namespace FakeXrmEasy
             }
 
             return defaultStringExpression; 
+        }
+
+        protected static Expression GetAppropiateCastExpressionBasedOnDateTime(Expression input, object value)
+        {
+            //Convert to DateTime if string
+            DateTime dtDateTimeConversion;
+            if (value.GetType() == typeof(string) 
+                && DateTime.TryParse(value.ToString(), out dtDateTimeConversion))
+            {
+                return Expression.Convert(input, typeof(DateTime));
+            }
+
+            return input; //return DateTime directly
         }
 
         protected static Expression GetAppropiateCastExpressionDefault(Expression input, object value)
