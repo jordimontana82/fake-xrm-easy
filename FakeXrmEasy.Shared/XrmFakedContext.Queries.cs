@@ -67,7 +67,7 @@ namespace FakeXrmEasy
 
             if(attributeInfo == null)
             {
-                throw new Exception(string.Format("XrmFakedContext.FindReflectedAttributeType: Attribute {0} not found for type {1}" + sAttributeName, earlyBoundType.ToString()));
+                throw new Exception(string.Format("XrmFakedContext.FindReflectedAttributeType: Attribute {0} not found for type {1}", sAttributeName, earlyBoundType.ToString()));
             }
 
             return attributeInfo.PropertyType;
@@ -951,8 +951,18 @@ namespace FakeXrmEasy
                 if(context.ProxyTypesAssembly != null)
                 {
 
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 
-                    sEntityName = qe.GetEntityNameFromAlias(c.EntityName);
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+                    if(c.EntityName != null) 
+                        sEntityName = qe.GetEntityNameFromAlias(c.EntityName);
+                    else
+                    {
+                        if (c.AttributeName.IndexOf(".") >= 0)
+                        {
+                            var alias = c.AttributeName.Split('.')[0];
+                            sEntityName = qe.GetEntityNameFromAlias(alias);
+                            sAttributeName = c.AttributeName.Split('.')[1];
+                        }
+                    }
 
 #else
                     //CRM 2011
