@@ -655,13 +655,12 @@ namespace FakeXrmEasy
         {
             //Convert to DateTime if string
             DateTime dtDateTimeConversion;
-            if (value.GetType() == typeof(string) 
-                && DateTime.TryParse(value.ToString(), out dtDateTimeConversion))
+            if (DateTime.TryParse(value.ToString(), out dtDateTimeConversion))
             {
                 return Expression.Convert(input, typeof(DateTime));
             }
 
-            return input; //return DateTime directly
+            return input; //return directly
         }
 
         protected static Expression GetAppropiateCastExpressionDefault(Expression input, object value)
