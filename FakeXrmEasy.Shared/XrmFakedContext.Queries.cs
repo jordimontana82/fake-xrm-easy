@@ -495,6 +495,40 @@ namespace FakeXrmEasy
             return Expression.Constant(value);
         }
 
+        protected static Expression GetAppropiateTypedValueAndType(object value, Type attributeType)
+        {
+            //Basic types conversions
+            //Special case => datetime is sent as a string
+            if (value is string)
+            {
+                DateTime dtDateTimeConversion;
+                if (DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out dtDateTimeConversion))
+                {
+                    return Expression.Constant(dtDateTimeConversion, typeof(DateTime));
+                }
+                else
+                {
+                    return GetCaseInsensitiveExpression(Expression.Constant(value, typeof(string)));
+                }
+            }
+            else if (value is EntityReference)
+            {
+                var cast = (value as EntityReference).Id;
+                return Expression.Constant(cast);
+            }
+            else if (value is OptionSetValue)
+            {
+                var cast = (value as OptionSetValue).Value;
+                return Expression.Constant(cast);
+            }
+            else if (value is Money)
+            {
+                var cast = (value as Money).Value;
+                return Expression.Constant(cast);
+            }
+            return Expression.Constant(value);
+        }
+
         protected static Expression GetAppropiateCastExpressionBasedOnType(Type t, Expression input, object value)
         {
             var typedExpression = GetAppropiateCastExpressionBasedOnAttributeTypeOrValue(input, value, t);
@@ -552,7 +586,7 @@ namespace FakeXrmEasy
                 {
                     if(attributeType == typeof(Guid) || attributeType == typeof(EntityReference))
                         return GetAppropiateCastExpressionBasedGuid(input);
-                    if (attributeType == typeof(int) || attributeType == typeof(OptionSetValue))
+                    if (attributeType == typeof(int) || attributeType.IsOptionSet())
                         return GetAppropiateCastExpressionBasedOnInt(input);
                     if (attributeType == typeof(decimal) || attributeType == typeof(Money))
                         return GetAppropiateCastExpressionBasedOnDecimal(input);
@@ -561,7 +595,7 @@ namespace FakeXrmEasy
                     if (attributeType == typeof(string))
                         return GetAppropiateCastExpressionBasedOnString(input, value);
 
-                    return GetAppropiateCastExpressionDefault(input, value); //any other type
+                return GetAppropiateCastExpressionDefault(input, value); //any other type
                 }
             
             return GetAppropiateCastExpressionBasedOnValueInherentType(input, value); //Dynamic entities
