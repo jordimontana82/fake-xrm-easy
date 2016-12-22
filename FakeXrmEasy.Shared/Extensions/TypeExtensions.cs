@@ -15,6 +15,13 @@ namespace FakeXrmEasy.Extensions
                 || nullableType != null && nullableType.IsEnum;
         }
 
+        public static bool IsDateTime(this Type t)
+        {
+            var nullableType = Nullable.GetUnderlyingType(t);
+            return t == typeof(DateTime)
+                || nullableType != null && nullableType == typeof(DateTime);
+        }
+
         public static bool IsNullableEnum(this Type t)
         {
             return
