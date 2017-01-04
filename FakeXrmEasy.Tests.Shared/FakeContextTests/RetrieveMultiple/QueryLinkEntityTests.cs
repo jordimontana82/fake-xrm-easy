@@ -474,6 +474,62 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         }
 
         [Fact]
+        public void Should_evaluate_all_LinkEntity_conditions()
+        {
+            var fakedContext = new XrmFakedContext();
+            var fakedService = fakedContext.GetOrganizationService();
+
+            var entity1 = new Entity("entity1")
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var entity2 = new Entity("entity2")
+            {
+                Id = Guid.NewGuid(),
+                ["associated1"] = entity1.ToEntityReference()
+            };
+
+            var entity3 = new Entity("entity3")
+            {
+                Id = Guid.NewGuid(),
+                ["associated2"] = entity2.ToEntityReference(),
+                ["testFilter"] = "testValue"
+            };
+
+            var query = new QueryExpression
+            {
+                EntityName = "entity1",
+                ColumnSet = new ColumnSet(true),
+                LinkEntities =
+                {
+                    new LinkEntity("entity1", "entity2", "entity1id", "associated1", JoinOperator.Inner)
+                    {
+                        LinkEntities =
+                        {
+                            new LinkEntity("entity2", "entity3", "entity2id", "associated2", JoinOperator.Inner)
+                            {
+                                LinkCriteria =
+                                {
+                                    Conditions =
+                                    {
+                                        new ConditionExpression("testFilter", ConditionOperator.Equal, "doesNotMatch")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            fakedContext.Initialize(new[] {entity1, entity2, entity3});
+
+            var result = fakedService.RetrieveMultiple(query);
+
+            Assert.Equal(0, result.Entities.Count);
+        }
+
+        [Fact]
         public void When_querying_by_an_attribute_which_wasnt_initialised_null_value_is_returned_for_early_bound_and_not_an_exception()
         {
             var ctx = new XrmFakedContext();
