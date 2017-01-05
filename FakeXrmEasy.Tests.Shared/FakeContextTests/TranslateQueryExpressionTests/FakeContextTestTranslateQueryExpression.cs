@@ -889,7 +889,7 @@ namespace FakeXrmEasy.Tests
             Entity pmr02 = new Entity("new_invoicepaymentmethod");
             pmr02.Id = Guid.NewGuid();
             pmr02.Attributes.Add("new_invoicepaymentmethodid", pmr02.Id);
-            pmr02.Attributes.Add("new_name", "PMR0000000001");
+            pmr02.Attributes.Add("new_name", "PMR0000000002");
 
             fakedService.Create(product01);
 
@@ -929,7 +929,8 @@ namespace FakeXrmEasy.Tests
 
             invoiceDetails = fakedService.RetrieveMultiple(query);
 
-            Assert.Equal(2, invoiceDetails.Entities.Count);
+            Assert.Equal(1, invoiceDetails.Entities.Count);
+            Assert.Equal(invoicedetail02.Id, invoiceDetails.Entities[0].Id);
         }
 
     }

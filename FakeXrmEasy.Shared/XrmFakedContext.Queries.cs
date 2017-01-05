@@ -1058,7 +1058,7 @@ namespace FakeXrmEasy
             return binaryExpression;
         }
 
-        protected static Expression TranslateLinkedEntityFilterExpressionToExpression(QueryExpression qe, XrmFakedContext context, LinkEntity le, ParameterExpression entity)
+        protected static List<Expression> TranslateLinkedEntityFilterExpressionToExpression(QueryExpression qe, XrmFakedContext context, LinkEntity le, ParameterExpression entity)
         {
             //In CRM 2011, condition expressions are at the LinkEntity level without an entity name
             //From CRM 2013, condition expressions were moved to outside the LinkEntity object at the QueryExpression level,
@@ -1066,8 +1066,9 @@ namespace FakeXrmEasy
 
             //If we reach this point, it means we are translating filters at the Link Entity level (2011),
             //Therefore we need to prepend the alias attribute because the code to generate attributes for Joins (JoinAttribute extension) is common across versions
-            
-            if(le.LinkCriteria != null)
+            var linkedEntitiesQueryExpressions = new List<Expression>();
+
+            if (le.LinkCriteria != null)
             {
                 foreach (var ce in le.LinkCriteria.Conditions)
                 {
@@ -1075,8 +1076,18 @@ namespace FakeXrmEasy
                     ce.AttributeName = entityAlias + "." + ce.AttributeName;
                 }
             }
-            
-            return TranslateFilterExpressionToExpression(qe, context, le.LinkToEntityName, le.LinkCriteria, entity);
+
+            //Translate this specific Link Criteria
+            linkedEntitiesQueryExpressions.Add(TranslateFilterExpressionToExpression(qe, context, le.LinkToEntityName, le.LinkCriteria, entity));
+
+            //Processed nested linked entities
+            foreach (var nestedLinkedEntity in le.LinkEntities)
+            {
+                var listOfExpressions = TranslateLinkedEntityFilterExpressionToExpression(qe, context, nestedLinkedEntity, entity);
+                linkedEntitiesQueryExpressions.AddRange(listOfExpressions);
+            }
+
+            return linkedEntitiesQueryExpressions;
         }
 
         protected static Expression TranslateQueryExpressionFiltersToExpression(XrmFakedContext context, QueryExpression qe, ParameterExpression entity)
@@ -1084,8 +1095,8 @@ namespace FakeXrmEasy
             var linkedEntitiesQueryExpressions = new List<Expression>();
             foreach(var le in qe.LinkEntities)
             {
-                var e = TranslateLinkedEntityFilterExpressionToExpression(qe, context, le, entity);
-                linkedEntitiesQueryExpressions.Add(e);
+                var listOfExpressions = TranslateLinkedEntityFilterExpressionToExpression(qe, context, le, entity);
+                linkedEntitiesQueryExpressions.AddRange(listOfExpressions);
             }
 
             if(linkedEntitiesQueryExpressions.Count > 0 && qe.Criteria != null)
