@@ -929,7 +929,7 @@ namespace FakeXrmEasy.Tests
 
             invoiceDetails = fakedService.RetrieveMultiple(query);
 
-            Assert.Equal(2, invoiceDetails.Entities.Count);
+            Assert.Equal(1, invoiceDetails.Entities.Count);
         }
 
     }
