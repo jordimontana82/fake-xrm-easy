@@ -5,7 +5,7 @@ Fake Xrm Easy: TDD for Dynamics CRM and Dynamics 365 made simple
 |-----------|-----|-----------------|
 |[![Build status](https://ci.appveyor.com/api/projects/status/2g8yc8jg817746du?svg=true)](https://ci.appveyor.com/project/Jordi/fake-xrm-easy)|[![Line coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_linecoverage.svg?v=1.20.0)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.20.0)|[![Branch coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_branchcoverage.svg?v=1.20.0)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.20.0)|
 
-|Version|NuGet|1.20.0|
+|Version|NuGet|
 |-----------|-----|
 |Dynamics 365|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.365?v=1.20.0)](https://www.nuget.org/packages/fakexrmeasy.365)|
 |Dynamics CRM 2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.20.0)](https://www.nuget.org/packages/fakexrmeasy.2016)|
