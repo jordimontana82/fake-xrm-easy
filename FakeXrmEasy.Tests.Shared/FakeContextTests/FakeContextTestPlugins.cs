@@ -170,6 +170,20 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_OrganizationName_Set()
+        {
+            var fakedContext = new XrmFakedContext();
+            var pluginCtx = fakedContext.GetDefaultPluginContext();
+            pluginCtx.OutputParameters = new ParameterCollection();
+            pluginCtx.OrganizationName = "TestOrgName";
+            fakedContext.ExecutePluginWith<TestContextOrgNamePlugin>(pluginCtx);
+
+            Assert.True(pluginCtx.OutputParameters.ContainsKey("OrgName"));
+            Assert.Equal("TestOrgName", pluginCtx.OutputParameters["OrgName"]);
+
+        }
+
+        [Fact]
         public void When_Passing_In_No_Properties_Plugins_Only_Get_Default_Values()
         {
             var context = new XrmFakedContext();
