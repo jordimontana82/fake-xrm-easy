@@ -15,6 +15,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
         [Fact]
         public void TestMinimalClientModel_Linq()
         {
+          
             var fakedContext = new XrmFakedContext();
            fakedContext.Initialize(new List<Entity>() {
                 new fake_minclient() { Id = Guid.NewGuid(), fake_name = "Jordi" },
@@ -40,10 +41,10 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
 
                 
             }
+          
             ////  A.CallTo(() => service.Execute(A<OrganizationRequest>.That.Matches(x => x is RetrieveMultipleRequest && ((RetrieveMultipleRequest)x).Query is QueryExpression))).MustHaveHappened();
         }
 
     }
 }
-
 #endif

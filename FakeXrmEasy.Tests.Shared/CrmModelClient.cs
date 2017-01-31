@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
-#if FAKE_XRM_EASY
+
 
 
 namespace Crm.Models
@@ -360,4 +360,3 @@ namespace Crm.Models
         }
     }
 }
-#endif
