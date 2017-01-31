@@ -597,7 +597,7 @@ namespace FakeXrmEasy
                 {
                     if(attributeType == typeof(Guid) || attributeType == typeof(EntityReference))
                         return GetAppropiateCastExpressionBasedGuid(input);
-                    if (attributeType == typeof(int) || attributeType.IsOptionSet())
+                    if (attributeType == typeof(int) || attributeType == typeof(Nullable<int>) || attributeType.IsOptionSet() )
                         return GetAppropiateCastExpressionBasedOnInt(input);
                     if (attributeType == typeof(decimal) || attributeType == typeof(Money))
                         return GetAppropiateCastExpressionBasedOnDecimal(input);
