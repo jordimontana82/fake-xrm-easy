@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\AddActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\AddActivityWithConstant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\CreateTaskActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CrmModelClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AddMemberListRequestTests\Tests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssignRequestTests\AssignRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssociateRequestTests\AssociateRequestTests.cs" />
@@ -42,6 +43,7 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\MetadataInferenceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\MinClientContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\OptionSetValuesRequestTests\OptionSetValueRequestsTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\OrgServiceContextTests\OrgServiceContextTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\PublishXml\PublishXmlRequestTests.cs" />
