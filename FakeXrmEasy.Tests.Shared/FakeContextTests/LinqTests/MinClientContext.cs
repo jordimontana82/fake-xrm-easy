@@ -13,7 +13,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
     {
 
         [Fact]
-        public void TestMinimalClientModel_Linq()
+        public void TestMinimalClientModel_Linq_Issue114()
         {
           
             var fakedContext = new XrmFakedContext();
