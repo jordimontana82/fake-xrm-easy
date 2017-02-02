@@ -595,7 +595,12 @@ namespace FakeXrmEasy
         {
             if(attributeType != null)
                 {
-                    if(attributeType == typeof(Guid) || attributeType == typeof(EntityReference))
+
+                    #if FAKE_XRM_EASY
+                    if (attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference))
+                            return GetAppropiateCastExpressionBasedGuid(input);
+                    #endif
+                    if (attributeType == typeof(Guid) || attributeType == typeof(EntityReference))
                         return GetAppropiateCastExpressionBasedGuid(input);
                     if (attributeType == typeof(int) || attributeType == typeof(Nullable<int>) || attributeType.IsOptionSet() )
                         return GetAppropiateCastExpressionBasedOnInt(input);

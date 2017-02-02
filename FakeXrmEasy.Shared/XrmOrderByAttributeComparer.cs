@@ -25,7 +25,11 @@ namespace FakeXrmEasy
                 OptionSetValue attributeValueB = (OptionSetValue)(objectB);
                 return attributeValueA.Value.CompareTo(attributeValueB.Value);
             }
-            else if (attributeType == typeof(EntityReference))
+            else if (attributeType == typeof(EntityReference)
+                #if FAKE_XRM_EASY
+                    || attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference) 
+                #endif
+                )
             {
                 // Name might well be Null in an entity reference?
                 EntityReference entityRefA = (EntityReference)objectA;
