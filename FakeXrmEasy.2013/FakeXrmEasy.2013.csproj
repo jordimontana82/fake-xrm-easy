@@ -129,28 +129,7 @@
     <None Include="fakexrmeasy.snk" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="bin\coretools\CrmSvcUtil.exe" />
-    <Content Include="bin\coretools\CrmSvcUtil.xml" />
-    <Content Include="bin\coretools\Microsoft.Xrm.Sdk.dll" />
-    <Content Include="bin\coretools\SolutionPackager.exe" />
-    <Content Include="bin\tools\CrmSvcUtil.exe" />
-    <Content Include="bin\tools\CrmSvcUtil.xml" />
-    <Content Include="bin\tools\Microsoft.Crm.Sdk.Proxy.dll" />
-    <Content Include="bin\tools\Microsoft.Xrm.Client.dll" />
-    <Content Include="bin\tools\Microsoft.Xrm.Sdk.dll" />
-    <Content Include="bin\tools\WebsiteCopy.exe" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="bin\Debug\" />
-    <Folder Include="bin\Release\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FakeXrmEasy.Tests\FakeXrmEasy.Tests.csproj">
-      <Project>{3F49C92F-F830-4E59-8042-6A7720367C19}</Project>
-      <Name>FakeXrmEasy.Tests</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
