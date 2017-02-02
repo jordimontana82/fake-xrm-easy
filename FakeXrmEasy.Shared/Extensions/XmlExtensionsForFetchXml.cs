@@ -480,13 +480,21 @@ namespace FakeXrmEasy.Extensions.FetchXml
 
             else if (t == typeof(Guid)
                 || t == typeof(Guid?)
-                || t == typeof(EntityReference))
+                || t == typeof(EntityReference)
+                #if FAKE_XRM_EASY
+                    || t == typeof(Microsoft.Xrm.Client.CrmEntityReference) 
+                #endif
+                )
             {
                 Guid gValue = Guid.Empty;
 
                 if (Guid.TryParse(value, out gValue))
                 {
-                    if (t == typeof(EntityReference))
+                    if (t == typeof(EntityReference)
+                    #if FAKE_XRM_EASY
+                    || t == typeof(Microsoft.Xrm.Client.CrmEntityReference) 
+                    #endif
+                        )
                     {
                         return new EntityReference() { Id = gValue };
                     }
