@@ -42,9 +42,7 @@ namespace FakeXrmEasy.Tests.XrmRealContextTests
             Assert.Equal(0, ctx.Data.Count);
         }
 
-#if FAKE_XRM_EASY_365
-
-        
+  
         [Fact]
         public void Should_generate_plugin_context_from_a_serialised_profile()
         {
@@ -55,7 +53,6 @@ namespace FakeXrmEasy.Tests.XrmRealContextTests
             Assert.DoesNotThrow(() => ctx.GetContextFromSerialisedCompressedProfile(serialised));
         }
 
-#endif
 
     }
 }
