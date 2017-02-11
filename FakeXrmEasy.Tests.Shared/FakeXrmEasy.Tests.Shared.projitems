@@ -65,6 +65,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Issue116.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\AccountSetTerritories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\BasePlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\ExceptionLoverPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\PreAccountCreate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\AccountNumberPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\ConfigurationPlugin.cs" />
