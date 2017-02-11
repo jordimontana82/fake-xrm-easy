@@ -326,7 +326,7 @@ namespace FakeXrmEasy
         }
         
 
-        protected static Expression TranslateConditionExpression(XrmFakedContext context, TypedConditionExpression c, ParameterExpression entity)
+        protected static Expression TranslateConditionExpression(QueryExpression qe, XrmFakedContext context, TypedConditionExpression c, ParameterExpression entity)
         {
             Expression attributesProperty = Expression.Property(
                 entity,
@@ -339,7 +339,9 @@ namespace FakeXrmEasy
 #if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
             string attributeName = "";
 
-            if (!string.IsNullOrWhiteSpace(c.CondExpression.EntityName))
+            //Do not prepend the entity name if the EntityLogicalName is the same as the QueryExpression main logical name
+
+            if (!string.IsNullOrWhiteSpace(c.CondExpression.EntityName) && !c.CondExpression.EntityName.Equals(qe.EntityName))
             {
                 attributeName = c.CondExpression.EntityName + "." + c.CondExpression.AttributeName;
             }
@@ -1030,10 +1032,10 @@ namespace FakeXrmEasy
                 //Build a binary expression  
                 if (op == LogicalOperator.And)
                 {
-                    binaryExpression = Expression.And(binaryExpression, TranslateConditionExpression(context, typedExpression, entity));
+                    binaryExpression = Expression.And(binaryExpression, TranslateConditionExpression(qe, context, typedExpression, entity));
                 }
                 else
-                    binaryExpression = Expression.Or(binaryExpression, TranslateConditionExpression(context, typedExpression, entity));
+                    binaryExpression = Expression.Or(binaryExpression, TranslateConditionExpression(qe, context, typedExpression, entity));
             }
 
             return binaryExpression;
