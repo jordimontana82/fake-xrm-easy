@@ -23,7 +23,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             tracingService.Trace(trace1);
             tracingService.Trace(trace2);
 
-            Assert.Equal(tracingService.DumpTrace(), trace1 + trace2);
+            Assert.Equal(tracingService.DumpTrace(), trace1 + "\r\n" + trace2 + "\r\n");
         }
     }
 }

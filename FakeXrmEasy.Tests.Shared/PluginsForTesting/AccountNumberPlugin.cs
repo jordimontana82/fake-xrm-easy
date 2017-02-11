@@ -22,10 +22,14 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
             Microsoft.Xrm.Sdk.IPluginExecutionContext context = (Microsoft.Xrm.Sdk.IPluginExecutionContext)
                 serviceProvider.GetService(typeof(Microsoft.Xrm.Sdk.IPluginExecutionContext));
 
+            var tracing = (ITracingService)serviceProvider.GetService(typeof(ITracingService));
+
             // The InputParameters collection contains all the data passed in the message request.
             if (context.InputParameters.Contains("Target") &&
                 context.InputParameters["Target"] is Entity)
             {
+                tracing.Trace("Contains target");
+
                 // Obtain the target entity from the input parameters.
                 Entity entity = (Entity)context.InputParameters["Target"];
                 //</snippetAccountNumberPlugin2>
@@ -34,6 +38,8 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
                 // If not, this plug-in was not registered correctly.
                 if (entity.LogicalName == "account")
                 {
+                    tracing.Trace("Is Account");
+
                     // An accountnumber attribute should not already exist because
                     // it is system generated.
                     if (entity.Attributes.Contains("accountnumber") == false)
