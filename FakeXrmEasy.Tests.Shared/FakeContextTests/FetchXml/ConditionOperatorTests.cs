@@ -820,16 +820,19 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Should be returned
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(-1) }; //Should be returned
             var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(1) }; //Shouldnt
-            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var ct4 = new Contact() {Id = Guid.NewGuid(), Anniversary = date.AddHours(4)}; // Should be returned
+            ctx.Initialize(new[] { ct1, ct2, ct3, ct4 });
             var service = ctx.GetFakedOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
-            Assert.Equal(2, collection.Entities.Count);
+            Assert.Equal(3, collection.Entities.Count);
             var retrievedDateFirst = collection.Entities[0]["anniversary"] as DateTime?;
             var retrievedDateSecond = collection.Entities[1]["anniversary"] as DateTime?;
+            var retrieveDateThird = collection.Entities[2]["anniversary"] as DateTime?;
             Assert.Equal(23, retrievedDateFirst.Value.Day);
             Assert.Equal(22, retrievedDateSecond.Value.Day);
+            Assert.Equal(4, retrieveDateThird.Value.Hour);
         }
 
         [Fact]

@@ -309,5 +309,35 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             Assert.True(ec.Entities.Count == 2);
         }
 
+        [Fact]
+        public void When_executing_a_query_expression_with_OnOrBefore_right_result_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            var fakedService = fakedContext.GetFakedOrganizationService();
+
+            var entity = new Entity("entity1")
+            {
+                Id = Guid.NewGuid(),
+                ["startTime"] = new DateTime(2016, 2, 1, 5, 0, 0) // 2016/2/1 set in EST timezone
+            };
+
+            var query = new QueryExpression
+            {
+                EntityName = "entity1",
+                Criteria = new FilterExpression
+                {
+                    Conditions =
+                    {
+                        new ConditionExpression("startTime", ConditionOperator.OnOrBefore, new DateTime(2016, 2, 1))
+                    }
+                }
+            };
+
+            fakedContext.Initialize(new[] {entity});
+            var result = fakedService.RetrieveMultiple(query);
+
+            Assert.Equal(1, result.Entities.Count);
+        }
+
     }
 }

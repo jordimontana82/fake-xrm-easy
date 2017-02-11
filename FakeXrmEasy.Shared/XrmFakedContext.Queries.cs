@@ -435,9 +435,8 @@ namespace FakeXrmEasy
                                TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression),
                                TranslateConditionExpressionGreaterThan(c, getNonBasicValueExpr, containsAttributeExpression));
                 case ConditionOperator.OnOrBefore:
-                    return Expression.Or(
-                                TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression),
-                                TranslateConditionExpressionLessThan(c, getNonBasicValueExpr, containsAttributeExpression));
+                    SetConditionValueToNextDay(c);
+                    return TranslateConditionExpressionLessThan(c, getNonBasicValueExpr, containsAttributeExpression);
 
                 case ConditionOperator.Between:
                     if(c.CondExpression.Values.Count != 2)
@@ -462,6 +461,18 @@ namespace FakeXrmEasy
 
             }
         }
+
+        protected static void SetConditionValueToNextDay(TypedConditionExpression c)
+        {
+            if (c == null || c.CondExpression == null || c.CondExpression.Values.Count < 1)
+                return;
+
+            var originalDate = c.CondExpression.Values[0] as DateTime?;
+
+            if (originalDate != null)
+                c.CondExpression.Values[0] = originalDate.Value.Date.AddDays(1);
+        }
+
         protected static Expression GetAppropiateTypedValue(object value)
         {
             //Basic types conversions
