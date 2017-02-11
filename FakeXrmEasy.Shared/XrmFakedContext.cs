@@ -47,6 +47,8 @@ namespace FakeXrmEasy
 
         public Dictionary<string, OptionSetMetadata> OptionSetValuesMetadata { get; set; }
 
+        protected internal XrmFakedTracingService _tracingService { get; set; }
+
         public XrmFakedContext()
         {
             AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
@@ -184,38 +186,6 @@ namespace FakeXrmEasy
             return GetFakedOrganizationService(this);
         }
 
-        //public OrganizationServiceProxy GetFakedOrganizationServiceProxy()
-        //{
-        //    return GetFakedOrganizationServiceProxy(this);
-        //}
-
-        //public OrganizationServiceProxy GetFakedOrganizationServiceProxy(XrmFakedContext context)
-        //{
-        //    var fakedServiceProxy = A.Fake<OrganizationServiceProxy>();
-
-        //    //Fake CRUD methods
-        //    FakeRetrieve(context, fakedServiceProxy);
-        //    FakeCreate(context, fakedServiceProxy);
-        //    FakeUpdate(context, fakedServiceProxy);
-        //    FakeDelete(context, fakedServiceProxy);
-
-        //    //Fake / Intercept Retrieve Multiple Requests
-        //    FakeRetrieveMultiple(context, fakedServiceProxy);
-
-        //    //Fake / Intercept other requests
-        //    FakeExecute(context, fakedServiceProxy);
-        //    FakeAssociate(context, fakedServiceProxy);
-        //    FakeDisassociate(context, fakedServiceProxy);
-
-        //    return fakedServiceProxy;
-        //}
-
-        /// <summary>
-        /// Defines a faked organization service that intercepts CRUD operations to make them work against
-        /// the faked context
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
         protected IOrganizationService GetFakedOrganizationService(XrmFakedContext context)
         {
             if (context.Service != null)
