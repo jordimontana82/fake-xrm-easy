@@ -49,3 +49,8 @@ Please consider the below guidelines for contributing to the project:
 *    TODO: Implement generic handling of not yet implemented messages (ideally, for many of them we'll just need to check how they were called, i.e. calculaterolluprequest)
 *  Increase test coverage
   
+##Donate 
+
+We won't ask you for any PayPal or similar donations. Seriously.
+
+Instead, if you are using this framework on a regular basis, and is making your life as CRM developer easier, I would really appreciate if you could nominate me as a CRM MVP. Please reach out on [my linkedin profile](https://www.linkedin.com/in/jordimontana) for that. Thank you! 
