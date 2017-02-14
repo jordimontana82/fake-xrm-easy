@@ -27,9 +27,13 @@ For a general overview of the framework and samples please refer to [this](http:
 
 If you have any kind of questions, or anything you would like to discuss, please do not hesitate to send me an email and I'll be happy to discuss.
 
-##Like it?
+##Donate 
 
-Great! Help us to better maintain & **improve this project by taking this short [survey](https://es.surveymonkey.com/r/TK8PXLK).** It will take you **less than 5 minutes** and will help us prioritise new features.
+We won't ask you for any PayPal or similar donations. Seriously.
+
+Instead, if you are using this framework on a regular basis, and is making your life as CRM developer easier, I would really appreciate if you could spend 5 minutes of your time to nominate me as a CRM MVP, given that I spent 2 years on this project! :). 
+
+Please reach out on [my linkedin profile](https://www.linkedin.com/in/jordimontana) for that. Thank you! 
 
 ##Contributing
 
@@ -49,8 +53,4 @@ Please consider the below guidelines for contributing to the project:
 *    TODO: Implement generic handling of not yet implemented messages (ideally, for many of them we'll just need to check how they were called, i.e. calculaterolluprequest)
 *  Increase test coverage
   
-##Donate 
 
-We won't ask you for any PayPal or similar donations. Seriously.
-
-Instead, if you are using this framework on a regular basis, and is making your life as CRM developer easier, I would really appreciate if you could nominate me as a CRM MVP. Please reach out on [my linkedin profile](https://www.linkedin.com/in/jordimontana) for that. Thank you! 
