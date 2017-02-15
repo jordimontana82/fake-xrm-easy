@@ -39,7 +39,8 @@ Please reach out on [my linkedin profile](https://www.linkedin.com/in/jordimonta
 
 Please consider the below guidelines for contributing to the project:
 
-* If you detect and raise any issues, they will be resolved much more quickly if you provide a unit test to reproduce the issue. Also, if you raised an issue and still remains open for a while, please do not hesitate to send me an email to see if I could help. 
+* If you detect and raise any issues, they will be resolved much more quickly if you provide a unit test to reproduce the issue. 
+* If you are using early bound entities (and I strongly encourage you to do so), please also attach a subset of your typed entities generated file so that it will speed up the issue resolution.
 * Finally, if you are able to even fix the issue yourself, which would be awesome, please do fork the project and submit a pull request. We'll thank you forever and ever. 
 
 
