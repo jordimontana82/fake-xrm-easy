@@ -87,7 +87,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.InitializeFromRequestTests
                 FirstName = "Arjen",
                 LastName = "Stortelder"
             };
-           
+
             ctx.Initialize(new List<Entity> { lead });
             ctx.AddAttributeMapping(Lead.EntityLogicalName, "firstname", Contact.EntityLogicalName, "firstname");
 
@@ -103,6 +103,40 @@ namespace FakeXrmEasy.Tests.FakeContextTests.InitializeFromRequestTests
             var contact = result.Entity.ToEntity<Contact>();
             Assert.Equal("Arjen", contact.FirstName);
             Assert.Equal(null, contact.LastName);
+        }
+
+        [Fact]
+        public void When_Calling_InitializeFromRequest_Should_Return_Entity_With_EntityReference()
+        {
+            var ctx = new XrmFakedContext
+            {
+                ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact))
+            };
+
+            var service = ctx.GetFakedOrganizationService();
+
+            var lead = new Lead
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Arjen",
+                LastName = "Stortelder"
+            };
+
+            ctx.Initialize(new List<Entity> { lead });
+            ctx.AddAttributeMapping(Lead.EntityLogicalName, "leadid", Contact.EntityLogicalName, "originatingleadid");
+
+            var entityReference = new EntityReference(Lead.EntityLogicalName, lead.Id);
+            var req = new InitializeFromRequest
+            {
+                EntityMoniker = entityReference,
+                TargetEntityName = Contact.EntityLogicalName,
+                TargetFieldType = TargetFieldType.All
+            };
+
+            var result = (InitializeFromResponse)service.Execute(req);
+            var contact = result.Entity;
+            var originatingleadid = contact["originatingleadid"];
+            Assert.IsType<EntityReference>(originatingleadid);
         }
     }
 }
