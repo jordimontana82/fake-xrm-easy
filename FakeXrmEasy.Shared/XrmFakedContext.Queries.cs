@@ -169,8 +169,7 @@ namespace FakeXrmEasy
                     query = query.Join(inner,
                                     outerKey => outerKey.KeySelector(linkFromAlias, context),
                                     innerKey => innerKey.KeySelector(le.LinkToAttributeName, context),
-                                    (outerEl, innerEl) => outerEl
-                                                            .JoinAttributes(innerEl, new ColumnSet(true), leAlias, context));
+                                    (outerEl, innerEl) => outerEl.JoinAttributes(innerEl, new ColumnSet(true), leAlias, context));
 
                     break;
                 case JoinOperator.LeftOuter:

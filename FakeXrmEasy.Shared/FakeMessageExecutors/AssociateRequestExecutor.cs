@@ -42,6 +42,25 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 if (fakeRelationShip.RelationshipType == XrmFakedRelationship.enmFakeRelationshipType.ManyToMany)
                 {
+                    //Check records exist
+                    var targetExists = ctx.CreateQuery(fakeRelationShip.Entity1LogicalName)
+                                                .Where(e => e.Id == associateRequest.Target.Id)
+                                                .FirstOrDefault() != null;
+
+                    if(!targetExists)
+                    {
+                        throw new Exception(string.Format("{0} with Id {1} doesn't exist", fakeRelationShip.Entity1LogicalName, associateRequest.Target.Id.ToString()));
+                    }
+
+                    var relatedExists = ctx.CreateQuery(fakeRelationShip.Entity2LogicalName)
+                                                .Where(e => e.Id == relatedEntityReference.Id)
+                                                .FirstOrDefault() != null;
+
+                    if (!relatedExists)
+                    {
+                        throw new Exception(string.Format("{0} with Id {1} doesn't exist", fakeRelationShip.Entity2LogicalName, relatedEntityReference.Id.ToString()));
+                    }
+
                     var association = new Entity(fakeRelationShip.IntersectEntity)
                     {
                         Attributes = new AttributeCollection
