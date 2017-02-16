@@ -50,6 +50,16 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     if (mappingEntity == null) continue;
                     var targetAttribute = mappingEntity.GetAttributeValue<AliasedValue>("attributemap.targetattributename").Value.ToString();
                     entity[targetAttribute] = attr.Value;
+
+                    var isEntityReference = string.Equals(attr.Key, source.LogicalName + "id", StringComparison.CurrentCultureIgnoreCase);
+                    if (isEntityReference)
+                    {
+                        entity[targetAttribute] = new EntityReference(source.LogicalName, (Guid)attr.Value);
+                    }
+                    else
+                    {
+                        entity[targetAttribute] = attr.Value;
+                    }
                 }
             }
 
