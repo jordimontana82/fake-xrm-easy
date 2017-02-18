@@ -621,7 +621,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
 #if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_365
         [Fact]
-        public void Should_Find_Expired_Case_And_Create_Email_But_Not_Send_By_Default()
+        public void Should_Not_Apply_Left_Outer_Join_Filters_When_The_Right_hand_side_of_the_expression_wasnt_found()
         {
             var context = new XrmFakedContext();
             var service = context.GetFakedOrganizationService();
@@ -656,8 +656,87 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                             Conditions =
                             {
                                 new ConditionExpression("statuscode", ConditionOperator.Equal, new OptionSetValue((int) IncidentState.Active)),
-                                new ConditionExpression("createdon", ConditionOperator.LessEqual, DateTime.UtcNow.AddDays(-1 * days)),
-                                new ConditionExpression("email", "regardingobjectid", ConditionOperator.Null)
+                                new ConditionExpression("createdon", ConditionOperator.LessEqual, DateTime.UtcNow.AddDays(-1 * days))
+                            }
+                        }
+                    }
+                },
+                LinkEntities =
+                {
+                    new LinkEntity
+                    {
+                        LinkFromEntityName = "incident",
+                        LinkToEntityName = "email",
+                        LinkFromAttributeName = "incidentid",
+                        LinkToAttributeName = "regardingobjectid",
+                        JoinOperator = JoinOperator.LeftOuter,
+                        LinkCriteria = new FilterExpression
+                        {
+                            Filters =
+                            {
+                                new FilterExpression
+                                {
+                                    FilterOperator = LogicalOperator.And,
+                                    Conditions =
+                                    {
+                                        new ConditionExpression("createdon", ConditionOperator.GreaterEqual, DateTime.UtcNow.AddDays(-1*days))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var incidents = service.RetrieveMultiple(query).Entities;
+            Assert.Equal(1, incidents.Count);
+        }
+
+        [Fact]
+        public void Should_Apply_Left_Outer_Join_Filters_When_The_Right_hand_side_of_the_expression_was_found()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            // Date for filtering, we only want "expired" records, i.e. those that weren't set as regarding in any emails for this period and logically even exist this long
+            var days = 5;
+
+            var incident = new Incident
+            {
+                Id = Guid.NewGuid(),
+                Title = "Test case",
+                StatusCode = new OptionSetValue((int)IncidentState.Active)
+            };
+
+            var email = new Email
+            {
+                Id = Guid.NewGuid(),
+                RegardingObjectId = incident.ToEntityReference(),
+            };
+
+            incident["createdon"] = DateTime.UtcNow.AddDays(-6);
+            email["createdon"] = DateTime.UtcNow.AddDays(10);
+
+            context.Initialize(new List<Entity>() { incident, email });
+
+            // Remove either incident createdon conditionexpression, or LinkEntities and the e-mail conditionexpression and it will pass
+            // What this query expresses: Get all incidents, that are older than given number of days and that also didn't receive emails for this number of days
+            var query = new QueryExpression
+            {
+                ColumnSet = new ColumnSet(true),
+                EntityName = Incident.EntityLogicalName,
+                Criteria =
+                {
+                    FilterOperator = LogicalOperator.And,
+                    Filters =
+                    {
+                        new FilterExpression
+                        {
+                            FilterOperator = LogicalOperator.And,
+                            Conditions =
+                            {
+                                new ConditionExpression("statuscode", ConditionOperator.Equal, new OptionSetValue((int) IncidentState.Active)),
+                                new ConditionExpression("createdon", ConditionOperator.LessEqual, DateTime.UtcNow.AddDays(-1 * days))
                             }
                         }
                     }
