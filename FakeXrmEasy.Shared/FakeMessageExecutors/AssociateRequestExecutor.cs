@@ -44,23 +44,31 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 if (fakeRelationShip.RelationshipType == XrmFakedRelationship.enmFakeRelationshipType.ManyToMany)
                 {
+                    var isFrom1to2 = associateRequest.Target.LogicalName == fakeRelationShip.Entity1LogicalName
+                                         || relatedEntityReference.LogicalName != fakeRelationShip.Entity1LogicalName
+                                         || String.IsNullOrWhiteSpace(associateRequest.Target.LogicalName);
+                    var fromAttribute = isFrom1to2 ? fakeRelationShip.Entity1Attribute : fakeRelationShip.Entity2Attribute;
+                    var toAttribute = isFrom1to2 ? fakeRelationShip.Entity2Attribute : fakeRelationShip.Entity1Attribute;
+                    var fromEntityName = isFrom1to2 ? fakeRelationShip.Entity1LogicalName : fakeRelationShip.Entity2LogicalName;
+                    var toEntityName = isFrom1to2 ? fakeRelationShip.Entity2LogicalName : fakeRelationShip.Entity1LogicalName;
+
                     //Check records exist
-                    var targetExists = ctx.CreateQuery(fakeRelationShip.Entity1LogicalName)
+                    var targetExists = ctx.CreateQuery(fromEntityName)
                                                 .Where(e => e.Id == associateRequest.Target.Id)
                                                 .FirstOrDefault() != null;
 
                     if(!targetExists)
                     {
-                        throw new Exception(string.Format("{0} with Id {1} doesn't exist", fakeRelationShip.Entity1LogicalName, associateRequest.Target.Id.ToString()));
+                        throw new Exception(string.Format("{0} with Id {1} doesn't exist", fromEntityName, associateRequest.Target.Id.ToString()));
                     }
 
-                    var relatedExists = ctx.CreateQuery(fakeRelationShip.Entity2LogicalName)
+                    var relatedExists = ctx.CreateQuery(toEntityName)
                                                 .Where(e => e.Id == relatedEntityReference.Id)
                                                 .FirstOrDefault() != null;
 
                     if (!relatedExists)
                     {
-                        throw new Exception(string.Format("{0} with Id {1} doesn't exist", fakeRelationShip.Entity2LogicalName, relatedEntityReference.Id.ToString()));
+                        throw new Exception(string.Format("{0} with Id {1} doesn't exist", toEntityName, relatedEntityReference.Id.ToString()));
                     }
 
                     var association = new Entity(fakeRelationShip.IntersectEntity)
