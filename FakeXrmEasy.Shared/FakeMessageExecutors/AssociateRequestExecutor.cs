@@ -37,6 +37,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 throw new Exception("Association without target is invalid!");
             }
+           
+
 
             foreach (var relatedEntityReference in associateRequest.RelatedEntities)
             {
@@ -65,8 +67,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     {
                         Attributes = new AttributeCollection
                         {
-                            { fakeRelationShip.Entity1Attribute, associateRequest.Target.Id },
-                            { fakeRelationShip.Entity2Attribute, relatedEntityReference.Id }
+                            { fromAttribute, associateRequest.Target.Id },
+                            { toAttribute, relatedEntityReference.Id }
                         }
                     };
 
