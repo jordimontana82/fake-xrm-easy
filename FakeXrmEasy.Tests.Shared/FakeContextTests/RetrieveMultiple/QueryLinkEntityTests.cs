@@ -33,7 +33,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 BusinessUnitId = new EntityReference(BusinessUnit.EntityLogicalName, businessId)
             };
 
-            fakedContext.Initialize(new Entity[] { testUser, testRole });
+            fakedContext.Initialize(new Entity[] {testUser, testRole});
 
             fakedContext.AddRelationship("systemuserroles_association", new XrmFakedRelationship
             {
@@ -60,19 +60,24 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             {
                 EntityName = "role",
                 ColumnSet = new ColumnSet("name"),
-                LinkEntities = {
-                    new LinkEntity {
+                LinkEntities =
+                {
+                    new LinkEntity
+                    {
                         LinkFromEntityName = Role.EntityLogicalName,
                         LinkFromAttributeName = "roleid",
                         LinkToEntityName = SystemUserRoles.EntityLogicalName,
                         LinkToAttributeName = "roleid",
-                        LinkCriteria = new FilterExpression {
+                        LinkCriteria = new FilterExpression
+                        {
                             FilterOperator = LogicalOperator.And,
-                            Conditions = {
-                                new ConditionExpression {
+                            Conditions =
+                            {
+                                new ConditionExpression
+                                {
                                     AttributeName = "systemuserid",
                                     Operator = ConditionOperator.Equal,
-                                    Values = { userId }
+                                    Values = {userId}
                                 }
                             }
                         }
@@ -84,7 +89,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             Assert.NotEmpty(result.Entities);
             Assert.Equal(1, result.Entities.Count);
         }
-        
+
         [Fact]
         public static void Should_Only_Find_Correct_Faked_N_To_N_Records()
         {
@@ -118,7 +123,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 BusinessUnitId = new EntityReference(BusinessUnit.EntityLogicalName, businessId)
             };
 
-            fakedContext.Initialize(new Entity[] { testUser, testRole, testUser2, testRole2 });
+            fakedContext.Initialize(new Entity[] {testUser, testRole, testUser2, testRole2});
 
             fakedContext.AddRelationship("systemuserroles_association", new XrmFakedRelationship
             {
@@ -157,19 +162,24 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             {
                 EntityName = "role",
                 ColumnSet = new ColumnSet("name"),
-                LinkEntities = {
-                    new LinkEntity {
+                LinkEntities =
+                {
+                    new LinkEntity
+                    {
                         LinkFromEntityName = Role.EntityLogicalName,
                         LinkFromAttributeName = "roleid",
                         LinkToEntityName = SystemUserRoles.EntityLogicalName,
                         LinkToAttributeName = "roleid",
-                        LinkCriteria = new FilterExpression {
+                        LinkCriteria = new FilterExpression
+                        {
                             FilterOperator = LogicalOperator.And,
-                            Conditions = {
-                                new ConditionExpression {
+                            Conditions =
+                            {
+                                new ConditionExpression
+                                {
                                     AttributeName = "systemuserid",
                                     Operator = ConditionOperator.Equal,
-                                    Values = { userId }
+                                    Values = {userId}
                                 }
                             }
                         }
@@ -203,7 +213,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 BusinessUnitId = new EntityReference(BusinessUnit.EntityLogicalName, businessId)
             };
 
-            fakedContext.Initialize(new Entity[] { testUser, testRole });
+            fakedContext.Initialize(new Entity[] {testUser, testRole});
 
             fakedContext.AddRelationship("systemuserroles_association", new XrmFakedRelationship
             {
@@ -242,19 +252,24 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             {
                 EntityName = "role",
                 ColumnSet = new ColumnSet("name"),
-                LinkEntities = {
-                    new LinkEntity {
+                LinkEntities =
+                {
+                    new LinkEntity
+                    {
                         LinkFromEntityName = Role.EntityLogicalName,
                         LinkFromAttributeName = "roleid",
                         LinkToEntityName = SystemUserRoles.EntityLogicalName,
                         LinkToAttributeName = "roleid",
-                        LinkCriteria = new FilterExpression {
+                        LinkCriteria = new FilterExpression
+                        {
                             FilterOperator = LogicalOperator.And,
-                            Conditions = {
-                                new ConditionExpression {
+                            Conditions =
+                            {
+                                new ConditionExpression
+                                {
                                     AttributeName = "systemuserid",
                                     Operator = ConditionOperator.Equal,
-                                    Values = { userId }
+                                    Values = {userId}
                                 }
                             }
                         }
@@ -287,7 +302,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 BusinessUnitId = new EntityReference(BusinessUnit.EntityLogicalName, businessId)
             };
 
-            fakedContext.Initialize(new Entity[] { testUser, testRole });
+            fakedContext.Initialize(new Entity[] {testUser, testRole});
 
             fakedContext.AddRelationship("systemuserroles", new XrmFakedRelationship
             {
@@ -299,30 +314,35 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             });
 
             fakedService.Associate("systemuserroles",
-                                        testUser.Id, 
-                                        new Relationship("systemuserroles"),
-                                        new EntityReferenceCollection()
-                                        {
-                                            new EntityReference(Role.EntityLogicalName, testRole.Id),
-                                        });
+                testUser.Id,
+                new Relationship("systemuserroles"),
+                new EntityReferenceCollection()
+                {
+                    new EntityReference(Role.EntityLogicalName, testRole.Id),
+                });
 
             var query = new QueryExpression()
             {
                 EntityName = "role",
                 ColumnSet = new ColumnSet("name"),
-                LinkEntities = {
-                    new LinkEntity {
+                LinkEntities =
+                {
+                    new LinkEntity
+                    {
                         LinkFromEntityName = Role.EntityLogicalName,
                         LinkFromAttributeName = "roleid",
                         LinkToEntityName = SystemUserRoles.EntityLogicalName,
                         LinkToAttributeName = "roleid",
-                        LinkCriteria = new FilterExpression {
+                        LinkCriteria = new FilterExpression
+                        {
                             FilterOperator = LogicalOperator.And,
-                            Conditions = {
-                                new ConditionExpression {
+                            Conditions =
+                            {
+                                new ConditionExpression
+                                {
                                     AttributeName = "systemuserid",
                                     Operator = ConditionOperator.Equal,
-                                    Values = { userId }
+                                    Values = {userId}
                                 }
                             }
                         }
@@ -356,7 +376,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 BusinessUnitId = new EntityReference(BusinessUnit.EntityLogicalName, businessId)
             };
 
-            fakedContext.Initialize(new Entity[] { testUser, testRole });
+            fakedContext.Initialize(new Entity[] {testUser, testRole});
 
             fakedContext.AddRelationship("systemuserroles", new XrmFakedRelationship
             {
@@ -368,38 +388,43 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             });
 
             fakedService.Associate("systemuserroles",
-                                        testUser.Id,
-                                        new Relationship("systemuserroles"),
-                                        new EntityReferenceCollection()
-                                        {
-                                            new EntityReference(Role.EntityLogicalName, testRole.Id),
-                                        });
+                testUser.Id,
+                new Relationship("systemuserroles"),
+                new EntityReferenceCollection()
+                {
+                    new EntityReference(Role.EntityLogicalName, testRole.Id),
+                });
 
             fakedService.Disassociate("systemuserroles",
-                                        testUser.Id,
-                                        new Relationship("systemuserroles"),
-                                        new EntityReferenceCollection()
-                                        {
-                                            new EntityReference(Role.EntityLogicalName, testRole.Id),
-                                        });
+                testUser.Id,
+                new Relationship("systemuserroles"),
+                new EntityReferenceCollection()
+                {
+                    new EntityReference(Role.EntityLogicalName, testRole.Id),
+                });
 
             var query = new QueryExpression()
             {
                 EntityName = "role",
                 ColumnSet = new ColumnSet("name"),
-                LinkEntities = {
-                    new LinkEntity {
+                LinkEntities =
+                {
+                    new LinkEntity
+                    {
                         LinkFromEntityName = Role.EntityLogicalName,
                         LinkFromAttributeName = "roleid",
                         LinkToEntityName = SystemUserRoles.EntityLogicalName,
                         LinkToAttributeName = "roleid",
-                        LinkCriteria = new FilterExpression {
+                        LinkCriteria = new FilterExpression
+                        {
                             FilterOperator = LogicalOperator.And,
-                            Conditions = {
-                                new ConditionExpression {
+                            Conditions =
+                            {
+                                new ConditionExpression
+                                {
                                     AttributeName = "systemuserid",
                                     Operator = ConditionOperator.Equal,
-                                    Values = { userId }
+                                    Values = {userId}
                                 }
                             }
                         }
@@ -421,14 +446,14 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             {
                 Attributes = new AttributeCollection
                 {
-                    {"entity1attr", "test1" }
+                    {"entity1attr", "test1"}
                 }
             };
             var testEntity2 = new Entity("entity2")
             {
                 Attributes = new AttributeCollection
                 {
-                    {"entity2attr", "test2" }
+                    {"entity2attr", "test2"}
                 }
             };
 
@@ -444,12 +469,14 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 Entity2Attribute = "entity2attr"
             };
             fakedContext.AddRelationship(testRelation.Entity2LogicalName, testRelation);
-            fakedService.Associate(testEntity1.LogicalName, testEntity1.Id, new Relationship(testRelation.Entity2LogicalName), new EntityReferenceCollection { testEntity2.ToEntityReference() });
+            fakedService.Associate(testEntity1.LogicalName, testEntity1.Id,
+                new Relationship(testRelation.Entity2LogicalName),
+                new EntityReferenceCollection {testEntity2.ToEntityReference()});
 
             var query = new QueryExpression
             {
                 EntityName = "entity1",
-                Criteria = new FilterExpression { FilterOperator = LogicalOperator.And },
+                Criteria = new FilterExpression {FilterOperator = LogicalOperator.And},
                 ColumnSet = new ColumnSet(true)
             };
 
@@ -463,7 +490,15 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 LinkCriteria = new FilterExpression
                 {
                     FilterOperator = LogicalOperator.And,
-                    Conditions = { new ConditionExpression { AttributeName = "entity2attr", Operator = ConditionOperator.Equal, Values = { "test2" } } }
+                    Conditions =
+                    {
+                        new ConditionExpression
+                        {
+                            AttributeName = "entity2attr",
+                            Operator = ConditionOperator.Equal,
+                            Values = {"test2"}
+                        }
+                    }
                 }
             };
             query.LinkEntities.Add(link);
@@ -474,15 +509,77 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         }
 
         [Fact]
-        public void When_querying_by_an_attribute_which_wasnt_initialised_null_value_is_returned_for_early_bound_and_not_an_exception()
+        public void Should_evaluate_all_LinkEntity_conditions()
+        {
+            var fakedContext = new XrmFakedContext();
+            var fakedService = fakedContext.GetOrganizationService();
+
+            var entity1 = new Entity("entity1")
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var entity2 = new Entity("entity2")
+            {
+                Id = Guid.NewGuid(),
+                ["associated1"] = entity1.ToEntityReference()
+            };
+
+            var entity3 = new Entity("entity3")
+            {
+                Id = Guid.NewGuid(),
+                ["associated2"] = entity2.ToEntityReference(),
+                ["testFilter"] = "testValue"
+            };
+
+            var query = new QueryExpression
+            {
+                EntityName = "entity1",
+                ColumnSet = new ColumnSet(true),
+                LinkEntities =
+                {
+                    new LinkEntity("entity1", "entity2", "entity1id", "associated1", JoinOperator.Inner)
+                    {
+                        LinkEntities =
+                        {
+                            new LinkEntity("entity2", "entity3", "entity2id", "associated2", JoinOperator.Inner)
+                            {
+                                LinkCriteria =
+                                {
+                                    Conditions =
+                                    {
+                                        new ConditionExpression("testFilter", ConditionOperator.Equal, "doesNotMatch")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            fakedContext.Initialize(new[] {entity1, entity2, entity3});
+
+            var result = fakedService.RetrieveMultiple(query);
+
+            Assert.Equal(0, result.Entities.Count);
+        }
+
+        [Fact]
+        public void
+            When_querying_by_an_attribute_which_wasnt_initialised_null_value_is_returned_for_early_bound_and_not_an_exception
+            ()
         {
             var ctx = new XrmFakedContext();
-            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof (Contact));
 
             var service = ctx.GetFakedOrganizationService();
-            ctx.Initialize(new List<Entity>() {
-                new Contact() {
-                    Id = Guid.NewGuid(), LastName = "Mcdonald" }
+            ctx.Initialize(new List<Entity>()
+            {
+                new Contact()
+                {
+                    Id = Guid.NewGuid(),
+                    LastName = "Mcdonald"
+                }
             });
 
             var name = "Mcdonald";
@@ -490,8 +587,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             using (var context = new XrmServiceContext(service))
             {
                 var contacts = (from c in context.ContactSet
-                                where c.FirstName == name || c.LastName == name
-                                select new Contact { Id = c.Id, FirstName = c.FirstName, LastName = c.LastName }).ToList();
+                    where c.FirstName == name || c.LastName == name
+                    select new Contact {Id = c.Id, FirstName = c.FirstName, LastName = c.LastName}).ToList();
 
                 Assert.Equal(1, contacts.Count);
                 Assert.Null(contacts[0].FirstName);
@@ -502,25 +599,178 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public void When_sorting_by_an_attribute_which_wasnt_initialised_an_exception_is_not_thrown()
         {
             var ctx = new XrmFakedContext();
-            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof (Contact));
 
             var service = ctx.GetFakedOrganizationService();
-            ctx.Initialize(new List<Entity>() {
-                new Contact() { Id = Guid.NewGuid(), FirstName = "Ronald", LastName = "Mcdonald" },
-                new Contact() { Id = Guid.NewGuid(), LastName = "Jordan" }
+            ctx.Initialize(new List<Entity>()
+            {
+                new Contact() {Id = Guid.NewGuid(), FirstName = "Ronald", LastName = "Mcdonald"},
+                new Contact() {Id = Guid.NewGuid(), LastName = "Jordan"}
             });
 
             using (var context = new XrmServiceContext(service))
             {
                 var contacts = (from c in context.ContactSet
-                                orderby c.FirstName
-                                select new Contact { Id = c.Id, FirstName = c.FirstName, LastName = c.LastName }).ToList();
+                    orderby c.FirstName
+                    select new Contact {Id = c.Id, FirstName = c.FirstName, LastName = c.LastName}).ToList();
 
                 Assert.Equal(2, contacts.Count);
                 Assert.Null(contacts[0].FirstName);
             }
         }
 
+#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_365
+        [Fact]
+        public void Should_Not_Apply_Left_Outer_Join_Filters_When_The_Right_hand_side_of_the_expression_wasnt_found()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
 
+            // Date for filtering, we only want "expired" records, i.e. those that weren't set as regarding in any emails for this period and logically even exist this long
+            var days = 5;
+
+            var incident = new Incident
+            {
+                Id = Guid.NewGuid(),
+                Title = "Test case",
+                StatusCode = new OptionSetValue((int)IncidentState.Active)
+            };
+            incident["createdon"] = DateTime.UtcNow.AddDays(-6);
+
+            context.Initialize(new[] {incident});
+
+            // Remove either incident createdon conditionexpression, or LinkEntities and the e-mail conditionexpression and it will pass
+            // What this query expresses: Get all incidents, that are older than given number of days and that also didn't receive emails for this number of days
+            var query = new QueryExpression
+            {
+                ColumnSet = new ColumnSet(true),
+                EntityName = Incident.EntityLogicalName,
+                Criteria =
+                {
+                    FilterOperator = LogicalOperator.And,
+                    Filters =
+                    {
+                        new FilterExpression
+                        {
+                            FilterOperator = LogicalOperator.And,
+                            Conditions =
+                            {
+                                new ConditionExpression("statuscode", ConditionOperator.Equal, new OptionSetValue((int) IncidentState.Active)),
+                                new ConditionExpression("createdon", ConditionOperator.LessEqual, DateTime.UtcNow.AddDays(-1 * days))
+                            }
+                        }
+                    }
+                },
+                LinkEntities =
+                {
+                    new LinkEntity
+                    {
+                        LinkFromEntityName = "incident",
+                        LinkToEntityName = "email",
+                        LinkFromAttributeName = "incidentid",
+                        LinkToAttributeName = "regardingobjectid",
+                        JoinOperator = JoinOperator.LeftOuter,
+                        LinkCriteria = new FilterExpression
+                        {
+                            Filters =
+                            {
+                                new FilterExpression
+                                {
+                                    FilterOperator = LogicalOperator.And,
+                                    Conditions =
+                                    {
+                                        new ConditionExpression("createdon", ConditionOperator.GreaterEqual, DateTime.UtcNow.AddDays(-1*days))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var incidents = service.RetrieveMultiple(query).Entities;
+            Assert.Equal(1, incidents.Count);
+        }
+
+        [Fact]
+        public void Should_Apply_Left_Outer_Join_Filters_When_The_Right_hand_side_of_the_expression_was_found()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            // Date for filtering, we only want "expired" records, i.e. those that weren't set as regarding in any emails for this period and logically even exist this long
+            var days = 5;
+
+            var incident = new Incident
+            {
+                Id = Guid.NewGuid(),
+                Title = "Test case",
+                StatusCode = new OptionSetValue((int)IncidentState.Active)
+            };
+
+            var email = new Email
+            {
+                Id = Guid.NewGuid(),
+                RegardingObjectId = incident.ToEntityReference(),
+            };
+
+            incident["createdon"] = DateTime.UtcNow.AddDays(-6);
+            email["createdon"] = DateTime.UtcNow.AddDays(10);
+
+            context.Initialize(new List<Entity>() { incident, email });
+
+            // Remove either incident createdon conditionexpression, or LinkEntities and the e-mail conditionexpression and it will pass
+            // What this query expresses: Get all incidents, that are older than given number of days and that also didn't receive emails for this number of days
+            var query = new QueryExpression
+            {
+                ColumnSet = new ColumnSet(true),
+                EntityName = Incident.EntityLogicalName,
+                Criteria =
+                {
+                    FilterOperator = LogicalOperator.And,
+                    Filters =
+                    {
+                        new FilterExpression
+                        {
+                            FilterOperator = LogicalOperator.And,
+                            Conditions =
+                            {
+                                new ConditionExpression("statuscode", ConditionOperator.Equal, new OptionSetValue((int) IncidentState.Active)),
+                                new ConditionExpression("createdon", ConditionOperator.LessEqual, DateTime.UtcNow.AddDays(-1 * days))
+                            }
+                        }
+                    }
+                },
+                LinkEntities =
+                {
+                    new LinkEntity
+                    {
+                        LinkFromEntityName = "incident",
+                        LinkToEntityName = "email",
+                        LinkFromAttributeName = "incidentid",
+                        LinkToAttributeName = "regardingobjectid",
+                        JoinOperator = JoinOperator.LeftOuter,
+                        LinkCriteria = new FilterExpression
+                        {
+                            Filters =
+                            {
+                                new FilterExpression
+                                {
+                                    FilterOperator = LogicalOperator.And,
+                                    Conditions =
+                                    {
+                                        new ConditionExpression("createdon", ConditionOperator.GreaterEqual, DateTime.UtcNow.AddDays(-1*days))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var incidents = service.RetrieveMultiple(query).Entities;
+            Assert.Equal(1, incidents.Count);
+        }
+#endif
     }
 }

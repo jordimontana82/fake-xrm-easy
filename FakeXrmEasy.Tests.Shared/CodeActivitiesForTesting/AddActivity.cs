@@ -21,6 +21,8 @@ namespace FakeXrmEasy.Tests.CodeActivitiesForTesting
             IOrganizationService service =
                 serviceFactory.CreateOrganizationService(context.UserId);
 
+            var tracing = (ITracingService)executionContext.GetExtension<ITracingService>();
+            tracing.Trace("Some trace written");
 
             // Retrieve the summands and perform addition
             this.result.Set(executionContext,

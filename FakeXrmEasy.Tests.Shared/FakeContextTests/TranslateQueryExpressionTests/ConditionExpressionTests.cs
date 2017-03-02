@@ -309,5 +309,49 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             Assert.True(ec.Entities.Count == 2);
         }
 
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+
+        [Fact]
+        public void ConditionExpression_Test()
+        {
+            var firstContact = new Contact()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "John",
+                LastName = "Smith",
+                EMailAddress1 = "SmiJo@witness.co.uk"
+            };
+
+            var secondContact = new Contact()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Mary",
+                LastName = "Bloody"
+            };
+
+
+            var fakedContext = new XrmFakedContext();
+            var fakedService = fakedContext.GetFakedOrganizationService();
+
+            fakedContext.Initialize(new Entity[] { firstContact, secondContact });
+
+            var query = new QueryExpression()
+            {
+                EntityName = Contact.EntityLogicalName,
+                Criteria = new FilterExpression()
+                {
+                    Conditions = {
+                        new ConditionExpression(Contact.EntityLogicalName /* without entityname test passes */, "firstname", ConditionOperator.Equal, "John")
+                    }
+                }
+            };
+
+            var result = fakedService.RetrieveMultiple(query).Entities;
+
+            Assert.Equal(1, result.Count());
+        }
+
+#endif
+
     }
 }

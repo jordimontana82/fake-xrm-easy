@@ -73,7 +73,11 @@ namespace FakeXrmEasy
                 invoker = new WorkflowInvoker(instance);
                 sDebug += "Invoker created" + System.Environment.NewLine;
                 sDebug += "Adding extensions..." + System.Environment.NewLine;
-                invoker.Extensions.Add<ITracingService>(() => new XrmFakedTracingService());
+                invoker.Extensions.Add<ITracingService>(() =>
+                {
+                    _tracingService = new XrmFakedTracingService();
+                    return _tracingService;
+                });
                 invoker.Extensions.Add<IWorkflowContext>(() =>
                 {
                     return wfContext;

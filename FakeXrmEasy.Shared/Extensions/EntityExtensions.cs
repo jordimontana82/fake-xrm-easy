@@ -138,7 +138,11 @@ namespace FakeXrmEasy.Extensions
             if (type == typeof(string))
                 return new string((attributeValue as string).ToCharArray());
 
-            else if (type == typeof(EntityReference))
+            else if (type == typeof(EntityReference)
+                    #if FAKE_XRM_EASY 
+                            || type == typeof(Microsoft.Xrm.Client.CrmEntityReference) 
+                    #endif 
+                    )
             {
                 var original = (attributeValue as EntityReference);
                 var clone = new EntityReference(original.LogicalName, original.Id);

@@ -8,6 +8,7 @@ open Fake.Testing.XUnit2
 open System.IO
 open Fake.OpenCoverHelper
 open Fake.ReportGeneratorHelper
+open Fake.FileHelper
 
 let projectName           = "FakeXrmEasy"
 
@@ -44,8 +45,8 @@ let nugetDeployDir          = @"[Enter_NuGet_Url]"
 let packagesDir             = @".\packages\"
 
 let nuGetCommandLine           = @".\tools\nuget\nuget286.exe"
-let mutable previousVersion = "1.19.0"
-let mutable version         = "1.19.1" //Copy this into previousVersion before publishing packages...
+let mutable previousVersion = "1.21.2"
+let mutable version         = "1.21.3" //Copy this into previousVersion before publishing packages...
 let mutable build           = buildVersion
 let mutable nugetVersion    = version
 let mutable asmVersion      = version
@@ -365,6 +366,15 @@ Target "ReportCodeCoverage" (fun _ ->
     
 )
 
+Target "ReplaceVersion" (fun _ ->
+    RegexReplaceInFileWithEncoding previousVersion version System.Text.Encoding.UTF8 "./Install-scripts/365/Install.ps1"
+    RegexReplaceInFileWithEncoding previousVersion version System.Text.Encoding.UTF8 "./Install-scripts/2011/Install.ps1"
+    RegexReplaceInFileWithEncoding previousVersion version System.Text.Encoding.UTF8 "./Install-scripts/2013/Install.ps1"
+    RegexReplaceInFileWithEncoding previousVersion version System.Text.Encoding.UTF8 "./Install-scripts/2015/Install.ps1"
+    RegexReplaceInFileWithEncoding previousVersion version System.Text.Encoding.UTF8 "./Install-scripts/2016/Install.ps1"
+    RegexReplaceInFileWithEncoding previousVersion version System.Text.Encoding.UTF8 "README.md"
+)
+
 "Clean"
   ==> "RestorePackages"
   ==> "BuildVersions"
@@ -390,9 +400,9 @@ Target "ReportCodeCoverage" (fun _ ->
   ==> "CodeCoverage.2016"
   ==> "CodeCoverage.365"
   ==> "ReportCodeCoverage"
+  ==> "ReplaceVersion"
   ==> "Publish"
   ==> "NuGet"
   ==> "PublishNuGet"
   
-//RunTargetOrDefault "ReportCodeCoverage"
 RunTargetOrDefault "NuGet"

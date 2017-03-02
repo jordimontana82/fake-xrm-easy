@@ -18,7 +18,7 @@ namespace FakeXrmEasy
 
         public void Trace(string format, params object[] args)
         {
-            _trace += string.Format(format, args);
+            _trace += string.Format(format, args) + System.Environment.NewLine;
         }
 
         public string DumpTrace()
