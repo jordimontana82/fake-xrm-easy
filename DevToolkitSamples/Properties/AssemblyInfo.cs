@@ -1,18 +1,20 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FakeXrmEasy.365")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Microsoft Dynamics 365 Developer Toolkit")]
+[assembly: AssemblyDescription("Dynamics 365 Developer Toolkit for Visual Studio")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("FakeXrmEasy.365")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyProduct("Microsoft Dynamics© CRM")]
+[assembly: AssemblyCopyright("© 2015 Microsoft Corporation. All rights reserved")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: CLSCompliant(true)]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -20,7 +22,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ba4e8486-58fb-458a-80b9-09ec721ba2b7")]
+[assembly: Guid("32303e14-1087-44a1-9dac-415389c799b7")]
 
 // Version information for an assembly consists of the following four values:
 //
