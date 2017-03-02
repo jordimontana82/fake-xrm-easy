@@ -118,13 +118,10 @@ namespace FakeXrmEasy
                         var pluginContextString = contextElement.Value;
 
                         XrmFakedPluginExecutionContext context = null;
-                        using (TextReader txtReader = new StringReader(pluginContextString))
+                        using (var reader = new MemoryStream(Encoding.UTF8.GetBytes(pluginContextString)))
                         {
-                            using (var reader = new XmlTextReader(txtReader))
-                            {
-                                var dcSerializer = new DataContractSerializer(typeof(XrmFakedPluginExecutionContext));
-                                context = (XrmFakedPluginExecutionContext)dcSerializer.ReadObject(reader, true);
-                            }
+                            var dcSerializer = new DataContractSerializer(typeof(XrmFakedPluginExecutionContext));
+                            context = (XrmFakedPluginExecutionContext)dcSerializer.ReadObject(reader);
                         }
 
                         return context;

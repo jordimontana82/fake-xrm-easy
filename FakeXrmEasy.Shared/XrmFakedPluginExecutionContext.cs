@@ -16,87 +16,86 @@ namespace FakeXrmEasy
     public class XrmFakedPluginExecutionContext: IPluginExecutionContext
     {
 
-        [DataMember]
+        [DataMember(Order = 1)]
         public Guid BusinessUnitId { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 2)]
         public Guid CorrelationId { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 3)]
         public int Depth { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 4)]
         public Guid InitiatingUserId { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 5)]
         public ParameterCollection InputParameters { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 6)]
         public bool IsExecutingOffline { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 7)]
         public bool IsInTransaction { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 8)]
         public bool IsOfflinePlayback { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 9)]
         public int IsolationMode { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 10)]
         public string MessageName { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 11)]
         public int Mode { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 12)]
         public DateTime OperationCreatedOn { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 13)]
         public Guid OperationId { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 14)]
         public Guid OrganizationId { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 15)]
         public string OrganizationName { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 16)]
         public ParameterCollection OutputParameters { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 17)]
         public EntityReference OwningExtension { get; set; }
 
-        [DataMember]
-        public IPluginExecutionContext ParentContext { get; set; }
-
-        [DataMember]
+        [DataMember(Order = 18)]
         public EntityImageCollection PostEntityImages { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 19)]
         public EntityImageCollection PreEntityImages { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 20)]
         public Guid PrimaryEntityId { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 21)]
         public string PrimaryEntityName { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 22)]
         public Guid? RequestId { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 23)]
         public string SecondaryEntityName { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 24)]
         public ParameterCollection SharedVariables { get; set; }
 
-        [DataMember]
-        public int Stage { get; set; }
-
-        [DataMember]
+        [DataMember(Order = 25)]
         public Guid UserId { get; set; }
 
+        [DataMember(Order = 26)]
+        public IPluginExecutionContext ParentContext { get; set; }
+
+        [DataMember(Order = 27)]
+        public int Stage { get; set; }
         /// <summary>
         /// Default constructor
         /// </summary>
