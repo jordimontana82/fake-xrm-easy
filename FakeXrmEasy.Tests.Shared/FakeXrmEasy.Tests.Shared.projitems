@@ -76,6 +76,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\InheritedPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\RetrieveServicesPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestContextOrgNamePlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestPropertiesPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestSharedVariablesPropertyPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestContextPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tracing\XrmFakeTracingExample.cs" />

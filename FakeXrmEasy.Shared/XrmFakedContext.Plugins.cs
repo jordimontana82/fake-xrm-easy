@@ -69,7 +69,7 @@ namespace FakeXrmEasy
             return context;
         }
 
-        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx) where T : IPlugin, new()
+        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx, T instance) where T : IPlugin, new()
         {
             var fakedServiceProvider = GetFakedServiceProvider(ctx);
 
@@ -77,13 +77,18 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedPlugin.Execute(A<IServiceProvider>._))
                 .Invokes((IServiceProvider provider) =>
                 {
-                    var plugin = new T();
+                    var plugin = instance;
                     plugin.Execute(fakedServiceProvider);
                 });
 
             fakedPlugin.Execute(fakedServiceProvider); //Execute the plugin
             return fakedPlugin;
         }
+        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx) where T : IPlugin, new()
+        {
+            return this.ExecutePluginWith<T>(ctx, new T());
+        }
+
         public IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
                                      ParameterCollection outputParameters,
                                      EntityImageCollection preEntityImages,
@@ -113,6 +118,26 @@ namespace FakeXrmEasy
                                      string unsecureConfiguration,
                                      string secureConfiguration) where T : class, IPlugin 
         {
+            var pluginType = typeof(T);
+            var constructors = pluginType.GetConstructors().ToList();
+
+            if (!constructors.Any(
+                            constructor => constructor.GetParameters().ToList().Count == 2
+                                && constructor.GetParameters().All(param => param.ParameterType == typeof(string))))
+            {
+                throw new ArgumentException("The plugin you are trying to execute does not specify a constructor for passing in two configuration strings.");
+            }
+
+            var pluginInstance = (T)Activator.CreateInstance(typeof(T), unsecureConfiguration, secureConfiguration);
+            return this.ExecutePluginWithConfigurations<T>(plugCtx, pluginInstance, unsecureConfiguration, secureConfiguration);
+          
+        }
+
+        public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, 
+                                     T instance,
+                                     string unsecureConfiguration,
+                                     string secureConfiguration) where T : class, IPlugin
+        {
             var fakedServiceProvider = GetFakedServiceProvider(plugCtx);
 
             var fakedPlugin = A.Fake<IPlugin>();
@@ -130,7 +155,7 @@ namespace FakeXrmEasy
                         throw new ArgumentException("The plugin you are trying to execute does not specify a constructor for passing in two configuration strings.");
                     }
 
-                    var plugin = (T)Activator.CreateInstance(pluginType, unsecureConfiguration, secureConfiguration);
+                    var plugin = instance;
                     plugin.Execute(fakedServiceProvider);
                 });
 
