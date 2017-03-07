@@ -1015,6 +1015,107 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_doing_a_crm_linq_query_with_an_intersect_entity_and_2_levels_of_joins_the_order_of_where_clauses_is_irrelevant_between_linked_entities()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var parentRole = new Role() { Id = Guid.NewGuid(), Name = "System Administrator" };
+            var role = new Role() { Id = Guid.NewGuid(), Name = "Sys Admin" };
+            var user = new SystemUser() { Id = Guid.NewGuid(), FirstName = "Jordi" };
+            var systemRole = new SystemUserRoles() { Id = Guid.NewGuid() };
+
+
+
+            role["parentroleid"] = parentRole.ToEntityReference();
+            systemRole["systemuserid"] = user.ToEntityReference();
+            systemRole["roleid"] = role.ToEntityReference();
+
+
+            fakedContext.Initialize(new List<Entity>() {
+                user, systemRole, role, parentRole
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from sr in ctx.CreateQuery<SystemUserRoles>()
+                               join r in ctx.CreateQuery<Role>() on sr.RoleId equals r.RoleId
+                               join u in ctx.CreateQuery<SystemUser>() on sr.SystemUserId equals u.SystemUserId
+
+                               where u.FirstName == "Jordi"
+                               where r.Name == "Sys Admin"
+                               select sr).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from sr in ctx.CreateQuery<SystemUserRoles>()
+                               join r in ctx.CreateQuery<Role>() on sr.RoleId equals r.RoleId
+                               join u in ctx.CreateQuery<SystemUser>() on sr.SystemUserId equals u.SystemUserId
+
+                               where r.Name == "Sys Admin"
+                               where u.FirstName == "Jordi"
+                               
+                               select sr).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_an_intersect_entity_and_2_levels_of_joins_the_order_of_where_clauses_is_irrelevant_between_main_and_linked_entity()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var account = new Account() { Id = Guid.NewGuid(), Name = "Barcelona" };
+            var contact1 = new Contact() { Id = Guid.NewGuid(),
+                ParentCustomerId = account.ToEntityReference(),
+                AccountRoleCode = new OptionSetValue(1)
+            };
+            var contact2 = new Contact() { Id = Guid.NewGuid(),
+                ParentCustomerId = account.ToEntityReference(),
+                AccountRoleCode = new OptionSetValue(1)
+            };
+
+            fakedContext.Initialize(new List<Entity>() {
+                account, contact1, contact2
+            });
+
+            var service = fakedContext.GetOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               join a in ctx.CreateQuery<Account>() on c.ParentCustomerId.Id equals a.AccountId
+
+                               where c.AccountRoleCode != null
+                               where a.Name == "Barcelona"
+                               select c.Address1_Name).ToList();
+
+                Assert.True(matches.Count == 2);
+            }
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               join a in ctx.CreateQuery<Account>() on c.ParentCustomerId.Id equals a.AccountId
+                               
+                               where a.Name == "Barcelona"
+                               where c.AccountRoleCode != null
+                               select c.Address1_Name).ToList();
+
+                Assert.True(matches.Count == 2);
+            }
+
+            
+        }
+
+        [Fact]
         public void When_doing_a_crm_linq_query_with_a_leftjoin_right_result_is_returned()
         {
             var fakedContext = new XrmFakedContext();
