@@ -33,7 +33,7 @@ We won't ask you for any PayPal or similar donations. Seriously.
 
 Instead, if you are using this framework on a regular basis, and is making your life as CRM developer easier, I would really appreciate if you could spend 5 minutes of your time to nominate me as a CRM MVP, given that I spent 2 years on this project! :). 
 
-Please reach out on [my linkedin profile](https://www.linkedin.com/in/jordimontana) for that. Thank you! 
+Please use this email address when nominating elric_jmv@hotmail.com. Thank you! 
 
 ##Contributing
 
