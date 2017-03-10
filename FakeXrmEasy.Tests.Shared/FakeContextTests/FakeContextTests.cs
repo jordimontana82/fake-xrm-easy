@@ -95,7 +95,7 @@ namespace FakeXrmEasy.Tests
             context.Initialize(data);
             Assert.True(context.Data.Count == 1);
             Assert.True(context.Data["account"].Count == 1);
-            Assert.Equal(context.Data["account"][guid], data.FirstOrDefault());
+            Assert.Equal(context.Data["account"][guid].Id, data.FirstOrDefault().Id);
         }
         [Fact]
         public void When_initializing_with_two_entities_with_the_same_guid_only_the_latest_will_be_in_the_context()
@@ -111,7 +111,7 @@ namespace FakeXrmEasy.Tests
             context.Initialize(data);
             Assert.True(context.Data.Count == 1);
             Assert.True(context.Data["account"].Count == 1);
-            Assert.Equal(context.Data["account"][guid], data.LastOrDefault());
+            Assert.Equal(context.Data["account"][guid].Id, data.LastOrDefault().Id);
         }
 
         [Fact]
@@ -129,8 +129,8 @@ namespace FakeXrmEasy.Tests
             context.Initialize(data);
             Assert.True(context.Data.Count == 1);
             Assert.True(context.Data["account"].Count == 2);
-            Assert.Equal(context.Data["account"][guid1], data.FirstOrDefault());
-            Assert.Equal(context.Data["account"][guid2], data.LastOrDefault());
+            Assert.Equal(context.Data["account"][guid1].Id, data.FirstOrDefault().Id);
+            Assert.Equal(context.Data["account"][guid2].Id, data.LastOrDefault().Id);
         }
         [Fact]
         public void When_initializing_with_two_entities_of_same_logical_name_and_another_one_the_context_will_have_all_three()
@@ -150,8 +150,8 @@ namespace FakeXrmEasy.Tests
             Assert.True(context.Data.Count == 2);
             Assert.True(context.Data["account"].Count == 2);
             Assert.True(context.Data["contact"].Count == 1);
-            Assert.Equal(context.Data["account"][guid1], data.FirstOrDefault());
-            Assert.Equal(context.Data["contact"][guid3], data.LastOrDefault());
+            Assert.Equal(context.Data["account"][guid1].Id, data.FirstOrDefault().Id);
+            Assert.Equal(context.Data["contact"][guid3].Id, data.LastOrDefault().Id);
 
         }
 
@@ -165,11 +165,11 @@ namespace FakeXrmEasy.Tests
             var e = new Entity("account") { Id = Guid.NewGuid() };
             context.Initialize(new List<Entity>() { e });
 
-            Assert.True(e.Attributes.ContainsKey("createdon"));
-            Assert.True(e.Attributes.ContainsKey("modifiedon"));
-            Assert.True(e.Attributes.ContainsKey("createdby"));
-            Assert.True(e.Attributes.ContainsKey("modifiedby"));
-
+            var createdEntity = context.CreateQuery("account").FirstOrDefault();
+            Assert.True(createdEntity.Attributes.ContainsKey("createdon"));
+            Assert.True(createdEntity.Attributes.ContainsKey("modifiedon"));
+            Assert.True(createdEntity.Attributes.ContainsKey("createdby"));
+            Assert.True(createdEntity.Attributes.ContainsKey("modifiedby"));
         }
 
         [Fact]
@@ -181,12 +181,16 @@ namespace FakeXrmEasy.Tests
             var e = new Entity("account") { Id = Guid.NewGuid() };
             context.Initialize(new List<Entity>() { e });
 
-            var oldModifiedOn = (DateTime)e["modifiedon"];
+            var oldModifiedOn = context.CreateQuery<Account>()
+                                        .FirstOrDefault()
+                                        .ModifiedOn;
 
             Thread.Sleep(1000);
 
             service.Update(e);
-            var newModifiedOn = (DateTime)e["modifiedon"];
+            var newModifiedOn = context.CreateQuery<Account>()
+                                        .FirstOrDefault()
+                                        .ModifiedOn;
 
             Assert.NotEqual(oldModifiedOn, newModifiedOn);
         }

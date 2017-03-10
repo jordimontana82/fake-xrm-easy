@@ -330,8 +330,9 @@ namespace FakeXrmEasy
 
         protected internal void AddEntityWithDefaults(Entity e)
         {
-            AddEntityDefaultAttributes(e);
-            AddEntity(e);
+            var clone = e.Clone(e.GetType());
+            AddEntityDefaultAttributes(clone);
+            AddEntity(clone);
         }
 
         protected internal void AddEntity(Entity e)

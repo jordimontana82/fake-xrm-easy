@@ -255,5 +255,41 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(createdOrderDetails[0].SalesOrderId.Id, id);
             Assert.Equal(createdOrderDetails[1].SalesOrderId.Id, id);
         }
+
+        [Fact]
+        public void Shouldnt_store_references_to_variables_but_actual_clones()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            //create an account and then retrieve it with no changes
+            Entity newAccount = new Entity("account");
+            newAccount["name"] = "New Account";
+
+            newAccount.Id = service.Create(newAccount);
+
+            Entity retrievedAccount = service.Retrieve("account", newAccount.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
+            Assert.True(retrievedAccount.Attributes.Contains("name"));
+
+            //do the same as above, but this time clear the attributes - see that when retrieved, the retrieved entity does not contain the name attribute
+            Entity newAccount1 = new Entity("account");
+            newAccount1["name"] = "New Account1";
+
+            newAccount1.Id = service.Create(newAccount1);
+            newAccount1.Attributes.Clear();
+
+            Entity retrievedAccount1 = service.Retrieve("account", newAccount1.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
+            Assert.True(retrievedAccount1.Attributes.Contains("name"));
+
+            //third time around, change the name to something new, the retrieved entity should not reflect this change
+            Entity newAccount2 = new Entity("account");
+            newAccount2["name"] = "New Account2";
+
+            newAccount2.Id = service.Create(newAccount2);
+            newAccount2["name"] = "Changed name";
+
+            Entity retrievedAccount2 = service.Retrieve("account", newAccount2.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
+            Assert.True(retrievedAccount2["name"].ToString() == "New Account2", $"'{retrievedAccount2["name"]}' was not the expected result");
+        }
     }
 }

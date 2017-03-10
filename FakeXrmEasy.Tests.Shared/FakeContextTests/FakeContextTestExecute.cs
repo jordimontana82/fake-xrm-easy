@@ -6,6 +6,7 @@ using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Xunit;
+using System.Linq;
 
 namespace FakeXrmEasy.Tests.FakeContextTests
 {
@@ -24,7 +25,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
 
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             context.Initialize(new [] { account });
 
@@ -35,7 +36,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
             service.Execute(assignRequest);
 
-            Assert.Equal(newOwner, account.OwnerId);
+            //retrieve account updated
+            var updatedAccount = context.CreateQuery<Account>().FirstOrDefault();
+            Assert.Equal(newOwner.Id, updatedAccount.OwnerId.Id);
         }
     }
 }
