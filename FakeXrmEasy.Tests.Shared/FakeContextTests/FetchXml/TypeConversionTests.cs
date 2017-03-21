@@ -107,6 +107,70 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void Conversion_to_bool_is_correct()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='account'>
+                                    <attribute name='name' />
+                                    <filter type='and'>
+                                        <condition attribute='donotemail' operator='eq' value='0' />
+                                    </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+            Assert.IsType<bool>(query.Criteria.Conditions[0].Values[0]);
+            Assert.Equal(false, query.Criteria.Conditions[0].Values[0]);
+
+            var fetchXml2 = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='account'>
+                                    <attribute name='name' />
+                                    <filter type='and'>
+                                        <condition attribute='donotemail' operator='eq' value='true' />
+                                    </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query2 = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml2);
+            Assert.IsType<bool>(query2.Criteria.Conditions[0].Values[0]);
+            Assert.Equal(true, query2.Criteria.Conditions[0].Values[0]);
+        }
+
+        [Fact]
+        public void Conversion_to_bool_throws_error_if_incorrect()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='account'>
+                                    <attribute name='name' />
+                                    <filter type='and'>
+                                        <condition attribute='donotemail' operator='eq' value='3' />
+                                    </filter>
+                                  </entity>
+                            </fetch>";
+
+            var exception = Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml));
+            Assert.Equal("When trying to parse value for entity account and attribute donotemail: Boolean value expected", exception.Message);
+
+            var fetchXml2 = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='account'>
+                                    <attribute name='name' />
+                                    <filter type='and'>
+                                        <condition attribute='donotemail' operator='eq' value='anothervalue' />
+                                    </filter>
+                                  </entity>
+                            </fetch>";
+
+            var exception2 = Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml2));
+            Assert.Equal("When trying to parse value for entity account and attribute donotemail: Boolean value expected", exception.Message);
+        }
+
+        [Fact]
         public void Conversion_to_string_is_correct()
         {
             var ctx = new XrmFakedContext();
