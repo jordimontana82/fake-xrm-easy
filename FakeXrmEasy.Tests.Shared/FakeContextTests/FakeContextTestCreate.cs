@@ -312,5 +312,27 @@ namespace FakeXrmEasy.Tests
             Assert.True(createdAccount.Attributes.ContainsKey("modifiedby"));
             Assert.True(createdAccount.Attributes.ContainsKey("statecode"));
         }
+
+        [Fact]
+        public void When_Creating_Without_Default_Attributes_They_Should_Be_Set_By_Default_With_Early_Bound()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var account = new Account
+            {
+                Name = "test"
+            };
+
+            service.Create(account);
+            var createdAccount = context.CreateQuery<Account>().FirstOrDefault();
+
+            Assert.True(createdAccount.Attributes.ContainsKey("createdon"));
+            Assert.True(createdAccount.Attributes.ContainsKey("createdby"));
+            Assert.True(createdAccount.Attributes.ContainsKey("modifiedon"));
+            Assert.True(createdAccount.Attributes.ContainsKey("modifiedby"));
+            Assert.True(createdAccount.Attributes.ContainsKey("statecode"));
+        }
     }
 }
