@@ -84,10 +84,12 @@ namespace FakeXrmEasy
                 }
                 catch { }
             }
+#if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
             else if (attributeInfo.PropertyType.FullName.StartsWith("System.Nullable"))
             {
                 return attributeInfo.PropertyType.GenericTypeArguments[0];
             }
+#endif
 
             return attributeInfo.PropertyType;
         }
