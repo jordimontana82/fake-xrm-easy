@@ -155,12 +155,22 @@ namespace FakeXrmEasy
                         throw new InvalidOperationException("The id must not be empty.");
                     }
 
+                    // Don't fail with invalid operation exception, if no record of this entity exists, but entity is known
                     if (!context.Data.ContainsKey(entityName))
-                        throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.", entityName));
+                    {
+                        if (context.ProxyTypesAssembly == null)
+                        {
+                            throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.", entityName));
+                        }
+
+                        if (!context.ProxyTypesAssembly.GetTypes().Any(type => context.FindReflectedType(entityName) != null))
+                        {
+                            throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.", entityName));
+                        }
+                    }
 
                     //Entity logical name exists, so , check if the requested entity exists
-                    if (context.Data[entityName] != null
-                        && context.Data[entityName].ContainsKey(id))
+                    if (context.Data.ContainsKey(entityName) && context.Data[entityName] != null && context.Data[entityName].ContainsKey(id))
                     {
                         //Entity found => return only the subset of columns specified or all of them
                         context.Data[entityName].Remove(id);
@@ -220,9 +230,7 @@ namespace FakeXrmEasy
         {
             //Validate primary key for dynamic entities
             var primaryKey = string.Format("{0}id", e.LogicalName);
-            if (ProxyTypesAssembly == null &&
-                !e.GetType().IsSubclassOf(typeof(Entity)) &&
-                !e.Attributes.ContainsKey(primaryKey))
+            if (!e.Attributes.ContainsKey(primaryKey))
             {
                 e[primaryKey] = e.Id;
             }
