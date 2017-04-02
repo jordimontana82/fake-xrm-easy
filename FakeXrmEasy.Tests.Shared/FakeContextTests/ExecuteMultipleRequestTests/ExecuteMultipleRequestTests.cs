@@ -272,6 +272,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteMultipleRequestTests
             Assert.False(response.IsFaulted);
             Assert.NotEmpty(response.Responses);
             Assert.Equal(2, response.Responses.Count);
+            Assert.True(response.Responses[0].Response is CreateResponse);
+            Assert.True(response.Responses[1].Response is CreateResponse);
 
             Assert.NotNull(service.Retrieve(Account.EntityLogicalName, account1.Id, new ColumnSet(true)));
             Assert.NotNull(service.Retrieve(Account.EntityLogicalName, account2.Id, new ColumnSet(true)));
