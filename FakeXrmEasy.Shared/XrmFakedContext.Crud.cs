@@ -285,20 +285,16 @@ namespace FakeXrmEasy
             if (e.Id == Guid.Empty)
             {
                 e.Id = Guid.NewGuid(); //Add default guid if none present
-
-                ValidateEntity(e);
-
-                //Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
-                if (!e.GetType().IsSubclassOf(typeof(Entity)))
-                {
-                    var primaryKeyAttribute = string.Format("{0}id", e.LogicalName);
-                    e[primaryKeyAttribute] = e.Id;
-                }
             }
-            else
+
+            //Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
+            var primaryKeyAttribute = string.Format("{0}id", e.LogicalName);
+            if (!e.Attributes.ContainsKey(primaryKeyAttribute))
             {
-                ValidateEntity(e);
+                e[primaryKeyAttribute] = e.Id;
             }
+
+            ValidateEntity(e);
 
             //Create specific validations
             if (e.Id != Guid.Empty && Data.ContainsKey(e.LogicalName) &&
