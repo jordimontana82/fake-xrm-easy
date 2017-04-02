@@ -181,6 +181,26 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_creating_a_record_using_early_bound_entities_and_proxytypes_primary_key_should_be_populated()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+            var c = new Contact();
+            c.Id = Guid.NewGuid();
+
+            IOrganizationService service = context.GetFakedOrganizationService();
+
+            context.Initialize(new List<Entity>() { c });
+
+            //Retrieve the record created
+            var contact = (from con in context.CreateQuery<Contact>()
+                           select con).FirstOrDefault();
+
+            Assert.True(contact.Attributes.ContainsKey("contactid"));
+            Assert.Equal(c.Id, contact["contactid"]);
+        }
+
+        [Fact]
         public void When_related_entities_are_used_without_relationship_info_exception_is_raised()
         {
             var ctx = new XrmFakedContext();
