@@ -69,6 +69,27 @@ namespace FakeXrmEasy
             {
                 throw new Exception(string.Format("XrmFakedContext.FindReflectedAttributeType: Attribute {0} not found for type {1}", sAttributeName, earlyBoundType.ToString()));
             }
+            else if (attributeInfo.PropertyType.FullName.EndsWith("Enum"))
+            {
+                return typeof(System.Int32);
+            }
+            else if (!attributeInfo.PropertyType.FullName.StartsWith("System."))
+            {
+                try
+                {
+                    var inst = Activator.CreateInstance(attributeInfo.PropertyType);
+
+                    if (inst is Entity)
+                        return typeof(EntityReference);
+                }
+                catch { }
+            }
+#if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+            else if (attributeInfo.PropertyType.FullName.StartsWith("System.Nullable"))
+            {
+                return attributeInfo.PropertyType.GenericTypeArguments[0];
+            }
+#endif
 
             return attributeInfo.PropertyType;
         }
