@@ -279,7 +279,7 @@ namespace FakeXrmEasy
 
             //Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
             var primaryKeyAttribute = string.Format("{0}id", e.LogicalName);
-            if (!e.GetType().IsSubclassOf(typeof(Entity)) && !e.Attributes.ContainsKey(primaryKeyAttribute))
+            if (!e.Attributes.ContainsKey(primaryKeyAttribute))
             {
                 e[primaryKeyAttribute] = e.Id;
             }
