@@ -64,6 +64,35 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_delete_is_invoked_with_non_existing_entity_and_nothing_has_been_initalised_an_exception_is_thrown()
+        {
+            var context = new XrmFakedContext();
+
+            //Initialize the context with a single entity
+            var nonExistingGuid = Guid.NewGuid();
+            
+            var service = context.GetFakedOrganizationService();
+
+            var ex = Assert.Throws<InvalidOperationException>(() => service.Delete("account", nonExistingGuid));
+            Assert.Equal(ex.Message.ToLower(), "the entity logical name account is not valid.");
+        }
+
+        [Fact]
+        public void When_delete_is_invoked_with_non_existing_entity_and_nothing_has_been_initalised_using_proxytypes_assembly_an_exception_is_thrown()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            //Initialize the context with a single entity
+            var nonExistingGuid = Guid.NewGuid();
+
+            var service = context.GetFakedOrganizationService();
+
+            var ex = Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Delete("account", nonExistingGuid));
+            Assert.Equal(ex.Message, string.Format("account with Id {0} Does Not Exist", nonExistingGuid));
+        }
+
+        [Fact]
         public void When_delete_is_invoked_with_an_existing_entity_that_entity_is_delete_from_the_context()
         {
             var context = new XrmFakedContext();
