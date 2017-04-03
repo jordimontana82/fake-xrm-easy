@@ -40,13 +40,14 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
                 try
                 {
-                    service.Execute(executeRequest);
+                    OrganizationResponse resp = service.Execute(executeRequest);
 
                     if (executeMultipleRequest.Settings.ReturnResponses)
                     {
                         response.Responses.Add(new ExecuteMultipleResponseItem
                         {
-                            RequestIndex = i
+                            RequestIndex = i,
+                            Response = resp
                         });
                     }
                 }
