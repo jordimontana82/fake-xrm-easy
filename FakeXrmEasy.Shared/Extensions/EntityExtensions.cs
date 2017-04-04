@@ -109,10 +109,6 @@ namespace FakeXrmEasy.Extensions
 
                     if (e.Attributes.ContainsKey(attKey))
                         projected[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
-                    else
-                    {
-                        projected[attKey] = null;
-                    }
                 }
 
                 //Plus attributes from joins

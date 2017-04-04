@@ -217,7 +217,7 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
-        public void When_executing_a_query_expression_with_an_attribute_in_columnset_that_doesnt_exists_null_value_is_returned_with_dynamic_entities()
+        public void When_executing_a_query_expression_with_an_attribute_in_columnset_that_doesnt_exists_no_value_is_returned_with_dynamic_entities()
         {
             var context = new XrmFakedContext();
             var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1"; contact1["firstname"] = "First 1";
@@ -238,8 +238,7 @@ namespace FakeXrmEasy.Tests
 
             var list = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
 
-            Assert.True(list[0].Attributes.ContainsKey("this attribute doesnt exists!"));
-            Assert.Equal(null, list[0].Attributes["this attribute doesnt exists!"]);
+            Assert.False(list[0].Attributes.ContainsKey("this attribute doesnt exists!"));
 
         }
 
