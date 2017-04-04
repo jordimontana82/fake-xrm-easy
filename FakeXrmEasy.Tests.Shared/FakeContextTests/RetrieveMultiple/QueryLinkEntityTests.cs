@@ -619,6 +619,63 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             }
         }
 
+        [Fact]
+        public void Should_Not_Throw_Unable_To_Cast_AliasedValue_Exception()
+        {
+            var account1 = new Account() { Id = Guid.NewGuid(), Name = "1 Test", Address1_City = "1 City", Address1_StateOrProvince = "a2 State" };
+            var account2 = new Account() { Id = Guid.NewGuid(), Name = "2 Test", Address1_City = "2 City", Address1_StateOrProvince = "b2 State" };
+            var account3 = new Account() { Id = Guid.NewGuid(), Name = "3 Test", Address1_City = "2 City", Address1_StateOrProvince = "b1 State" };
+
+            var contact1 = new Contact() { Id = Guid.NewGuid(), FirstName = "1 Cont", LastName = "Cont 1", Address1_City = "1 City", ParentCustomerId = account1.ToEntityReference() };
+            var contact2 = new Contact() { Id = Guid.NewGuid(), FirstName = "2 Cont", LastName = "Cont 2", Address1_City = "1 City", ParentCustomerId = account2.ToEntityReference() };
+            var contact3 = new Contact() { Id = Guid.NewGuid(), FirstName = "3 Cont", LastName = "Cont 3", Address1_City = "1 City", ParentCustomerId = account3.ToEntityReference() };
+            var contact4 = new Contact() { Id = Guid.NewGuid(), FirstName = "4 Cont", LastName = "Cont 4", Address1_City = "2 City", ParentCustomerId = account1.ToEntityReference() };
+            var contact5 = new Contact() { Id = Guid.NewGuid(), FirstName = "5 Cont", LastName = "Cont 5", Address1_City = "2 City", ParentCustomerId = account2.ToEntityReference() };
+            var contact6 = new Contact() { Id = Guid.NewGuid(), FirstName = "6 Cont", LastName = "Cont 6", Address1_City = "2 City", ParentCustomerId = account3.ToEntityReference() };
+
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var service = ctx.GetFakedOrganizationService();
+            ctx.Initialize(new List<Entity>() {
+                account1, account2, account3, contact1, contact2, contact3, contact4, contact5, contact6
+            });
+
+            QueryExpression query = new QueryExpression()
+            {
+                EntityName = "contact",
+                ColumnSet = new ColumnSet(true),
+                LinkEntities =
+                {
+                    new LinkEntity(Contact.EntityLogicalName, Account.EntityLogicalName, "parentcustomerid", "accountid", JoinOperator.LeftOuter)
+                    {
+                        LinkCriteria = new FilterExpression()
+                        {
+                            FilterOperator = LogicalOperator.And,
+                            Conditions =
+                            {
+                                new ConditionExpression("address1_city", ConditionOperator.Like, "2%")
+                            }
+                        }
+                    },
+                    new LinkEntity(Contact.EntityLogicalName, Contact.EntityLogicalName, "parentcustomerid", "contactid", JoinOperator.LeftOuter)
+                    {
+                        LinkCriteria = new FilterExpression()
+                        {
+                            FilterOperator = LogicalOperator.And,
+                            Conditions =
+                            {
+                                new ConditionExpression("address1_city", ConditionOperator.Like, "2%")
+                            }
+                        }
+                    },
+                }
+            };
+
+            EntityCollection entities = service.RetrieveMultiple(query);
+            Assert.Equal(4, entities.Entities.Count);
+        }
+
 #if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_365
         [Fact]
         public void Should_Not_Apply_Left_Outer_Join_Filters_When_The_Right_hand_side_of_the_expression_wasnt_found()
@@ -772,5 +829,5 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             Assert.Equal(1, incidents.Count);
         }
 #endif
-    }
+}
 }
