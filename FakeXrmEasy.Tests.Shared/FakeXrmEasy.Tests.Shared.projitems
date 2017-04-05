@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\AddActivityWithConstant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\CreateTaskActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CrmModelClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AddListMembersListRequestTests\Tests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AddMemberListRequestTests\Tests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssignRequestTests\AssignRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssociateRequestTests\AssociateRequestTests.cs" />
