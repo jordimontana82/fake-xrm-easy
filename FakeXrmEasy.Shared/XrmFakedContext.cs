@@ -43,6 +43,8 @@ namespace FakeXrmEasy
 
         private Dictionary<Type, IFakeMessageExecutor> FakeMessageExecutors { get; set; }
 
+        private Dictionary<string, IFakeMessageExecutor> GenericFakeMessageExecutors { get; set; }
+
         private Dictionary<string, XrmFakedRelationship> Relationships { get; set; }
 
         public Dictionary<string, OptionSetMetadata> OptionSetValuesMetadata { get; set; }
@@ -61,6 +63,8 @@ namespace FakeXrmEasy
                 .Where(t => t.GetInterfaces().Contains(typeof(IFakeMessageExecutor)))
                 .Select(t => Activator.CreateInstance(t) as IFakeMessageExecutor)
                 .ToDictionary(t => t.GetResponsibleRequestType(), t => t);
+
+            GenericFakeMessageExecutors = new Dictionary<string, IFakeMessageExecutor>();
 
             Relationships = new Dictionary<string, XrmFakedRelationship>();
         }
@@ -113,6 +117,18 @@ namespace FakeXrmEasy
         public void RemoveFakeMessageExecutor<T>() where T : OrganizationRequest
         {
             FakeMessageExecutors.Remove(typeof(T));
+        }
+        public void AddGenericFakeMessageExecutor(string message, IFakeMessageExecutor executor)
+        {
+            if (!GenericFakeMessageExecutors.ContainsKey(message))
+                GenericFakeMessageExecutors.Add(message, executor);
+            else
+                GenericFakeMessageExecutors[message] = executor;
+        }
+        public void RemoveGenericFakeMessageExecutor(string message)
+        {
+            if (GenericFakeMessageExecutors.ContainsKey(message))
+                GenericFakeMessageExecutors.Remove(message);
         }
 
         public void AddRelationship(string schemaname, XrmFakedRelationship relationship)
@@ -232,6 +248,10 @@ namespace FakeXrmEasy
                     if (context.FakeMessageExecutors.ContainsKey(req.GetType()))
                     {
                         return context.FakeMessageExecutors[req.GetType()].Execute(req, context);
+                    }
+                    if (req.GetType() == typeof(OrganizationRequest) && context.GenericFakeMessageExecutors.ContainsKey(req.RequestName))
+                    {
+                        return context.GenericFakeMessageExecutors[req.RequestName].Execute(req,context);
                     }
 
                     throw PullRequestException.NotImplementedOrganizationRequest(req.GetType());
