@@ -107,8 +107,10 @@ namespace FakeXrmEasy.Extensions
                         OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
                     }
 
-                    if (e.Attributes.ContainsKey(attKey))
-                        projected[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
+                    if (e.Attributes.ContainsKey(attKey) && e.Attributes[attKey] != null)
+                    {
+                            projected[attKey] = CloneAttribute(e[attKey]);
+                    }
                 }
 
                 //Plus attributes from joins
