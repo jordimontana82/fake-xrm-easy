@@ -989,8 +989,8 @@ namespace FakeXrmEasy
             var c = tc.CondExpression;
 
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
-            Expression convertedValueToStr = Expression.Convert(getAttributeValueExpr, typeof(string));
-
+            Expression convertedValueToStr = Expression.Convert(GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, c.Values[0]), typeof(string));
+                                
             Expression convertedValueToStrAndToLower = GetCaseInsensitiveExpression(convertedValueToStr);
 
             string sLikeOperator = "%";
