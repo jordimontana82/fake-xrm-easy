@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using Microsoft.Xrm.Sdk;
+using FakeXrmEasy.Extensions;
 
 namespace FakeXrmEasy.Services
 {
@@ -19,21 +20,12 @@ namespace FakeXrmEasy.Services
 
             var CallerId = new EntityReference("systemuser", gCallerId); //Create a new instance by default
 
-            if (!e.Attributes.ContainsKey("createdon"))
-                e["createdon"] = DateTime.UtcNow;
-
-            if (!e.Attributes.ContainsKey("modifiedon"))
-                e["modifiedon"] = DateTime.UtcNow;
-
-            if (!e.Attributes.ContainsKey("createdby"))
-                e["createdby"] = CallerId;
-
-            if (!e.Attributes.ContainsKey("modifiedby"))
-                e["modifiedby"] = CallerId;
-
-            if (!e.Attributes.ContainsKey("statecode"))
-                e["statecode"] = new OptionSetValue(0); //Active by default
-
+            var now = DateTime.UtcNow;
+            e.SetValueIfEmpty("createdon", now);
+            e.SetValueIfEmpty("modifiedon", now);
+            e.SetValueIfEmpty("createdby", CallerId);
+            e.SetValueIfEmpty("modifiedby", CallerId);
+            e.SetValueIfEmpty("statecode", new OptionSetValue(0)); //Active by default
 
             return e;
         }
