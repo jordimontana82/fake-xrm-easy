@@ -9,6 +9,8 @@ using System.Reflection;
 using FakeXrmEasy.FakeMessageExecutors;
 using Microsoft.Xrm.Sdk.Metadata;
 
+using FakeXrmEasy.Services;
+
 namespace FakeXrmEasy
 {
     /// <summary>
@@ -51,6 +53,8 @@ namespace FakeXrmEasy
 
         protected internal XrmFakedTracingService _tracingService { get; set; }
 
+        public IEntityInitializerService EntityInitializerService { get; set; }
+
         public XrmFakedContext()
         {
             AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
@@ -67,6 +71,8 @@ namespace FakeXrmEasy
             GenericFakeMessageExecutors = new Dictionary<string, IFakeMessageExecutor>();
 
             Relationships = new Dictionary<string, XrmFakedRelationship>();
+
+            EntityInitializerService = new DefaultEntityInitializerService();
         }
 
         /// <summary>
