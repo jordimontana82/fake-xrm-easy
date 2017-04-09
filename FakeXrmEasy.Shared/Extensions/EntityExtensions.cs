@@ -391,6 +391,14 @@ namespace FakeXrmEasy.Extensions
             e.GetType().GetProperty(property).SetValue(e, value, null);
         }
 
+        public static void SetValueIfEmpty(this Entity e, string property, object value)
+        {
+            var containsKey = e.Attributes.ContainsKey(property);
+            if (!containsKey || containsKey && e[property] == null)
+            {
+                e[property] = value;
+            }
+        }
         
          
     }
