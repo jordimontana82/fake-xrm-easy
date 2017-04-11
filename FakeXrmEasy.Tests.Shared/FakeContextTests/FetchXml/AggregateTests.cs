@@ -14,8 +14,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         [Fact]
         public void FetchXml_Aggregate_Group_Count()
         {
-
-
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' aggregate='true'>
                               <entity name='contact'>
                                     <attribute name='contactid' alias='count.contacts' aggregate='count' />
@@ -104,6 +102,23 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(3, ent.GetAttributeValue<AliasedValue>("sum")?.Value);
         }
 
+        [Fact]
+        public void FetchXml_Aggregate_Sum_Int_Should_Return_Empty_Alias()
+        {
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' aggregate='true'>
+                              <entity name='contact'>
+                                    <attribute name='numberofchildren' alias='sum' aggregate='sum'/>                                    
+                                  </entity>
+                            </fetch>";
+            var ctx = new XrmFakedContext();
+
+            var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            var ent = collection.Entities[0];
+
+            Assert.True(ent.Contains("sum"));
+        }
 
         [Fact]
         public void FetchXml_Aggregate_Sum_Money()

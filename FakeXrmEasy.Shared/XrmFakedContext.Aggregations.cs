@@ -176,6 +176,12 @@ namespace FakeXrmEasy
                 {
                     ent[agg.OutputAlias] = new AliasedValue(null, agg.Attribute, val);
                 }
+                else
+                {
+                    //if the aggregate value cannot be calculated
+                    //CRM still returns an alias
+                    ent[agg.OutputAlias] = new AliasedValue(null, agg.Attribute, null);
+                }
             }
 
             return ent;
