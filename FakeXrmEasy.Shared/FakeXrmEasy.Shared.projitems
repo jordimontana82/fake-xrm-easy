@@ -41,6 +41,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\TypedConditionExpression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultQueryBuilderNoAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PullRequestException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\EntityInitializer\DefaultEntityInitializerService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\IEntityInitializerService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedContext.Aggregations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedContext.CodeActivities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedContext.Crud.cs" />
