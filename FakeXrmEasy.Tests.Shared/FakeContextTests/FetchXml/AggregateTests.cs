@@ -103,24 +103,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
-        public void FetchXml_Aggregate_Sum_Int_Should_Return_Empty_Alias()
-        {
-            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' aggregate='true'>
-                              <entity name='contact'>
-                                    <attribute name='numberofchildren' alias='sum' aggregate='sum'/>                                    
-                                  </entity>
-                            </fetch>";
-            var ctx = new XrmFakedContext();
-
-            var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
-
-            Assert.Equal(1, collection.Entities.Count);
-            var ent = collection.Entities[0];
-
-            Assert.True(ent.Contains("sum"));
-        }
-
-        [Fact]
         public void FetchXml_Aggregate_Sum_Money()
         {
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' aggregate='true'>
@@ -339,7 +321,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
             
             Assert.Equal(1, collection.Entities.Count);
-            Assert.Equal(0, collection.Entities.First().Attributes.Count);
+            Assert.Equal(1, collection.Entities.First().Attributes.Count);
+            Assert.True(collection.Entities.First().Contains("sum"));
         }
 
         [Fact]
@@ -358,7 +341,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
 
             Assert.Equal(1, collection.Entities.Count);
-            Assert.Equal(0, collection.Entities.First().Attributes.Count);
+            Assert.Equal(1, collection.Entities.First().Attributes.Count);
+            Assert.True(collection.Entities.First().Contains("avg"));
         }
 
         [Fact]
