@@ -155,12 +155,22 @@ namespace FakeXrmEasy
                         throw new InvalidOperationException("The id must not be empty.");
                     }
 
+                    // Don't fail with invalid operation exception, if no record of this entity exists, but entity is known
                     if (!context.Data.ContainsKey(entityName))
-                        throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.", entityName));
+                    {
+                        if (context.ProxyTypesAssembly == null)
+                        {
+                            throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.", entityName));
+                        }
+
+                        if (!context.ProxyTypesAssembly.GetTypes().Any(type => context.FindReflectedType(entityName) != null))
+                        {
+                            throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.", entityName));
+                        }
+                    }
 
                     //Entity logical name exists, so , check if the requested entity exists
-                    if (context.Data[entityName] != null
-                        && context.Data[entityName].ContainsKey(id))
+                    if (context.Data.ContainsKey(entityName) && context.Data[entityName] != null && context.Data[entityName].ContainsKey(id))
                     {
                         //Entity found => return only the subset of columns specified or all of them
                         context.Data[entityName].Remove(id);
@@ -218,34 +228,11 @@ namespace FakeXrmEasy
 
         protected void AddEntityDefaultAttributes(Entity e)
         {
-            //Validate primary key for dynamic entities
-            var primaryKey = string.Format("{0}id", e.LogicalName);
-            if (ProxyTypesAssembly == null &&
-                !e.GetType().IsSubclassOf(typeof(Entity)) &&
-                !e.Attributes.ContainsKey(primaryKey))
-            {
-                e[primaryKey] = e.Id;
-            }
-
             //Add createdon, modifiedon, createdby, modifiedby properties
             if (CallerId == null)
                 CallerId = new EntityReference("systemuser", Guid.NewGuid()); //Create a new instance by default
 
-
-            if (!e.Attributes.ContainsKey("createdon"))
-                e["createdon"] = DateTime.UtcNow;
-
-            if (!e.Attributes.ContainsKey("modifiedon"))
-                e["modifiedon"] = DateTime.UtcNow;
-
-            if (!e.Attributes.ContainsKey("createdby"))
-                e["createdby"] = CallerId;
-
-            if (!e.Attributes.ContainsKey("modifiedby"))
-                e["modifiedby"] = CallerId;
-
-            if (!e.Attributes.ContainsKey("statecode"))
-                e["statecode"] = new OptionSetValue(0); //Active by default
+            EntityInitializerService.Initialize(e, CallerId.Id);
         }
 
         protected void ValidateEntity(Entity e)
@@ -277,20 +264,16 @@ namespace FakeXrmEasy
             if (e.Id == Guid.Empty)
             {
                 e.Id = Guid.NewGuid(); //Add default guid if none present
-
-                ValidateEntity(e);
-
-                //Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
-                if (!e.GetType().IsSubclassOf(typeof(Entity)))
-                {
-                    var primaryKeyAttribute = string.Format("{0}id", e.LogicalName);
-                    e[primaryKeyAttribute] = e.Id;
-                }
             }
-            else
+
+            //Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
+            var primaryKeyAttribute = string.Format("{0}id", e.LogicalName);
+            if (!e.Attributes.ContainsKey(primaryKeyAttribute))
             {
-                ValidateEntity(e);
+                e[primaryKeyAttribute] = e.Id;
             }
+
+            ValidateEntity(e);
 
             //Create specific validations
             if (e.Id != Guid.Empty && Data.ContainsKey(e.LogicalName) &&
@@ -330,8 +313,9 @@ namespace FakeXrmEasy
 
         protected internal void AddEntityWithDefaults(Entity e)
         {
-            AddEntityDefaultAttributes(e);
-            AddEntity(e);
+            var clone = e.Clone(e.GetType());
+            AddEntityDefaultAttributes(clone);
+            AddEntity(clone);
         }
 
         protected internal void AddEntity(Entity e)

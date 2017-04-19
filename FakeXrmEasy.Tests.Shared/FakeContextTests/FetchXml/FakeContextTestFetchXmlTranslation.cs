@@ -630,6 +630,70 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void When_filtering_by_a_boolean_attribute_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var account1 = new Entity("account");
+            account1.Id = Guid.NewGuid();
+            account1["name"] = "Test 1";
+            account1["donotemail"] = false;
+
+            var account2 = new Entity("account");
+            account2.Id = Guid.NewGuid();
+            account2["name"] = "Test 2";
+            account2["donotemail"] = true;
+
+            context.Initialize(new List<Entity> { account1, account2 });
+
+            var fetchXml =
+                 "<fetch>" +
+                 "  <entity name='account'>" +
+                 "     <attribute name='name'/>" +
+                 "     <filter type='and'>" +
+                 "         <condition attribute='donotemail' operator='eq' value='0' />" +
+                 "     </filter>" +
+                 "  </entity>" +
+                 "</fetch>";
+            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            Assert.Equal(rows.Entities.Count, 1);
+            Assert.Equal(rows.Entities[0]["name"], account1["name"]);
+        }
+
+        [Fact]
+        public void When_filtering_by_a_boolean_attribute_and_using_proxy_types_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var account1 = new Account();
+            account1.Id = Guid.NewGuid();
+            account1.Name = "Test 1";
+            account1.DoNotEMail = false;
+
+            var account2 = new Account();
+            account2.Id = Guid.NewGuid();
+            account2.Name = "Test 2";
+            account2.DoNotEMail = true;
+
+            context.Initialize(new List<Entity> { account1, account2 });
+
+            var fetchXml =
+                 "<fetch>" +
+                 "  <entity name='account'>" +
+                 "     <attribute name='name'/>" +
+                 "     <filter type='and'>" +
+                 "         <condition attribute='donotemail' operator='eq' value='0' />" +
+                 "     </filter>" +
+                 "  </entity>" +
+                 "</fetch>";
+            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            Assert.Equal(rows.Entities.Count, 1);
+            Assert.Equal(rows.Entities[0].ToEntity<Account>().Name, account1.Name);
+        }
+
+        [Fact]
         public void When_filtering_by_an_enum_attribute_and_using_proxy_types_right_result_is_returned()
         {
             var fakedContext = new XrmFakedContext { };

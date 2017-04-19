@@ -585,6 +585,25 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     throw new Exception("DateTime value expected");
                 }
             }
+            //fix Issue #141
+            else if (t == typeof(bool)
+                || t == typeof(bool?))
+            {
+                bool boolValue = false;
+                if (bool.TryParse(value, out boolValue))
+                {
+                    return boolValue;
+                }
+                else
+                {
+                    switch (value) {
+                        case "0": return false;
+                        case "1": return true;
+                        default:
+                            throw new Exception("Boolean value expected");
+                    }
+                }
+            }
 
             //Otherwise, return the string
             return value;

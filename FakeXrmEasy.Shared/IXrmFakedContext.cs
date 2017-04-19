@@ -83,6 +83,7 @@ namespace FakeXrmEasy
         /// <returns></returns>
         IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx) where T : IPlugin, new();
 
+        IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx, T instance) where T : IPlugin, new();
 
         /// <summary>
         /// Executes a plugin with a custom context and custom configurations (configurations aren't inherent properties of the context so they need to be passed separately)
@@ -97,6 +98,10 @@ namespace FakeXrmEasy
                                      string secureConfiguration) where T : class, IPlugin;
 
 
+        IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, 
+                                     T instance,
+                                     string unsecureConfiguration,
+                                     string secureConfiguration) where T : class, IPlugin;
         /// <summary>
         /// Executes a code activity against this context
         /// An optional instance can be passed. 

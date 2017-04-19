@@ -45,7 +45,9 @@ namespace FakeXrmEasy
             A.CallTo(() => context.PreEntityImages).ReturnsLazily(() => ctx.PreEntityImages);
             A.CallTo(() => context.PostEntityImages).ReturnsLazily(() => ctx.PostEntityImages);
             A.CallTo(() => context.MessageName).ReturnsLazily(() => ctx.MessageName);
+            A.CallTo(() => context.Mode).ReturnsLazily(() => ctx.Mode);
             A.CallTo(() => context.OrganizationName).ReturnsLazily(() => ctx.OrganizationName);
+            A.CallTo(() => context.OrganizationId).ReturnsLazily(() => ctx.OrganizationId);
             A.CallTo(() => context.InitiatingUserId).ReturnsLazily(() => ctx.InitiatingUserId == Guid.Empty ? newUserId : ctx.InitiatingUserId);
             A.CallTo(() => context.UserId).ReturnsLazily(() => ctx.UserId == Guid.Empty ? newUserId : ctx.UserId);
             A.CallTo(() => context.ParentContext).ReturnsLazily(() => ctx.ParentContext);
@@ -68,7 +70,7 @@ namespace FakeXrmEasy
             return context;
         }
 
-        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx) where T : IPlugin, new()
+        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx, T instance) where T : IPlugin, new()
         {
             var fakedServiceProvider = GetFakedServiceProvider(ctx);
 
@@ -76,13 +78,18 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedPlugin.Execute(A<IServiceProvider>._))
                 .Invokes((IServiceProvider provider) =>
                 {
-                    var plugin = new T();
+                    var plugin = instance;
                     plugin.Execute(fakedServiceProvider);
                 });
 
             fakedPlugin.Execute(fakedServiceProvider); //Execute the plugin
             return fakedPlugin;
         }
+        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx) where T : IPlugin, new()
+        {
+            return this.ExecutePluginWith<T>(ctx, new T());
+        }
+
         public IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
                                      ParameterCollection outputParameters,
                                      EntityImageCollection preEntityImages,
@@ -112,6 +119,26 @@ namespace FakeXrmEasy
                                      string unsecureConfiguration,
                                      string secureConfiguration) where T : class, IPlugin 
         {
+            var pluginType = typeof(T);
+            var constructors = pluginType.GetConstructors().ToList();
+
+            if (!constructors.Any(
+                            constructor => constructor.GetParameters().ToList().Count == 2
+                                && constructor.GetParameters().All(param => param.ParameterType == typeof(string))))
+            {
+                throw new ArgumentException("The plugin you are trying to execute does not specify a constructor for passing in two configuration strings.");
+            }
+
+            var pluginInstance = (T)Activator.CreateInstance(typeof(T), unsecureConfiguration, secureConfiguration);
+            return this.ExecutePluginWithConfigurations<T>(plugCtx, pluginInstance, unsecureConfiguration, secureConfiguration);
+          
+        }
+
+        public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, 
+                                     T instance,
+                                     string unsecureConfiguration,
+                                     string secureConfiguration) where T : class, IPlugin
+        {
             var fakedServiceProvider = GetFakedServiceProvider(plugCtx);
 
             var fakedPlugin = A.Fake<IPlugin>();
@@ -129,63 +156,13 @@ namespace FakeXrmEasy
                         throw new ArgumentException("The plugin you are trying to execute does not specify a constructor for passing in two configuration strings.");
                     }
 
-                    var plugin = (T)Activator.CreateInstance(pluginType, unsecureConfiguration, secureConfiguration);
+                    var plugin = instance;
                     plugin.Execute(fakedServiceProvider);
                 });
 
             fakedPlugin.Execute(fakedServiceProvider); //Execute the plugin
             return fakedPlugin;
         }
-
-
-        /// <summary>
-        /// Deprecated, please use ExecutePluginWithConfigurations
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="inputParameters"></param>
-        /// <param name="outputParameters"></param>
-        /// <param name="preEntityImages"></param>
-        /// <param name="postEntityImages"></param>
-        /// <param name="unsecureConfiguration"></param>
-        /// <param name="secureConfiguration"></param>
-        /// <returns></returns>
-        //public IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
-        //                             ParameterCollection outputParameters,
-        //                             EntityImageCollection preEntityImages,
-        //                             EntityImageCollection postEntityImages,
-        //                             string unsecureConfiguration,
-        //                             string secureConfiguration) where T : IPlugin, new()
-        //{
-        //    var ctx = new XrmFakedPluginExecutionContext();
-        //    ctx.InputParameters = inputParameters;
-        //    ctx.PreEntityImages = preEntityImages;
-        //    ctx.OutputParameters = outputParameters;
-        //    ctx.PostEntityImages = postEntityImages;
-
-        //    var fakedServiceProvider = GetFakedServiceProvider(ctx);
-
-        //    var fakedPlugin = A.Fake<IPlugin>();
-
-        //    A.CallTo(() => fakedPlugin.Execute(A<IServiceProvider>._))
-        //        .Invokes((IServiceProvider provider) =>
-        //        {
-        //            var pluginType = typeof (T);
-        //            var constructors = pluginType.GetConstructors().ToList();
-
-        //            if (!constructors.Any(
-        //                    constructor => constructor.GetParameters().ToList().Count == 2
-        //                        && constructor.GetParameters().All(param => param.ParameterType == typeof(string))))
-        //            {
-        //                throw new ArgumentException("The plugin you are trying to execute does not specify a constructor for passing in two configuration strings.");
-        //            }
-                    
-        //            var plugin = (T)Activator.CreateInstance(pluginType, unsecureConfiguration, secureConfiguration);
-        //            plugin.Execute(fakedServiceProvider);
-        //        });
-
-        //    fakedPlugin.Execute(fakedServiceProvider); //Execute the plugin
-        //    return fakedPlugin;
-        //}
 
         /// <summary>
         /// Executes the plugin of type T against the faked context for an entity target
@@ -219,36 +196,6 @@ namespace FakeXrmEasy
             return this.ExecutePluginWith<T>(ctx);
         }
 
-        //protected IPluginExecutionContext GetFakedPluginContext(ParameterCollection inputParameters,
-        //                                                    ParameterCollection outputParameters,
-        //                                                    EntityImageCollection preEntityImages,
-        //                                                    EntityImageCollection postEntityImages)
-        //{
-        //    var context = A.Fake<IPluginExecutionContext>();
-
-        //    A.CallTo(() => context.Depth).ReturnsLazily(() => 1);
-        //    A.CallTo(() => context.IsExecutingOffline).ReturnsLazily(() => false);
-        //    A.CallTo(() => context.InputParameters).ReturnsLazily(() => inputParameters != null ? inputParameters : new ParameterCollection());
-        //    A.CallTo(() => context.OutputParameters).ReturnsLazily(() => outputParameters != null ? outputParameters : new ParameterCollection());
-        //    A.CallTo(() => context.PreEntityImages).ReturnsLazily(() => preEntityImages);
-        //    A.CallTo(() => context.PostEntityImages).ReturnsLazily(() => postEntityImages);
-        //    A.CallTo(() => context.MessageName).ReturnsLazily(() => MessageName);
-        //    A.CallTo(() => context.InitiatingUserId).ReturnsLazily(() => InitiatingUserId);
-        //    A.CallTo(() => context.UserId).ReturnsLazily(() => UserId);
-
-        //    //Create message will pass an Entity as the target but this is not always true
-        //    //For instance, a Delete request will receive an EntityReference
-        //    if (inputParameters != null &&
-        //        inputParameters.ContainsKey("Target") &&
-        //        inputParameters["Target"] is Entity)
-        //    {
-        //        var target = inputParameters["Target"] as Entity;
-        //        A.CallTo(() => context.PrimaryEntityId).ReturnsLazily(() => target.Id);
-        //        A.CallTo(() => context.PrimaryEntityName).ReturnsLazily(() => target.LogicalName);
-        //    }
-
-        //    return context;
-        //}
         protected IServiceProvider GetFakedServiceProvider(XrmFakedPluginExecutionContext plugCtx)
         {
             var fakedServiceProvider = A.Fake<IServiceProvider>();
@@ -263,7 +210,8 @@ namespace FakeXrmEasy
                    }
                    else if (t.Equals(typeof(ITracingService)))
                    {
-                       return new XrmFakedTracingService();
+                       _tracingService = new XrmFakedTracingService();
+                       return _tracingService;
                    }
                    else if (t.Equals(typeof(IPluginExecutionContext)))
                    {
@@ -289,43 +237,11 @@ namespace FakeXrmEasy
 
             return fakedServiceProvider;
         }
-        //protected IServiceProvider GetFakedServiceProvider(ParameterCollection inputParameters, 
-        //                                                    ParameterCollection outputParameters,
-        //                                                    EntityImageCollection preEntityImages,
-        //                                                    EntityImageCollection postEntityImages)
-        //{
 
-        //    var fakedServiceProvider = A.Fake<IServiceProvider>();
+        public XrmFakedTracingService GetFakeTracingService()
+        {
+            return _tracingService;
+        }
 
-        //    A.CallTo(() => fakedServiceProvider.GetService(A<Type>._))
-        //       .ReturnsLazily((Type t) =>
-        //       {
-        //           if (t.Equals(typeof(IOrganizationService))) {
-        //               //Return faked organization service
-        //               return GetFakedOrganizationService();
-        //           } 
-        //           else if (t.Equals(typeof(ITracingService)))
-        //           {
-        //               return new XrmFakedTracingService();
-        //           }
-        //           else if (t.Equals(typeof(IPluginExecutionContext)))
-        //           {
-        //               return GetFakedPluginContext(inputParameters, outputParameters, preEntityImages, postEntityImages);   
-        //           }
-        //           else if (t.Equals(typeof(IOrganizationServiceFactory)))
-        //           {
-        //               var fakedServiceFactory = A.Fake<IOrganizationServiceFactory>();
-        //               A.CallTo(() => fakedServiceFactory.CreateOrganizationService(A<Guid?>._))
-        //                    .ReturnsLazily((Guid? g) =>
-        //                    {
-        //                        return GetFakedOrganizationService();
-        //                    });
-        //               return fakedServiceFactory;
-        //           }
-        //           throw new PullRequestException("The specified service type is not supported");
-        //       });
-
-        //    return fakedServiceProvider;
-        //}
     }
 }

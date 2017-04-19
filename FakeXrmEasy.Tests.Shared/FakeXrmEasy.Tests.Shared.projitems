@@ -14,6 +14,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\AddActivityWithConstant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeActivitiesForTesting\CreateTaskActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CrmModelClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityExtensionsTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AddListMembersListRequestTests\Tests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AddMemberListRequestTests\Tests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssignRequestTests\AssignRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssociateRequestTests\AssociateRequestTests.cs" />
@@ -53,6 +55,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveEntityRequestTests\RetrieveEntityRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveOptionSetRequestTests\RetrieveOptionSetRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveRequestTests\RetrieveRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ReviseQuoteRequestTests\ReviseQuoteRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs" />
@@ -64,8 +68,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WhoAmIRequest\WhoAmITests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\XrmFakedRelationshipTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GeneratedCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Issue116.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue125.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue156.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Issues\ProxyEntities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Issues\TestCRMHandlingOfNullsAndMissingFields.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\AccountSetTerritories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\BasePlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\ExceptionLoverPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\PreAccountCreate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\AccountNumberPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\ConfigurationPlugin.cs" />
@@ -74,8 +84,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\InheritedPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\RetrieveServicesPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestContextOrgNamePlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestPropertiesPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestSharedVariablesPropertyPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestContextPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tracing\XrmFakeTracingExample.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmRealContextTests\XrmRealContextTests.cs" />
   </ItemGroup>
 </Project>

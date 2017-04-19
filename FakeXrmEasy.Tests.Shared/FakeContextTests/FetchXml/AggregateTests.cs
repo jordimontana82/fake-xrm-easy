@@ -14,8 +14,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         [Fact]
         public void FetchXml_Aggregate_Group_Count()
         {
-
-
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' aggregate='true'>
                               <entity name='contact'>
                                     <attribute name='contactid' alias='count.contacts' aggregate='count' />
@@ -103,7 +101,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             Assert.Equal(3, ent.GetAttributeValue<AliasedValue>("sum")?.Value);
         }
-
 
         [Fact]
         public void FetchXml_Aggregate_Sum_Money()
@@ -324,7 +321,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
             
             Assert.Equal(1, collection.Entities.Count);
-            Assert.Equal(0, collection.Entities.First().Attributes.Count);
+            Assert.Equal(1, collection.Entities.First().Attributes.Count);
+            Assert.True(collection.Entities.First().Contains("sum"));
         }
 
         [Fact]
@@ -343,7 +341,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
 
             Assert.Equal(1, collection.Entities.Count);
-            Assert.Equal(0, collection.Entities.First().Attributes.Count);
+            Assert.Equal(1, collection.Entities.First().Attributes.Count);
+            Assert.True(collection.Entities.First().Contains("avg"));
         }
 
         [Fact]

@@ -155,6 +155,48 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_A_Plugin_Is_Executed_With_And_Instance_That_one_is_executed()
+        {
+            var fakedContext = new XrmFakedContext();
+
+            var guid1 = Guid.NewGuid();
+            var target = new Entity("contact") { Id = guid1 };
+
+            TestPropertiesPlugin plugin = 
+                new TestPropertiesPlugin()
+                { Property = "Some test" };
+            
+            var inputParams = new ParameterCollection { new KeyValuePair<string, object>("Target", target) };
+
+            //Execute our plugin against the selected target
+            var plugCtx = fakedContext.GetDefaultPluginContext();
+            plugCtx.InputParameters = inputParams;
+
+            fakedContext.ExecutePluginWith<TestPropertiesPlugin>(plugCtx, plugin);
+            Assert.Equal("Property Updated", plugin.Property);
+        }
+
+        [Fact]
+        public void When_A_Plugin_Is_Executed_With_Configurations_And_Instance_That_one_is_executed()
+        {
+            var fakedContext = new XrmFakedContext();
+
+            var guid1 = Guid.NewGuid();
+            var target = new Entity("contact") { Id = guid1 };
+
+            var inputParams = new ParameterCollection { new KeyValuePair<string, object>("Target", target) };
+
+            var unsecureConfiguration = "Unsecure Configuration";
+            var secureConfiguration = "Secure Configuration";
+
+            //Execute our plugin against the selected target
+            var plugCtx = fakedContext.GetDefaultPluginContext();
+            plugCtx.InputParameters = inputParams;
+
+            Assert.Throws<ArgumentException>(() => fakedContext.ExecutePluginWithConfigurations<FollowupPlugin>(plugCtx, unsecureConfiguration, secureConfiguration));
+        }
+
+        [Fact]
         public void When_initializing_the_context_with_Properties_Plugins_Can_Access_It()
         {
             var context = new XrmFakedContext();

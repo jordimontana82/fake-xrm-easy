@@ -107,11 +107,9 @@ namespace FakeXrmEasy.Extensions
                         OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
                     }
 
-                    if (e.Attributes.ContainsKey(attKey))
-                        projected[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
-                    else
+                    if (e.Attributes.ContainsKey(attKey) && e.Attributes[attKey] != null)
                     {
-                        projected[attKey] = null;
+                            projected[attKey] = CloneAttribute(e[attKey]);
                     }
                 }
 
@@ -393,6 +391,14 @@ namespace FakeXrmEasy.Extensions
             e.GetType().GetProperty(property).SetValue(e, value, null);
         }
 
+        public static void SetValueIfEmpty(this Entity e, string property, object value)
+        {
+            var containsKey = e.Attributes.ContainsKey(property);
+            if (!containsKey || containsKey && e[property] == null)
+            {
+                e[property] = value;
+            }
+        }
         
          
     }

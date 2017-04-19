@@ -49,6 +49,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
     TODO:
 
+      DATEs:
       <xs:enumeration value="last-seven-days" />
       <xs:enumeration value="next-seven-days" />
       <xs:enumeration value="last-week" />
@@ -57,7 +58,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="last-month" />
       <xs:enumeration value="this-month" />
       <xs:enumeration value="next-month" />
-
       <xs:enumeration value="last-year" />
       <xs:enumeration value="this-year" />
       <xs:enumeration value="next-year" />
@@ -77,6 +77,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="olderthan-x-minutes" />
       <xs:enumeration value="last-x-years" />
       <xs:enumeration value="next-x-years" />
+
+
       <xs:enumeration value="eq-userteams" />
       <xs:enumeration value="eq-useroruserteams" />
       <xs:enumeration value="eq-useroruserhierarchy" />
@@ -84,6 +86,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="eq-businessid" />
       <xs:enumeration value="ne-businessid" />
       <xs:enumeration value="eq-userlanguage" />
+
+      
       <xs:enumeration value="this-fiscal-year" />
       <xs:enumeration value="this-fiscal-period" />
       <xs:enumeration value="next-fiscal-year" />
@@ -100,7 +104,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="in-or-before-fiscal-period-and-year" />
       <xs:enumeration value="in-or-after-fiscal-period-and-year" />
 
-
+    
+      HIERACHY OPERATORS:
       <xs:enumeration value="under"/>
       <xs:enumeration value="eq-or-under" />
       <xs:enumeration value="not-under"/>

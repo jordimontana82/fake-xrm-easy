@@ -32,7 +32,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "Can not assign without assignee");
             }
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var assignment = new Entity
             {

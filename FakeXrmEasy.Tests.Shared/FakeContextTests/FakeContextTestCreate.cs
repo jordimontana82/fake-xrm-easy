@@ -181,6 +181,26 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_creating_a_record_using_early_bound_entities_and_proxytypes_primary_key_should_be_populated()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+            var c = new Contact();
+            c.Id = Guid.NewGuid();
+
+            IOrganizationService service = context.GetFakedOrganizationService();
+
+            context.Initialize(new List<Entity>() { c });
+
+            //Retrieve the record created
+            var contact = (from con in context.CreateQuery<Contact>()
+                           select con).FirstOrDefault();
+
+            Assert.True(contact.Attributes.ContainsKey("contactid"));
+            Assert.Equal(c.Id, contact["contactid"]);
+        }
+
+        [Fact]
         public void When_related_entities_are_used_without_relationship_info_exception_is_raised()
         {
             var ctx = new XrmFakedContext();
@@ -254,6 +274,85 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(createdOrderDetails.Count, 2);
             Assert.Equal(createdOrderDetails[0].SalesOrderId.Id, id);
             Assert.Equal(createdOrderDetails[1].SalesOrderId.Id, id);
+        }
+
+        [Fact]
+        public void Shouldnt_store_references_to_variables_but_actual_clones()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            //create an account and then retrieve it with no changes
+            Entity newAccount = new Entity("account");
+            newAccount["name"] = "New Account";
+
+            newAccount.Id = service.Create(newAccount);
+
+            Entity retrievedAccount = service.Retrieve("account", newAccount.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
+            Assert.True(retrievedAccount.Attributes.Contains("name"));
+
+            //do the same as above, but this time clear the attributes - see that when retrieved, the retrieved entity does not contain the name attribute
+            Entity newAccount1 = new Entity("account");
+            newAccount1["name"] = "New Account1";
+
+            newAccount1.Id = service.Create(newAccount1);
+            newAccount1.Attributes.Clear();
+
+            Entity retrievedAccount1 = service.Retrieve("account", newAccount1.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
+            Assert.True(retrievedAccount1.Attributes.Contains("name"));
+
+            //third time around, change the name to something new, the retrieved entity should not reflect this change
+            Entity newAccount2 = new Entity("account");
+            newAccount2["name"] = "New Account2";
+
+            newAccount2.Id = service.Create(newAccount2);
+            newAccount2["name"] = "Changed name";
+
+            Entity retrievedAccount2 = service.Retrieve("account", newAccount2.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
+            Assert.True(retrievedAccount2["name"].ToString() == "New Account2", $"'{retrievedAccount2["name"]}' was not the expected result");
+        }
+
+        [Fact]
+        public void When_Creating_Without_Default_Attributes_They_Should_Be_Set_By_Default()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            var account = new Account
+            {
+                Name = "test"
+            };
+
+            service.Create(account);
+            var createdAccount = context.CreateQuery<Account>().FirstOrDefault();
+
+            Assert.True(createdAccount.Attributes.ContainsKey("createdon"));
+            Assert.True(createdAccount.Attributes.ContainsKey("createdby"));
+            Assert.True(createdAccount.Attributes.ContainsKey("modifiedon"));
+            Assert.True(createdAccount.Attributes.ContainsKey("modifiedby"));
+            Assert.True(createdAccount.Attributes.ContainsKey("statecode"));
+        }
+
+        [Fact]
+        public void When_Creating_Without_Default_Attributes_They_Should_Be_Set_By_Default_With_Early_Bound()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var account = new Account
+            {
+                Name = "test"
+            };
+
+            service.Create(account);
+            var createdAccount = context.CreateQuery<Account>().FirstOrDefault();
+
+            Assert.True(createdAccount.Attributes.ContainsKey("createdon"));
+            Assert.True(createdAccount.Attributes.ContainsKey("createdby"));
+            Assert.True(createdAccount.Attributes.ContainsKey("modifiedon"));
+            Assert.True(createdAccount.Attributes.ContainsKey("modifiedby"));
+            Assert.True(createdAccount.Attributes.ContainsKey("statecode"));
         }
     }
 }
