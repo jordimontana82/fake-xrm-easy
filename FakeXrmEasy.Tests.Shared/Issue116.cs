@@ -41,7 +41,7 @@ namespace FakeXrmEasy
 
             query.PageInfo = new PagingInfo();
             query.PageInfo.Count = 100;
-            query.PageInfo.PageNumber = 100;
+            query.PageInfo.PageNumber = 1;
             query.PageInfo.PagingCookie = null;
 
             // Setup the query for the contact entity
@@ -87,7 +87,7 @@ namespace FakeXrmEasy
 
             query.PageInfo = new PagingInfo();
             query.PageInfo.Count = 100;
-            query.PageInfo.PageNumber = 100;
+            query.PageInfo.PageNumber = 1;
             query.PageInfo.PagingCookie = null;
 
             // Setup the query for the contact entity

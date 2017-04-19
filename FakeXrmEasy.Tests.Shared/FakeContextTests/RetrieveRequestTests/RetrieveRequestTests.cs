@@ -857,6 +857,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         {
             //related entities should all be returned
             //even when PageInfo is set
+            //AM: There is no reason for the result to retun all related records regardless of the PageSize - at least that is not the CRM behavior
+            //The result set shoudl not exceed the number specifit in he Page info
 
             var account1 = new Account
             {
@@ -925,7 +927,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             //check relationship
             Assert.NotNull(resultAccount.accountleads_association);
-            Assert.Equal(50, resultAccount.accountleads_association.Count());
+            //The 
+            Assert.Equal(20, resultAccount.accountleads_association.Count());
         }
 
         [Fact]
