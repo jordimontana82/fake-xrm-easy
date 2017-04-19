@@ -62,7 +62,22 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             return request is RetrieveEntityRequest;
         }
+        public static Type GetEntityProxyType(string entityName, XrmFakedContext ctx)
+        {
+            //Find the reflected type in the proxy types assembly
+            var assembly = ctx.ProxyTypesAssembly;
+            var subClassType = assembly.GetTypes()
+                    .Where(t => typeof(Entity).IsAssignableFrom(t))
+                    .Where(t => t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
+                    .Where(t => ((EntityLogicalNameAttribute)t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0]).LogicalName.Equals(entityName.ToLower()))
+                    .FirstOrDefault();
 
+            if (subClassType == null)
+            {
+                throw new Exception(string.Format("Entity {0} was not found in the proxy types", entityName));
+            }
+            return subClassType;
+        }
         public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
         {
             var req = request as RetrieveEntityRequest;
@@ -86,17 +101,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 }
 
                 //Find the reflected type in the proxy types assembly
-                var assembly = ctx.ProxyTypesAssembly;
-                var subClassType = assembly.GetTypes()
-                        .Where(t => typeof(Entity).IsAssignableFrom(t))
-                        .Where(t => t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
-                        .Where(t => ((EntityLogicalNameAttribute)t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0]).LogicalName.Equals(req.LogicalName.ToLower()))
-                        .FirstOrDefault();
-
-                if (subClassType == null)
-                {
-                    throw new Exception(string.Format("Entity {0} was not found in the proxy types", req.LogicalName));
-                }
+                var subClassType = GetEntityProxyType(req.LogicalName, ctx);
 
 
                 //Get that type properties
