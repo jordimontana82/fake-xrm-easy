@@ -10,6 +10,7 @@ using FakeXrmEasy.FakeMessageExecutors;
 using Microsoft.Xrm.Sdk.Metadata;
 
 using FakeXrmEasy.Services;
+using FakeXrmEasy.Permissions;
 
 namespace FakeXrmEasy
 {
@@ -54,6 +55,7 @@ namespace FakeXrmEasy
         protected internal XrmFakedTracingService _tracingService { get; set; }
 
         public IEntityInitializerService EntityInitializerService { get; set; }
+        public IAccessRightsRepository AccessRightsRepository { get; set; }
 
         public XrmFakedContext()
         {
@@ -73,6 +75,8 @@ namespace FakeXrmEasy
             Relationships = new Dictionary<string, XrmFakedRelationship>();
 
             EntityInitializerService = new DefaultEntityInitializerService();
+
+            AccessRightsRepository = new AccessRightsRepository();
         }
 
         /// <summary>
