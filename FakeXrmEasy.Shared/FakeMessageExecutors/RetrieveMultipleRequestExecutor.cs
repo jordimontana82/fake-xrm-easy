@@ -20,20 +20,28 @@ namespace FakeXrmEasy.FakeMessageExecutors
         public OrganizationResponse Execute(OrganizationRequest req, XrmFakedContext ctx)
         {
             var request = req as RetrieveMultipleRequest;
+            List<Entity> list = null;
+            PagingInfo pageInfo = null;
+            int? topCount = null;
+
             if (request.Query is QueryExpression)
             {
-                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, request.Query as QueryExpression);
-                var list = linqQuery.ToList();
-                list.ForEach(e => PopulateFormattedValues(e));
+                var qe = request.Query as QueryExpression;
 
-                var response = new RetrieveMultipleResponse
-                {
-                    Results = new ParameterCollection
-                                 {
-                                    { "EntityCollection", new EntityCollection(list) }
-                                 }
-                };
-                return response;
+                pageInfo = qe.PageInfo;
+                topCount = qe.TopCount;
+
+                //need to request 1 extra to get a fill if there are more records
+                if (topCount != null)
+                    qe.TopCount = topCount + 1;
+
+
+                if (qe.PageInfo.Count > 0)
+                    qe.TopCount = qe.PageInfo.Count + 1;
+
+                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, request.Query as QueryExpression);
+                list = linqQuery.ToList();
+
             }
             else if (request.Query is FetchExpression)
             {
@@ -41,23 +49,26 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 var xmlDoc = XrmFakedContext.ParseFetchXml(fetchXml);
                 var queryExpression = XrmFakedContext.TranslateFetchXmlDocumentToQueryExpression(ctx, xmlDoc);
 
-                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, queryExpression);
-                var list = linqQuery.ToList();
+                pageInfo = queryExpression.PageInfo;
+                topCount = queryExpression.TopCount;
 
-                if(xmlDoc.IsAggregateFetchXml())
+                //need to request 1 extra to get a fill if there are more records
+                if (topCount != null)
+                    queryExpression.TopCount = topCount + 1;
+                if (queryExpression.PageInfo.Count > 0)
+                {
+                    queryExpression.TopCount = queryExpression.PageInfo.Count + 1;
+                }
+
+                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, queryExpression);
+                list = linqQuery.ToList();
+
+                if (xmlDoc.IsAggregateFetchXml())
                 {
                     list = XrmFakedContext.ProcessAggregateFetchXml(ctx, xmlDoc, list);
                 }
-                list.ForEach(e => PopulateFormattedValues(e));
 
-                var response = new RetrieveMultipleResponse
-                {
-                    Results = new ParameterCollection
-                                 {
-                                    { "EntityCollection", new EntityCollection(list) }
-                                 }
-                };
-                return response;
+                
             }
             else if (request.Query is QueryByAttribute)
             {
@@ -72,23 +83,59 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     qe.Criteria.AddCondition(new ConditionExpression(query.Attributes[i], ConditionOperator.Equal, query.Values[i]));
                 }
 
+                pageInfo = qe.PageInfo;
+                topCount = qe.TopCount;
+
+                //need to request 1 extra to be able check if there are more records
+                if (topCount != null)
+                    qe.TopCount = topCount + 1;
+                if (qe.PageInfo.Count > 0)
+                {
+                    qe.TopCount = qe.PageInfo.Count + 1;
+                }
+
+
                 //QueryExpression now done... execute it!
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe as QueryExpression);
-                var list = linqQuery.ToList();
-                list.ForEach(e => PopulateFormattedValues(e));
+                list = linqQuery.ToList();
 
-                var response = new RetrieveMultipleResponse
-                {
-                    Results = new ParameterCollection
-                                 {
-                                    { "EntityCollection", new EntityCollection(list) }
-                                 }
-                };
-                return response;
             }
             else
                 throw PullRequestException.NotImplementedOrganizationRequest(request.Query.GetType());
+
+            list.ForEach(e => PopulateFormattedValues(e));
+            var recordCount = list.Count();
+            var pageSize = recordCount ;
+            int pageNumber = 1;
+            if (pageInfo != null && pageInfo.PageNumber > 0 && pageInfo.Count>0) {
+                pageSize = pageInfo.Count;
+                pageNumber = pageInfo.PageNumber;
+            }
+            else if (topCount != null)
+                pageSize = topCount.Value;
+
+            var response = new RetrieveMultipleResponse
+            {
+                
+                Results = new ParameterCollection
+                                 {
+                                    { "EntityCollection", new EntityCollection(list.Take(pageSize).ToList()) }
+                                 }
+            };
+            response.EntityCollection.MoreRecords = recordCount > pageSize;
+            if (response.EntityCollection.MoreRecords)
+            {
+                var first = response.EntityCollection.Entities.First();
+                var last = response.EntityCollection.Entities.Last();
+                response.EntityCollection.PagingCookie= String.Format(
+                    "<cookie page=\"{0}\"><{1}id last=\"{2}\" first=\"{3}\" /></cookie>",
+                    pageNumber, first.LogicalName , last.Id.ToString("B").ToUpper(), first.Id.ToString("B").ToUpper());
+            }
+
+            return response;
         }
+
+        
 
         /// <summary>
         /// Populates the formmated values property of this entity record based on the proxy types

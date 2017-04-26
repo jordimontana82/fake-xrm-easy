@@ -107,6 +107,18 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return iCount;
         }
 
+        public static int? ToPageNumber(this XElement el)
+        {
+            var pageAttr = el.GetAttribute("page");
+            if (pageAttr == null) return null;
+
+            int iPage;
+            if (!int.TryParse(pageAttr.Value, out iPage))
+                throw new Exception("Count attribute in fetch node must be an integer");
+
+            return iPage;
+        }
+
         public static ColumnSet ToColumnSet(this XDocument xlDoc)
         {
             //Check if all-attributes exist
@@ -123,6 +135,14 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return xlDoc.Elements()   //fetch
                     .FirstOrDefault()
                     .ToTopCount();
+        }
+
+        public static int? ToPageNumber(this XDocument xlDoc)
+        {
+            //Check if all-attributes exist
+            return xlDoc.Elements()   //fetch
+                    .FirstOrDefault()
+                    .ToPageNumber();
         }
 
         public static FilterExpression ToCriteria(this XDocument xlDoc, XrmFakedContext ctx)

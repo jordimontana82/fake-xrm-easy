@@ -275,6 +275,12 @@ namespace FakeXrmEasy
 
             query.TopCount = xlDoc.ToTopCount();
 
+            if (query.TopCount != null)
+            {
+                query.PageInfo.Count = query.TopCount.Value;
+                query.PageInfo.PageNumber = xlDoc.ToPageNumber() ?? 1;
+            }
+
             var linkedEntities = xlDoc.ToLinkEntities(context);
             foreach(var le in linkedEntities)
             {
@@ -336,11 +342,19 @@ namespace FakeXrmEasy
                     query = orderedQuery;
                 }
             }
-
+            
             //Apply TopCount
+            
+            if (qe.PageInfo!=null && qe.PageInfo.Count >0 && qe.PageInfo.PageNumber>0)
+            {
+                //selecting 1 extra to get calculate if there are more records to fetch
+                query = query.Skip(qe.PageInfo.Count * (qe.PageInfo.PageNumber - 1));
+            }
+
             if (qe.TopCount != null)
             {
-                query = query.Take(qe.TopCount.Value);
+                //selecting 1 extra to get calculate if there are more records to fetch
+                query = query.Take(qe.TopCount.Value );
             }
             return query;
         }

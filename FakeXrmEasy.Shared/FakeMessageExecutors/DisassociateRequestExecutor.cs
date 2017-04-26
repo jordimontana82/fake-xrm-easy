@@ -40,15 +40,21 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             foreach (var relatedEntity in disassociateRequest.RelatedEntities)
             {
+                var isFrom1to2 = disassociateRequest.Target.LogicalName == relationShip.Entity1LogicalName
+                                      || relatedEntity.LogicalName != relationShip.Entity1LogicalName
+                                      || String.IsNullOrWhiteSpace(disassociateRequest.Target.LogicalName);
+                var fromAttribute = isFrom1to2 ? relationShip.Entity1Attribute : relationShip.Entity2Attribute;
+                var toAttribute = isFrom1to2 ? relationShip.Entity2Attribute : relationShip.Entity1Attribute;
+
                 var query = new QueryExpression(relationShip.IntersectEntity)
                 {
                     ColumnSet = new ColumnSet(true),
                     Criteria = new FilterExpression(LogicalOperator.And)
                 };
 
-                query.Criteria.AddCondition(new ConditionExpression(relationShip.Entity1Attribute,
+                query.Criteria.AddCondition(new ConditionExpression(fromAttribute,
                     ConditionOperator.Equal, disassociateRequest.Target.Id));
-                query.Criteria.AddCondition(new ConditionExpression(relationShip.Entity2Attribute,
+                query.Criteria.AddCondition(new ConditionExpression(toAttribute,
                     ConditionOperator.Equal, relatedEntity.Id));
 
                 var results = service.RetrieveMultiple(query);
