@@ -21,7 +21,7 @@ namespace FakeXrmEasy.Permissions
         /// </summary>
         /// <param name="er"></param>
         /// <param name="pa"></param>
-        void RevokeAccessTo(EntityReference er, PrincipalAccess pa);
+        void RevokeAccessTo(EntityReference er, EntityReference principal);
 
         /// <summary>
         /// Revokes any access to any record for the specified security principal (kind of 'Clear All')
@@ -37,6 +37,13 @@ namespace FakeXrmEasy.Permissions
         /// <param name="principal"></param>
         /// <returns></returns>
         RetrievePrincipalAccessResponse RetrievePrincipalAccess(EntityReference er, EntityReference principal);
+
+        /// <summary>
+        /// Retrieves the list of permitted security principals (user or team) that have access to the given record
+        /// </summary>
+        /// <param name="er"></param>
+        /// <returns></returns>
+        RetrieveSharedPrincipalsAndAccessResponse RetrieveSharedPrincipalsAndAccess(EntityReference er);
 
         /// <summary>
         /// Retrieves all principals (security principals) who have any access to the specified record

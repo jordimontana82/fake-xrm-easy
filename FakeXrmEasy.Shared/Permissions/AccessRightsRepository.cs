@@ -50,14 +50,28 @@ namespace FakeXrmEasy.Permissions
         }
 
         /// <summary>
+        /// Retrieves the list of permitted security principals (user or team) that have access to the given record
+        /// </summary>
+        /// <param name="er"></param>
+        /// <returns></returns>
+        public RetrieveSharedPrincipalsAndAccessResponse RetrieveSharedPrincipalsAndAccess(EntityReference er)
+        {
+            List<PrincipalAccess> accessList = GetAccessListForRecord(er);
+            RetrieveSharedPrincipalsAndAccessResponse resp = new RetrieveSharedPrincipalsAndAccessResponse();
+            resp.Results["PrincipalAccesses"] = accessList.ToArray();
+            return resp;
+        }
+
+        /// <summary>
         /// Revokes the specified rights to the security principal (user or team) for the specified record
         /// </summary>
         /// <param name="er"></param>
         /// <param name="pa"></param>
-        public void RevokeAccessTo(EntityReference er, PrincipalAccess pa)
+        public void RevokeAccessTo(EntityReference er, EntityReference principal)
         {
             List<PrincipalAccess> accessList = GetAccessListForRecord(er);
-            if (accessList.Contains(pa))
+            List<PrincipalAccess> pas = accessList.Where(a => a.Principal.Id == principal.Id).ToList();
+            foreach (PrincipalAccess pa in pas)
                 accessList.Remove(pa);
         }
 

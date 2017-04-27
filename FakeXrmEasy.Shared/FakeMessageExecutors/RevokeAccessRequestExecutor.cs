@@ -4,23 +4,23 @@ using Microsoft.Xrm.Sdk;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
-    public class GrantAccessRequestExecutor : IFakeMessageExecutor
+    public class RevokeAccessRequestExecutor : IFakeMessageExecutor
     {
         public bool CanExecute(OrganizationRequest request)
         {
-            return request is GrantAccessRequest;
+            return request is RevokeAccessRequest;
         }
 
         public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
         {
-            GrantAccessRequest req = (GrantAccessRequest)request;
-            ctx.AccessRightsRepository.GrantAccessTo(req.Target, req.PrincipalAccess);
-            return new GrantAccessResponse();
+            RevokeAccessRequest req = (RevokeAccessRequest)request;
+            ctx.AccessRightsRepository.RevokeAccessTo(req.Target, req.Revokee);
+            return new RevokeAccessResponse();
         }
 
         public Type GetResponsibleRequestType()
         {
-            return typeof(GrantAccessRequest);
+            return typeof(RevokeAccessRequest);
         }
     }
 }
