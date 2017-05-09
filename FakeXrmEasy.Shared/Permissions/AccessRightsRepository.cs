@@ -26,10 +26,9 @@ namespace FakeXrmEasy.Permissions
         public void GrantAccessTo(EntityReference er, PrincipalAccess pa)
         {
             List<PrincipalAccess> accessList = GetAccessListForRecord(er);
-            if (!accessList.Contains(pa))
+            PrincipalAccess paMatch = accessList.Where(p => p.Principal.Id == pa.Principal.Id).SingleOrDefault();
+            if (paMatch == null)
                 accessList.Add(pa);
-
-
         }
 
         /// <summary>
@@ -70,23 +69,12 @@ namespace FakeXrmEasy.Permissions
         public void RevokeAccessTo(EntityReference er, EntityReference principal)
         {
             List<PrincipalAccess> accessList = GetAccessListForRecord(er);
-            List<PrincipalAccess> pas = accessList.Where(a => a.Principal.Id == principal.Id).ToList();
-            foreach (PrincipalAccess pa in pas)
-                accessList.Remove(pa);
-        }
 
-        /// <summary>
-        /// Revokes any access to any record for the specified security principal (kind of 'Clear All')
-        /// </summary>
-        /// <param name="er"></param>
-        /// <param name="pa"></param>
-        public void RevokeAccessToAllRecordsTo(PrincipalAccess pa)
-        {
-            foreach (EntityReference er in _accessRights.Keys)
+            for (int x = accessList.Count - 1; x >= 0; x--)
             {
-                List<PrincipalAccess> accessList = GetAccessListForRecord(er);
-                if (accessList.Contains(pa))
-                    accessList.Remove(pa);
+                PrincipalAccess pa = accessList[x];
+                if (pa.Principal.Id == principal.Id)
+                    accessList.RemoveAt(x);
             }
         }
 

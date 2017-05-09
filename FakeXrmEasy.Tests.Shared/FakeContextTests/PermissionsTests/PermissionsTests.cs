@@ -626,5 +626,50 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PermissionsTests
                 }
             }
         }
+
+        [Fact]
+        public void Principal_Granted_Access_Multiple_Times_Only_Appears_Once()
+        {
+            var context = new XrmFakedContext();
+            var contact1 = new Contact { Id = Guid.NewGuid() };
+            var user1 = new SystemUser { Id = Guid.NewGuid() };
+
+            context.Initialize(new List<Entity>
+            {
+                contact1, user1
+            });
+
+            var service = context.GetFakedOrganizationService();
+
+            GrantAccessRequest gar1 = new GrantAccessRequest
+            {
+                PrincipalAccess = new PrincipalAccess
+                {
+                    AccessMask = AccessRights.ReadAccess | AccessRights.WriteAccess,
+                    Principal = user1.ToEntityReference()
+                },
+                Target = contact1.ToEntityReference()
+            };
+            service.Execute(gar1);
+
+            GrantAccessRequest gar2 = new GrantAccessRequest
+            {
+                PrincipalAccess = new PrincipalAccess
+                {
+                    AccessMask = AccessRights.ReadAccess | AccessRights.WriteAccess,
+                    Principal = user1.ToEntityReference()
+                },
+                Target = contact1.ToEntityReference()
+            };
+            service.Execute(gar2);
+
+            RetrieveSharedPrincipalsAndAccessRequest req = new RetrieveSharedPrincipalsAndAccessRequest
+            {
+                Target = contact1.ToEntityReference()
+            };
+            RetrieveSharedPrincipalsAndAccessResponse resp = (RetrieveSharedPrincipalsAndAccessResponse)service.Execute(req);
+
+            Assert.Equal(1, resp.PrincipalAccesses.Length);
+        }
     }
 }
