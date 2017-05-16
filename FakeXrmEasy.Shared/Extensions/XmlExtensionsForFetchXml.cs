@@ -355,6 +355,8 @@ namespace FakeXrmEasy.Extensions.FetchXml
                             op = ConditionOperator.EndsWith;
                         else if (!value.StartsWith("%") && value.EndsWith("%"))
                             op = ConditionOperator.BeginsWith;
+                        else if (value.StartsWith("%") && value.EndsWith("%"))
+                            op = ConditionOperator.Contains;
 
                         value = value.Replace("%", "");
                     }
@@ -369,6 +371,8 @@ namespace FakeXrmEasy.Extensions.FetchXml
                             op = ConditionOperator.DoesNotEndWith;
                         else if (!value.StartsWith("%") && value.EndsWith("%"))
                             op = ConditionOperator.DoesNotBeginWith;
+                        else if (value.StartsWith("%") && value.EndsWith("%"))
+                            op = ConditionOperator.DoesNotContain;
 
                         value = value.Replace("%", "");
                     }
