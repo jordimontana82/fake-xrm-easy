@@ -247,7 +247,10 @@ namespace FakeXrmEasy.Extensions
 
             foreach (var attKey in e.Attributes.Keys)
             {
-                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
+                if (e[attKey] != null)
+                {
+                    cloned[attKey] = CloneAttribute(e[attKey]);
+                }
             }
             return cloned;
         }
