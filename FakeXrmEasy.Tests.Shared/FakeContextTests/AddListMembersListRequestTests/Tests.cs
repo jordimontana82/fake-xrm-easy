@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using Xunit;
+
+#if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+using Xunit.Sdk;
+#endif
+
 using System.Linq;
 using Microsoft.Crm.Sdk.Messages;
 using Crm;
@@ -212,7 +217,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddListMembersListRequestTests
                 ListId = list.ToEntityReference().Id
             };
 
-            Assert.DoesNotThrow(() => service.Execute(addListMembersListRequest));
+            service.Execute(addListMembersListRequest);
 
             using (var context = new XrmServiceContext(service))
             {
@@ -260,7 +265,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddListMembersListRequestTests
                 ListId = list.ToEntityReference().Id
             };
 
-            Assert.DoesNotThrow(() => service.Execute(addListMembersListRequest));
+            service.Execute(addListMembersListRequest);
 
             using (var context = new XrmServiceContext(service))
             {
@@ -308,7 +313,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddListMembersListRequestTests
                 ListId = list.ToEntityReference().Id
             };
 
-            Assert.DoesNotThrow(() => service.Execute(addListMembersListRequest));
+            service.Execute(addListMembersListRequest);
 
             using (var context = new XrmServiceContext(service))
             {

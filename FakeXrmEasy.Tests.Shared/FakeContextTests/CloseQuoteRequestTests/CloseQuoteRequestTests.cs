@@ -55,7 +55,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.CloseQuoteRequestTests
                 Status = new OptionSetValue(1)
             };
 
-            Assert.DoesNotThrow(() => executor.Execute(req, context));
+            executor.Execute(req, context);
 
             quote = service.Retrieve("quote", quote.Id, new ColumnSet(true));
 

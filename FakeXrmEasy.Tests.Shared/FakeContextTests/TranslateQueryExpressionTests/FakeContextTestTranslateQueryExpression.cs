@@ -234,7 +234,7 @@ namespace FakeXrmEasy.Tests
             //We only select fullname and parentcustomerid, firstname should not be included
             qe.ColumnSet = new ColumnSet(new string[] { "this attribute doesnt exists!" });
 
-            Assert.DoesNotThrow(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
+            XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
 
             var list = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
 
@@ -629,10 +629,6 @@ namespace FakeXrmEasy.Tests
 
             Entity invoice_entity = new Entity("invoice");
             invoice_entity.Id = Guid.NewGuid();
-
-            //create the onlinePayment structure
-            int opstatus_completed = 108550002;
-            int opstatus_new = 108550000;
 
             Entity op_entity = new Entity("new_onlinepayment");
             op_entity.Id = Guid.NewGuid();

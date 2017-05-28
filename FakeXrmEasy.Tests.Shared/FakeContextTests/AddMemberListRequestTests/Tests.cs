@@ -139,7 +139,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddMemberListRequestTests
             request.EntityId = account.Id;
             request.ListId = list.ToEntityReference().Id;
 
-            Assert.DoesNotThrow(() => service.Execute(request));
+            service.Execute(request);
 
             using (var context = new XrmServiceContext(service))
             {
@@ -181,7 +181,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddMemberListRequestTests
             request.EntityId = contact.Id;
             request.ListId = list.ToEntityReference().Id;
 
-            Assert.DoesNotThrow(() => service.Execute(request));
+            service.Execute(request);
 
             using (var context = new XrmServiceContext(service))
             {
@@ -223,7 +223,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddMemberListRequestTests
             request.EntityId = lead.Id;
             request.ListId = list.ToEntityReference().Id;
 
-            Assert.DoesNotThrow(() => service.Execute(request));
+            service.Execute(request);
 
             using (var context = new XrmServiceContext(service))
             {

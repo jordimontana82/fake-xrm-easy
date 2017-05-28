@@ -64,7 +64,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ReviseQuoteRequestTests
                 QuoteId = quote.Id
             };
 
-            Assert.DoesNotThrow(() => executor.Execute(req, context));
+            executor.Execute(req, context);
 
             quote = service.RetrieveMultiple(new QueryExpression("quote")
             {

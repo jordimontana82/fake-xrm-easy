@@ -74,9 +74,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.OptionSetValuesRequestTests
                 Label = new Label("Yeah! This is a fake label!", 0)
             };
 
-            Assert.DoesNotThrow(() => service.Execute(req));
+            service.Execute(req);
 
-            
             //Check the optionsetmetadata was updated
             Assert.True(ctx.OptionSetValuesMetadata.ContainsKey("GlobalOptionSet"));
 
@@ -99,8 +98,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.OptionSetValuesRequestTests
                 Label = new Label("Yeah! This is a fake label!", 0)
             };
 
-            Assert.DoesNotThrow(() => service.Execute(req));
-
+            service.Execute(req);
 
             //Check the optionsetmetadata was updated
             var key = string.Format("{0}#{1}", req.EntityLogicalName, req.AttributeLogicalName);

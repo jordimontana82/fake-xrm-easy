@@ -26,7 +26,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.BasePluginTests
             pluginCtx.MessageName = "Create";
             pluginCtx.InputParameters = inputParameters;
 
-            Assert.DoesNotThrow(() => context.ExecutePluginWithConfigurations<AccountSetTerritories>(pluginCtx, null, null));
+            var ex = Record.Exception(() => context.ExecutePluginWithConfigurations<AccountSetTerritories>(pluginCtx, null, null));
+            Assert.Null(ex);
         }
     }
 }

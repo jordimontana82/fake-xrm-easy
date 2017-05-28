@@ -192,7 +192,8 @@ namespace FakeXrmEasy.Tests
 
             service.Create(email);
 
-            Assert.DoesNotThrow(() => service.Retrieve(email.LogicalName, email.Id, new ColumnSet(true)));
+            var ex = Record.Exception(() => service.Retrieve(email.LogicalName, email.Id, new ColumnSet(true)));
+            Assert.Null(ex);
         }
     }
 }

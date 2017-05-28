@@ -208,7 +208,8 @@ namespace FakeXrmEasy.Tests
             plugCtx.MessageName = "Create";
             plugCtx.InputParameters = inputParameters;
 
-            Assert.DoesNotThrow(() => context.ExecutePluginWith<TestContextPlugin>(plugCtx));
+            var ex = Record.Exception(() => context.ExecutePluginWith<TestContextPlugin>(plugCtx));
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -241,7 +242,8 @@ namespace FakeXrmEasy.Tests
             };
 
             //Parameters are defaulted now...
-            Assert.DoesNotThrow(() => context.ExecutePluginWith<TestContextPlugin>(pluginContext));
+            var ex = Record.Exception(() => context.ExecutePluginWith<TestContextPlugin>(pluginContext));
+            Assert.Null(ex);
 
             pluginContext = new XrmFakedPluginExecutionContext()
             {
@@ -251,7 +253,8 @@ namespace FakeXrmEasy.Tests
             };
 
 
-            Assert.DoesNotThrow(() => context.ExecutePluginWith<TestContextPlugin>(pluginContext));
+            ex = Record.Exception(() => context.ExecutePluginWith<TestContextPlugin>(pluginContext));
+            Assert.Null(ex);
 
             pluginContext = new XrmFakedPluginExecutionContext()
             {
@@ -260,7 +263,8 @@ namespace FakeXrmEasy.Tests
                 UserId = Guid.NewGuid()
             };
 
-            Assert.DoesNotThrow(() => context.ExecutePluginWith<TestContextPlugin>(pluginContext));
+            ex = Record.Exception(() => context.ExecutePluginWith<TestContextPlugin>(pluginContext));
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -294,7 +298,8 @@ namespace FakeXrmEasy.Tests
             var pluginContext = context.GetDefaultPluginContext();
             pluginContext.SharedVariables.Add("key", "somevalue");
 
-            Assert.DoesNotThrow(() =>context.ExecutePluginWith<TestSharedVariablesPropertyPlugin>(pluginContext));
+            var ex = Record.Exception(() =>context.ExecutePluginWith<TestSharedVariablesPropertyPlugin>(pluginContext));
+            Assert.Null(ex);
         }
 
     }

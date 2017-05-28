@@ -33,7 +33,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PublishXml
                 ParameterXml = "<somexml></somexml>"
             };
 
-            Assert.DoesNotThrow(() => service.Execute(req));
+            var ex = Record.Exception(() => service.Execute(req));
+            Assert.Null(ex);
         }
     }
 }

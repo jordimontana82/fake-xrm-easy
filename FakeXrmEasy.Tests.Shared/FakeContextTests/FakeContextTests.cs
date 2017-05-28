@@ -63,7 +63,7 @@ namespace FakeXrmEasy.Tests
                 new Entity("account") { Id = Guid.NewGuid() }
             };
 
-            Assert.DoesNotThrow(() => context.Initialize(data));
+            context.Initialize(data);
             Assert.True(context.Data.Count == 1);
             Assert.True(context.Data["account"].Count == 1);
         }
@@ -77,7 +77,7 @@ namespace FakeXrmEasy.Tests
                 new Entity("account") { Id = Guid.NewGuid(), Attributes = new AttributeCollection { { "accountid", Guid.NewGuid() } }  }
             };
 
-            Assert.DoesNotThrow(() => context.Initialize(data));
+            context.Initialize(data);
             Assert.True(context.Data.Count == 1);
             Assert.True(context.Data["account"].Count == 1);
         }
@@ -214,8 +214,8 @@ namespace FakeXrmEasy.Tests
             }
 
             //Query faked context directly
-            Assert.DoesNotThrow(() => context.CreateQuery<Contact>());
-
+            var ex = Record.Exception(() => context.CreateQuery<Contact>());
+            Assert.Null(ex);
 
         }
 
@@ -253,7 +253,8 @@ namespace FakeXrmEasy.Tests
         {
             var context = new XrmFakedContext();
             var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Lionel" };
-            Assert.DoesNotThrow(() => context.Initialize(new List<Entity>() { c }));
+            var ex = Record.Exception(() => context.Initialize(new List<Entity>() { c }));
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -261,7 +262,8 @@ namespace FakeXrmEasy.Tests
         {
             var context = new XrmFakedContext();
             var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Lionel" };
-            Assert.DoesNotThrow(() => context.Initialize(new List<Entity>() { c }));
+            var ex = Record.Exception(() => context.Initialize(new List<Entity>() { c }));
+            Assert.Null(ex);
             Assert.Throws<Exception>(() => context.Initialize(new List<Entity>() { c }));
         }
 

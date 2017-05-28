@@ -30,7 +30,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             context.ExecutePluginWith<CustomMockPlugin>(inputs, new ParameterCollection(), new EntityImageCollection(), new EntityImageCollection());
 
             Assert.Equal("Successful", (string)e["response"]);
-            Assert.DoesNotThrow(() => context.RemoveExecutionMock<RetrieveEntityRequest>());
+            var ex = Record.Exception(() => context.RemoveExecutionMock<RetrieveEntityRequest>());
+            Assert.Null(ex);
         }
 
         public OrganizationResponse RetrieveEntityMock(OrganizationRequest req)
@@ -63,7 +64,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             context.ExecutePluginWith<CustomMockPlugin>(inputs, new ParameterCollection(), new EntityImageCollection(), new EntityImageCollection());
 
             Assert.Equal("Another", (string)e["response"]);
-            Assert.DoesNotThrow(() => context.RemoveExecutionMock<RetrieveEntityRequest>());
+            var ex = Record.Exception(() => context.RemoveExecutionMock<RetrieveEntityRequest>());
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -84,7 +86,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             context.ExecutePluginWith<CustomMockPlugin>(inputs, new ParameterCollection(), new EntityImageCollection(), new EntityImageCollection());
 
             Assert.Equal("Successful", (string)e["response"]);
-            Assert.DoesNotThrow(() => context.RemoveFakeMessageExecutor<RetrieveEntityRequest>());
+            var ex = Record.Exception(() => context.RemoveFakeMessageExecutor<RetrieveEntityRequest>());
+            Assert.Null(ex);
         }
 
         protected class FakeRetrieveEntityRequestExecutor : IFakeMessageExecutor
