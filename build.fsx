@@ -322,7 +322,7 @@ Target "CodeCoverage.2013" (fun _ ->
 
 Target "CodeCoverage.2015" (fun _ ->
     OpenCover (fun p -> { p with 
-                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.2.0/tools/xunit.console.exe"
                                 ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
                                 Register = RegisterType.RegisterUser
                                 WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.2015")
@@ -334,7 +334,7 @@ Target "CodeCoverage.2015" (fun _ ->
 
 Target "CodeCoverage.2016" (fun _ ->
     OpenCover (fun p -> { p with 
-                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.2.0/tools/xunit.console.exe"
                                 ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
                                 Register = RegisterType.RegisterUser
                                 WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.2016")
@@ -346,7 +346,7 @@ Target "CodeCoverage.2016" (fun _ ->
 
 Target "CodeCoverage.365" (fun _ ->
     OpenCover (fun p -> { p with 
-                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.2.0/tools/xunit.console.exe"
                                 ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
                                 Register = RegisterType.RegisterUser
                                 WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.365")
