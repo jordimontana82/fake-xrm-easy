@@ -52,6 +52,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\OptionSetValuesRequestTests\OptionSetValueRequestsTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\OrgServiceContextTests\OrgServiceContextTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\PermissionsTests\PermissionsTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\PickFromQueueRequestTests\PickFromQueueRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\PublishXml\PublishXmlRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QueryByAttribute\QueryByAttributeTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs" />
