@@ -11,7 +11,7 @@ using FakeXrmEasy.FakeMessageExecutors;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.PickFromQueueRequestTests
 {
-    public class PickFromQueueRequestTests2
+    public class PickFromQueueRequestTests
     {
         [Fact]
         public void When_can_execute_is_called_with_an_invalid_request_result_is_false()
