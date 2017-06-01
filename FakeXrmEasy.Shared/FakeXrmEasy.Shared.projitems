@@ -16,6 +16,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\XmlExtensionsForFetchXml.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddListMembersListRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddMemberListRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\PickFromQueueRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddToQueueRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AssignRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AssociateRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\CloseQuoteRequestExecutor.cs" />
