@@ -77,8 +77,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryLookupTests
             var context = new XrmFakedContext();
             var user = new SystemUser { Id = Guid.NewGuid(), ["fullname"] = "User" };
             var user2 = new SystemUser { Id = Guid.NewGuid(), ["fullname"] = "Other user!" };
-            var account = new Account() { Id = Guid.NewGuid(), Name = "Test", ["createdby"] = new EntityReference(user.LogicalName) { Id = user.Id, Name = user.FullName } };
-            var account2 = new Account() { Id = Guid.NewGuid(), Name = "Other account!", ["createdby"] = new EntityReference(user.LogicalName) { Id = user2.Id, Name = user2.FullName } };
+            var account = new Account() { Id = Guid.NewGuid(), Name = "Test", ["createdby"] = new EntityReference(user.LogicalName, user.Id) { Name = user.FullName } };
+            var account2 = new Account() { Id = Guid.NewGuid(), Name = "Other account!", ["createdby"] = new EntityReference(user.LogicalName, user2.Id) { Name = user2.FullName } };
             context.Initialize(new List<Entity>()
             {
                 user, user2, account, account2
