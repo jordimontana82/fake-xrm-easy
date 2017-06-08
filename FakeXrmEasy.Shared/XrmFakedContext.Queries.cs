@@ -1,24 +1,17 @@
-﻿using FakeItEasy;
-using Microsoft.Xrm.Sdk;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xrm.Sdk.Query;
-using System.ServiceModel;
-using Microsoft.Xrm.Sdk.Messages;
-using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using FakeXrmEasy.Extensions;
 using System.Reflection;
-using Microsoft.Xrm.Sdk.Client;
-using System.Globalization;
 using System.Xml.Linq;
-using System.Xml.Schema;
+using FakeXrmEasy.Extensions;
 using FakeXrmEasy.Extensions.FetchXml;
-using FakeXrmEasy.OrganizationFaults;
 using FakeXrmEasy.Models;
+using FakeXrmEasy.OrganizationFaults;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Client;
+using Microsoft.Xrm.Sdk.Query;
 
 namespace FakeXrmEasy
 {
@@ -53,17 +46,25 @@ namespace FakeXrmEasy
 
                 throw new Exception("XrmFakedContext.FindReflectedType: " + s);
             }
-            
+
         }
 
         protected internal Type FindReflectedAttributeType(Type earlyBoundType, string sAttributeName)
         {
             //Get that type properties
-            var attributeInfo = earlyBoundType
-                .GetProperties()
-                .Where(pi => pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true).Length > 0)
-                .Where(pi => (pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true)[0] as AttributeLogicalNameAttribute).LogicalName.Equals(sAttributeName))
-                .FirstOrDefault();
+            var attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, sAttributeName);
+            if (attributeInfo == null && sAttributeName.EndsWith("name"))
+            {
+                // Special case for referencing the name of a EntityReference
+                sAttributeName = sAttributeName.Substring(0, sAttributeName.Length - 4);
+                attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, sAttributeName);
+
+                if (attributeInfo.PropertyType != typeof(EntityReference))
+                {
+                    // Don't mess up if other attributes follow this naming pattern
+                    attributeInfo = null;
+                }
+            }
 
             if(attributeInfo == null)
             {
@@ -92,6 +93,16 @@ namespace FakeXrmEasy
 #endif
 
             return attributeInfo.PropertyType;
+        }
+
+        private static PropertyInfo GetEarlyBoundTypeAttribute(Type earlyBoundType, string sAttributeName)
+        {
+            var attributeInfo = earlyBoundType.GetProperties()
+                .Where(pi => pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true).Length > 0)
+                .Where(pi => (pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true)[0] as AttributeLogicalNameAttribute).LogicalName.Equals(sAttributeName))
+                .FirstOrDefault();
+
+            return attributeInfo;
         }
 
         public IQueryable<Entity> CreateQuery(string entityLogicalName)
@@ -157,7 +168,7 @@ namespace FakeXrmEasy
         }
 
         public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, string linkFromAlias = "") {
-            
+
             var leAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
             context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName);
             context.EnsureEntityNameExistsInMetadata(le.LinkToEntityName);
@@ -220,7 +231,7 @@ namespace FakeXrmEasy
             return query;
         }
 
-        
+
 
         protected static XElement RetrieveFetchXmlNode(XDocument xlDoc, string sName)
         {
@@ -228,17 +239,17 @@ namespace FakeXrmEasy
         }
 
         public static XDocument ParseFetchXml(string fetchXml)
-        {            
+        {
             try
             {
-                return XDocument.Parse(fetchXml);                
+                return XDocument.Parse(fetchXml);
             }
             catch (Exception ex)
             {
                 throw new Exception(string.Format("FetchXml must be a valid XML document: {0}", ex.ToString()));
             }
         }
-       
+
         public static QueryExpression TranslateFetchXmlToQueryExpression(XrmFakedContext context, string fetchXml)
         {
             return TranslateFetchXmlDocumentToQueryExpression(context, ParseFetchXml(fetchXml));
@@ -342,9 +353,9 @@ namespace FakeXrmEasy
                     query = orderedQuery;
                 }
             }
-            
+
             //Apply TopCount
-            
+
             if (qe.PageInfo!=null && qe.PageInfo.Count >0 && qe.PageInfo.PageNumber>0)
             {
                 //selecting 1 extra to get calculate if there are more records to fetch
@@ -358,7 +369,7 @@ namespace FakeXrmEasy
             }
             return query;
         }
-        
+
 
         protected static Expression TranslateConditionExpression(QueryExpression qe, XrmFakedContext context, TypedConditionExpression c, ParameterExpression entity)
         {
@@ -577,6 +588,7 @@ namespace FakeXrmEasy
                 int iValue;
 
                 DateTime dtDateTimeConversion;
+                Guid id;
                 if (attributeType.IsDateTime()  //Only convert to DateTime if the attribute's type was DateTime
                     && DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out dtDateTimeConversion))
                 {
@@ -585,6 +597,10 @@ namespace FakeXrmEasy
                 else if (attributeType.IsOptionSet() && int.TryParse(value.ToString(), out iValue))
                 {
                     return Expression.Constant(iValue, typeof(int));
+                }
+                else if (attributeType == typeof(EntityReference) && Guid.TryParse((string)value, out id))
+                {
+                    return Expression.Constant(id);
                 }
                 else
                 {
@@ -663,28 +679,30 @@ namespace FakeXrmEasy
         protected static Expression GetAppropiateCastExpressionBasedOnAttributeTypeOrValue(Expression input, object value, Type attributeType)
         {
             if(attributeType != null)
-                {
+            {
 
-                    #if FAKE_XRM_EASY
+#if FAKE_XRM_EASY
                     if (attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference))
                             return GetAppropiateCastExpressionBasedGuid(input);
-                    #endif
-                    if (attributeType == typeof(Guid) || attributeType == typeof(EntityReference))
-                        return GetAppropiateCastExpressionBasedGuid(input);
-                    if (attributeType == typeof(int) || attributeType == typeof(Nullable<int>) || attributeType.IsOptionSet() )
-                        return GetAppropiateCastExpressionBasedOnInt(input);
-                    if (attributeType == typeof(decimal) || attributeType == typeof(Money))
-                        return GetAppropiateCastExpressionBasedOnDecimal(input);
-                    if (attributeType == typeof(bool) || attributeType == typeof(BooleanManagedProperty))
-                        return GetAppropiateCastExpressionBasedOnBoolean(input);
-                    if (attributeType == typeof(string))
-                        return GetAppropiateCastExpressionBasedOnStringAndType(input, value, attributeType);
-                    if(attributeType.IsDateTime())
-                        return GetAppropiateCastExpressionBasedOnDateTime(input, value);
+#endif
+                if (attributeType == typeof(Guid))
+                    return GetAppropiateCastExpressionBasedGuid(input);
+                if (attributeType == typeof(EntityReference))
+                    return GetAppropiateCastExpressionBasedOnEntityReference(input, value);
+                if (attributeType == typeof(int) || attributeType == typeof(Nullable<int>) || attributeType.IsOptionSet())
+                    return GetAppropiateCastExpressionBasedOnInt(input);
+                if (attributeType == typeof(decimal) || attributeType == typeof(Money))
+                    return GetAppropiateCastExpressionBasedOnDecimal(input);
+                if (attributeType == typeof(bool) || attributeType == typeof(BooleanManagedProperty))
+                    return GetAppropiateCastExpressionBasedOnBoolean(input);
+                if (attributeType == typeof(string))
+                    return GetAppropiateCastExpressionBasedOnStringAndType(input, value, attributeType);
+                if(attributeType.IsDateTime())
+                    return GetAppropiateCastExpressionBasedOnDateTime(input, value);
 
-                    return GetAppropiateCastExpressionDefault(input, value); //any other type
-                }
-            
+                return GetAppropiateCastExpressionDefault(input, value); //any other type
+            }
+
             return GetAppropiateCastExpressionBasedOnValueInherentType(input, value); //Dynamic entities
         }
         protected static Expression GetAppropiateCastExpressionBasedOnString(Expression input, object value)
@@ -706,7 +724,7 @@ namespace FakeXrmEasy
                 );
             }
 
-            return defaultStringExpression; 
+            return defaultStringExpression;
         }
 
         protected static Expression GetAppropiateCastExpressionBasedOnStringAndType(Expression input, object value, Type attributeType)
@@ -744,16 +762,42 @@ namespace FakeXrmEasy
         protected static Expression GetAppropiateCastExpressionBasedGuid(Expression input)
         {
             var getIdFromEntityReferenceExpr = Expression.Call(Expression.TypeAs(input, typeof(EntityReference)),
-                                            typeof(EntityReference).GetMethod("get_Id"));
+                typeof(EntityReference).GetMethod("get_Id"));
 
             return Expression.Condition(
-                        Expression.TypeIs(input, typeof(EntityReference)),  //If input is an entity reference, compare the Guid against the Id property
-                                Expression.Convert(
-                                            getIdFromEntityReferenceExpr,
-                                            typeof(Guid)),
-                                Expression.Condition(Expression.TypeIs(input, typeof(Guid)),  //If any other case, then just compare it as a Guid directly
-                                            Expression.Convert(input, typeof(Guid)),
-                                            Expression.Constant(Guid.Empty, typeof(Guid))));
+                Expression.TypeIs(input, typeof(EntityReference)),  //If input is an entity reference, compare the Guid against the Id property
+                Expression.Convert(
+                    getIdFromEntityReferenceExpr,
+                    typeof(Guid)),
+                Expression.Condition(Expression.TypeIs(input, typeof(Guid)),  //If any other case, then just compare it as a Guid directly
+                    Expression.Convert(input, typeof(Guid)),
+                    Expression.Constant(Guid.Empty, typeof(Guid))));
+        }
+
+        protected static Expression GetAppropiateCastExpressionBasedOnEntityReference(Expression input, object value)
+        {
+            Guid guid;
+            if (value is string && !Guid.TryParse((string)value, out guid))
+            {
+                var getNameFromEntityReferenceExpr = Expression.Call(Expression.TypeAs(input, typeof(EntityReference)),
+                    typeof(EntityReference).GetMethod("get_Name"));
+
+                return GetCaseInsensitiveExpression(Expression.Condition(Expression.TypeIs(input, typeof(EntityReference)),
+                    Expression.Convert(getNameFromEntityReferenceExpr, typeof(string)),
+                    Expression.Constant(string.Empty, typeof(string))));
+            }
+
+            var getIdFromEntityReferenceExpr = Expression.Call(Expression.TypeAs(input, typeof(EntityReference)),
+                typeof(EntityReference).GetMethod("get_Id"));
+
+            return Expression.Condition(
+                Expression.TypeIs(input, typeof(EntityReference)),  //If input is an entity reference, compare the Guid against the Id property
+                Expression.Convert(
+                    getIdFromEntityReferenceExpr,
+                    typeof(Guid)),
+                Expression.Condition(Expression.TypeIs(input, typeof(Guid)),  //If any other case, then just compare it as a Guid directly
+                    Expression.Convert(input, typeof(Guid)),
+                    Expression.Constant(Guid.Empty, typeof(Guid))));
 
         }
 
@@ -788,7 +832,7 @@ namespace FakeXrmEasy
         protected static Expression GetAppropiateCastExpressionBasedOnInt(Expression input)
         {
             return Expression.Condition(
-                        Expression.TypeIs(input, typeof(OptionSetValue)), 
+                        Expression.TypeIs(input, typeof(OptionSetValue)),
                                             Expression.Convert(
                                                 Expression.Call(Expression.TypeAs(input, typeof(OptionSetValue)),
                                                         typeof(OptionSetValue).GetMethod("get_Value")),
@@ -837,7 +881,7 @@ namespace FakeXrmEasy
 
                 }
             }
-            
+
             return Expression.AndAlso(
                             containsAttributeExpr,
                             Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
@@ -1004,7 +1048,7 @@ namespace FakeXrmEasy
 
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             Expression convertedValueToStr = Expression.Convert(GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, c.Values[0]), typeof(string));
-                                
+
             Expression convertedValueToStrAndToLower = GetCaseInsensitiveExpression(convertedValueToStr);
 
             string sLikeOperator = "%";
@@ -1044,7 +1088,7 @@ namespace FakeXrmEasy
             computedTypedCondition.AttributeType = tc.AttributeType;
 
             return TranslateConditionExpressionLike(computedTypedCondition, getAttributeValueExpr, containsAttributeExpr);
-        
+
         }
 
         protected static BinaryExpression TranslateMultipleConditionExpressions(QueryExpression qe, XrmFakedContext context, string sEntityName, List<ConditionExpression> conditions, LogicalOperator op, ParameterExpression entity, bool bIsOuter)
@@ -1068,7 +1112,7 @@ namespace FakeXrmEasy
                 {
 
 #if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
-                    if(c.EntityName != null) 
+                    if(c.EntityName != null)
                         sEntityName = qe.GetEntityNameFromAlias(c.EntityName);
                     else
                     {
@@ -1096,9 +1140,21 @@ namespace FakeXrmEasy
                     if (earlyBoundType != null)
                     {
                         typedExpression.AttributeType = context.FindReflectedAttributeType(earlyBoundType, sAttributeName);
+
+                        // Special case when filtering on the name of a Lookup
+                        if (typedExpression.AttributeType == typeof(EntityReference) && sAttributeName.EndsWith("name"))
+                        {
+                            var realAttributeName = c.AttributeName.Substring(0, c.AttributeName.Length - 4);
+
+                            if (GetEarlyBoundTypeAttribute(earlyBoundType, sAttributeName) == null && GetEarlyBoundTypeAttribute(earlyBoundType, realAttributeName) != null && GetEarlyBoundTypeAttribute(earlyBoundType, realAttributeName).PropertyType == typeof(EntityReference))
+                            {
+                                // Need to make Lookups work against the real attribute, not the "name" suffixed attribute that doesn't exist
+                                c.AttributeName = realAttributeName;
+                            }
+                        }
                     }
                 }
-                
+
 
                 //Build a binary expression  
                 if (op == LogicalOperator.And)
@@ -1148,8 +1204,37 @@ namespace FakeXrmEasy
 
             if (le.LinkCriteria != null)
             {
+                var earlyBoundType = context.FindReflectedType(le.LinkToEntityName);
+                var attributeMetadata = context.AttributeMetadata.ContainsKey(le.LinkToEntityName) ? context.AttributeMetadata[le.LinkToEntityName] : null;
+
                 foreach (var ce in le.LinkCriteria.Conditions)
                 {
+                    if (earlyBoundType != null)
+                    {
+                        var attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, ce.AttributeName);
+                        if (attributeInfo == null && ce.AttributeName.EndsWith("name"))
+                        {
+                            // Special case for referencing the name of a EntityReference
+                            var sAttributeName = ce.AttributeName.Substring(0, ce.AttributeName.Length - 4);
+                            attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, sAttributeName);
+
+                            if (attributeInfo.PropertyType == typeof(EntityReference))
+                            {
+                                // Don't mess up if other attributes follow this naming pattern
+                                ce.AttributeName = sAttributeName;
+                            }
+                        }
+                    }
+                    else if (attributeMetadata != null && !attributeMetadata.ContainsKey(ce.AttributeName) && ce.AttributeName.EndsWith("name"))
+                    {
+                        // Special case for referencing the name of a EntityReference
+                        var sAttributeName = ce.AttributeName.Substring(0, ce.AttributeName.Length - 4);
+                        if (attributeMetadata.ContainsKey(sAttributeName))
+                        {
+                            ce.AttributeName = sAttributeName;
+                        }
+                    }
+
                     var entityAlias = !string.IsNullOrEmpty(le.EntityAlias) ? le.EntityAlias : le.LinkToEntityName;
                     ce.AttributeName = entityAlias + "." + ce.AttributeName;
                 }
