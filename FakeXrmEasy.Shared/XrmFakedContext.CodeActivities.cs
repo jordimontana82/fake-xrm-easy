@@ -63,7 +63,6 @@ namespace FakeXrmEasy
         public IDictionary<string, object> ExecuteCodeActivity<T>(XrmFakedWorkflowContext wfContext, Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new()
         {
             WorkflowInvoker invoker = null;
-            WorkflowInstanceExtensionManager mngr = null;
             string sDebug = "";
             try
             {

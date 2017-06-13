@@ -895,12 +895,21 @@ namespace FakeXrmEasy
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             foreach (object value in c.Values)
             {
-
-                expOrValues = Expression.Or(expOrValues, Expression.Equal(
-                            GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value),
-                            GetAppropiateTypedValueAndType(value, tc.AttributeType)));
-
-
+               if (value is Array)
+                {
+                    foreach (var a in ((Array)value))
+                    {
+                        expOrValues = Expression.Or(expOrValues, Expression.Equal(
+                            GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, a),
+                            GetAppropiateTypedValueAndType(a, tc.AttributeType)));
+                    }
+                }
+                else
+                {
+                    expOrValues = Expression.Or(expOrValues, Expression.Equal(
+                                GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value),
+                                GetAppropiateTypedValueAndType(value, tc.AttributeType)));
+                }
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
