@@ -206,7 +206,7 @@ namespace FakeXrmEasy
                     break;
                 case JoinOperator.LeftOuter:
                     query = query.GroupJoin(inner,
-                                    outerKey => outerKey.KeySelector(le.LinkFromAttributeName, context),
+                                    outerKey => outerKey.KeySelector(linkFromAlias, context),
                                     innerKey => innerKey.KeySelector(le.LinkToAttributeName, context),
                                     (outerEl, innerElemsCol) => new { outerEl, innerElemsCol })
                                                 .SelectMany(x => x.innerElemsCol.DefaultIfEmpty()
