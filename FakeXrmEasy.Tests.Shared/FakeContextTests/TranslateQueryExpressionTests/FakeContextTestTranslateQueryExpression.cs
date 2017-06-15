@@ -337,11 +337,11 @@ namespace FakeXrmEasy.Tests
             var firstContact = result.FirstOrDefault();
             var lastContact = result.LastOrDefault();
 
-            //Contact 1 attributes = 4 + 5 (the extra five are the CreatedOn, ModifiedOn, CreatedBy, ModifiedBy + StateCode attributes generated automatically
-            //+ Attributes from the join(account) = 2 + 5
+            //Contact 1 attributes = 4 + 6 (the extra five are the CreatedOn, ModifiedOn, CreatedBy, ModifiedBy, OwnerId + StateCode attributes generated automatically
+            //+ Attributes from the join(account) = 2 + 6
 
-            Assert.True(firstContact.Attributes.Count == 16);
-            Assert.True(lastContact.Attributes.Count == 16);  
+            Assert.True(firstContact.Attributes.Count == 18);
+            Assert.True(lastContact.Attributes.Count == 18);  
         }
 
         [Fact]

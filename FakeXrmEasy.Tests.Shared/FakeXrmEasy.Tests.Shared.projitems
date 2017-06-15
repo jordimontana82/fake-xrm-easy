@@ -92,6 +92,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestPropertiesPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestSharedVariablesPropertyPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestContextPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestDefaultEntityInitializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tracing\XrmFakeTracingExample.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmRealContextTests\XrmRealContextTests.cs" />
   </ItemGroup>
