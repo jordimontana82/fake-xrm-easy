@@ -25,6 +25,7 @@ namespace FakeXrmEasy.Services
             e.SetValueIfEmpty("modifiedon", now);
             e.SetValueIfEmpty("createdby", CallerId);
             e.SetValueIfEmpty("modifiedby", CallerId);
+            e.SetValueIfEmpty("ownerid", CallerId);
             e.SetValueIfEmpty("statecode", new OptionSetValue(0)); //Active by default
 
             return e;
