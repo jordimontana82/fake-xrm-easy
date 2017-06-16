@@ -57,8 +57,12 @@ namespace FakeXrmEasy
         public IEntityInitializerService EntityInitializerService { get; set; }
         public IAccessRightsRepository AccessRightsRepository { get; set; }
 
+        public int MaxRetrieveCount { get; set; }
+
         public XrmFakedContext()
         {
+            MaxRetrieveCount = 5000;
+
             AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
             ExecutionMocks = new Dictionary<Type, ServiceRequestExecution>();

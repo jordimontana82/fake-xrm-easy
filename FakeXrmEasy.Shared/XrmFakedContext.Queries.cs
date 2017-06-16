@@ -362,11 +362,13 @@ namespace FakeXrmEasy
                 query = query.Skip(qe.PageInfo.Count * (qe.PageInfo.PageNumber - 1));
             }
 
-            if (qe.TopCount != null)
+            if (qe.TopCount == null)
             {
-                //selecting 1 extra to get calculate if there are more records to fetch
-                query = query.Take(qe.TopCount.Value );
+                qe.TopCount = context.MaxRetrieveCount;
             }
+            
+            query = query.Take(qe.TopCount.Value);
+
             return query;
         }
 
