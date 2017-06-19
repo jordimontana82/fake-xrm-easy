@@ -5,6 +5,7 @@ using System.Linq;
 using System.Dynamic;
 using System.Linq.Expressions;
 using System.Text;
+using FakeXrmEasy.Metadata;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using FakeXrmEasy.OrganizationFaults;
@@ -38,6 +39,34 @@ namespace FakeXrmEasy.Extensions
             return ProjectAttributes(e, new QueryExpression() { ColumnSet = columnSet }, context);
         }
 
+        public static void ApplyDateBehaviour(this Entity e, XrmFakedContext context)
+        {
+            if (context.DateBehaviour.Count == 0 || e.LogicalName == null || !context.DateBehaviour.ContainsKey(e.LogicalName))
+            {
+                return;
+            }
+
+            var entityDateBehaviours = context.DateBehaviour[e.LogicalName];
+            foreach (var attribute in entityDateBehaviours.Keys)
+            {
+                if (!e.Attributes.ContainsKey(attribute))
+                {
+                    continue;
+                }
+
+                switch (entityDateBehaviours[attribute])
+                {
+                    case DateTimeAttributeBehavior.DateOnly:
+                        var currentValue = (DateTime)e[attribute];
+                        e[attribute] = new DateTime(currentValue.Year, currentValue.Month, currentValue.Day, 0, 0, 0, DateTimeKind.Utc);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
         public static void ProjectAttributes(Entity e, Entity projected, LinkEntity le, XrmFakedContext context)
         {
             var sAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
@@ -62,7 +91,7 @@ namespace FakeXrmEasy.Extensions
                         projected[linkedAttKey] = e[linkedAttKey];
                 }
             }
-            
+
 
             foreach (var nestedLinkedEntity in le.LinkEntities)
             {
@@ -93,10 +122,10 @@ namespace FakeXrmEasy.Extensions
                         projected = (Entity)instance;
                         projected.Id = e.Id;
                     }
-                    else 
+                    else
                         projected = new Entity(e.LogicalName) { Id = e.Id }; //fallback to generic type if type not found
                 }
-                else 
+                else
                     projected = new Entity(e.LogicalName) { Id = e.Id };
 
                 foreach (var attKey in qe.ColumnSet.Columns)
@@ -109,7 +138,7 @@ namespace FakeXrmEasy.Extensions
 
                     if (e.Attributes.ContainsKey(attKey) && e.Attributes[attKey] != null)
                     {
-                            projected[attKey] = CloneAttribute(e[attKey]);
+                        projected[attKey] = CloneAttribute(e[attKey]);
                     }
                 }
 
@@ -137,9 +166,9 @@ namespace FakeXrmEasy.Extensions
                 return new string((attributeValue as string).ToCharArray());
 
             else if (type == typeof(EntityReference)
-                    #if FAKE_XRM_EASY 
-                            || type == typeof(Microsoft.Xrm.Client.CrmEntityReference) 
-                    #endif 
+#if FAKE_XRM_EASY
+                            || type == typeof(Microsoft.Xrm.Client.CrmEntityReference)
+#endif
                     )
             {
                 var original = (attributeValue as EntityReference);
@@ -235,7 +264,7 @@ namespace FakeXrmEasy.Extensions
             var cloned = Activator.CreateInstance(t) as Entity;
             cloned.Id = e.Id;
             cloned.LogicalName = e.LogicalName;
-            
+
             if(e.FormattedValues != null)
             {
                 var formattedValues = new FormattedValueCollection();
@@ -293,7 +322,7 @@ namespace FakeXrmEasy.Extensions
                     {
                         e[alias + "." + attKey] = new AliasedValue(alias, attKey, null);
                     }
-                    
+
                 }
             }
             return e;
@@ -352,7 +381,7 @@ namespace FakeXrmEasy.Extensions
             {
                 sAttributeName = sAttributeName.ToLower();
             }
-            
+
 
             if (!e.Attributes.ContainsKey(sAttributeName))
             {
@@ -375,7 +404,7 @@ namespace FakeXrmEasy.Extensions
                 keyValue = e[sAttributeName];
             }
 
-            if (keyValue is EntityReference) 
+            if (keyValue is EntityReference)
                 return (keyValue as EntityReference).Id;
             if (keyValue is Guid)
                 return ((Guid)keyValue);
@@ -402,7 +431,7 @@ namespace FakeXrmEasy.Extensions
                 e[property] = value;
             }
         }
-        
-         
+
+
     }
 }

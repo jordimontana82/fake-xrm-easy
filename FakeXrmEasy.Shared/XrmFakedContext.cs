@@ -8,7 +8,6 @@ using Microsoft.Xrm.Sdk.Messages;
 using System.Reflection;
 using FakeXrmEasy.FakeMessageExecutors;
 using Microsoft.Xrm.Sdk.Metadata;
-
 using FakeXrmEasy.Services;
 using FakeXrmEasy.Permissions;
 
@@ -77,6 +76,9 @@ namespace FakeXrmEasy
             EntityInitializerService = new DefaultEntityInitializerService();
 
             AccessRightsRepository = new AccessRightsRepository();
+
+            SystemTimeZone = TimeZoneInfo.Local;
+            DateBehaviour = DefaultDateBehaviour();
         }
 
         /// <summary>

@@ -27,6 +27,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             var service = context.GetFakedOrganizationService();
             var resultEntity = service.Retrieve(request.Target.LogicalName, request.Target.Id, request.ColumnSet);
+            resultEntity.ApplyDateBehaviour(context);
 
             if (request.RelatedEntitiesQuery != null && request.RelatedEntitiesQuery.Count > 0)
             {

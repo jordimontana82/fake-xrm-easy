@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FakeXrmEasy.Extensions;
 using FakeXrmEasy.Extensions.FetchXml;
 
 namespace FakeXrmEasy.FakeMessageExecutors
@@ -103,6 +104,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             else
                 throw PullRequestException.NotImplementedOrganizationRequest(request.Query.GetType());
 
+            list.ForEach(e => e.ApplyDateBehaviour(ctx));
             list.ForEach(e => PopulateFormattedValues(e));
             var recordCount = list.Count();
             var pageSize = recordCount ;
@@ -134,8 +136,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             return response;
         }
-
-        
 
         /// <summary>
         /// Populates the formmated values property of this entity record based on the proxy types
