@@ -591,5 +591,35 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             Assert.True(names[4].Equals("11"));
             Assert.True(names[5].Equals("12"));
         }
+
+        [Fact]
+        public void When_ordering_column_is_not_in_column_set_ordering_is_still_correct()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity secondEntity = new Entity("entity");
+            secondEntity.Id = Guid.NewGuid();
+            secondEntity["int"] = 2;
+            secondEntity["text"] = "second";
+            initialEntities.Add(secondEntity);
+
+            Entity firstEntity = new Entity("entity");
+            firstEntity.Id = Guid.NewGuid();
+            firstEntity["int"] = 1;
+            firstEntity["text"] = "first";
+            initialEntities.Add(firstEntity);
+
+            context.Initialize(initialEntities);
+
+            QueryExpression query = new QueryExpression("entity");
+            query.ColumnSet = new ColumnSet("text");
+            query.AddOrder("int", OrderType.Ascending);
+
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(firstEntity.Id, result.Entities[0].Id);
+            Assert.Equal(secondEntity.Id, result.Entities[1].Id);
+        }
     }
 }
