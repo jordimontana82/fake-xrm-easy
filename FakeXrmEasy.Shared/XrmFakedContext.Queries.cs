@@ -324,9 +324,6 @@ namespace FakeXrmEasy
             Expression<Func<Entity, bool>> lambda = Expression.Lambda<Func<Entity, bool>>(expTreeBody, entity);
             query = query.Where(lambda);
 
-            //Project the attributes in the root column set  (must be applied after the where clause, not before!!)
-            query = query.Select(x => x.Clone(x.GetType()).ProjectAttributes(qe, context));
-
             //Sort results
             if (qe.Orders != null)
             {
@@ -353,6 +350,9 @@ namespace FakeXrmEasy
                     query = orderedQuery;
                 }
             }
+
+            //Project the attributes in the root column set  (must be applied after the where and order clauses, not before!!)
+            query = query.Select(x => x.Clone(x.GetType()).ProjectAttributes(qe, context));
 
             //Apply TopCount
 
