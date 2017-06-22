@@ -272,7 +272,7 @@ namespace FakeXrmEasy.Extensions
             {
                 foreach (var attKey in otherEntity.Attributes.Keys)
                 {
-                    e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
+                    e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, otherEntity[attKey]);
                 }
             }
             else
@@ -287,11 +287,11 @@ namespace FakeXrmEasy.Extensions
 
                     if (otherEntity.Attributes.ContainsKey(attKey))
                     {
-                        e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherEntity[attKey]);
+                        e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, otherEntity[attKey]);
                     }
                     else
                     {
-                        e[alias + "." + attKey] = new AliasedValue(alias, attKey, null);
+                        e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, null);
                     }
                     
                 }
@@ -308,7 +308,7 @@ namespace FakeXrmEasy.Extensions
                 {
                     foreach (var attKey in otherClonedEntity.Attributes.Keys)
                     {
-                        e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherClonedEntity[attKey]);
+                        e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, otherClonedEntity[attKey]);
                     }
                 }
                 else
@@ -323,10 +323,10 @@ namespace FakeXrmEasy.Extensions
 
                         if (otherClonedEntity.Attributes.ContainsKey(attKey))
                         {
-                            e[alias + "." + attKey] = new AliasedValue(alias, attKey, otherClonedEntity[attKey]);
+                            e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, otherClonedEntity[attKey]);
                         }
                         else {
-                            e[alias + "." + attKey] = new AliasedValue(alias, attKey, null);
+                            e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, null);
                         }
                     }
                 }
