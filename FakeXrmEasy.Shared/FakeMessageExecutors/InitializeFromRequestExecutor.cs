@@ -39,7 +39,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             var entity = new Entity
             {
                 LogicalName = req.TargetEntityName,
-                Id = Guid.NewGuid()
+                Id = Guid.Empty
             };
 
             if (mapping.Entities.Count > 0)
