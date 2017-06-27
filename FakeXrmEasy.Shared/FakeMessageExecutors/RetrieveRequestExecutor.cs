@@ -25,7 +25,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new ArgumentNullException("Target", "RetrieveRequest without Target is invalid.");
             }
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
             var resultEntity = service.Retrieve(request.Target.LogicalName, request.Target.Id, request.ColumnSet);
             resultEntity.ApplyDateBehaviour(context);
 

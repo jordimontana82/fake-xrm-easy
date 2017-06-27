@@ -41,6 +41,10 @@ namespace FakeXrmEasy.Extensions
 
         public static void ApplyDateBehaviour(this Entity e, XrmFakedContext context)
         {
+#if FAKE_XRM_EASY || FAKE_XRM_EASY_2013
+            return; //Do nothing... DateBehavior wasn't available for versions <= 2013
+#else 
+
             if (context.DateBehaviour.Count == 0 || e.LogicalName == null || !context.DateBehaviour.ContainsKey(e.LogicalName))
             {
                 return;
@@ -65,9 +69,10 @@ namespace FakeXrmEasy.Extensions
                         break;
                 }
             }
+#endif
         }
 
-        public static void ProjectAttributes(Entity e, Entity projected, LinkEntity le, XrmFakedContext context)
+            public static void ProjectAttributes(Entity e, Entity projected, LinkEntity le, XrmFakedContext context)
         {
             var sAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
 

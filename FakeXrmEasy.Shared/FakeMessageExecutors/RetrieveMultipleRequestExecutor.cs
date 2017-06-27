@@ -104,6 +104,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             else
                 throw PullRequestException.NotImplementedOrganizationRequest(request.Query.GetType());
 
+
             list.ForEach(e => e.ApplyDateBehaviour(ctx));
             list.ForEach(e => PopulateFormattedValues(e));
             var recordCount = list.Count();
