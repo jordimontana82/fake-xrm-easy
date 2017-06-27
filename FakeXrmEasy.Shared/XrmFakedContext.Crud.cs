@@ -3,14 +3,10 @@ using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Xrm.Sdk.Query;
 using System.ServiceModel;
 using Microsoft.Xrm.Sdk.Messages;
-using System.Dynamic;
-using System.Linq.Expressions;
 using FakeXrmEasy.Extensions;
-using Microsoft.Xrm.Sdk.Client;
 using System.Reflection;
 
 namespace FakeXrmEasy
@@ -70,13 +66,15 @@ namespace FakeXrmEasy
                         && context.Data[entityName].ContainsKey(id))
                     {
                         //Entity found => return only the subset of columns specified or all of them
-                        if (columnSet.AllColumns)
-                            return context.Data[entityName][id].Clone(reflectedType);
+                        var foundEntity = context.Data[entityName][id].Clone(reflectedType);
+                        if (columnSet.AllColumns) { 
+                            foundEntity.ApplyDateBehaviour(context);
+                            return foundEntity;
+                        }
                         else
                         {
-                            Entity foundEntity = null;
-                            foundEntity = context.Data[entityName][id].Clone(reflectedType);
-                            Entity projected = foundEntity.ProjectAttributes(columnSet, context);
+                            var projected = foundEntity.ProjectAttributes(columnSet, context);
+                            projected.ApplyDateBehaviour(context);
                             return projected;
                         }
                     }
