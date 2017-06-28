@@ -225,8 +225,7 @@ namespace FakeXrmEasy
                    }
                    else if (t.Equals(typeof(ITracingService)))
                    {
-                       _tracingService = new XrmFakedTracingService();
-                       return _tracingService;
+                       return TracingService;
                    }
                    else if (t.Equals(typeof(IPluginExecutionContext)))
                    {
@@ -259,7 +258,7 @@ namespace FakeXrmEasy
 
         public XrmFakedTracingService GetFakeTracingService()
         {
-            return _tracingService;
+            return TracingService;
         }
 
     }

@@ -74,8 +74,7 @@ namespace FakeXrmEasy
                 sDebug += "Adding extensions..." + System.Environment.NewLine;
                 invoker.Extensions.Add<ITracingService>(() =>
                 {
-                    _tracingService = new XrmFakedTracingService();
-                    return _tracingService;
+                    return TracingService;
                 });
                 invoker.Extensions.Add<IWorkflowContext>(() =>
                 {
