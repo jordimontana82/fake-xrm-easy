@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.ServiceModel;
 using System.Xml.Linq;
 using FakeXrmEasy.Extensions;
 using FakeXrmEasy.Extensions.FetchXml;
@@ -749,7 +750,7 @@ namespace FakeXrmEasy
         {
             //Convert to DateTime if string
             DateTime dtDateTimeConversion;
-            if (DateTime.TryParse(value.ToString(), out dtDateTimeConversion))
+            if (value != null && DateTime.TryParse(value.ToString(), out dtDateTimeConversion))
             {
                 return Expression.Convert(input, typeof(DateTime));
             }
@@ -949,6 +950,11 @@ namespace FakeXrmEasy
         protected static Expression TranslateConditionExpressionGreaterThan(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             var c = tc.CondExpression;
+
+            if (c.Values.Count(v => v != null) != 1)
+            {
+                throw new FaultException(new FaultReason($"The ConditonOperator.{c.Operator} requires 1 value/s, not {c.Values.Count(v => v != null)}. Parameter Name: {c.AttributeName}"));
+            }
 
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             foreach (object value in c.Values)
