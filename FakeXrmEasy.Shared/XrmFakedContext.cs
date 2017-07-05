@@ -24,6 +24,10 @@ namespace FakeXrmEasy
 
         protected internal IOrganizationService Service { get; set; }
 
+        private readonly Lazy<XrmFakedTracingService> _tracingService = new Lazy<XrmFakedTracingService>(() => new XrmFakedTracingService());
+
+        protected internal XrmFakedTracingService TracingService => _tracingService.Value;
+
         protected internal bool Initialised { get; set; }
 
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
@@ -50,8 +54,6 @@ namespace FakeXrmEasy
         private Dictionary<string, XrmFakedRelationship> Relationships { get; set; }
 
         public Dictionary<string, OptionSetMetadata> OptionSetValuesMetadata { get; set; }
-
-        protected internal XrmFakedTracingService _tracingService { get; set; }
 
         public IEntityInitializerService EntityInitializerService { get; set; }
         public IAccessRightsRepository AccessRightsRepository { get; set; }

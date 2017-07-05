@@ -17,7 +17,7 @@ namespace FakeXrmEasy.Tests.Tracing
 
             var guid1 = Guid.NewGuid();
             var target = new Entity("account") { Id = guid1 };
-
+            
             //Execute our plugin against a target that doesn't contains the accountnumber attribute
             var fakedPlugin = fakedContext.ExecutePluginWithTarget<AccountNumberPlugin>(target);
 
@@ -48,6 +48,34 @@ namespace FakeXrmEasy.Tests.Tracing
 
             //Assert that the target contains a new attribute      
             Assert.Equal(log, "Some trace written" + System.Environment.NewLine);
+        }
+
+        [Fact]
+        public void The_TracingService_Should_Be_Retrievable_Without_Calling_Execute_Before()
+        {
+            var fakedContext = new XrmFakedContext();
+
+            //Get tracing service
+            var fakeTracingService = fakedContext.GetFakeTracingService();  
+            
+            Assert.NotNull(fakeTracingService);         
+        }
+
+        [Fact]
+        public void Retrieving_The_TracingService_Twice_Should_Return_The_Same_Instance()
+        {
+            var fakedContext = new XrmFakedContext();
+
+            //Get tracing service
+            var fakeTracingService1 = fakedContext.GetFakeTracingService();
+            fakeTracingService1.Trace("foobar");
+
+            var fakeTracingService2 = fakedContext.GetFakeTracingService();
+
+            Assert.NotNull(fakeTracingService1);
+            Assert.NotNull(fakeTracingService2);
+
+            Assert.Contains("foobar", fakeTracingService2.DumpTrace());
         }
     }
 }
