@@ -354,5 +354,26 @@ namespace FakeXrmEasy.Tests
             Assert.True(createdAccount.Attributes.ContainsKey("modifiedby"));
             Assert.True(createdAccount.Attributes.ContainsKey("statecode"));
         }
+
+        [Fact]
+        public void When_creating_a_record_overridencreatedon_should_override_created_on()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetOrganizationService();
+
+            var now = DateTime.Now.Date;
+
+            var account = new Account()
+            {
+                OverriddenCreatedOn = now,
+                ["createdon"] = now.AddDays(-1)
+            };
+
+            service.Create(account);
+
+            var createdAccount = ctx.CreateQuery<Account>().FirstOrDefault();
+            Assert.Equal(now, createdAccount.CreatedOn);
+        }
+        
     }
 }

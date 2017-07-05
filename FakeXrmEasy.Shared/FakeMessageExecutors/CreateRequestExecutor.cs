@@ -17,7 +17,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             var createRequest = (CreateRequest)request;
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var guid = service.Create(createRequest.Target);
 

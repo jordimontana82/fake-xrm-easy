@@ -21,7 +21,15 @@ namespace FakeXrmEasy.Services
             var CallerId = new EntityReference("systemuser", gCallerId); //Create a new instance by default
 
             var now = DateTime.UtcNow;
+
             e.SetValueIfEmpty("createdon", now);
+
+            //Overriden created on should replace created on
+            if(e.Contains("overriddencreatedon"))
+            {
+                e["createdon"] = e["overriddencreatedon"];
+            }
+
             e.SetValueIfEmpty("modifiedon", now);
             e.SetValueIfEmpty("createdby", CallerId);
             e.SetValueIfEmpty("modifiedby", CallerId);
