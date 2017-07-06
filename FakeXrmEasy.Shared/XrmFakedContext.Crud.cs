@@ -230,7 +230,9 @@ namespace FakeXrmEasy
             if (CallerId == null)
                 CallerId = new EntityReference("systemuser", Guid.NewGuid()); //Create a new instance by default
 
-            EntityInitializerService.Initialize(e, CallerId.Id);
+            var isManyToManyRelationshipEntity = this.Relationships.ContainsKey(e.LogicalName);
+
+            EntityInitializerService.Initialize(e, CallerId.Id, isManyToManyRelationshipEntity);
         }
 
         protected void ValidateEntity(Entity e)
@@ -348,7 +350,7 @@ namespace FakeXrmEasy
                 AttributeMetadata.Add(e.LogicalName, new Dictionary<string, string>());
 
             //Update attribute metadata
-            if (ProxyTypesAssembly != null)
+            if (ProxyTypesAssembly != null && !this.Relationships.ContainsKey(e.LogicalName))
             {
                 //If the context is using a proxy types assembly then we can just guess the metadata from the generated attributes
                 var type = FindReflectedType(e.LogicalName);

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
 using Microsoft.Xrm.Sdk;
 using FakeXrmEasy.Extensions;
 
@@ -9,13 +6,18 @@ namespace FakeXrmEasy.Services
 {
     public class DefaultEntityInitializerService : IEntityInitializerService
     {
-        public Entity Initialize(Entity e, Guid gCallerId)
+        public Entity Initialize(Entity e, Guid gCallerId, bool isManyToManyRelationshipEntity = false)
         {
             //Validate primary key for dynamic entities
             var primaryKey = string.Format("{0}id", e.LogicalName);
             if (!e.Attributes.ContainsKey(primaryKey))
             {
                 e[primaryKey] = e.Id;
+            }
+
+            if (isManyToManyRelationshipEntity)
+            {
+                return e;
             }
 
             var CallerId = new EntityReference("systemuser", gCallerId); //Create a new instance by default
@@ -39,9 +41,9 @@ namespace FakeXrmEasy.Services
             return e;
         }
 
-        public Entity Initialize(Entity e)
+        public Entity Initialize(Entity e, bool isManyToManyRelationshipEntity = false)
         {
-            return this.Initialize(e, Guid.NewGuid());
+            return this.Initialize(e, Guid.NewGuid(), isManyToManyRelationshipEntity);
         }
     }
 }

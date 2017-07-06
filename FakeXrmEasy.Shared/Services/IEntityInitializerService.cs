@@ -7,8 +7,8 @@ namespace FakeXrmEasy.Services
 {
     public interface IEntityInitializerService
     {
-        Entity Initialize(Entity e);
-        Entity Initialize(Entity e, Guid gCallerId);
+        Entity Initialize(Entity e, bool isManyToManyRelationshipEntity = false);
+        Entity Initialize(Entity e, Guid gCallerId, bool isManyToManyRelationshipEntity = false);
     }
 
 
