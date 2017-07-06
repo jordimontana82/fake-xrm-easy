@@ -350,7 +350,7 @@ namespace FakeXrmEasy
                 AttributeMetadata.Add(e.LogicalName, new Dictionary<string, string>());
 
             //Update attribute metadata
-            if (ProxyTypesAssembly != null && !this.Relationships.ContainsKey(e.LogicalName))
+            if (ProxyTypesAssembly != null)
             {
                 //If the context is using a proxy types assembly then we can just guess the metadata from the generated attributes
                 var type = FindReflectedType(e.LogicalName);
