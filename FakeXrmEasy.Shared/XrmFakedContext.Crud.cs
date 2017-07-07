@@ -1,20 +1,20 @@
 ﻿using FakeItEasy;
+using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xrm.Sdk.Query;
-using System.ServiceModel;
-using Microsoft.Xrm.Sdk.Messages;
-using FakeXrmEasy.Extensions;
 using System.Reflection;
+using System.ServiceModel;
 
 namespace FakeXrmEasy
 {
     public partial class XrmFakedContext : IXrmContext
     {
-
         #region CRUD
+
         /// <summary>
         /// A fake retrieve method that will query the FakedContext to retrieve the specified
         /// entity and Guid, or null, if the entity was not found
@@ -60,14 +60,15 @@ namespace FakeXrmEasy
 
                     //Return the subset of columns requested only
                     var reflectedType = context.FindReflectedType(entityName);
-                    
+
                     //Entity logical name exists, so , check if the requested entity exists
                     if (context.Data.ContainsKey(entityName) && context.Data[entityName] != null
                         && context.Data[entityName].ContainsKey(id))
                     {
                         //Entity found => return only the subset of columns specified or all of them
                         var foundEntity = context.Data[entityName][id].Clone(reflectedType);
-                        if (columnSet.AllColumns) { 
+                        if (columnSet.AllColumns)
+                        {
                             foundEntity.ApplyDateBehaviour(context);
                             return foundEntity;
                         }
@@ -85,6 +86,7 @@ namespace FakeXrmEasy
                     }
                 });
         }
+
         /// <summary>
         /// Fakes the Create message
         /// </summary>
@@ -96,10 +98,9 @@ namespace FakeXrmEasy
                 .ReturnsLazily((Entity e) =>
                 {
                     context.CreateEntity(e);
-           
+
                     return e.Id;
                 });
-
         }
 
         protected static void FakeUpdate(XrmFakedContext context, IOrganizationService fakedService)
@@ -130,7 +131,6 @@ namespace FakeXrmEasy
                         throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("{0} with Id {1} Does Not Exist", e.LogicalName, e.Id));
                     }
                 });
-
         }
 
         /// <summary>
@@ -199,9 +199,11 @@ namespace FakeXrmEasy
         //        });
 
         //}
-        #endregion
+
+        #endregion CRUD
 
         #region Other protected methods
+
         protected void EnsureEntityNameExistsInMetadata(string sEntityName)
         {
             if (Relationships.Values.Any(value => new[] { value.Entity1LogicalName, value.Entity2LogicalName, value.IntersectEntity }.Contains(sEntityName, StringComparer.InvariantCultureIgnoreCase)))
@@ -342,7 +344,6 @@ namespace FakeXrmEasy
                 Data[e.LogicalName].Add(e.Id, e);
             }
 
-
             //Update metadata for that entity
             if (!AttributeMetadata.ContainsKey(e.LogicalName))
                 AttributeMetadata.Add(e.LogicalName, new Dictionary<string, string>());
@@ -363,7 +364,6 @@ namespace FakeXrmEasy
                 }
                 else
                     throw new Exception(string.Format("Couldnt find reflected type for {0}", e.LogicalName));
-
             }
             else
             {
@@ -375,8 +375,6 @@ namespace FakeXrmEasy
                         AttributeMetadata[e.LogicalName].Add(attKey, attKey);
                 }
             }
-
-            
         }
 
         protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
@@ -390,7 +388,7 @@ namespace FakeXrmEasy
             //Early bound types
             if (ProxyTypesAssembly != null)
             {
-                //Check if attribute exists in the early bound type 
+                //Check if attribute exists in the early bound type
                 var earlyBoundType = FindReflectedType(sEntityName);
                 if (earlyBoundType != null)
                 {
@@ -409,7 +407,7 @@ namespace FakeXrmEasy
             //Dynamic entities => just return true
             return true;
         }
-        #endregion
 
+        #endregion Other protected methods
     }
 }

@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Crm;
 using FakeItEasy;
-using FakeXrmEasy;
-using Xunit;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using Microsoft.Xrm.Sdk.Client;
-using Crm;
-using Microsoft.Xrm.Sdk.Messages;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;  //TypedEntities generated code for testing
-
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
 {
@@ -141,7 +136,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
             });
 
             fakedContext.Data["contact"][guid]["versionnumber"] = long.MaxValue; //Couldn´t be set by the Proxy types but set here just for testing long data types
-            
+
             var service = fakedContext.GetFakedOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
@@ -175,6 +170,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 Assert.True(contact.Count == 1);
             }
         }
+
         [Fact]
         public void When_executing_a_linq_query_with_equals_between_2_date_times_result_is_returned()
         {
@@ -361,8 +357,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
             {
                 var activities = (from pointer in ctx.CreateQuery<Email>()
                                   join party in ctx.CreateQuery<ActivityParty>() on pointer.ActivityId.Value equals party.ActivityId.Id
-                                 // from party in ctx.CreateQuery<ActivityParty>() //on pointer.ActivityId.Value equals party.ActivityId.Id
-                                    where party.PartyId.Id == contactId
+                                  // from party in ctx.CreateQuery<ActivityParty>() //on pointer.ActivityId.Value equals party.ActivityId.Id
+                                  where party.PartyId.Id == contactId
                                   select pointer).ToList();
 
                 Assert.True(activities.Count == 1);
@@ -419,8 +415,5 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
         //    Assert.Equal(1, result.Entities.Count);
         //    Assert.Equal(AccountState.Inactive, (result.Entities[0] as Account).StateCode.Value);
         //}
-
-
     }
-    
 }

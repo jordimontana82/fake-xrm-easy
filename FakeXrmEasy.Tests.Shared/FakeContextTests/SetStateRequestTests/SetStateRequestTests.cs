@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Xrm.Sdk.Query;
-using Xunit;
-using Crm;
+﻿using Crm;
 using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
+using System;
+using System.Linq;
 using System.Reflection;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.SetStateRequestTests
 {
@@ -21,15 +17,16 @@ namespace FakeXrmEasy.Tests.FakeContextTests.SetStateRequestTests
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
             var service = context.GetFakedOrganizationService();
 
-            var c = new Contact() {
+            var c = new Contact()
+            {
                 Id = Guid.NewGuid()
-            }; 
+            };
             context.Initialize(new[] { c });
 
             var request = new SetStateRequest
             {
                 EntityMoniker = c.ToEntityReference(),
-                State = new OptionSetValue(69), 
+                State = new OptionSetValue(69),
                 Status = new OptionSetValue(6969),
             };
 
@@ -40,8 +37,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.SetStateRequestTests
                            where con.Id == c.Id
                            select con).FirstOrDefault();
 
-            Assert.Equal((int) contact.StateCode.Value, 69);
-            Assert.Equal((int) contact.StatusCode.Value, 6969);
+            Assert.Equal((int)contact.StateCode.Value, 69);
+            Assert.Equal((int)contact.StatusCode.Value, 6969);
         }
 
         [Fact]
@@ -78,7 +75,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.SetStateRequestTests
             };
 
             c["statecode"] = new OptionSetValue(69); //As the StateCode is read only in the early bound entity, this is the only way of updating it
-             
+
             context.Initialize(new[] { c });
 
             //Retrieve record after update

@@ -3,9 +3,8 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Xunit;
 using System.Linq;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 {
@@ -20,17 +19,16 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             contact1.Id = Guid.NewGuid();
             contact1.Attributes["firstname"] = "Fred";
             contact1.Attributes["lastname"] = "Bloggs";
-            contact1.Attributes["new_somefield"] = new Money(12345); // (decimal)678910 
+            contact1.Attributes["new_somefield"] = new Money(12345); // (decimal)678910
 
             Entity contact2 = new Entity("contact");
             contact2.Id = Guid.NewGuid();
             contact2.Attributes["firstname"] = "Jo";
             contact2.Attributes["lastname"] = "Bloggs";
-            contact2.Attributes["new_somefield"] = new Money(678910); // (decimal)678910 
-
+            contact2.Attributes["new_somefield"] = new Money(678910); // (decimal)678910
 
             contactList.Add(contact2);
-            contactList.Add(contact1); 
+            contactList.Add(contact1);
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
@@ -55,14 +53,13 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             contact1.Id = Guid.NewGuid();
             contact1.Attributes["firstname"] = "Fred";
             contact1.Attributes["lastname"] = "Bloggs";
-            contact1.Attributes["new_somefield"] = new Money(12345); // (decimal)678910 
+            contact1.Attributes["new_somefield"] = new Money(12345); // (decimal)678910
 
             Entity contact2 = new Entity("contact");
             contact2.Id = Guid.NewGuid();
             contact2.Attributes["firstname"] = "Jo";
             contact2.Attributes["lastname"] = "Bloggs";
-            contact2.Attributes["new_somefield"] = new Money(678910); // (decimal)678910 
-
+            contact2.Attributes["new_somefield"] = new Money(678910); // (decimal)678910
 
             contactList.Add(contact2);
             contactList.Add(contact1);
@@ -180,7 +177,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             contact2.Attributes["firstname"] = "Jo";
             contact2.Attributes["new_optionsetfield"] = new OptionSetValue(2);
 
-
             contactList.Add(contact2);
             contactList.Add(contact1);
 
@@ -225,7 +221,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             qry.AddOrder("new_orderbyfield", OrderType.Ascending);
             var results = service.RetrieveMultiple(qry);
 
-            var firstResultValue = (int) results.Entities[0]["new_orderbyfield"];
+            var firstResultValue = (int)results.Entities[0]["new_orderbyfield"];
 
             Assert.Equal(69, firstResultValue);
         }
@@ -434,12 +430,12 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             var ctx = new XrmFakedContext();
             var service = ctx.GetOrganizationService();
 
-            var account11 = new Account() { Id = Guid.NewGuid(), Name = "11", ImportSequenceNumber = 1, NumberOfEmployees = 1  };
-            var account12 = new Account() { Id = Guid.NewGuid(), Name = "12", ImportSequenceNumber = 1, NumberOfEmployees = 2  };
-            var account21 = new Account() { Id = Guid.NewGuid(), Name = "21", ImportSequenceNumber = 2, NumberOfEmployees = 1  };
-            var account22 = new Account() { Id = Guid.NewGuid(), Name = "22", ImportSequenceNumber = 2, NumberOfEmployees = 2  };
-            var account31 = new Account() { Id = Guid.NewGuid(), Name = "31", ImportSequenceNumber = 3, NumberOfEmployees = 1  };
-            var account32 = new Account() { Id = Guid.NewGuid(), Name = "32", ImportSequenceNumber = 3, NumberOfEmployees = 2  };
+            var account11 = new Account() { Id = Guid.NewGuid(), Name = "11", ImportSequenceNumber = 1, NumberOfEmployees = 1 };
+            var account12 = new Account() { Id = Guid.NewGuid(), Name = "12", ImportSequenceNumber = 1, NumberOfEmployees = 2 };
+            var account21 = new Account() { Id = Guid.NewGuid(), Name = "21", ImportSequenceNumber = 2, NumberOfEmployees = 1 };
+            var account22 = new Account() { Id = Guid.NewGuid(), Name = "22", ImportSequenceNumber = 2, NumberOfEmployees = 2 };
+            var account31 = new Account() { Id = Guid.NewGuid(), Name = "31", ImportSequenceNumber = 3, NumberOfEmployees = 1 };
+            var account32 = new Account() { Id = Guid.NewGuid(), Name = "32", ImportSequenceNumber = 3, NumberOfEmployees = 2 };
 
             List<Account> initialAccs = new List<Account>() {
                 account12, account22, account21, account32, account11, account31

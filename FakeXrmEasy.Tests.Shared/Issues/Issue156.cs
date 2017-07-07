@@ -1,13 +1,10 @@
 ﻿using Crm;
 using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Xunit;
-using Microsoft.Xrm.Sdk.Query;
-
 using System.Reflection;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.Issues
 {
@@ -47,7 +44,7 @@ namespace FakeXrmEasy.Tests.Issues
 
             // Create Faked Context
             var ctx = new XrmFakedContext();
-             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Connection));
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Connection));
             //ctx.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
             ctx.Initialize(new List<Entity>() { contact, otherContact, conRole, conn });
 
@@ -75,8 +72,7 @@ namespace FakeXrmEasy.Tests.Issues
             // Act
             EntityCollection getConnectionListResults = ctx.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
 
-
-            // Assert 
+            // Assert
             Assert.True(getConnectionListResults.Entities.Count > 0);
         }
     }

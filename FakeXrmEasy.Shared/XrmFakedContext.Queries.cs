@@ -1,4 +1,11 @@
-﻿using System;
+﻿using FakeXrmEasy.Extensions;
+using FakeXrmEasy.Extensions.FetchXml;
+using FakeXrmEasy.Models;
+using FakeXrmEasy.OrganizationFaults;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Client;
+using Microsoft.Xrm.Sdk.Query;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,13 +13,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.ServiceModel;
 using System.Xml.Linq;
-using FakeXrmEasy.Extensions;
-using FakeXrmEasy.Extensions.FetchXml;
-using FakeXrmEasy.Models;
-using FakeXrmEasy.OrganizationFaults;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Client;
-using Microsoft.Xrm.Sdk.Query;
 
 namespace FakeXrmEasy
 {
@@ -47,7 +47,6 @@ namespace FakeXrmEasy
 
                 throw new Exception("XrmFakedContext.FindReflectedType: " + s);
             }
-
         }
 
         protected internal Type FindReflectedAttributeType(Type earlyBoundType, string sAttributeName)
@@ -67,7 +66,7 @@ namespace FakeXrmEasy
                 }
             }
 
-            if(attributeInfo == null)
+            if (attributeInfo == null)
             {
                 throw new Exception(string.Format("XrmFakedContext.FindReflectedAttributeType: Attribute {0} not found for type {1}", sAttributeName, earlyBoundType.ToString()));
             }
@@ -115,11 +114,11 @@ namespace FakeXrmEasy
         {
             Type typeParameter = typeof(T);
 
-            if(ProxyTypesAssembly == null)
+            if (ProxyTypesAssembly == null)
             {
                 //Try to guess proxy types assembly
                 var asm = Assembly.GetAssembly(typeof(T));
-                if(asm != null)
+                if (asm != null)
                 {
                     ProxyTypesAssembly = asm;
                 }
@@ -168,8 +167,8 @@ namespace FakeXrmEasy
             return Data[s].Values.AsQueryable();
         }
 
-        public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, string linkFromAlias = "") {
-
+        public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, string linkFromAlias = "")
+        {
             var leAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
             context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName);
             context.EnsureEntityNameExistsInMetadata(le.LinkToEntityName);
@@ -205,6 +204,7 @@ namespace FakeXrmEasy
                                     (outerEl, innerEl) => outerEl.JoinAttributes(innerEl, new ColumnSet(true), leAlias, context));
 
                     break;
+
                 case JoinOperator.LeftOuter:
                     query = query.GroupJoin(inner,
                                     outerKey => outerKey.KeySelector(linkFromAlias, context),
@@ -214,11 +214,10 @@ namespace FakeXrmEasy
                                                             , (x, y) => x.outerEl
                                                                             .JoinAttributes(y, new ColumnSet(true), leAlias, context));
 
-
                     break;
+
                 default: //This shouldn't be reached as there are only 3 types of Join...
                     throw new PullRequestException(string.Format("The join operator {0} is currently not supported. Feel free to implement and send a PR.", le.JoinOperator));
-
             }
 
             //Process nested linked entities recursively
@@ -231,8 +230,6 @@ namespace FakeXrmEasy
             }
             return query;
         }
-
-
 
         protected static XElement RetrieveFetchXmlNode(XDocument xlDoc, string sName)
         {
@@ -294,7 +291,7 @@ namespace FakeXrmEasy
             }
 
             var linkedEntities = xlDoc.ToLinkEntities(context);
-            foreach(var le in linkedEntities)
+            foreach (var le in linkedEntities)
             {
                 query.LinkEntities.Add(le);
             }
@@ -328,7 +325,7 @@ namespace FakeXrmEasy
             //Sort results
             if (qe.Orders != null)
             {
-                if(qe.Orders.Count > 0)
+                if (qe.Orders.Count > 0)
                 {
                     IOrderedQueryable<Entity> orderedQuery = null;
 
@@ -357,7 +354,7 @@ namespace FakeXrmEasy
 
             //Apply TopCount
 
-            if (qe.PageInfo!=null && qe.PageInfo.Count >0 && qe.PageInfo.PageNumber>0)
+            if (qe.PageInfo != null && qe.PageInfo.Count > 0 && qe.PageInfo.PageNumber > 0)
             {
                 //selecting 1 extra to get calculate if there are more records to fetch
                 query = query.Skip(qe.PageInfo.Count * (qe.PageInfo.PageNumber - 1));
@@ -367,12 +364,11 @@ namespace FakeXrmEasy
             {
                 qe.TopCount = context.MaxRetrieveCount;
             }
-            
+
             query = query.Take(qe.TopCount.Value);
 
             return query;
         }
-
 
         protected static Expression TranslateConditionExpression(QueryExpression qe, XrmFakedContext context, TypedConditionExpression c, ParameterExpression entity)
         {
@@ -380,7 +376,6 @@ namespace FakeXrmEasy
                 entity,
                 "Attributes"
                 );
-
 
             //If the attribute comes from a joined entity, then we need to access the attribute from the join
             //But the entity name attribute only exists >= 2013
@@ -418,8 +413,6 @@ namespace FakeXrmEasy
                             Expression.Constant(c.CondExpression.AttributeName, typeof(string))
                             );
 #endif
-
-
 
             Expression getNonBasicValueExpr = getAttributeValueExpr;
 
@@ -516,7 +509,7 @@ namespace FakeXrmEasy
                     break;
 
                 case ConditionOperator.Between:
-                    if(c.CondExpression.Values.Count != 2)
+                    if (c.CondExpression.Values.Count != 2)
                     {
                         throw new Exception("Between operator requires exactly 2 values.");
                     }
@@ -530,10 +523,9 @@ namespace FakeXrmEasy
                     }
                     operatorExpression = Expression.Not(TranslateConditionExpressionBetween(c, getNonBasicValueExpr, containsAttributeExpression));
                     break;
+
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.CondExpression.Operator.ToString()));
-
-
             }
 
             if (c.IsOuter)
@@ -543,8 +535,8 @@ namespace FakeXrmEasy
             }
             else
                 return operatorExpression;
-
         }
+
         protected static Expression GetAppropiateTypedValue(object value)
         {
             //Basic types conversions
@@ -552,7 +544,7 @@ namespace FakeXrmEasy
             if (value is string)
             {
                 DateTime dtDateTimeConversion;
-                if (DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture,DateTimeStyles.AdjustToUniversal, out dtDateTimeConversion))
+                if (DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out dtDateTimeConversion))
                 {
                     return Expression.Constant(dtDateTimeConversion, typeof(DateTime));
                 }
@@ -561,7 +553,8 @@ namespace FakeXrmEasy
                     return GetCaseInsensitiveExpression(Expression.Constant(value, typeof(string)));
                 }
             }
-            else if(value is EntityReference) {
+            else if (value is EntityReference)
+            {
                 var cast = (value as EntityReference).Id;
                 return Expression.Constant(cast);
             }
@@ -582,7 +575,6 @@ namespace FakeXrmEasy
         {
             if (attributeType == null)
                 return GetAppropiateTypedValue(value);
-
 
             //Basic types conversions
             //Special case => datetime is sent as a string
@@ -681,12 +673,11 @@ namespace FakeXrmEasy
 
         protected static Expression GetAppropiateCastExpressionBasedOnAttributeTypeOrValue(Expression input, object value, Type attributeType)
         {
-            if(attributeType != null)
+            if (attributeType != null)
             {
-
 #if FAKE_XRM_EASY
-                    if (attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference))
-                            return GetAppropiateCastExpressionBasedGuid(input);
+                if (attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference))
+                    return GetAppropiateCastExpressionBasedGuid(input);
 #endif
                 if (attributeType == typeof(Guid))
                     return GetAppropiateCastExpressionBasedGuid(input);
@@ -700,7 +691,7 @@ namespace FakeXrmEasy
                     return GetAppropiateCastExpressionBasedOnBoolean(input);
                 if (attributeType == typeof(string))
                     return GetAppropiateCastExpressionBasedOnStringAndType(input, value, attributeType);
-                if(attributeType.IsDateTime())
+                if (attributeType.IsDateTime())
                     return GetAppropiateCastExpressionBasedOnDateTime(input, value);
 
                 return GetAppropiateCastExpressionDefault(input, value); //any other type
@@ -708,6 +699,7 @@ namespace FakeXrmEasy
 
             return GetAppropiateCastExpressionBasedOnValueInherentType(input, value); //Dynamic entities
         }
+
         protected static Expression GetAppropiateCastExpressionBasedOnString(Expression input, object value)
         {
             var defaultStringExpression = GetCaseInsensitiveExpression(GetAppropiateCastExpressionDefault(input, value));
@@ -719,7 +711,7 @@ namespace FakeXrmEasy
             }
 
             int iValue;
-            if(int.TryParse(value.ToString(), out iValue))
+            if (int.TryParse(value.ToString(), out iValue))
             {
                 return Expression.Condition(Expression.TypeIs(input, typeof(OptionSetValue)),
                     GetToStringExpression<Int32>(GetAppropiateCastExpressionBasedOnInt(input)),
@@ -762,6 +754,7 @@ namespace FakeXrmEasy
         {
             return Expression.Convert(input, value.GetType());  //Default type conversion
         }
+
         protected static Expression GetAppropiateCastExpressionBasedGuid(Expression input)
         {
             var getIdFromEntityReferenceExpr = Expression.Call(Expression.TypeAs(input, typeof(EntityReference)),
@@ -801,7 +794,6 @@ namespace FakeXrmEasy
                 Expression.Condition(Expression.TypeIs(input, typeof(Guid)),  //If any other case, then just compare it as a Guid directly
                     Expression.Convert(input, typeof(Guid)),
                     Expression.Constant(Guid.Empty, typeof(Guid))));
-
         }
 
         protected static Expression GetAppropiateCastExpressionBasedOnDecimal(Expression input)
@@ -815,7 +807,6 @@ namespace FakeXrmEasy
                            Expression.Condition(Expression.TypeIs(input, typeof(decimal)),
                                         Expression.Convert(input, typeof(decimal)),
                                         Expression.Constant(0.0M)));
-
         }
 
         protected static Expression GetAppropiateCastExpressionBasedOnBoolean(Expression input)
@@ -829,7 +820,6 @@ namespace FakeXrmEasy
                            Expression.Condition(Expression.TypeIs(input, typeof(bool)),
                                         Expression.Convert(input, typeof(bool)),
                                         Expression.Constant(false)));
-
         }
 
         protected static Expression GetAppropiateCastExpressionBasedOnInt(Expression input)
@@ -842,24 +832,27 @@ namespace FakeXrmEasy
                                                         typeof(int)),
                                                     Expression.Convert(input, typeof(int)));
         }
+
         protected static Expression TranslateConditionExpressionEqual(XrmFakedContext context, TypedConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
-
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
 
             object unaryOperatorValue = null;
 
-            switch(c.CondExpression.Operator)
+            switch (c.CondExpression.Operator)
             {
                 case ConditionOperator.Today:
                     unaryOperatorValue = DateTime.Today;
                     break;
+
                 case ConditionOperator.Yesterday:
                     unaryOperatorValue = DateTime.Today.AddDays(-1);
                     break;
+
                 case ConditionOperator.Tomorrow:
                     unaryOperatorValue = DateTime.Today.AddDays(1);
                     break;
+
                 case ConditionOperator.EqualUserId:
                 case ConditionOperator.NotEqualUserId:
                     unaryOperatorValue = context.CallerId.Id;
@@ -876,12 +869,9 @@ namespace FakeXrmEasy
             {
                 foreach (object value in c.CondExpression.Values)
                 {
-
                     expOrValues = Expression.Or(expOrValues, Expression.Equal(
                                 GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, value),
                                 GetAppropiateTypedValueAndType(value, c.AttributeType)));
-
-
                 }
             }
 
@@ -898,7 +888,7 @@ namespace FakeXrmEasy
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             foreach (object value in c.Values)
             {
-               if (value is Array)
+                if (value is Array)
                 {
                     foreach (var a in ((Array)value))
                     {
@@ -925,11 +915,9 @@ namespace FakeXrmEasy
         //    BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
         //    foreach (object value in c.Values)
         //    {
-
         //        expOrValues = Expression.Or(expOrValues, Expression.Equal(
         //                    GetAppropiateCastExpressionBasedOnValue(getAttributeValueExpr, value),
         //                    GetAppropiateTypedValue(value)));
-
 
         //    }
         //    return Expression.AndAlso(
@@ -945,8 +933,8 @@ namespace FakeXrmEasy
             return Expression.Or(
                                 TranslateConditionExpressionEqual(context, tc, getAttributeValueExpr, containsAttributeExpr),
                                 TranslateConditionExpressionGreaterThan(tc, getAttributeValueExpr, containsAttributeExpr));
-
         }
+
         protected static Expression TranslateConditionExpressionGreaterThan(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             var c = tc.CondExpression;
@@ -977,8 +965,8 @@ namespace FakeXrmEasy
             return Expression.Or(
                                 TranslateConditionExpressionEqual(context, tc, getAttributeValueExpr, containsAttributeExpr),
                                 TranslateConditionExpressionLessThan(tc, getAttributeValueExpr, containsAttributeExpr));
-
         }
+
         protected static Expression TranslateConditionExpressionLessThan(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             var c = tc.CondExpression;
@@ -1005,7 +993,7 @@ namespace FakeXrmEasy
             value1 = c.Values[0];
             value2 = c.Values[1];
 
-            //Between the range... 
+            //Between the range...
             var exp = Expression.And(
                 Expression.GreaterThanOrEqual(
                             GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value1),
@@ -1014,7 +1002,6 @@ namespace FakeXrmEasy
                 Expression.LessThanOrEqual(
                             GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value2),
                             GetAppropiateTypedValueAndType(value2, tc.AttributeType)));
-
 
             //and... attribute exists too
             return Expression.AndAlso(
@@ -1042,7 +1029,7 @@ namespace FakeXrmEasy
             var c = tc.CondExpression;
 
             //Append a ´%´at the end of each condition value
-            var computedCondition = new ConditionExpression(c.AttributeName, c.Operator, c.Values.Select(x => "%" + x.ToString()).ToList() );
+            var computedCondition = new ConditionExpression(c.AttributeName, c.Operator, c.Values.Select(x => "%" + x.ToString()).ToList());
             var typedComputedCondition = new TypedConditionExpression(computedCondition);
             typedComputedCondition.AttributeType = tc.AttributeType;
 
@@ -1053,6 +1040,7 @@ namespace FakeXrmEasy
         {
             return Expression.Call(e, typeof(T).GetMethod("ToString", new Type[] { }));
         }
+
         protected static Expression GetCaseInsensitiveExpression(Expression e)
         {
             return Expression.Call(e,
@@ -1076,10 +1064,8 @@ namespace FakeXrmEasy
 
                 if (strValue.EndsWith(sLikeOperator) && strValue.StartsWith(sLikeOperator))
                     sMethod = "Contains";
-
                 else if (strValue.StartsWith(sLikeOperator))
                     sMethod = "EndsWith";
-
                 else
                     sMethod = "StartsWith";
 
@@ -1105,7 +1091,6 @@ namespace FakeXrmEasy
             computedTypedCondition.AttributeType = tc.AttributeType;
 
             return TranslateConditionExpressionLike(computedTypedCondition, getAttributeValueExpr, containsAttributeExpr);
-
         }
 
         protected static BinaryExpression TranslateMultipleConditionExpressions(QueryExpression qe, XrmFakedContext context, string sEntityName, List<ConditionExpression> conditions, LogicalOperator op, ParameterExpression entity, bool bIsOuter)
@@ -1118,18 +1103,17 @@ namespace FakeXrmEasy
 
             foreach (var c in conditions)
             {
-                //Create a new typed expression 
+                //Create a new typed expression
                 var typedExpression = new TypedConditionExpression(c);
                 typedExpression.IsOuter = bIsOuter;
 
                 string sAttributeName = c.AttributeName;
 
                 //Find the attribute type if using early bound entities
-                if(context.ProxyTypesAssembly != null)
+                if (context.ProxyTypesAssembly != null)
                 {
-
 #if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
-                    if(c.EntityName != null)
+                    if (c.EntityName != null)
                         sEntityName = qe.GetEntityNameFromAlias(c.EntityName);
                     else
                     {
@@ -1139,14 +1123,16 @@ namespace FakeXrmEasy
                             sEntityName = qe.GetEntityNameFromAlias(alias);
                             sAttributeName = c.AttributeName.Split('.')[1];
                         }
-                        else {
+                        else
+                        {
                             sEntityName = qe.EntityName; //Attributes from the root entity
                         }
                     }
 
 #else
                     //CRM 2011
-                    if(c.AttributeName.IndexOf(".") >= 0) {
+                    if (c.AttributeName.IndexOf(".") >= 0)
+                    {
                         var alias = c.AttributeName.Split('.')[0];
                         sEntityName = qe.GetEntityNameFromAlias(alias);
                         sAttributeName = c.AttributeName.Split('.')[1];
@@ -1172,8 +1158,7 @@ namespace FakeXrmEasy
                     }
                 }
 
-
-                //Build a binary expression  
+                //Build a binary expression
                 if (op == LogicalOperator.And)
                 {
                     binaryExpression = Expression.And(binaryExpression, TranslateConditionExpression(qe, context, typedExpression, entity));
@@ -1197,7 +1182,7 @@ namespace FakeXrmEasy
             {
                 var thisFilterLambda = TranslateFilterExpressionToExpression(qe, context, sEntityName, f, entity, bIsOuter);
 
-                //Build a binary expression  
+                //Build a binary expression
                 if (op == LogicalOperator.And)
                 {
                     binaryExpression = Expression.And(binaryExpression, thisFilterLambda);
@@ -1256,7 +1241,7 @@ namespace FakeXrmEasy
                     ce.AttributeName = entityAlias + "." + ce.AttributeName;
                 }
 
-                foreach(var fe in le.LinkCriteria.Filters)
+                foreach (var fe in le.LinkCriteria.Filters)
                 {
                     foreach (var ce in fe.Conditions)
                     {
@@ -1282,20 +1267,19 @@ namespace FakeXrmEasy
         protected static Expression TranslateQueryExpressionFiltersToExpression(XrmFakedContext context, QueryExpression qe, ParameterExpression entity)
         {
             var linkedEntitiesQueryExpressions = new List<Expression>();
-            foreach(var le in qe.LinkEntities)
+            foreach (var le in qe.LinkEntities)
             {
                 var listOfExpressions = TranslateLinkedEntityFilterExpressionToExpression(qe, context, le, entity);
                 linkedEntitiesQueryExpressions.AddRange(listOfExpressions);
             }
 
-            if(linkedEntitiesQueryExpressions.Count > 0 && qe.Criteria != null)
+            if (linkedEntitiesQueryExpressions.Count > 0 && qe.Criteria != null)
             {
                 //Return the and of the two
                 Expression andExpression = Expression.Constant(true);
-                foreach(var e in linkedEntitiesQueryExpressions)
+                foreach (var e in linkedEntitiesQueryExpressions)
                 {
                     andExpression = Expression.And(e, andExpression);
-
                 }
                 var feExpression = TranslateFilterExpressionToExpression(qe, context, qe.EntityName, qe.Criteria, entity, false);
                 return Expression.And(andExpression, feExpression);
@@ -1307,7 +1291,6 @@ namespace FakeXrmEasy
                 foreach (var e in linkedEntitiesQueryExpressions)
                 {
                     andExpression = Expression.And(e, andExpression);
-
                 }
                 return andExpression;
             }
@@ -1317,6 +1300,7 @@ namespace FakeXrmEasy
                 return TranslateFilterExpressionToExpression(qe, context, qe.EntityName, qe.Criteria, entity, false);
             }
         }
+
         protected static Expression TranslateFilterExpressionToExpression(QueryExpression qe, XrmFakedContext context, string sEntityName, FilterExpression fe, ParameterExpression entity, bool bIsOuter)
         {
             if (fe == null) return Expression.Constant(true);

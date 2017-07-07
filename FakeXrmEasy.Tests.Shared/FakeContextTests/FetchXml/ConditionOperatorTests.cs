@@ -4,7 +4,6 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
@@ -78,7 +77,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="last-x-years" />
       <xs:enumeration value="next-x-years" />
 
-
       <xs:enumeration value="eq-userteams" />
       <xs:enumeration value="eq-useroruserteams" />
       <xs:enumeration value="eq-useroruserhierarchy" />
@@ -87,7 +85,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="ne-businessid" />
       <xs:enumeration value="eq-userlanguage" />
 
-      
       <xs:enumeration value="this-fiscal-year" />
       <xs:enumeration value="this-fiscal-period" />
       <xs:enumeration value="next-fiscal-year" />
@@ -104,7 +101,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="in-or-before-fiscal-period-and-year" />
       <xs:enumeration value="in-or-after-fiscal-period-and-year" />
 
-    
       HIERACHY OPERATORS:
       <xs:enumeration value="under"/>
       <xs:enumeration value="eq-or-under" />
@@ -114,9 +110,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
     </xs:restriction>
   </xs:simpleType>
-      
-     
+
      */
+
     /// </summary>
     public class ConditionOperatorTests
     {
@@ -553,8 +549,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                                   </entity>
                             </fetch>";
 
-
-
             var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
 
             Assert.True(query.Criteria != null);
@@ -807,7 +801,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(23, retrievedDate.Value.Day);
         }
 
-
         [Fact]
         public void FetchXml_Operator_On_Or_Before_Execution()
         {
@@ -907,7 +900,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                             </fetch>";
 
             var date = DateTime.Today;
-            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt 
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(-1) }; //Should be returned
             ctx.Initialize(new[] { ct1, ct2 });
             var service = ctx.GetFakedOrganizationService();
@@ -934,7 +927,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                             </fetch>";
 
             var date = DateTime.Today;
-            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt 
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(1) }; //Should be returned
             ctx.Initialize(new[] { ct1, ct2 });
             var service = ctx.GetFakedOrganizationService();
@@ -971,7 +964,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(1, query.Criteria.Conditions.Count);
             Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
             Assert.Equal(ConditionOperator.Between, query.Criteria.Conditions[0].Operator);
-            Assert.Equal(new DateTime(2013,5,17), query.Criteria.Conditions[0].Values[0]);
+            Assert.Equal(new DateTime(2013, 5, 17), query.Criteria.Conditions[0].Values[0]);
             Assert.Equal(new DateTime(2013, 5, 20, 14, 40, 0), query.Criteria.Conditions[0].Values[1]);
         }
 
@@ -1024,8 +1017,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                             </fetch>";
 
             var date = DateTime.Today;
-            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt 
-            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(2013,05,19) }; //Should be returned
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(2013, 05, 19) }; //Should be returned
             ctx.Initialize(new[] { ct1, ct2 });
             var service = ctx.GetFakedOrganizationService();
 
@@ -1249,7 +1242,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal("product", query.Criteria.Conditions[0].EntityName);
             Assert.Equal(ConditionOperator.Null, query.Criteria.Conditions[0].Operator);
             Assert.Equal(0, query.Criteria.Conditions[0].Values.Count);
-
         }
 
         [Fact]
@@ -1294,6 +1286,5 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(0, collection.Entities.Count);
         }
 #endif
-
     }
 }

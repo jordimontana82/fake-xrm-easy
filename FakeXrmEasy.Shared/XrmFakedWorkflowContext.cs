@@ -1,8 +1,6 @@
-﻿using Microsoft.Xrm.Sdk.Workflow;
+﻿using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Workflow;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xrm.Sdk;
 
 namespace FakeXrmEasy
 {
@@ -64,9 +62,8 @@ namespace FakeXrmEasy
 
         public int WorkflowCategory { get; set; }
 
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
         public int WorkflowMode { get; set; }
 #endif
-
     }
 }

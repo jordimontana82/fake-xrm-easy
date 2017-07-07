@@ -1,12 +1,10 @@
 ﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
-    public class PublishXmlRequestExecutor: IFakeMessageExecutor
+    public class PublishXmlRequestExecutor : IFakeMessageExecutor
     {
         public bool CanExecute(OrganizationRequest request)
         {
@@ -17,13 +15,12 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             var req = request as PublishXmlRequest;
 
-            if(string.IsNullOrWhiteSpace(req.ParameterXml))
+            if (string.IsNullOrWhiteSpace(req.ParameterXml))
             {
                 throw new Exception(string.Format("ParameterXml property must not be blank."));
             }
             return new PublishXmlResponse()
             {
-
             };
         }
 

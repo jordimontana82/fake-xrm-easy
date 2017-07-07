@@ -1,9 +1,8 @@
 ﻿using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Xunit;
-using Microsoft.Xrm.Sdk.Query;
 
 namespace FakeXrmEasy.Tests.Issues
 {
@@ -19,7 +18,7 @@ namespace FakeXrmEasy.Tests.Issues
             XrmFakedContext context = new XrmFakedContext();
             IOrganizationService service = context.GetOrganizationService();
 
-            context.Initialize( 
+            context.Initialize(
                 new List<Entity>()
                 {
                     testEntity
@@ -40,7 +39,7 @@ namespace FakeXrmEasy.Tests.Issues
             XrmFakedContext context = new XrmFakedContext();
             IOrganizationService service = context.GetOrganizationService();
 
-            context.Initialize( 
+            context.Initialize(
                 new List<Entity>()
                 {
                     testEntity
@@ -62,7 +61,7 @@ namespace FakeXrmEasy.Tests.Issues
             XrmFakedContext context = new XrmFakedContext();
             IOrganizationService service = context.GetOrganizationService();
 
-            context.Initialize( 
+            context.Initialize(
                 new List<Entity>()
                 {
                     testEntity
@@ -82,7 +81,7 @@ namespace FakeXrmEasy.Tests.Issues
             XrmFakedContext context = new XrmFakedContext();
             IOrganizationService service = context.GetOrganizationService();
 
-            context.Initialize( 
+            context.Initialize(
                 new List<Entity>()
                 {
                     testEntity
@@ -94,6 +93,7 @@ namespace FakeXrmEasy.Tests.Issues
             EntityCollection result = service.RetrieveMultiple(contactQuery);
             Assert.False(result.Entities[0].Contains("field"));
         }
+
         [Fact]
         public void TestRetriveWithLinkEntityWithNullField()
         {
@@ -117,7 +117,7 @@ namespace FakeXrmEasy.Tests.Issues
             context.Initialize(initialEntities);
 
             QueryExpression query = new QueryExpression("child");
-            LinkEntity link = new LinkEntity("child", "parent", "parent", "parentid",JoinOperator.Inner);
+            LinkEntity link = new LinkEntity("child", "parent", "parent", "parentid", JoinOperator.Inner);
             link.EntityAlias = "parententity";
             link.Columns = new ColumnSet("field");
             query.LinkEntities.Add(link);

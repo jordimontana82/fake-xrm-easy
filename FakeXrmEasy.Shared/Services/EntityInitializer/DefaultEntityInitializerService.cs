@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
-using FakeXrmEasy.Extensions;
+using System;
 
 namespace FakeXrmEasy.Services
 {
@@ -25,7 +22,7 @@ namespace FakeXrmEasy.Services
             e.SetValueIfEmpty("createdon", now);
 
             //Overriden created on should replace created on
-            if(e.Contains("overriddencreatedon"))
+            if (e.Contains("overriddencreatedon"))
             {
                 e["createdon"] = e["overriddencreatedon"];
             }

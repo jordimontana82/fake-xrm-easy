@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ServiceModel;
-using System.Text;
-using Microsoft.Crm.Sdk.Messages;
+﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
+using System;
+using System.ServiceModel;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -51,7 +48,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
         public Type GetResponsibleRequestType()
         {
-            return typeof (AssignRequest);
+            return typeof(AssignRequest);
         }
     }
 }

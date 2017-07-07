@@ -1,15 +1,9 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
-using FakeItEasy;
-using FakeXrmEasy;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-
+using System;
 using System.Collections.Generic;
-using Microsoft.Xrm.Sdk;
-using Crm;
-using System.Reflection;
+using System.Linq;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 {
@@ -26,7 +20,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var qe = new QueryExpression() { EntityName = "contact" };
             qe.ColumnSet = new ColumnSet(true);
-            
 
             var filter1 = new FilterExpression();
             filter1.AddCondition(new ConditionExpression("fullname", ConditionOperator.Equal, "Contact 1"));
@@ -66,8 +59,5 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             Assert.True(result.Count == 2);
         }
-
-
-
     }
 }

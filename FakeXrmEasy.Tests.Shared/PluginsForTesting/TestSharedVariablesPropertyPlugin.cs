@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
+using System;
 
 namespace FakeXrmEasy.Tests.PluginsForTesting
 {
@@ -13,7 +9,7 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
         {
             var context = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
 
-            if(context.SharedVariables.Count == 0)
+            if (context.SharedVariables.Count == 0)
             {
                 throw new Exception("Plugin context must have shared variables");
             }

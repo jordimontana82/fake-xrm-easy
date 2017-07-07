@@ -4,11 +4,9 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using Xunit;
 using System.Linq;
+using System.Reflection;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveEntityRequestTests
 {

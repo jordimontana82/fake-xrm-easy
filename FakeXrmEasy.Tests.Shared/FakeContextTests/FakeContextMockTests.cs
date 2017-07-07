@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using FakeXrmEasy.FakeMessageExecutors;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Xrm.Sdk.Query;
+using System;
 using Xunit;
-using FakeXrmEasy.FakeMessageExecutors;
 
 namespace FakeXrmEasy.Tests.FakeContextTests
 {
@@ -43,7 +39,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         {
             return new RetrieveEntityResponse { ResponseName = "Another" };
         }
-
 
         [Fact]
         public void Should_Override_Execution_Mock()

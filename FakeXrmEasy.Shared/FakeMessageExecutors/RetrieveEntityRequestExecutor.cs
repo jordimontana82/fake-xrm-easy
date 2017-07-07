@@ -1,11 +1,10 @@
 ﻿using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using Microsoft.Xrm.Sdk.Client;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -53,7 +52,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 return new StringAttributeMetadata(sAttributeName);
             }
 
-
             //Default
             return new StringAttributeMetadata(sAttributeName);
         }
@@ -62,6 +60,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             return request is RetrieveEntityRequest;
         }
+
         public static Type GetEntityProxyType(string entityName, XrmFakedContext ctx)
         {
             //Find the reflected type in the proxy types assembly
@@ -78,6 +77,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
             return subClassType;
         }
+
         public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
         {
             var req = request as RetrieveEntityRequest;
@@ -95,7 +95,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             if (req.EntityFilters == Microsoft.Xrm.Sdk.Metadata.EntityFilters.Entity ||
                 req.EntityFilters == Microsoft.Xrm.Sdk.Metadata.EntityFilters.Attributes)
             {
-                if(!FakeEntityMetadata.ContainsKey(req.LogicalName))
+                if (!FakeEntityMetadata.ContainsKey(req.LogicalName))
                 {
                     throw new Exception("The specified entity name wasn't found in the metadata cache");
                 }
@@ -103,13 +103,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 //Find the reflected type in the proxy types assembly
                 var subClassType = GetEntityProxyType(req.LogicalName, ctx);
 
-
                 //Get that type properties
                 var attributes = subClassType
                     .GetProperties()
                     .Where(pi => pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true).Length > 0)
                     .ToList();
-
 
                 var computedAttributeMetadataList = new List<AttributeMetadata>();
 
@@ -129,7 +127,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
                 //AttributeMetadata is internal set in a sealed class so... just doing this
                 entityMetadata.GetType().GetProperty("Attributes").SetValue(entityMetadata, computedAttributeMetadataList.ToArray(), null);
-
 
                 //entityMetadata["AttributeMetadata"] = computedAttributeMetadataList.ToArray();
 

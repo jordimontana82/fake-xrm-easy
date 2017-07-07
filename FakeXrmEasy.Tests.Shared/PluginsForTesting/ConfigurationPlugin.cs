@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
+using System;
 
 namespace FakeXrmEasy.Tests.PluginsForTesting
 {
@@ -12,7 +8,9 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
         private string _unsecureConfiguration;
         private string _secureConfiguration;
 
-        public ConfigurationPlugin() : this(string.Empty, string.Empty) { }
+        public ConfigurationPlugin() : this(string.Empty, string.Empty)
+        {
+        }
 
         public ConfigurationPlugin(string unsecureConfiguration, string secureConfiguration)
         {

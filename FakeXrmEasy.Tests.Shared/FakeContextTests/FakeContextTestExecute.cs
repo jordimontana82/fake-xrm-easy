@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Crm;
+﻿using Crm;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
-using Xunit;
+using System;
 using System.Linq;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests
 {
@@ -27,7 +24,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var context = new XrmFakedContext();
             var service = context.GetOrganizationService();
 
-            context.Initialize(new [] { account });
+            context.Initialize(new[] { account });
 
             var assignRequest = new AssignRequest
             {

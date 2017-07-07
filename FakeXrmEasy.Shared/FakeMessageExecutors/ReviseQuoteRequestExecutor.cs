@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Xrm.Sdk.Query;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -54,7 +52,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
                 if (columnSet.AllColumns || columnSet.Columns.Contains(attribute.Key))
                 {
-                    revisedQuote[attribute.Key] = attribute.Value; 
+                    revisedQuote[attribute.Key] = attribute.Value;
                 }
             }
 

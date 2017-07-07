@@ -1,15 +1,7 @@
 ﻿using FakeItEasy;
 using Microsoft.Xrm.Sdk;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Xrm.Sdk.Query;
-using System.ServiceModel;
-using Microsoft.Xrm.Sdk.Messages;
-using System.Dynamic;
-using System.Linq.Expressions;
-using FakeXrmEasy.Extensions;
 
 namespace FakeXrmEasy
 {
@@ -76,6 +68,7 @@ namespace FakeXrmEasy
                 A.CallTo(() => context.PrimaryEntityName).ReturnsLazily(() => target.LogicalName);
             }
         }
+
         protected IExecutionContext GetFakedExecutionContext(XrmFakedPluginExecutionContext ctx)
         {
             var context = A.Fake<IExecutionContext>();
@@ -100,6 +93,7 @@ namespace FakeXrmEasy
             fakedPlugin.Execute(fakedServiceProvider); //Execute the plugin
             return fakedPlugin;
         }
+
         public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx) where T : IPlugin, new()
         {
             return this.ExecutePluginWith<T>(ctx, new T());
@@ -115,7 +109,7 @@ namespace FakeXrmEasy
             ctx.PreEntityImages = preEntityImages;
             ctx.OutputParameters = outputParameters;
             ctx.PostEntityImages = postEntityImages;
-            
+
             var fakedServiceProvider = GetFakedServiceProvider(ctx);
 
             var fakedPlugin = A.Fake<IPlugin>();
@@ -132,7 +126,7 @@ namespace FakeXrmEasy
 
         public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx,
                                      string unsecureConfiguration,
-                                     string secureConfiguration) where T : class, IPlugin 
+                                     string secureConfiguration) where T : class, IPlugin
         {
             var pluginType = typeof(T);
             var constructors = pluginType.GetConstructors().ToList();
@@ -146,10 +140,9 @@ namespace FakeXrmEasy
 
             var pluginInstance = (T)Activator.CreateInstance(typeof(T), unsecureConfiguration, secureConfiguration);
             return this.ExecutePluginWithConfigurations<T>(plugCtx, pluginInstance, unsecureConfiguration, secureConfiguration);
-          
         }
 
-        public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, 
+        public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx,
                                      T instance,
                                      string unsecureConfiguration,
                                      string secureConfiguration) where T : class, IPlugin
@@ -186,7 +179,7 @@ namespace FakeXrmEasy
         /// <typeparam name="T"></typeparam>
         /// <param name="target"></param>
         /// <returns></returns>
-        public IPlugin ExecutePluginWithTarget<T>(Entity target) where T: IPlugin, new()
+        public IPlugin ExecutePluginWithTarget<T>(Entity target) where T : IPlugin, new()
         {
             //Add the target entity to the InputParameters
             ParameterCollection inputParameters = new ParameterCollection();
@@ -260,6 +253,5 @@ namespace FakeXrmEasy
         {
             return TracingService;
         }
-
     }
 }

@@ -1,5 +1,5 @@
-﻿using Xunit;
-using Microsoft.Xrm.Sdk.Messages;
+﻿using Microsoft.Xrm.Sdk.Messages;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveAttributeRequestTests
 {
@@ -9,7 +9,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveAttributeRequestTests
         public static void When_retrieve_attribute_request_is_called_an_exception_is_not_thrown()
         {
             var context = new XrmFakedContext();
-            
+
             var service = context.GetFakedOrganizationService();
             RetrieveAttributeRequest req = new RetrieveAttributeRequest()
             {

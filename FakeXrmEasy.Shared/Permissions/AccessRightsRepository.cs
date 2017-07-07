@@ -1,17 +1,15 @@
-﻿using System;
+﻿using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
-using Microsoft.Xrm.Sdk;
-using Microsoft.Crm.Sdk.Messages;
 
 namespace FakeXrmEasy.Permissions
 {
-    public class AccessRightsRepository: IAccessRightsRepository
+    public class AccessRightsRepository : IAccessRightsRepository
     {
         protected Dictionary<EntityReference, List<PrincipalAccess>> _accessRights;
-        
+
         public AccessRightsRepository()
         {
             //One record might be accessed from many security principals
