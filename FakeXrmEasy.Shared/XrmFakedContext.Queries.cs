@@ -1222,7 +1222,7 @@ namespace FakeXrmEasy
             if (le.LinkCriteria != null)
             {
                 var earlyBoundType = context.FindReflectedType(le.LinkToEntityName);
-                var attributeMetadata = context.AttributeMetadata.ContainsKey(le.LinkToEntityName) ? context.AttributeMetadata[le.LinkToEntityName] : null;
+                var attributeMetadata = context.AttributeMetadataNames.ContainsKey(le.LinkToEntityName) ? context.AttributeMetadataNames[le.LinkToEntityName] : null;
 
                 foreach (var ce in le.LinkCriteria.Conditions)
                 {

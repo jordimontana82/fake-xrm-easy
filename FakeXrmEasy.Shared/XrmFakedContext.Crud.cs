@@ -346,8 +346,8 @@ namespace FakeXrmEasy
 
 
             //Update metadata for that entity
-            if (!AttributeMetadata.ContainsKey(e.LogicalName))
-                AttributeMetadata.Add(e.LogicalName, new Dictionary<string, string>());
+            if (!AttributeMetadataNames.ContainsKey(e.LogicalName))
+                AttributeMetadataNames.Add(e.LogicalName, new Dictionary<string, string>());
 
             //Update attribute metadata
             if (ProxyTypesAssembly != null)
@@ -359,8 +359,8 @@ namespace FakeXrmEasy
                     var props = type.GetProperties();
                     foreach (var p in props)
                     {
-                        if (!AttributeMetadata[e.LogicalName].ContainsKey(p.Name))
-                            AttributeMetadata[e.LogicalName].Add(p.Name, p.Name);
+                        if (!AttributeMetadataNames[e.LogicalName].ContainsKey(p.Name))
+                            AttributeMetadataNames[e.LogicalName].Add(p.Name, p.Name);
                     }
                 }
                 else
@@ -373,8 +373,8 @@ namespace FakeXrmEasy
                 //if the entity has the attribute in the dictionary
                 foreach (var attKey in e.Attributes.Keys)
                 {
-                    if (!AttributeMetadata[e.LogicalName].ContainsKey(attKey))
-                        AttributeMetadata[e.LogicalName].Add(attKey, attKey);
+                    if (!AttributeMetadataNames[e.LogicalName].ContainsKey(attKey))
+                        AttributeMetadataNames[e.LogicalName].Add(attKey, attKey);
                 }
             }
 

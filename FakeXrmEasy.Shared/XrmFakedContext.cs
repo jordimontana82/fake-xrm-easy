@@ -20,7 +20,6 @@ namespace FakeXrmEasy
     /// </summary>
     public partial class XrmFakedContext : IXrmContext
     {
-        protected Dictionary<string, Dictionary<string, string>> AttributeMetadata { get; set; }
 
         protected internal IOrganizationService Service { get; set; }
 
@@ -53,7 +52,6 @@ namespace FakeXrmEasy
 
         private Dictionary<string, XrmFakedRelationship> Relationships { get; set; }
 
-        public Dictionary<string, OptionSetMetadata> OptionSetValuesMetadata { get; set; }
 
         public IEntityInitializerService EntityInitializerService { get; set; }
         public IAccessRightsRepository AccessRightsRepository { get; set; }
@@ -64,7 +62,7 @@ namespace FakeXrmEasy
         {
             MaxRetrieveCount = 5000;
 
-            AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
+            AttributeMetadataNames = new Dictionary<string, Dictionary<string, string>>();
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
             ExecutionMocks = new Dictionary<Type, ServiceRequestExecution>();
             OptionSetValuesMetadata = new Dictionary<string, OptionSetMetadata>();
@@ -109,6 +107,11 @@ namespace FakeXrmEasy
             }
 
             Initialised = true;
+        }
+
+        public void Initialize(Entity e)
+        {
+            this.Initialize(new List<Entity>() { e });
         }
 
         public void AddExecutionMock<T>(ServiceRequestExecution mock) where T : OrganizationRequest
