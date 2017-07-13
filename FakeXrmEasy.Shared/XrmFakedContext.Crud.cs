@@ -230,7 +230,9 @@ namespace FakeXrmEasy
             if (CallerId == null)
                 CallerId = new EntityReference("systemuser", Guid.NewGuid()); //Create a new instance by default
 
-            EntityInitializerService.Initialize(e, CallerId.Id);
+            var isManyToManyRelationshipEntity = e.LogicalName != null && this.Relationships.ContainsKey(e.LogicalName);
+
+            EntityInitializerService.Initialize(e, CallerId.Id, isManyToManyRelationshipEntity);
         }
 
         protected void ValidateEntity(Entity e)
