@@ -13,7 +13,35 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public void Should_throw_exception_if_null_was_used_to_initialise()
         {
             var ctx = new XrmFakedContext();
-            Assert.Throws<Exception>(() => ctx.InitializeMetadata(null));
+            Assert.Throws<Exception>(() => ctx.InitializeMetadata(entityMetadataList: null));
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_logical_name_is_null_during_initialisation()
+        {
+            var ctx = new XrmFakedContext();
+            var entityMetadata = new EntityMetadata()
+            {
+
+            };
+            Assert.Throws<Exception>(() =>
+                ctx.InitializeMetadata(new List<EntityMetadata>() {
+                    entityMetadata
+                }));
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_logical_name_is_empty_during_initialisation()
+        {
+            var ctx = new XrmFakedContext();
+            var entityMetadata = new EntityMetadata()
+            {
+                LogicalName = ""
+            };
+            Assert.Throws<Exception>(() =>
+                ctx.InitializeMetadata(new List<EntityMetadata>() {
+                    entityMetadata
+                }));
         }
 
         [Fact]

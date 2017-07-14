@@ -1,5 +1,6 @@
 ﻿using Crm;
 using FakeXrmEasy.FakeMessageExecutors;
+using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
@@ -71,19 +72,15 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveEntityRequestTests
         [Fact]
         public void When_calling_retrieve_entity_with_a_fake_entity_metadata_that_one_is_returned()
         {
-            var ctx = new XrmFakedContext()
-            {
-                ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account))
-            };
-
+            var ctx = new XrmFakedContext();
             var service = ctx.GetOrganizationService();
-            var executor = new RetrieveEntityRequestExecutor();
-            executor.AddFakeEntityMetadata(Account.EntityLogicalName, new EntityMetadata()
-            {
-                IsCustomizable = new BooleanManagedProperty(true)
-            });
 
-            ctx.AddFakeMessageExecutor<RetrieveEntityRequest>(executor);
+            var entityMetadata = new EntityMetadata()
+            {
+                LogicalName = Account.EntityLogicalName,
+                IsCustomizable = new BooleanManagedProperty(true)
+            };
+            ctx.InitializeMetadata(entityMetadata);
 
             var request = new RetrieveEntityRequest()
             {
@@ -99,27 +96,22 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveEntityRequestTests
         [Fact]
         public void When_calling_retrieve_entity_with_a_fake_attribute_definition_it_is_returned()
         {
-            var ctx = new XrmFakedContext()
-            {
-                ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account))
-            };
-
+            var ctx = new XrmFakedContext();
             var service = ctx.GetOrganizationService();
 
-            var executor = new RetrieveEntityRequestExecutor();
-            executor.AddFakeEntityMetadata(Account.EntityLogicalName, new EntityMetadata()
+            var entityMetadata = new EntityMetadata()
             {
+                LogicalName = Account.EntityLogicalName,
                 IsCustomizable = new BooleanManagedProperty(true)
-            });
-
+            };
             var stringMetadata = new StringAttributeMetadata()
             {
-                MaxLength = 200
+                SchemaName = "name",
+                MaxLength = 200, 
             };
-            stringMetadata.GetType().GetProperty("IsValidForCreate").SetValue(stringMetadata, new Nullable<bool>(true), null);
-            executor.AddFakeAttributeMetadata(Account.EntityLogicalName, "name", stringMetadata);
-
-            ctx.AddFakeMessageExecutor<RetrieveEntityRequest>(executor);
+            stringMetadata.SetSealedPropertyValue("IsValidForCreate", new Nullable<bool>(true));
+            entityMetadata.SetAttributeCollection(new List<AttributeMetadata>() { stringMetadata });
+            ctx.InitializeMetadata(entityMetadata);
 
             var request = new RetrieveEntityRequest()
             {
