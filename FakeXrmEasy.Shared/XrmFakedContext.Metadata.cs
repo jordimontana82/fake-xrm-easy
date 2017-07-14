@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FakeXrmEasy.Extensions;
 
 namespace FakeXrmEasy
 {
@@ -41,12 +42,16 @@ namespace FakeXrmEasy
                 {
                     throw new Exception("An entity metadata record with the same logical name was previously added. ");
                 }
+                EntityMetadata.Add(eMetadata.LogicalName, eMetadata.Copy());
             }
         }
 
         public IQueryable<EntityMetadata> CreateMetadataQuery()
         {
-            return this.EntityMetadata.Values.AsQueryable();
+            return this.EntityMetadata.Values
+                    .Select(em => em.Copy())
+                    .ToList()
+                    .AsQueryable();
         }
     }
 }

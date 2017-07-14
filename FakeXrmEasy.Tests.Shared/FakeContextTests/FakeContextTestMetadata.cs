@@ -43,7 +43,36 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             var metadatas = ctx.CreateMetadataQuery().ToList();
             Assert.True(metadatas.Count == 1);
+            Assert.Equal("account", metadatas[0].LogicalName);
+        }
 
+        [Fact]
+        public void Should_store_a_clone_after_initialisation()
+        {
+            var ctx = new XrmFakedContext();
+            var entityMetadata = new EntityMetadata()
+            {
+                LogicalName = "account"
+            };
+            ctx.InitializeMetadata(new List<EntityMetadata>() { entityMetadata });
+
+            var metadatas = ctx.CreateMetadataQuery().ToList();
+            Assert.True(metadatas[0] != entityMetadata);
+        }
+
+        [Fact]
+        public void Should_return_a_clone_when_querying_entity_metadatas()
+        {
+            var ctx = new XrmFakedContext();
+            var entityMetadata = new EntityMetadata()
+            {
+                LogicalName = "account"
+            };
+            ctx.InitializeMetadata(new List<EntityMetadata>() { entityMetadata });
+
+            var metadata1 = ctx.CreateMetadataQuery().FirstOrDefault();
+            var metadata2 = ctx.CreateMetadataQuery().FirstOrDefault();
+            Assert.True(metadata1 != metadata2);
         }
     }
 }
