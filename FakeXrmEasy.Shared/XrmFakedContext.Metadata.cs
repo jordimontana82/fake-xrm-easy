@@ -26,20 +26,27 @@ namespace FakeXrmEasy
         /// </summary>
         protected Dictionary<string, EntityMetadata> EntityMetadata { get; set; }
 
-        /// <summary>
-        /// Fakes the RetrieveAttributeRequest that checks if an attribute exists for a given entity
-        /// For simpicity, it asumes all attributes exist
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="fakedService"></param>
-        protected static OrganizationResponse FakeRetrieveAttributeRequest(XrmFakedContext context, IOrganizationService fakedService, RetrieveAttributeRequest req)
+
+        public void InitializeMetadata(IEnumerable<EntityMetadata> entityMetadata)
         {
-            var response = new RetrieveAttributeResponse
+            if(entityMetadata == null)
             {
+                throw new Exception("Entity metadata parameter can not be null");
+            }
 
+            this.EntityMetadata = new Dictionary<string, EntityMetadata>();
+            foreach (var eMetadata in entityMetadata)
+            {
+                if (EntityMetadata.ContainsKey(eMetadata.LogicalName))
+                {
+                    throw new Exception("An entity metadata record with the same logical name was previously added. ");
+                }
+            }
+        }
 
-            };
-            return response;
+        public IQueryable<EntityMetadata> CreateMetadataQuery()
+        {
+            return this.EntityMetadata.Values.AsQueryable();
         }
     }
 }
