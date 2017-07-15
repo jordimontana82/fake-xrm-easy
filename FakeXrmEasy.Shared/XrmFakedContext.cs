@@ -83,6 +83,8 @@ namespace FakeXrmEasy
 
             SystemTimeZone = TimeZoneInfo.Local;
             DateBehaviour = DefaultDateBehaviour();
+
+            EntityMetadata = new Dictionary<string, EntityMetadata>();
         }
 
         /// <summary>
