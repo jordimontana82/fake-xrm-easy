@@ -19,7 +19,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             var target = (Entity)request.Parameters["Target"];
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
             service.Update(target);
 
             return new UpdateResponse();

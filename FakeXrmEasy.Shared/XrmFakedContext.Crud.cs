@@ -107,30 +107,60 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Update(A<Entity>._))
                 .Invokes((Entity e) =>
                 {
-                    context.ValidateEntity(e);
+                    context.UpdateEntity(e);
+                });
 
-                    //Update specific validations: The entity record must exist in the context
-                    if (context.Data.ContainsKey(e.LogicalName) &&
-                        context.Data[e.LogicalName].ContainsKey(e.Id))
+        }
+
+        protected void UpdateEntity(Entity e)
+        {
+            ValidateEntity(e);
+
+            //Update specific validations: The entity record must exist in the context
+            if (Data.ContainsKey(e.LogicalName) &&
+                Data[e.LogicalName].ContainsKey(e.Id))
+            {
+
+                var originalEntity = CreateQuery(e.LogicalName)
+                                        .Where(entity => entity.Id == e.Id)
+                                        .FirstOrDefault();
+
+                if(originalEntity.Attributes.ContainsKey("statecode"))
+                {
+
+                    var statecode = originalEntity["statecode"];
+                    var stateCodeValue = 1;
+                    if(statecode is OptionSetValue)
                     {
-                        //Add as many attributes to the entity as the ones received (this will keep existing ones)
-                        var cachedEntity = context.Data[e.LogicalName][e.Id];
-                        foreach (var sAttributeName in e.Attributes.Keys.ToList())
-                        {
-                            cachedEntity[sAttributeName] = e[sAttributeName];
-                        }
-
-                        // Update ModifiedOn
-                        cachedEntity["modifiedon"] = DateTime.UtcNow;
-                        cachedEntity["modifiedby"] = context.CallerId;
+                        stateCodeValue = (statecode as OptionSetValue).Value;
                     }
                     else
                     {
-                        //The entity record was not found, return a CRM-ish update error message
-                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("{0} with Id {1} Does Not Exist", e.LogicalName, e.Id));
+                        stateCodeValue = Convert.ToInt32(statecode);
                     }
-                });
 
+                    if(stateCodeValue != 0)
+                    {
+                        //The entity record was not found, return a CRM-ish update error message
+                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("{0} with Id {1} can't be updated because it is in inactive status. Please use SetStateRequest to activate the record first.", e.LogicalName, e.Id));
+                    }
+                }
+                //Add as many attributes to the entity as the ones received (this will keep existing ones)
+                var cachedEntity = Data[e.LogicalName][e.Id];
+                foreach (var sAttributeName in e.Attributes.Keys.ToList())
+                {
+                    cachedEntity[sAttributeName] = e[sAttributeName];
+                }
+
+                // Update ModifiedOn
+                cachedEntity["modifiedon"] = DateTime.UtcNow;
+                cachedEntity["modifiedby"] = CallerId;
+            }
+            else
+            {
+                //The entity record was not found, return a CRM-ish update error message
+                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("{0} with Id {1} Does Not Exist", e.LogicalName, e.Id));
+            }
         }
 
         /// <summary>
@@ -280,6 +310,12 @@ namespace FakeXrmEasy
                 Data[e.LogicalName].ContainsKey(e.Id))
             {
                 throw new InvalidOperationException(string.Format("There is already a record of entity {0} with id {1}, can't create with this Id.", e.LogicalName, e.Id));
+            }
+
+            //Create specific validations
+            if (e.Attributes.ContainsKey("statecode"))
+            {
+                throw new InvalidOperationException(string.Format("When creating an entity with logical name '{0}', or any other entity, it is not possible to create records with the statecode property. Statecode must be set after creation.", e.LogicalName));
             }
 
             AddEntityWithDefaults(e);

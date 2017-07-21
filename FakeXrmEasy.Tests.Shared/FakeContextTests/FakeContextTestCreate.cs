@@ -106,6 +106,23 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_Creating_With_A_StateCode_Property_Exception_Is_Thrown()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+            var accId = Guid.NewGuid();
+
+            var account = new Account
+            {
+                Name = "TestAcc",
+                Id = accId
+            };
+            account["statecode"] = 2;
+
+            Assert.Throws<InvalidOperationException>(() => service.Create(account));
+        }
+
+        [Fact]
         public void When_Creating_Using_Organization_Context_Record_Should_Be_Created()
         {
             var context = new XrmFakedContext();
