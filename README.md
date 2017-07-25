@@ -51,7 +51,7 @@ Please consider the below guidelines for contributing to the project:
 *   DONE:  Add support for FetchXml aggregations
 *   TO DO:  Adding support for date operators...
 	-	Check the [Full list of done / to do condition operators](https://github.com/jordimontana82/fake-xrm-easy/blob/master/FakeXrmEasy.Tests.Shared/FakeContextTests/FetchXml/ConditionOperatorTests.cs#L19-L110) and feel free to add missing ones!
-*    TODO: Implement generic handling of not yet implemented messages (ideally, for many of them we'll just need to check how they were called, i.e. calculaterolluprequest)
+*    TODO: Implement remaining CRM messages. To know which ones have been implemented so far, there is [one folder per CRM message under FakeMessageExecutors](https://github.com/jordimontana82/fake-xrm-easy/tree/master/FakeXrmEasy.Shared/FakeMessageExecutors).
 *  Increase test coverage
   
 
