@@ -168,10 +168,10 @@ namespace FakeXrmEasy
             return Data[s].Values.AsQueryable();
         }
 
-        public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, string linkFromAlias = "") {
+        public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, string linkFromAlias = "", string linkFromEntity = "") {
 
             var leAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
-            context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName);
+            context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName != linkFromAlias ? le.LinkFromEntityName : linkFromEntity);
             context.EnsureEntityNameExistsInMetadata(le.LinkToEntityName);
 
             if (!context.AttributeExistsInMetadata(le.LinkToEntityName, le.LinkToAttributeName))
@@ -227,7 +227,7 @@ namespace FakeXrmEasy
                 if (string.IsNullOrWhiteSpace(le.EntityAlias))
                     le.EntityAlias = le.LinkToEntityName;
 
-                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, query, le.Columns, le.EntityAlias);
+                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, query, le.Columns, le.EntityAlias, le.LinkToEntityName);
             }
             return query;
         }
