@@ -11,6 +11,20 @@ namespace FakeXrmEasy.Extensions.FetchXml
 {
     public static class XmlExtensionsForFetchXml
     {
+        private static IEnumerable<ConditionOperator> OperatorsNotToConvertArray = new []
+        {
+            ConditionOperator.OlderThanXDays,
+            ConditionOperator.OlderThanXHours,
+            ConditionOperator.OlderThanXMinutes,
+            ConditionOperator.OlderThanXMonths,
+            ConditionOperator.OlderThanXWeeks,
+            ConditionOperator.OlderThanXYears,
+            ConditionOperator.LastXDays,
+            ConditionOperator.LastXHours,
+            ConditionOperator.LastXMonths,
+            ConditionOperator.LastXWeeks,
+            ConditionOperator.LastXYears
+        };
 
         public static bool IsAttributeTrue(this XElement elem, string attributeName)
         {
@@ -289,9 +303,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return filterExpression;
         }
 
-        public static object ToValue(this XElement elem, XrmFakedContext ctx, string sEntityName, string sAttributeName)
+        public static object ToValue(this XElement elem, XrmFakedContext ctx, string sEntityName, string sAttributeName, ConditionOperator op)
         {
-            return GetConditionExpressionValueCast(elem.Value, ctx, sEntityName, sAttributeName);
+            return GetConditionExpressionValueCast(elem.Value, ctx, sEntityName, sAttributeName, op);
         }
 
         public static ConditionExpression ToConditionExpression(this XElement elem, XrmFakedContext ctx)
@@ -424,6 +438,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "ne-userid":
                     op = ConditionOperator.NotEqualUserId;
                     break;
+                case "olderthan-x-months":
+                    op = ConditionOperator.OlderThanXMonths;
+                    break;
                 default:
                     throw PullRequestException.FetchXmlOperatorNotImplemented(elem.GetAttribute("operator").Value);
             }
@@ -438,7 +455,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             values = elem
                         .Elements() //child nodes of this filter
                         .Where(el => el.Name.LocalName.Equals("value"))
-                        .Select(el => el.ToValue(ctx, entityName, attributeName))
+                        .Select(el => el.ToValue(ctx, entityName, attributeName, op))
                         .ToArray();
 
 
@@ -448,11 +465,11 @@ namespace FakeXrmEasy.Extensions.FetchXml
 #if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
                 if(string.IsNullOrWhiteSpace(conditionEntityName))
                 {
-                    return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName));
+                    return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName, op));
                 }
                 else
                 {
-                    return new ConditionExpression(conditionEntityName, attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName));
+                    return new ConditionExpression(conditionEntityName, attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName, op));
                 }
 
 #else
@@ -613,7 +630,12 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return value;
         }
 
-        public static object GetConditionExpressionValueCast(string value, XrmFakedContext ctx, string sEntityName, string sAttributeName)
+        public static bool ValueNeedsConverting(ConditionOperator conditionOperator)
+        {
+            return !OperatorsNotToConvertArray.Contains(conditionOperator);
+        }
+
+        public static object GetConditionExpressionValueCast(string value, XrmFakedContext ctx, string sEntityName, string sAttributeName, ConditionOperator op)
         {
             if (ctx.ProxyTypesAssembly != null)
             {
@@ -626,7 +648,15 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     {
                         try
                         {
-                            return GetValueBasedOnType(attributeType, value);
+                            if (ValueNeedsConverting(op))
+                            {
+                                return GetValueBasedOnType(attributeType, value);
+                            }
+
+                            else
+                            {
+                                return int.Parse(value);
+                            }
                         }
                         catch (Exception e)
                         {
