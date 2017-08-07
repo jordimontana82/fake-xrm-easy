@@ -100,9 +100,15 @@ namespace FakeXrmEasy
             fakedPlugin.Execute(fakedServiceProvider); //Execute the plugin
             return fakedPlugin;
         }
-        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx) where T : IPlugin, new()
+
+        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx = null) where T : IPlugin, new()
         {
-            return this.ExecutePluginWith<T>(ctx, new T());
+            if (ctx == null)
+            {
+                ctx = new XrmFakedPluginExecutionContext();
+            } 
+
+            return this.ExecutePluginWith(ctx, new T());
         }
 
         public IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
