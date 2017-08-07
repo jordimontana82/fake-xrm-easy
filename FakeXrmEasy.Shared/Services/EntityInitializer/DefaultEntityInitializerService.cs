@@ -1,18 +1,23 @@
-﻿using FakeXrmEasy.Extensions;
+﻿using System;
 using Microsoft.Xrm.Sdk;
-using System;
+using FakeXrmEasy.Extensions;
 
 namespace FakeXrmEasy.Services
 {
     public class DefaultEntityInitializerService : IEntityInitializerService
     {
-        public Entity Initialize(Entity e, Guid gCallerId)
+        public Entity Initialize(Entity e, Guid gCallerId, bool isManyToManyRelationshipEntity = false)
         {
             //Validate primary key for dynamic entities
             var primaryKey = string.Format("{0}id", e.LogicalName);
             if (!e.Attributes.ContainsKey(primaryKey))
             {
                 e[primaryKey] = e.Id;
+            }
+
+            if (isManyToManyRelationshipEntity)
+            {
+                return e;
             }
 
             var CallerId = new EntityReference("systemuser", gCallerId); //Create a new instance by default
@@ -22,7 +27,7 @@ namespace FakeXrmEasy.Services
             e.SetValueIfEmpty("createdon", now);
 
             //Overriden created on should replace created on
-            if (e.Contains("overriddencreatedon"))
+            if(e.Contains("overriddencreatedon"))
             {
                 e["createdon"] = e["overriddencreatedon"];
             }
@@ -36,9 +41,9 @@ namespace FakeXrmEasy.Services
             return e;
         }
 
-        public Entity Initialize(Entity e)
+        public Entity Initialize(Entity e, bool isManyToManyRelationshipEntity = false)
         {
-            return this.Initialize(e, Guid.NewGuid());
+            return this.Initialize(e, Guid.NewGuid(), isManyToManyRelationshipEntity);
         }
     }
 }

@@ -1,9 +1,11 @@
-﻿using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Query;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -52,7 +54,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
                 if (columnSet.AllColumns || columnSet.Columns.Contains(attribute.Key))
                 {
-                    revisedQuote[attribute.Key] = attribute.Value;
+                    if(attribute.Key != "statecode")  //Skip statecode on create
+                        revisedQuote[attribute.Key] = attribute.Value; 
                 }
             }
 
@@ -87,8 +90,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     {
                         continue;
                     }
-
-                    revisedDetail[attribute.Key] = attribute.Value;
+                    if (attribute.Key != "statecode")  //Skip statecode on create
+                        revisedDetail[attribute.Key] = attribute.Value;
                 }
 
                 service.Create(revisedDetail);

@@ -1,11 +1,16 @@
-﻿using Crm;
-using Microsoft.Xrm.Sdk;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
+﻿using System;
+
 using Xunit;
+using FakeItEasy;
+using FakeXrmEasy;
+
+using System.Collections.Generic;
+using Microsoft.Xrm.Sdk;
+using System.Linq;
+using System.Threading;
+using FakeXrmEasy.Tests.PluginsForTesting;
+using Crm;
+using System.Reflection;
 
 namespace FakeXrmEasy.Tests
 {
@@ -22,7 +27,7 @@ namespace FakeXrmEasy.Tests
         public void When_initializing_the_context_with_a_null_list_of_entities_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
-            var ex = Assert.Throws<InvalidOperationException>(() => context.Initialize(null));
+            var ex = Assert.Throws<InvalidOperationException>(() => context.Initialize(entities: null));
             Assert.Equal(ex.Message, "The entities parameter must be not null");
         }
 
@@ -63,6 +68,7 @@ namespace FakeXrmEasy.Tests
             Assert.True(context.Data["account"].Count == 1);
         }
 
+
         [Fact]
         public void When_initializing_the_context_with_a_dynamic_entity_with_a_primary_key_is_added_to_the_context()
         {
@@ -90,6 +96,18 @@ namespace FakeXrmEasy.Tests
             Assert.True(context.Data.Count == 1);
             Assert.True(context.Data["account"].Count == 1);
             Assert.Equal(context.Data["account"][guid].Id, data.FirstOrDefault().Id);
+        }
+
+        [Fact]
+        public void When_initializing_the_context_with_the_single_entity_overload_the_context_has_that_entity()
+        {
+            var context = new XrmFakedContext();
+            var guid = Guid.NewGuid();
+
+            context.Initialize(new Entity("account") { Id = guid });
+            Assert.True(context.Data.Count == 1);
+            Assert.True(context.Data["account"].Count == 1);
+            Assert.Equal(context.Data["account"][guid].Id, guid);
         }
 
         [Fact]
@@ -127,7 +145,6 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(context.Data["account"][guid1].Id, data.FirstOrDefault().Id);
             Assert.Equal(context.Data["account"][guid2].Id, data.LastOrDefault().Id);
         }
-
         [Fact]
         public void When_initializing_with_two_entities_of_same_logical_name_and_another_one_the_context_will_have_all_three()
         {
@@ -148,7 +165,9 @@ namespace FakeXrmEasy.Tests
             Assert.True(context.Data["contact"].Count == 1);
             Assert.Equal(context.Data["account"][guid1].Id, data.FirstOrDefault().Id);
             Assert.Equal(context.Data["contact"][guid3].Id, data.LastOrDefault().Id);
+
         }
+
 
         [Fact]
         public void When_initializing_the_context_with_an_entity_it_should_have_default_createdon_createdby_modifiedon_and_modifiedby_attributes()
@@ -210,12 +229,13 @@ namespace FakeXrmEasy.Tests
             //Query faked context directly
             var ex = Record.Exception(() => context.CreateQuery<Contact>());
             Assert.Null(ex);
+
         }
 
         [Fact]
         public void When_initializing_the_entities_a_proxy_types_assembly_is_not_mandatory()
         {
-            //This will make tests much more simple as we won't need to specificy the ProxyTypesAssembly every single time if
+            //This will make tests much more simple as we won't need to specificy the ProxyTypesAssembly every single time if 
             //we use early bound entities
 
             var assembly = Assembly.GetAssembly(typeof(Contact));

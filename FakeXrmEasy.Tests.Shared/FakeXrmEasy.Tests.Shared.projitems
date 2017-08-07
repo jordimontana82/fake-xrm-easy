@@ -34,6 +34,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestCreateQuery.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestDelete.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestExecute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestMetadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestPlugins.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTestRetrieve.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FakeContextTests.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveOptionSetRequestTests\RetrieveOptionSetRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveRequestTests\RetrieveRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveVersionRequestTests\RetrieveVersionRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ReviseQuoteRequestTests\ReviseQuoteRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs" />

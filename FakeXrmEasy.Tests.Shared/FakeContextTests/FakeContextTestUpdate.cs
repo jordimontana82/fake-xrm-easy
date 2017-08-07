@@ -282,5 +282,28 @@ namespace FakeXrmEasy.Tests
             Assert.Equal("Updated locally", firstRetrieve.Name);
             Assert.Equal("Adventure Works", secondRetrieve.Name);
         }
+
+        [Fact]
+        public void Should_Raise_An_Exception_When_Updating_An_Inactive_Record()
+        {
+            var entityId = Guid.NewGuid();
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            context.Initialize(new[] {
+                new Account()
+                {
+                    Id = entityId,
+                    Attributes = new AttributeCollection
+                    {
+                        { "statecode", 1 }  //0 = Active, anything else: Inactive
+                    }
+                }
+            });
+
+            var accountToUpdate = new Account() { Id = entityId, Name = "FC Barcelona" };
+
+            Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Update(accountToUpdate));
+        }
     }
 }
