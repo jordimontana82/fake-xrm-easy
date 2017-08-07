@@ -111,6 +111,10 @@ namespace FakeXrmEasy
         private void ExecutePipelineStage(string method, ProcessingStepStage stage, ProcessingStepMode mode, EntityReference entityReference)
         {
             var entityType = FindReflectedType(entityReference.LogicalName);
+            if (entityType == null)
+            {
+                return;
+            }
 
             var plugins = GetStepsForStage(method, stage, mode, (Entity)Activator.CreateInstance(entityType));
 
@@ -194,14 +198,14 @@ namespace FakeXrmEasy
                 }
             };
 
-            var entityTypeCode = (int)entity.GetType().GetField("EntityTypeCode").GetValue(entity);
+            var entityTypeCode = (int?)entity.GetType().GetField("EntityTypeCode")?.GetValue(entity);
 
             var plugins = this.Service.RetrieveMultiple(query).Entities.AsEnumerable();
             plugins = plugins.Where(p =>
             {
                 var primaryObjectTypeCode = p.GetAttributeValue<AliasedValue>("sdkmessagefilter.primaryobjecttypecode");
 
-                return primaryObjectTypeCode == null || (int)primaryObjectTypeCode.Value == entityTypeCode;
+                return primaryObjectTypeCode == null || entityTypeCode.HasValue && (int)primaryObjectTypeCode.Value == entityTypeCode.Value;
             });
 
             // Todo: Filter on attributes
