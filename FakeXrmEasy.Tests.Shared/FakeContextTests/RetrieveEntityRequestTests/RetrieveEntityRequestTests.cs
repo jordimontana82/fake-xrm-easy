@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Xunit;
+using System.Collections.Generic;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveEntityRequestTests
 {

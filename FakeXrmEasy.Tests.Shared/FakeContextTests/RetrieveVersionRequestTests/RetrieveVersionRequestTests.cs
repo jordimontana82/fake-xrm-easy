@@ -54,14 +54,12 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveVersionRequestTests
 
 #elif FAKE_XRM_EASY_2013
 
-            Assert.StartsWith("6", result.Version);
+            Assert.True(int.Parse(majorVersion) == 6);
 
 #elif FAKE_XRM_EASY
 
-            Assert.StartsWith("5", result.Version);
-
+            Assert.True(int.Parse(majorVersion) == 5);
 #endif
-
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using System;
+using System.Linq;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -37,10 +38,9 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
 
             var attributeMetadata = entityMetadata.Attributes
-                                    .Where(a => a.LogicalName.Equals(req.LogicalName))
-                                    .FirstOrDefault();
+                                    .FirstOrDefault(a => a.LogicalName.Equals(req.LogicalName));
 
-            if(attributeMetadata == null)
+            if (attributeMetadata == null)
             {
                 throw new Exception(string.Format("The attribute {0} wasn't found in entity metadata with logical name {1}. ", req.LogicalName, req.EntityLogicalName));
             }
