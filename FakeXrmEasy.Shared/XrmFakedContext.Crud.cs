@@ -262,7 +262,7 @@ namespace FakeXrmEasy
 
             var isManyToManyRelationshipEntity = e.LogicalName != null && this.Relationships.ContainsKey(e.LogicalName);
 
-            EntityInitializerService.Initialize(e, CallerId.Id, isManyToManyRelationshipEntity);
+            EntityInitializerService.Initialize(e, CallerId.Id, this, isManyToManyRelationshipEntity);
         }
 
         protected void ValidateEntity(Entity e)
@@ -379,7 +379,6 @@ namespace FakeXrmEasy
             {
                 Data[e.LogicalName].Add(e.Id, e);
             }
-
 
             //Update metadata for that entity
             if (!AttributeMetadataNames.ContainsKey(e.LogicalName))

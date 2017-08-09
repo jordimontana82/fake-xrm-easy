@@ -54,6 +54,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Permissions\IAccessRightsRepository.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PullRequestException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\EntityInitializer\DefaultEntityInitializerService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\EntityInitializer\InvoiceDetailInitializerService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\EntityInitializer\InvoiceInitializerService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\IEntityInitializerService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedContext.DateTime.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedContext.Aggregations.cs" />
