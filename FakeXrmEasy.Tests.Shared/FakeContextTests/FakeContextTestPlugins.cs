@@ -291,5 +291,14 @@ namespace FakeXrmEasy.Tests
             var ex = Record.Exception(() => context.ExecutePluginWith<TestSharedVariablesPropertyPlugin>(pluginContext));
             Assert.Null(ex);
         }
+
+        [Fact]
+        public void When_executing_a_plugin_theres_no_need_to_pass_a_default_plugin_context_if_the_plugin_doesnt_need_it()
+        {
+            var context = new XrmFakedContext();
+            var entity = new Entity();
+            context.ExecutePluginWith<AccountNumberPlugin>();
+            Assert.True(true);
+        }
     }
 }

@@ -104,9 +104,7 @@ namespace FakeXrmEasy
         public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx = null) where T : IPlugin, new()
         {
             if (ctx == null)
-            {
-                ctx = new XrmFakedPluginExecutionContext();
-            } 
+                ctx = GetDefaultPluginContext();
 
             return this.ExecutePluginWith(ctx, new T());
         }
