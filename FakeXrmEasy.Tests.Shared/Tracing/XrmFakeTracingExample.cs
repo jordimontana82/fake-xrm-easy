@@ -3,7 +3,6 @@ using FakeXrmEasy.Tests.PluginsForTesting;
 using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.Tracing
@@ -17,7 +16,7 @@ namespace FakeXrmEasy.Tests.Tracing
 
             var guid1 = Guid.NewGuid();
             var target = new Entity("account") { Id = guid1 };
-            
+
             //Execute our plugin against a target that doesn't contains the accountnumber attribute
             var fakedPlugin = fakedContext.ExecutePluginWithTarget<AccountNumberPlugin>(target);
 
@@ -25,7 +24,7 @@ namespace FakeXrmEasy.Tests.Tracing
             var fakeTracingService = fakedContext.GetFakeTracingService();
             var log = fakeTracingService.DumpTrace();
 
-            //Assert that the target contains a new attribute      
+            //Assert that the target contains a new attribute
             Assert.Equal(log, "Contains target\r\nIs Account\r\n");
         }
 
@@ -46,7 +45,7 @@ namespace FakeXrmEasy.Tests.Tracing
             var fakeTracingService = fakedContext.GetFakeTracingService();
             var log = fakeTracingService.DumpTrace();
 
-            //Assert that the target contains a new attribute      
+            //Assert that the target contains a new attribute
             Assert.Equal(log, "Some trace written" + System.Environment.NewLine);
         }
 
@@ -56,9 +55,9 @@ namespace FakeXrmEasy.Tests.Tracing
             var fakedContext = new XrmFakedContext();
 
             //Get tracing service
-            var fakeTracingService = fakedContext.GetFakeTracingService();  
-            
-            Assert.NotNull(fakeTracingService);         
+            var fakeTracingService = fakedContext.GetFakeTracingService();
+
+            Assert.NotNull(fakeTracingService);
         }
 
         [Fact]

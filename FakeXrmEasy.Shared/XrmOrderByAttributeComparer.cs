@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FakeXrmEasy
 {
@@ -26,9 +25,9 @@ namespace FakeXrmEasy
                 return attributeValueA.Value.CompareTo(attributeValueB.Value);
             }
             else if (attributeType == typeof(EntityReference)
-                #if FAKE_XRM_EASY
-                    || attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference) 
-                #endif
+#if FAKE_XRM_EASY
+                    || attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference)
+#endif
                 )
             {
                 // Name might well be Null in an entity reference?
@@ -55,7 +54,6 @@ namespace FakeXrmEasy
             {
                 return ((DateTime)objectA).CompareTo((DateTime)objectB);
             }
-            
             else if (attributeType == typeof(Guid))
             {
                 return ((Guid)objectA).CompareTo((Guid)objectB);
@@ -72,17 +70,14 @@ namespace FakeXrmEasy
             {
                 return ((float)objectA).CompareTo((float)objectB);
             }
-            
             else if (attributeType == typeof(bool))
             {
                 return ((bool)objectA).CompareTo((bool)objectB);
             }
-
-            else if(attributeType == typeof(AliasedValue))
+            else if (attributeType == typeof(AliasedValue))
             {
                 return Compare((objectA as AliasedValue)?.Value, (objectB as AliasedValue)?.Value);
             }
-
             else
             {
                 return 0;

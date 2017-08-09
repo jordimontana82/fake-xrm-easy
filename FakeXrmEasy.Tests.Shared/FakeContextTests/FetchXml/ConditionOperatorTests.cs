@@ -46,6 +46,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="not-between" />
       <xs:enumeration value="eq-userid" />
       <xs:enumeration value="ne-userid" />
+      <xs:enumeration value="olderthan-x-months" />
 
     TODO:
 
@@ -68,8 +69,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="last-x-weeks" />
       <xs:enumeration value="next-x-weeks" />
       <xs:enumeration value="last-x-months" />
-      <xs:enumeration value="next-x-months" />
-      <xs:enumeration value="olderthan-x-months" />
+      <xs:enumeration value="next-x-months" />     
       <xs:enumeration value="olderthan-x-years" />
       <xs:enumeration value="olderthan-x-weeks" />
       <xs:enumeration value="olderthan-x-days" />
@@ -619,6 +619,34 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void FetchXml_Operator_Older_Than_X_Months_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='birthdate' operator='olderthan-x-months' value='3' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var ct = new Contact();
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("birthdate", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.OlderThanXMonths, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(3, query.Criteria.Conditions[0].Values[0]);
+        }
+
+        [Fact]
         public void FetchXml_Operator_Ge_Execution()
         {
             var ctx = new XrmFakedContext();
@@ -971,7 +999,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(1, query.Criteria.Conditions.Count);
             Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
             Assert.Equal(ConditionOperator.Between, query.Criteria.Conditions[0].Operator);
-            Assert.Equal(new DateTime(2013,5,17), query.Criteria.Conditions[0].Values[0]);
+            Assert.Equal(new DateTime(2013, 5, 17), query.Criteria.Conditions[0].Values[0]);
             Assert.Equal(new DateTime(2013, 5, 20, 14, 40, 0), query.Criteria.Conditions[0].Values[1]);
         }
 
@@ -1025,7 +1053,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             var date = DateTime.Today;
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt 
-            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(2013,05,19) }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(2013, 05, 19) }; //Should be returned
             ctx.Initialize(new[] { ct1, ct2 });
             var service = ctx.GetFakedOrganizationService();
 

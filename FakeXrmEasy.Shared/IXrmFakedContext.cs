@@ -1,10 +1,7 @@
 ﻿using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Client;
-using System;
+using System.Activities;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Activities;
 
 namespace FakeXrmEasy
 {
@@ -17,19 +14,19 @@ namespace FakeXrmEasy
         void Initialize(IEnumerable<Entity> entities);
 
         /// <summary>
-        /// Returns an instance of an organization service 
+        /// Returns an instance of an organization service
         /// </summary>
         /// <returns></returns>
         IOrganizationService GetOrganizationService();
 
         /// <summary>
-        /// DEPRECATED: Consider using GetOrganizationService instead 
+        /// DEPRECATED: Consider using GetOrganizationService instead
         /// </summary>
         /// <returns></returns>
         IOrganizationService GetFakedOrganizationService();
 
         ///// <summary>
-        ///// Returns a faked organization service proxy that will execute CRUD in-memory operations and other requests against this faked context 
+        ///// Returns a faked organization service proxy that will execute CRUD in-memory operations and other requests against this faked context
         ///// </summary>
         ///// <param name="context"></param>
         ///// <returns></returns>
@@ -49,14 +46,12 @@ namespace FakeXrmEasy
         /// <returns></returns>
         IPlugin ExecutePluginWithTarget<T>(Entity target) where T : IPlugin, new();
 
-
         /// <summary>
         /// Returns a faked plugin with a target and the specified pre entity images
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         IPlugin ExecutePluginWithTargetAndPreEntityImages<T>(object target, EntityImageCollection preEntityImages) where T : IPlugin, new();
-
 
         /// <summary>
         /// Execute a plugin with input and output params, as well as entity images
@@ -67,7 +62,6 @@ namespace FakeXrmEasy
                                      ParameterCollection outputParameters,
                                      EntityImageCollection preEntityImages,
                                      EntityImageCollection postEntityImages) where T : IPlugin, new();
-
 
         /// <summary>
         /// Returns a plugin context with default properties one can override
@@ -97,19 +91,18 @@ namespace FakeXrmEasy
                                      string unsecureConfiguration,
                                      string secureConfiguration) where T : class, IPlugin;
 
-
-        IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, 
+        IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx,
                                      T instance,
                                      string unsecureConfiguration,
                                      string secureConfiguration) where T : class, IPlugin;
+
         /// <summary>
         /// Executes a code activity against this context
-        /// An optional instance can be passed. 
+        /// An optional instance can be passed.
         /// This is useful when the codeactivity requires additional mocks that could be stored in the codeactivity itself
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        IDictionary <string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new();
-
+        IDictionary<string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new();
 
         /// <summary>
         /// Executes a code activity passing the primary entity
@@ -117,8 +110,5 @@ namespace FakeXrmEasy
         /// </summary>
         /// <typeparam name="T"></typeparam>
         IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new();
-        
     }
-
-  
 }

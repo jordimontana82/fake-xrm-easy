@@ -1,6 +1,6 @@
-﻿using System;
+﻿using FakeXrmEasy.Metadata;
+using System;
 using System.Collections.Generic;
-using FakeXrmEasy.Metadata;
 
 namespace FakeXrmEasy
 {

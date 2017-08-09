@@ -1,10 +1,7 @@
 ﻿using Crm;
-using FakeXrmEasy.FakeMessageExecutors;
 using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using Xunit;
 
@@ -17,7 +14,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DisassociateRequestTests
         {
             var context = new XrmFakedContext();
 
-            
             var userId = Guid.NewGuid();
             var teamId = Guid.NewGuid();
             var user2Id = Guid.NewGuid();
@@ -58,7 +54,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DisassociateRequestTests
                     ["systemuserid"] =teamId ,
                     ["teamid"] = user2Id
                 }
-
             });
 
             context.AddRelationship("teammembership", new XrmFakedRelationship()
@@ -78,9 +73,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DisassociateRequestTests
             using (Crm.XrmServiceContext ctx = new XrmServiceContext(orgSvc))
             {
                 var correctAssociation1 = (from tu in ctx.TeamMembershipSet
-                                          where tu.TeamId == teamId
-                                          && tu.SystemUserId == user2Id
-                                          select tu).ToList();
+                                           where tu.TeamId == teamId
+                                           && tu.SystemUserId == user2Id
+                                           select tu).ToList();
                 Assert.False(correctAssociation1.Any());
 
                 var correctAssociation = (from tu in ctx.TeamMembershipSet
@@ -90,9 +85,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DisassociateRequestTests
                 Assert.False(correctAssociation.Any());
 
                 var wrongAssociation2 = (from tu in ctx.TeamMembershipSet
-                                        where tu.TeamId == user2Id
-                                        && tu.SystemUserId == teamId
-                                        select tu).ToList();
+                                         where tu.TeamId == user2Id
+                                         && tu.SystemUserId == teamId
+                                         select tu).ToList();
                 Assert.Equal(1, wrongAssociation2.Count());
 
                 var wrongAssociation = (from tu in ctx.TeamMembershipSet
@@ -101,7 +96,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DisassociateRequestTests
                                         select tu).ToList();
                 Assert.Equal(1, wrongAssociation.Count());
             }
-
         }
 
         [Fact]
@@ -109,7 +103,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DisassociateRequestTests
         {
             var context = new XrmFakedContext();
 
-          
             var user2Id = Guid.NewGuid();
             var userId = Guid.NewGuid();
             var teamId = Guid.NewGuid();
@@ -155,7 +148,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DisassociateRequestTests
                     ["systemuserid"] =team2Id ,
                     ["teamid"] = userId
                 }
-
             });
 
             context.AddRelationship("teammembership", new XrmFakedRelationship()
@@ -170,14 +162,14 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DisassociateRequestTests
 
             var orgSvc = context.GetFakedOrganizationService();
             orgSvc.Disassociate("systmuser", userId, new Relationship("teammembership"),
-                new EntityReferenceCollection(new List<EntityReference> { new EntityReference("team", teamId) ,new EntityReference("team", team2Id) }));
-            
+                new EntityReferenceCollection(new List<EntityReference> { new EntityReference("team", teamId), new EntityReference("team", team2Id) }));
+
             using (Crm.XrmServiceContext ctx = new XrmServiceContext(orgSvc))
             {
                 var correctAssociation1 = (from tu in ctx.TeamMembershipSet
-                                        where tu.TeamId == teamId
-                                        && tu.SystemUserId == userId
-                                        select tu).ToList();
+                                           where tu.TeamId == teamId
+                                           && tu.SystemUserId == userId
+                                           select tu).ToList();
                 Assert.False(correctAssociation1.Any());
 
                 var correctAssociation = (from tu in ctx.TeamMembershipSet
@@ -187,20 +179,17 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DisassociateRequestTests
                 Assert.False(correctAssociation.Any());
 
                 var wrongAssociation1 = (from tu in ctx.TeamMembershipSet
-                                        where tu.TeamId == userId
-                                        && tu.SystemUserId == team2Id
-                                        select tu).ToList();
+                                         where tu.TeamId == userId
+                                         && tu.SystemUserId == team2Id
+                                         select tu).ToList();
                 Assert.Equal(1, wrongAssociation1.Count());
 
                 var wrongAssociation = (from tu in ctx.TeamMembershipSet
-                                         where tu.TeamId == userId
-                                         && tu.SystemUserId == teamId
-                                         select tu).ToList();
+                                        where tu.TeamId == userId
+                                        && tu.SystemUserId == teamId
+                                        select tu).ToList();
                 Assert.Equal(1, wrongAssociation.Count());
-
             }
-
         }
-
     }
 }

@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Xunit;
-using FakeItEasy;
-using FakeXrmEasy;
-using Microsoft.Xrm.Sdk.Query;
+﻿using Crm;
 using Microsoft.Xrm.Sdk;
-
-using Crm;
 using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.QueryByAttributeTests
 {
@@ -65,7 +59,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryByAttributeTests
             };
 
             query.AddAttributeValue("donotemail", false);
-            
+
             //Execute using a request to test the OOB (XRM) message contracts
             RetrieveMultipleRequest request = new RetrieveMultipleRequest();
             request.Query = query;

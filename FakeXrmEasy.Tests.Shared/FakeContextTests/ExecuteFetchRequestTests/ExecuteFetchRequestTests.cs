@@ -1,15 +1,12 @@
 ﻿using Crm;
-using Microsoft.Xrm.Sdk;
+using FakeXrmEasy.FakeMessageExecutors;
 using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Xrm.Sdk.Query;
+using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using Xunit;
-using System.Xml.Linq;
 using System.Linq;
-using FakeXrmEasy.FakeMessageExecutors;
+using System.Xml.Linq;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
 {
@@ -20,22 +17,22 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
         {
             var executor = new ExecuteFetchRequestExecutor();
             var date = new DateTime(2011, 7, 12, 13, 12, 43, DateTimeKind.Local);
-            var element = executor.AttributeValueToFetchResult(new KeyValuePair<string, object>("new_startdate", date ), null, null);
+            var element = executor.AttributeValueToFetchResult(new KeyValuePair<string, object>("new_startdate", date), null, null);
             var utcOffset = date.ToString("zz");
             Assert.NotNull(element);
             Assert.Equal(@"<new_startdate date=""2011-07-12"" time=""01:12 PM"">2011-07-12T13:12:43" + utcOffset + ":00</new_startdate>", element.ToString());
         }
+
         [Fact]
         public void Test_Conversion_AlliasedDateTime_ToXml()
         {
             var executor = new ExecuteFetchRequestExecutor();
             var date = new DateTime(2011, 7, 12, 13, 12, 43, DateTimeKind.Local);
-            var element = executor.AttributeValueToFetchResult(new KeyValuePair<string, object>("alias.new_startdate", new AliasedValue(null,null, date)), null, null);
+            var element = executor.AttributeValueToFetchResult(new KeyValuePair<string, object>("alias.new_startdate", new AliasedValue(null, null, date)), null, null);
             var utcOffset = date.ToString("zz");
             Assert.NotNull(element);
             Assert.Equal(@"<alias.new_startdate date=""2011-07-12"" time=""01:12 PM"">2011-07-12T13:12:43" + utcOffset + ":00</alias.new_startdate>", element.ToString());
         }
-
 
         [Fact]
         public void Test_Conversion_EntityReference_ToXml()
@@ -44,11 +41,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             fake.ProxyTypesAssembly = typeof(Crm.Contact).Assembly;
             var executor = new ExecuteFetchRequestExecutor();
             var contactGuid = Guid.NewGuid();
-            var element = executor.AttributeValueToFetchResult(new KeyValuePair<string, object>("new_contact", new EntityReference("contact", contactGuid) { Name = "John Doe"}), null, fake);
+            var element = executor.AttributeValueToFetchResult(new KeyValuePair<string, object>("new_contact", new EntityReference("contact", contactGuid) { Name = "John Doe" }), null, fake);
             Assert.NotNull(element);
             Assert.Equal(@"<new_contact dsc=""0"" yomi=""John Doe"" name=""John Doe"" type=""2"">" + contactGuid.ToString().ToUpper() + "</new_contact>", element.ToString());
-            
-		
         }
 
         [Fact]
@@ -59,10 +54,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             var executor = new ExecuteFetchRequestExecutor();
             var formattedValues = new FormattedValueCollection();
             formattedValues.Add("new_contact", "Test");
-            var element = executor.AttributeValueToFetchResult(new KeyValuePair<string, object>("new_contact", new OptionSetValue(1)) , formattedValues, fake);
+            var element = executor.AttributeValueToFetchResult(new KeyValuePair<string, object>("new_contact", new OptionSetValue(1)), formattedValues, fake);
             Assert.NotNull(element);
             Assert.Equal(@"<new_contact name=""Test"" formattedvalue=""1"">1</new_contact>", element.ToString());
-           
         }
 
         [Fact]
@@ -108,12 +102,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
                                   </entity>
                             </fetch>";
 
-
-            
             var service = ctx.GetFakedOrganizationService();
-            
-            var response = service.Execute(new ExecuteFetchRequest { FetchXml = fetchXml }) as ExecuteFetchResponse;
 
+            var response = service.Execute(new ExecuteFetchRequest { FetchXml = fetchXml }) as ExecuteFetchResponse;
 
             Assert.NotEmpty(response.FetchXmlResult);
             XDocument resXml = XDocument.Parse(response.FetchXmlResult);
@@ -129,10 +120,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             var row123 = rows.Where(e => e.Element("telephone1").Value == "123").FirstOrDefault();
             Assert.NotNull(row123);
             Assert.Equal(8, row123.Elements().Count());
-
         }
-
-
 
         [Fact]
         public void When_executing_fetchxml_with_count_attribute_only_that_number_of_results_is_returned()
@@ -154,15 +142,13 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
                               <entity name='contact'>
                                     <attribute name='fullname' />
                                     <attribute name='telephone1' />
-                                    <attribute name='contactid' /> 
+                                    <attribute name='contactid' />
                                   </entity>
                             </fetch>";
-
 
             var service = ctx.GetFakedOrganizationService();
 
             var response = service.Execute(new ExecuteFetchRequest { FetchXml = fetchXml }) as ExecuteFetchResponse;
-
 
             Assert.NotEmpty(response.FetchXmlResult);
             XDocument resXml = XDocument.Parse(response.FetchXmlResult);
@@ -172,8 +158,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
 
             Assert.Equal(7, rows.Count());
         }
-
-      
 
         [Fact]
         public void When_executing_fetchxml_with_paging_cookies_correct_page_is_returned()
@@ -195,15 +179,13 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
                               <entity name='contact'>
                                     <attribute name='fullname' />
                                     <attribute name='telephone1' />
-                                    <attribute name='contactid' /> 
+                                    <attribute name='contactid' />
                                   </entity>
                             </fetch>";
-
 
             var service = ctx.GetFakedOrganizationService();
 
             var response = service.Execute(new ExecuteFetchRequest { FetchXml = string.Format(fetchXml, String.Empty) }) as ExecuteFetchResponse;
-
 
             Assert.NotEmpty(response.FetchXmlResult);
             XDocument resXml = XDocument.Parse(response.FetchXmlResult);
@@ -214,9 +196,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             Assert.Equal(7, rows.Count());
             Assert.Equal("1", resXml.Element("resultset").Attribute("morerecords").Value);
             var pageCookie = resXml.Element("resultset").Attribute("paging-cookie");
-            var pagingXml = "page=\"2\" "  + pageCookie.ToString() ;
+            var pagingXml = "page=\"2\" " + pageCookie.ToString();
 
-            var response2 = service.Execute(new ExecuteFetchRequest { FetchXml = string.Format(fetchXml,pagingXml) }) as ExecuteFetchResponse;
+            var response2 = service.Execute(new ExecuteFetchRequest { FetchXml = string.Format(fetchXml, pagingXml) }) as ExecuteFetchResponse;
             Assert.NotEmpty(response2.FetchXmlResult);
             resXml = XDocument.Parse(response2.FetchXmlResult);
             Assert.NotNull(resXml);
@@ -226,7 +208,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             Assert.Equal(7, rows.Count());
             Assert.Equal("1", resXml.Element("resultset").Attribute("morerecords").Value);
             pageCookie = resXml.Element("resultset").Attribute("paging-cookie");
-            pagingXml = "page=\"3\" " + pageCookie ;
+            pagingXml = "page=\"3\" " + pageCookie;
 
             var response3 = service.Execute(new ExecuteFetchRequest { FetchXml = string.Format(fetchXml, pagingXml) }) as ExecuteFetchResponse;
             Assert.NotEmpty(response3.FetchXmlResult);
@@ -237,7 +219,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
 
             Assert.Equal(6, rows.Count());
             Assert.Equal("0", resXml.Element("resultset").Attribute("morerecords").Value);
-
         }
 
         [Fact]
@@ -278,9 +259,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
                     </fetch>
                 ";
 
-           
             var response = service.Execute(new ExecuteFetchRequest { FetchXml = fetchXml }) as ExecuteFetchResponse;
-
 
             Assert.NotEmpty(response.FetchXmlResult);
             XDocument resXml = XDocument.Parse(response.FetchXmlResult);
@@ -293,6 +272,5 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             var rowsWithLinkedData = rows.Where(r => r.Element("aa.firstname") != null);
             Assert.Equal(1, rowsWithLinkedData.Count());
         }
-
     }
 }

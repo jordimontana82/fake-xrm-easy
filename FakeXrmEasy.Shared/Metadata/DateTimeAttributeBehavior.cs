@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FakeXrmEasy.Metadata
+﻿namespace FakeXrmEasy.Metadata
 {
     /// <summary>
     ///   <para>Specifies the behavior of a <see cref="T:Microsoft.Xrm.Sdk.Metadata.DateTimeAttributeMetadata" /> attribute using the <see cref="P:Microsoft.Xrm.Sdk.Metadata.DateTimeAttributeMetadata.DateTimeBehavior" /> property.</para>

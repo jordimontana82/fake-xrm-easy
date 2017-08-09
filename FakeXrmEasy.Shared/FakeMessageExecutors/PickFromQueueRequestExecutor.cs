@@ -1,12 +1,11 @@
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
 
-using System;
-using System.ServiceModel;
-
+using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using Microsoft.Crm.Sdk.Messages;
+using System;
 using System.Linq;
+using System.ServiceModel;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -16,7 +15,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             return request is PickFromQueueRequest;
         }
-
 
         public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
         {
@@ -35,7 +33,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             var query = new QueryByAttribute("systemuser");
             query.Attributes.Add("systemuserid");
             query.Values.Add(workerid);
-            
+
             var worker = service.RetrieveMultiple(query).Entities.FirstOrDefault();
             if (worker == null)
             {
@@ -51,7 +49,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("queueitem With Id = {0} Does Not Exist", queueItemId));
             }
-
 
             if (pickFromQueueRequest.RemoveQueueItem)
             {
@@ -75,7 +72,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             return new PickFromQueueResponse();
         }
-
 
         public Type GetResponsibleRequestType()
         {

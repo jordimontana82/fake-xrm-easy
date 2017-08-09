@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
-using System.Linq;
-using FakeXrmEasy.Extensions;
+using System;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -36,14 +33,14 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     if (relatedEntitiesQuery.Value == null)
                     {
                         throw new ArgumentNullException("relateEntitiesQuery.Value",
-                            string.Format("RelatedEntitiesQuery for \"{0}\" does not contain a Query Expression.", 
+                            string.Format("RelatedEntitiesQuery for \"{0}\" does not contain a Query Expression.",
                                 relatedEntitiesQuery.Key.SchemaName));
                     }
 
                     var fakeRelationship = context.GetRelationship(relatedEntitiesQuery.Key.SchemaName);
                     if (fakeRelationship == null)
                     {
-                        throw new Exception(string.Format("Relationship \"{0}\" does not exist in the metadata cache.", 
+                        throw new Exception(string.Format("Relationship \"{0}\" does not exist in the metadata cache.",
                             relatedEntitiesQuery.Key.SchemaName));
                     }
 
@@ -107,7 +104,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     };
 
                     //use of an executor directly; if to use service.RetrieveMultiple then the result will be
-                    //limited to the number of records per page (somewhere in future release). 
+                    //limited to the number of records per page (somewhere in future release).
                     //ALL RECORDS are needed here.
                     var executor = new RetrieveMultipleRequestExecutor();
                     var retrieveRelatedEntitiesResponse = executor

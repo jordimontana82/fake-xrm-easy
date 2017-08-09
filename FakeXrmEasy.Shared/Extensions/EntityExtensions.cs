@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Dynamic;
-using System.Linq.Expressions;
-using System.Text;
-using FakeXrmEasy.Metadata;
+﻿using FakeXrmEasy.Metadata;
+using FakeXrmEasy.OrganizationFaults;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using FakeXrmEasy.OrganizationFaults;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FakeXrmEasy.Extensions
 {
@@ -43,7 +39,7 @@ namespace FakeXrmEasy.Extensions
         {
 #if FAKE_XRM_EASY || FAKE_XRM_EASY_2013
             return; //Do nothing... DateBehavior wasn't available for versions <= 2013
-#else 
+#else
 
             if (context.DateBehaviour.Count == 0 || e.LogicalName == null || !context.DateBehaviour.ContainsKey(e.LogicalName))
             {
@@ -72,7 +68,7 @@ namespace FakeXrmEasy.Extensions
 #endif
         }
 
-            public static void ProjectAttributes(Entity e, Entity projected, LinkEntity le, XrmFakedContext context)
+        public static void ProjectAttributes(Entity e, Entity projected, LinkEntity le, XrmFakedContext context)
         {
             var sAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
 
@@ -80,7 +76,7 @@ namespace FakeXrmEasy.Extensions
             {
                 foreach (var attKey in e.Attributes.Keys)
                 {
-                    if(attKey.StartsWith(sAlias + "."))
+                    if (attKey.StartsWith(sAlias + "."))
                     {
                         projected[attKey] = e[attKey];
                     }
@@ -90,13 +86,11 @@ namespace FakeXrmEasy.Extensions
             {
                 foreach (var attKey in le.Columns.Columns)
                 {
-
                     var linkedAttKey = sAlias + "." + attKey;
                     if (e.Attributes.ContainsKey(linkedAttKey))
                         projected[linkedAttKey] = e[linkedAttKey];
                 }
             }
-
 
             foreach (var nestedLinkedEntity in le.LinkEntities)
             {
@@ -148,7 +142,7 @@ namespace FakeXrmEasy.Extensions
                 }
 
                 //Plus attributes from joins
-                foreach(var le in qe.LinkEntities)
+                foreach (var le in qe.LinkEntities)
                 {
                     ProjectAttributes(e, projected, le, context);
                 }
@@ -169,7 +163,6 @@ namespace FakeXrmEasy.Extensions
             var type = attributeValue.GetType();
             if (type == typeof(string))
                 return new string((attributeValue as string).ToCharArray());
-
             else if (type == typeof(EntityReference)
 #if FAKE_XRM_EASY
                             || type == typeof(Microsoft.Xrm.Client.CrmEntityReference)
@@ -186,7 +179,6 @@ namespace FakeXrmEasy.Extensions
                 var original = (attributeValue as BooleanManagedProperty);
                 return new BooleanManagedProperty(original.Value);
             }
-
             else if (type == typeof(OptionSetValue))
             {
                 var original = (attributeValue as OptionSetValue);
@@ -197,36 +189,33 @@ namespace FakeXrmEasy.Extensions
                 var original = (attributeValue as AliasedValue);
                 return new AliasedValue(original.EntityLogicalName, original.AttributeLogicalName, CloneAttribute(original.Value));
             }
-
             else if (type == typeof(Money))
             {
                 var original = (attributeValue as Money);
                 return new Money(original.Value);
             }
-
-            else if (attributeValue.GetType() == typeof (EntityCollection))
+            else if (attributeValue.GetType() == typeof(EntityCollection))
             {
                 var collection = attributeValue as EntityCollection;
                 return new EntityCollection(collection.Entities.Select(e => e.Clone(e.GetType())).ToList());
             }
-
-            else if (type == typeof (int) || type == typeof (Int64))
+            else if (type == typeof(int) || type == typeof(Int64))
                 return attributeValue; //Not a reference type
-            else if (type == typeof (decimal))
+            else if (type == typeof(decimal))
                 return attributeValue; //Not a reference type
-            else if (type == typeof (double))
+            else if (type == typeof(double))
                 return attributeValue; //Not a reference type
-            else if (type == typeof (float))
+            else if (type == typeof(float))
                 return attributeValue; //Not a reference type
-            else if (type == typeof (byte))
+            else if (type == typeof(byte))
                 return attributeValue; //Not a reference type
-            else if (type == typeof (float))
+            else if (type == typeof(float))
                 return attributeValue; //Not a reference type
-            else if (type == typeof (bool))
+            else if (type == typeof(bool))
                 return attributeValue; //Not a reference type
-            else if (type == typeof (Guid))
+            else if (type == typeof(Guid))
                 return attributeValue; //Not a reference type
-            else if (type == typeof (DateTime))
+            else if (type == typeof(DateTime))
                 return attributeValue; //Not a reference type
             else if (attributeValue is Enum)
                 return attributeValue; //Not a reference type
@@ -256,9 +245,9 @@ namespace FakeXrmEasy.Extensions
             return cloned;
         }
 
-        public static T Clone<T>(this Entity e) where T: Entity
+        public static T Clone<T>(this Entity e) where T : Entity
         {
-            return (T) e.Clone(typeof(T));
+            return (T)e.Clone(typeof(T));
         }
 
         public static Entity Clone(this Entity e, Type t)
@@ -270,7 +259,7 @@ namespace FakeXrmEasy.Extensions
             cloned.Id = e.Id;
             cloned.LogicalName = e.LogicalName;
 
-            if(e.FormattedValues != null)
+            if (e.FormattedValues != null)
             {
                 var formattedValues = new FormattedValueCollection();
                 foreach (var key in e.FormattedValues.Keys)
@@ -327,7 +316,6 @@ namespace FakeXrmEasy.Extensions
                     {
                         e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, null);
                     }
-
                 }
             }
             return e;
@@ -335,7 +323,8 @@ namespace FakeXrmEasy.Extensions
 
         public static Entity JoinAttributes(this Entity e, IEnumerable<Entity> otherEntities, ColumnSet columnSet, string alias, XrmFakedContext context)
         {
-            foreach (var otherEntity in otherEntities) {
+            foreach (var otherEntity in otherEntities)
+            {
                 var otherClonedEntity = otherEntity.Clone(); //To avoid joining entities from/to the same entities, which would cause collection modified exceptions
 
                 if (columnSet.AllColumns)
@@ -359,7 +348,8 @@ namespace FakeXrmEasy.Extensions
                         {
                             e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, otherClonedEntity[attKey]);
                         }
-                        else {
+                        else
+                        {
                             e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, null);
                         }
                     }
@@ -376,7 +366,7 @@ namespace FakeXrmEasy.Extensions
         /// <returns></returns>
         public static Guid KeySelector(this Entity e, string sAttributeName, XrmFakedContext context)
         {
-            if(sAttributeName.Contains("."))
+            if (sAttributeName.Contains("."))
             {
                 //Do not lowercase the alias prefix
                 var splitted = sAttributeName.Split('.');
@@ -386,7 +376,6 @@ namespace FakeXrmEasy.Extensions
             {
                 sAttributeName = sAttributeName.ToLower();
             }
-
 
             if (!e.Attributes.ContainsKey(sAttributeName))
             {
@@ -400,7 +389,7 @@ namespace FakeXrmEasy.Extensions
             }
 
             object keyValue = null;
-            if(e[sAttributeName] is AliasedValue)
+            if (e[sAttributeName] is AliasedValue)
             {
                 keyValue = (e[sAttributeName] as AliasedValue).Value;
             }
@@ -436,7 +425,5 @@ namespace FakeXrmEasy.Extensions
                 e[property] = value;
             }
         }
-
-
     }
 }

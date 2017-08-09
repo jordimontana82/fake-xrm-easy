@@ -1,16 +1,12 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
-using FakeItEasy;
-using FakeXrmEasy;
-using Microsoft.Xrm.Sdk.Query;
-
-using System.Collections.Generic;
+﻿using Crm;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
-using Crm;
+using Xunit;
 
 namespace FakeXrmEasy.Tests
 {
@@ -22,7 +18,7 @@ namespace FakeXrmEasy.Tests
             var context = new XrmFakedContext();
             var service = context.GetFakedOrganizationService();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve(null,Guid.Empty,new ColumnSet()));
+            var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve(null, Guid.Empty, new ColumnSet()));
             Assert.Equal(ex.Message, "The entity logical name must not be null or empty.");
 
             ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("", Guid.Empty, new ColumnSet()));
@@ -56,7 +52,7 @@ namespace FakeXrmEasy.Tests
         public void When_retrieve_is_invoked_with_a_non_existing_logical_name_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
-                
+
             var service = context.GetFakedOrganizationService();
 
             var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("account", Guid.NewGuid(), null));
@@ -136,7 +132,7 @@ namespace FakeXrmEasy.Tests
 
             var service = context.GetFakedOrganizationService();
 
-            var result = service.Retrieve("account", guid, new ColumnSet(new string [] {"name"}));
+            var result = service.Retrieve("account", guid, new ColumnSet(new string[] { "name" }));
             Assert.Equal(result.Id, data.FirstOrDefault().Id);
             Assert.True(result.Attributes.Count == 1);
             Assert.Equal(result["name"], "Test account");

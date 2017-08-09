@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using Crm;
+﻿using Crm;
 using Microsoft.Xrm.Sdk;
-using Xunit;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Linq;
+using System.ServiceModel;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteMultipleRequestTests
 {
@@ -53,7 +51,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteMultipleRequestTests
             };
 
             var response = service.Execute(executeMultipleRequest) as ExecuteMultipleResponse;
-            
+
             Assert.False(response.IsFaulted);
             Assert.NotEmpty(response.Responses);
 
@@ -322,7 +320,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteMultipleRequestTests
                     {
                         Target = account2
                     },
-                    
+
                     new CreateRequest
                     {
                         Target = account3

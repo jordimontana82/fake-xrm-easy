@@ -1,17 +1,12 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
+﻿using Crm;
 using FakeItEasy;
-using FakeXrmEasy;
-using Microsoft.Xrm.Sdk.Query;
-
-using System.Collections.Generic;
-using Microsoft.Xrm.Sdk;
-
 using FakeXrmEasy.Tests.PluginsForTesting;
-using Crm;
+using Microsoft.Xrm.Sdk;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Xunit;
 
 namespace FakeXrmEasy.Tests
 {
@@ -28,10 +23,9 @@ namespace FakeXrmEasy.Tests
             //Execute our plugin against the selected target
             var fakedPlugin = fakedContext.ExecutePluginWithTarget<RetrieveServicesPlugin>(target);
 
-            //Assert that the plugin was executed      
+            //Assert that the plugin was executed
             A.CallTo(() => fakedPlugin.Execute(A<IServiceProvider>._))
                 .MustHaveHappened();
-
         }
 
         [Fact]
@@ -45,9 +39,8 @@ namespace FakeXrmEasy.Tests
             //Execute our plugin against a target that doesn't contains the accountnumber attribute
             var fakedPlugin = fakedContext.ExecutePluginWithTarget<AccountNumberPlugin>(target);
 
-            //Assert that the target contains a new attribute      
+            //Assert that the target contains a new attribute
             Assert.True(target.Attributes.ContainsKey("accountnumber"));
-
         }
 
         [Fact]
@@ -61,7 +54,6 @@ namespace FakeXrmEasy.Tests
 
             //Execute our plugin against a target thatcontains the accountnumber attribute will throw exception
             Assert.Throws<InvalidPluginExecutionException>(() => fakedContext.ExecutePluginWithTarget<AccountNumberPlugin>(target));
-
         }
 
         [Fact]
@@ -162,10 +154,10 @@ namespace FakeXrmEasy.Tests
             var guid1 = Guid.NewGuid();
             var target = new Entity("contact") { Id = guid1 };
 
-            TestPropertiesPlugin plugin = 
+            TestPropertiesPlugin plugin =
                 new TestPropertiesPlugin()
                 { Property = "Some test" };
-            
+
             var inputParams = new ParameterCollection { new KeyValuePair<string, object>("Target", target) };
 
             //Execute our plugin against the selected target
@@ -223,7 +215,6 @@ namespace FakeXrmEasy.Tests
 
             Assert.True(pluginCtx.OutputParameters.ContainsKey("OrgName"));
             Assert.Equal("TestOrgName", pluginCtx.OutputParameters["OrgName"]);
-
         }
 
         [Fact]
@@ -251,7 +242,6 @@ namespace FakeXrmEasy.Tests
                 MessageName = "Create",
                 InitiatingUserId = Guid.NewGuid()
             };
-
 
             ex = Record.Exception(() => context.ExecutePluginWith<TestContextPlugin>(pluginContext));
             Assert.Null(ex);
@@ -298,9 +288,8 @@ namespace FakeXrmEasy.Tests
             var pluginContext = context.GetDefaultPluginContext();
             pluginContext.SharedVariables.Add("key", "somevalue");
 
-            var ex = Record.Exception(() =>context.ExecutePluginWith<TestSharedVariablesPropertyPlugin>(pluginContext));
+            var ex = Record.Exception(() => context.ExecutePluginWith<TestSharedVariablesPropertyPlugin>(pluginContext));
             Assert.Null(ex);
         }
-
     }
 }

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.ServiceModel;
-using Microsoft.Crm.Sdk.Messages;
+﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Linq;
+using System.ServiceModel;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -82,12 +82,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                                                                  <attribute name='sourceattributename'/>
                                                                  <attribute name='targetattributename'/>
                                                               </link-entity>
-                                                              <filter type='and'> 
-                                                                 <condition attribute='sourceentityname' operator='eq' value='{0}' /> 
-                                                                 <condition attribute='targetentityname' operator='eq' value='{1}' /> 
+                                                              <filter type='and'>
+                                                                 <condition attribute='sourceentityname' operator='eq' value='{0}' />
+                                                                 <condition attribute='targetentityname' operator='eq' value='{1}' />
                                                               </filter>
                                                            </entity>
                                                         </fetch>";
-
     }
 }

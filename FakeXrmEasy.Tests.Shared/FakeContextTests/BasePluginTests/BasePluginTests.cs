@@ -1,8 +1,5 @@
 ﻿using FakeXrmEasy.Tests.PluginsForTesting;
 using Microsoft.Xrm.Sdk;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.BasePluginTests

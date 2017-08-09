@@ -1,10 +1,8 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Text;
 using System.Linq;
 
 namespace FakeXrmEasy.Tests.PluginsForTesting
@@ -22,6 +20,7 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
             internal eStage Stage { get { return (eStage)this.PluginExecutionContext.Stage; } }
             internal int Depth { get { return this.PluginExecutionContext.Depth; } }
             internal string MessageName { get { return this.PluginExecutionContext.MessageName; } }
+
             internal LocalPluginContext(IServiceProvider serviceProvider)
             {
                 if (serviceProvider == null)
@@ -64,6 +63,7 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
                 if (this.CrmContext != null)
                     this.CrmContext.Dispose();
             }
+
             /// <summary>
             /// Returns the first registered 'Pre' image for the pipeline execution
             /// </summary>
@@ -76,6 +76,7 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
                     return null;
                 }
             }
+
             /// <summary>
             /// Returns the first registered 'Post' image for the pipeline execution
             /// </summary>
@@ -88,6 +89,7 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
                     return null;
                 }
             }
+
             /// <summary>
             /// Returns the 'Target' of the message if available
             /// This is an 'Entity' instead of the specified type in order to retain the same instance of the 'Entity' object. This allows for updates to the target in a 'Pre' stage that
@@ -102,6 +104,7 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
                     return null;
                 }
             }
+
             /// <summary>
             /// Returns the 'Target' of the message as an EntityReference if available
             /// </summary>
@@ -114,6 +117,7 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
                     return null;
                 }
             }
+
             private T GetEntityAsType(Entity entity)
             {
                 if (typeof(T) == entity.GetType())
@@ -122,26 +126,31 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
                     return entity.ToEntity<T>();
             }
         }
+
         protected enum eStage
         {
             PreValidation = 10,
             PreOperation = 20,
             PostOperation = 40
         }
+
         protected class PluginEvent
         {
             /// <summary>
             /// Execution pipeline stage that the plugin should be registered against.
             /// </summary>
             public eStage Stage { get; set; }
+
             /// <summary>
             /// Logical name of the entity that the plugin should be registered against. Leave 'null' to register against all entities.
             /// </summary>
             public string EntityName { get; set; }
+
             /// <summary>
             /// Name of the message that the plugin should be triggered off of.
             /// </summary>
             public string MessageName { get; set; }
+
             /// <summary>
             /// Method that should be executed when the conditions of the Plugin Event have been met.
             /// </summary>
@@ -200,10 +209,10 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
         /// </summary>
         /// <param name="serviceProvider">The service provider.</param>
         /// <remarks>
-        /// For improved performance, Microsoft Dynamics CRM caches plug-in instances. 
-        /// The plug-in's Execute method should be written to be stateless as the constructor 
-        /// is not called for every invocation of the plug-in. Also, multiple system threads 
-        /// could execute the plug-in at the same time. All per invocation state information 
+        /// For improved performance, Microsoft Dynamics CRM caches plug-in instances.
+        /// The plug-in's Execute method should be written to be stateless as the constructor
+        /// is not called for every invocation of the plug-in. Also, multiple system threads
+        /// could execute the plug-in at the same time. All per invocation state information
         /// is stored in the context. This means that you should not use global variables in plug-ins.
         /// </remarks>
         public void Execute(IServiceProvider serviceProvider)

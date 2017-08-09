@@ -1,10 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Xml.Serialization;
 
 namespace FakeXrmEasy
 {
@@ -12,10 +8,9 @@ namespace FakeXrmEasy
     /// Holds custom properties of a IPluginExecutionContext
     /// Extracted from https://msdn.microsoft.com/es-es/library/microsoft.xrm.sdk.ipluginexecutioncontext_properties.aspx
     /// </summary>
-    [DataContract(Name= "PluginExecutionContext", Namespace = "")]
-    public class XrmFakedPluginExecutionContext: IPluginExecutionContext
+    [DataContract(Name = "PluginExecutionContext", Namespace = "")]
+    public class XrmFakedPluginExecutionContext : IPluginExecutionContext
     {
-
         [DataMember(Order = 1)]
         public Guid BusinessUnitId { get; set; }
 
@@ -96,6 +91,7 @@ namespace FakeXrmEasy
 
         [DataMember(Order = 27)]
         public int Stage { get; set; }
+
         /// <summary>
         /// Default constructor
         /// </summary>

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ServiceModel;
-using System.Text;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using System;
+using System.ServiceModel;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -29,7 +27,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("An OptionSetMetadata with the name {0} does not exist.", name));
             }
-            
+
             var optionSetMetadata = ctx.OptionSetValuesMetadata[name];
 
             var response = new RetrieveOptionSetResponse()
@@ -39,7 +37,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                             { "OptionSetMetadata", optionSetMetadata }
                         }
             };
-            
+
             return response;
         }
 

@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Crm;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.InitializeFromRequestTests
@@ -87,7 +87,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.InitializeFromRequestTests
                 FirstName = "Arjen",
                 LastName = "Stortelder"
             };
-           
+
             ctx.Initialize(new List<Entity> { lead });
             ctx.AddAttributeMapping(Lead.EntityLogicalName, "firstname", Contact.EntityLogicalName, "firstname");
 
@@ -155,7 +155,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.InitializeFromRequestTests
                 FirstName = "Arjen",
                 LastName = "Stortelder"
             };
-           
+
             ctx.Initialize(new List<Entity> { lead });
             ctx.AddAttributeMapping(Lead.EntityLogicalName, "firstname", Contact.EntityLogicalName, "firstname");
 

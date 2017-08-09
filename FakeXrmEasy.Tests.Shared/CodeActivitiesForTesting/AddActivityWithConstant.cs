@@ -1,10 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Workflow;
-using System;
 using System.Activities;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace FakeXrmEasy.Tests.CodeActivitiesForTesting
 {
@@ -26,7 +22,6 @@ namespace FakeXrmEasy.Tests.CodeActivitiesForTesting
                 executionContext.GetExtension<IOrganizationServiceFactory>();
             IOrganizationService service =
                 serviceFactory.CreateOrganizationService(context.UserId);
-
 
             // Retrieve the summands and perform addition
             this.result.Set(executionContext,

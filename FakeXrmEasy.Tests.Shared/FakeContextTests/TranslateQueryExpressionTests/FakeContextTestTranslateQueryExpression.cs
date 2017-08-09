@@ -1,17 +1,13 @@
-﻿using System;
+﻿using Crm;
+using FakeXrmEasy.OrganizationFaults;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using FakeItEasy;
-using FakeXrmEasy;
-using FakeXrmEasy.OrganizationFaults;
-using Xunit;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Query;
-using Microsoft.Xrm.Sdk.Client;
-using Crm;
-using Microsoft.Xrm.Sdk.Messages;
 using System.ServiceModel;  //TypedEntities generated code for testing
+using Xunit;
 
 namespace FakeXrmEasy.Tests
 {
@@ -88,8 +84,8 @@ namespace FakeXrmEasy.Tests
 
             Assert.True(secondContact["fullname"].Equals(contact2["fullname"]));
             Assert.True((secondContact["account.name"] as AliasedValue).Value.Equals(account["name"]));
-
         }
+
         [Fact]
         public void When_executing_a_query_expression_with_a_left_join_all_left_hand_side_elements_are_returned()
         {
@@ -239,7 +235,6 @@ namespace FakeXrmEasy.Tests
             var list = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
 
             Assert.False(list[0].Attributes.ContainsKey("this attribute doesnt exists!"));
-
         }
 
         [Fact]
@@ -341,7 +336,7 @@ namespace FakeXrmEasy.Tests
             //+ Attributes from the join(account) = 2 + 6
 
             Assert.True(firstContact.Attributes.Count == 18);
-            Assert.True(lastContact.Attributes.Count == 18);  
+            Assert.True(lastContact.Attributes.Count == 18);
         }
 
         [Fact]
@@ -475,8 +470,8 @@ namespace FakeXrmEasy.Tests
             Assert.True(lastContact.Attributes["myCoolAlias.name"] is AliasedValue);  //Contact 2
         }
 
-
         #region Filters
+
         [Fact]
         public void When_executing_a_query_expression_with_simple_equals_condition_expression_returns_right_number_of_results()
         {
@@ -620,7 +615,8 @@ namespace FakeXrmEasy.Tests
             var firstContact = result.Entities.FirstOrDefault();
             Assert.True(firstContact["fullname"].Equals("Contact 1"));
         }
-        #endregion
+
+        #endregion Filters
 
         [Fact]
         public void When_using_joins_attribute_projection_shouldnt_affect_column_sets()
@@ -709,7 +705,7 @@ namespace FakeXrmEasy.Tests
                 LogicalName = "pet",
                 Id = petId,
                 Attributes = new AttributeCollection {
-                    { "petid", petId }, 
+                    { "petid", petId },
                     { "childid", new EntityReference("child", child.Id) }
                 }
             };
@@ -735,7 +731,6 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(1, count2); // returns 0 records (unexpected?)
         }
 
-
         [Fact]
         public void When_querying_early_bound_entities_attribute_not_initialised_returns_null_in_joins()
         {
@@ -747,16 +742,14 @@ namespace FakeXrmEasy.Tests
 
             context.Initialize(new[] { role, parentRole });
 
-            using(var ctx = new XrmServiceContext(service))
+            using (var ctx = new XrmServiceContext(service))
             {
                 var roleResult = (from r in ctx.CreateQuery<Role>()
-                                    join parent in ctx.CreateQuery<Role>() on r.ParentRoleId.Id equals parent.RoleId.Value
-                                   select r).FirstOrDefault();
+                                  join parent in ctx.CreateQuery<Role>() on r.ParentRoleId.Id equals parent.RoleId.Value
+                                  select r).FirstOrDefault();
 
                 Assert.Equal(roleResult, null);
             }
-
-
         }
 
         [Fact]
@@ -784,7 +777,7 @@ namespace FakeXrmEasy.Tests
                         Columns = new ColumnSet(new string[] { "thisAttributeDoesntExists" })
                     }
                 );
-                
+
                 Assert.Throws<FaultException<OrganizationServiceFault>>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
             }
         }
@@ -819,7 +812,6 @@ namespace FakeXrmEasy.Tests
             }
         }
 
-
         [Fact]
         public void When_retrieve_multiple_is_invoked_with_a_service_created_entity_that_entity_is_returned_with_logical_name()
         {
@@ -842,7 +834,6 @@ namespace FakeXrmEasy.Tests
 
             var result = service.RetrieveMultiple(query);
 
-
             foreach (var item in result.Entities)
             {
                 Assert.NotNull(item.LogicalName);
@@ -855,10 +846,10 @@ namespace FakeXrmEasy.Tests
             var fakedContext = new XrmFakedContext();
             var fakedService = fakedContext.GetOrganizationService();
 
-            fakedContext.AddRelationship("new_invoicepaymentmethod_invoicedetail", 
-                new XrmFakedRelationship("new_invoicepaymentmethod_invoicedetail", 
-                            "invoicedetailid", "new_invoicepaymentmethodid", 
-                            "invoicedetail", 
+            fakedContext.AddRelationship("new_invoicepaymentmethod_invoicedetail",
+                new XrmFakedRelationship("new_invoicepaymentmethod_invoicedetail",
+                            "invoicedetailid", "new_invoicepaymentmethodid",
+                            "invoicedetail",
                             "new_invoicepaymentmethod"));
 
             Entity product01 = new Entity("product");
@@ -874,7 +865,6 @@ namespace FakeXrmEasy.Tests
             pmr01.Id = Guid.NewGuid();
             pmr01.Attributes.Add("new_invoicepaymentmethodid", pmr01.Id);
             pmr01.Attributes.Add("new_name", "PMR0000000001");
-
 
             Entity invoicedetail02 = new Entity("invoicedetail");
             invoicedetail02.Id = Guid.NewGuid();
@@ -895,7 +885,6 @@ namespace FakeXrmEasy.Tests
 
             fakedService.Associate("invoicedetail", invoicedetail01.Id, new Relationship("new_invoicepaymentmethod_invoicedetail"), new EntityReferenceCollection() { pmr01.ToEntityReference() });
             fakedService.Associate("invoicedetail", invoicedetail02.Id, new Relationship("new_invoicepaymentmethod_invoicedetail"), new EntityReferenceCollection() { pmr02.ToEntityReference() });
-
 
             EntityCollection invoiceDetails = new EntityCollection();
 
@@ -927,6 +916,5 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(1, invoiceDetails.Entities.Count);
             Assert.Equal(invoicedetail02.Id, invoiceDetails.Entities[0].Id);
         }
-
     }
 }

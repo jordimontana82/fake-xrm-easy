@@ -1,18 +1,11 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
-using FakeItEasy;
-using FakeXrmEasy;
-using Microsoft.Xrm.Sdk.Query;
-
-using System.Collections.Generic;
-using Microsoft.Xrm.Sdk;
-
+﻿using Crm;
 using FakeXrmEasy.Tests.CodeActivitiesForTesting;
-using Crm;
+using Microsoft.Xrm.Sdk;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using Microsoft.Xrm.Sdk.Messages;
+using Xunit;
 
 namespace FakeXrmEasy.Tests
 {
@@ -22,7 +15,7 @@ namespace FakeXrmEasy.Tests
         public void When_the_add_activity_is_executed_the_right_sum_is_returned()
         {
             var fakedContext = new XrmFakedContext();
-            
+
             //Inputs
             var inputs = new Dictionary<string, object>() {
                 { "firstSummand", 2 },
@@ -120,7 +113,5 @@ namespace FakeXrmEasy.Tests
 
             Assert.True(((string)result["MessageName"]).Equals("Update"));
         }
-
-        
     }
 }

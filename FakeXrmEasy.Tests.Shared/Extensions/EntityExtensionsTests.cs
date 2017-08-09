@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
+﻿using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
-using FakeXrmEasy.Extensions;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.Extensions
 {
