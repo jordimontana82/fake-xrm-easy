@@ -82,8 +82,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue191.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\ProxyEntities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\TestCRMHandlingOfNullsAndMissingFields.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\PipelineTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\AccountSetTerritories.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\ValidatePipelinePlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\BasePlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\CreateAccountPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\ExceptionLoverPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\PreAccountCreate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\AccountNumberPlugin.cs" />
