@@ -1,7 +1,5 @@
 ﻿using Microsoft.Crm.Sdk.Messages;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.PublishXml

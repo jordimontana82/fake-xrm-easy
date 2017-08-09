@@ -4,7 +4,6 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using Xunit;
 
@@ -61,7 +60,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AssociateRequestTests
                     Id = teamId
                 }
             });
-            
+
             context.AddRelationship("teammembership", new XrmFakedRelationship()
             {
                 RelationshipType = XrmFakedRelationship.enmFakeRelationshipType.ManyToMany,
@@ -88,12 +87,11 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AssociateRequestTests
                 Assert.NotNull(firstAssociation);
 
                 var secondAssociation = (from tu in ctx.TeamMembershipSet
-                                        where tu.TeamId == teamId
-                                        && tu.SystemUserId == user2Id
-                                        select tu).FirstOrDefault();
+                                         where tu.TeamId == teamId
+                                         && tu.SystemUserId == user2Id
+                                         select tu).FirstOrDefault();
                 Assert.NotNull(secondAssociation);
             }
-
         }
 
         [Fact]
@@ -101,8 +99,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AssociateRequestTests
         {
             var context = new XrmFakedContext();
             var executor = new AssociateRequestExecutor();
-            
-            context.AddRelationship("fakeRelationship", 
+
+            context.AddRelationship("fakeRelationship",
                 new XrmFakedRelationship()
                 {
                     IntersectEntity = "account_contact_intersect",
@@ -118,13 +116,15 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AssociateRequestTests
             {
                 account
             });
-            var req = new AssociateRequest() {
+            var req = new AssociateRequest()
+            {
                 Target = contact.ToEntityReference(),
                 RelatedEntities = new EntityReferenceCollection()
                 {
                     new EntityReference(Account.EntityLogicalName, account.Id),
                 },
-                Relationship = new Relationship("fakeRelationship") };
+                Relationship = new Relationship("fakeRelationship")
+            };
             Assert.Throws<Exception>(() => executor.Execute(req, context));
         }
 

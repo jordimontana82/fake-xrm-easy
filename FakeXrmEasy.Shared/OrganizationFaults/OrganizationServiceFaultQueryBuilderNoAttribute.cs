@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using System.ServiceModel;
 
 namespace FakeXrmEasy.OrganizationFaults
@@ -17,10 +12,10 @@ namespace FakeXrmEasy.OrganizationFaults
         public static void Throw(string sMissingAttributeName)
         {
             throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault()
-                {
-                    ErrorCode = ErrorCode,
-                    Message = string.Format("The attribute {0} does not exist on this entity.", sMissingAttributeName)
-                },
+            {
+                ErrorCode = ErrorCode,
+                Message = string.Format("The attribute {0} does not exist on this entity.", sMissingAttributeName)
+            },
                 new FaultReason(string.Format("The attribute {0} does not exist on this entity.", sMissingAttributeName)));
         }
     }

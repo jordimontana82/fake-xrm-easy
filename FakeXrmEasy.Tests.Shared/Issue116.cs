@@ -3,14 +3,12 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace FakeXrmEasy
 {
     public class Issue116
     {
-
         private List<Entity> SetupContactTests()
         {
             var entityList = new List<Entity>();
@@ -66,6 +64,7 @@ namespace FakeXrmEasy
             linkAccount.EntityAlias = "accountItem";
 
             #region this is the broken additional field condition
+
             linkAccount.LinkCriteria = new FilterExpression();
             linkAccount.LinkCriteria.FilterOperator = LogicalOperator.And;
 
@@ -76,7 +75,9 @@ namespace FakeXrmEasy
             condition3.Values.Add(new Guid(contactId));
 
             linkAccount.LinkCriteria.Conditions.Add(condition3);
-            #endregion
+
+            #endregion this is the broken additional field condition
+
             query.LinkEntities.Add(linkAccount);
             return query;
         }
@@ -115,6 +116,7 @@ namespace FakeXrmEasy
             linkAccount.LinkCriteria.FilterOperator = LogicalOperator.And;
 
             #region this is the working additional field reference
+
             // Create the primary contact condition
             LinkEntity linkContact = new LinkEntity(Account.EntityLogicalName, Contact.EntityLogicalName, "primarycontactid", "contactid", JoinOperator.Inner);
             linkContact.Columns = new ColumnSet(true);
@@ -125,7 +127,9 @@ namespace FakeXrmEasy
 
             linkContact.LinkCriteria.Conditions.Add(new ConditionExpression("contactid", ConditionOperator.Equal, new Guid(contactId)));
             linkAccount.LinkEntities.Add(linkContact);
-            #endregion
+
+            #endregion this is the working additional field reference
+
             query.LinkEntities.Add(linkAccount);
             return query;
         }

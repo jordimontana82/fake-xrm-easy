@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace FakeXrmEasy.Extensions
 {
@@ -24,6 +23,7 @@ namespace FakeXrmEasy.Extensions
         {
             return InternalCopy(originalObject, new Dictionary<Object, Object>(new ReferenceEqualityComparer()));
         }
+
         private static Object InternalCopy(Object originalObject, IDictionary<Object, Object> visited)
         {
             if (originalObject == null) return null;
@@ -40,7 +40,6 @@ namespace FakeXrmEasy.Extensions
                     Array clonedArray = (Array)cloneObject;
                     clonedArray.ForEach((array, indices) => array.SetValue(InternalCopy(clonedArray.GetValue(indices), visited), indices));
                 }
-
             }
             visited.Add(originalObject, cloneObject);
             CopyFields(originalObject, visited, cloneObject, typeToReflect);
@@ -68,6 +67,7 @@ namespace FakeXrmEasy.Extensions
                 fieldInfo.SetValue(cloneObject, clonedFieldValue);
             }
         }
+
         public static T Copy<T>(this T original)
         {
             return (T)Copy((Object)original);
@@ -80,6 +80,7 @@ namespace FakeXrmEasy.Extensions
         {
             return ReferenceEquals(x, y);
         }
+
         public override int GetHashCode(object obj)
         {
             if (obj == null) return 0;

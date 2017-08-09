@@ -2,9 +2,6 @@
 using Microsoft.Xrm.Sdk.Workflow;
 using System;
 using System.Activities;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace FakeXrmEasy.Tests.CodeActivitiesForTesting
 {

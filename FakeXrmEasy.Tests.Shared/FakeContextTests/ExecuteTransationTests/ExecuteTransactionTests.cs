@@ -1,13 +1,13 @@
 ﻿#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
 
+using FakeXrmEasy.FakeMessageExecutors;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xunit;
-using FakeXrmEasy.FakeMessageExecutors;
-using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Xrm.Sdk;
-using System.Linq;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteTransationTests
 {

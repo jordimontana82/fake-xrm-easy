@@ -1,17 +1,13 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
-using FakeItEasy;
-using FakeXrmEasy;
-using Microsoft.Xrm.Sdk.Query;
-
-using System.Collections.Generic;
-using System.Reflection;
-using Crm;
+﻿using Crm;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Xunit;
 
 namespace FakeXrmEasy.Tests
 {
@@ -27,7 +23,7 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(ex.Message, "The entity must not be null");
         }
 
-       [Fact]
+        [Fact]
         public void When_an_entity_is_created_with_an_empty_logical_name_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
@@ -45,7 +41,6 @@ namespace FakeXrmEasy.Tests
             var context = new XrmFakedContext();
             var service = context.GetFakedOrganizationService();
 
-            
             var e = new Entity("account") { Id = Guid.Empty };
             var guid = service.Create(e);
 
@@ -172,7 +167,7 @@ namespace FakeXrmEasy.Tests
 
             //Retrieve the record created
             var contact = (from con in context.CreateQuery<Contact>()
-                          select con).FirstOrDefault();
+                           select con).FirstOrDefault();
 
             Assert.True(contact.Attributes.ContainsKey("contactid"));
             Assert.Equal(id, contact["contactid"]);
@@ -194,7 +189,6 @@ namespace FakeXrmEasy.Tests
 
             Assert.True(record.Attributes.ContainsKey("new_myentityid"));
             Assert.Equal(id, record["new_myentityid"]);
-
         }
 
         [Fact]
@@ -245,7 +239,6 @@ namespace FakeXrmEasy.Tests
 
             var exception = Assert.Throws<Exception>(() => service.Execute(request));
             Assert.Equal(exception.Message, "Relationship order_details does not exist in the metadata cache");
-            
         }
 
         [Fact]
@@ -263,7 +256,6 @@ namespace FakeXrmEasy.Tests
                     Entity2Attribute = "salesorderid",              //Lookup attribute
                     RelationshipType = XrmFakedRelationship.enmFakeRelationshipType.OneToMany
                 });
-
 
             var order = new SalesOrder();
 
@@ -391,6 +383,5 @@ namespace FakeXrmEasy.Tests
             var createdAccount = ctx.CreateQuery<Account>().FirstOrDefault();
             Assert.Equal(now, createdAccount.CreatedOn);
         }
-        
     }
 }

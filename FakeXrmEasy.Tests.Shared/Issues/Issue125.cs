@@ -1,11 +1,10 @@
 ﻿using Crm;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Xunit;
-using Microsoft.Xrm.Sdk.Query;
 
 namespace FakeXrmEasy.Tests.Issues
 {
@@ -63,7 +62,6 @@ namespace FakeXrmEasy.Tests.Issues
 
             var fakedService = context.GetOrganizationService();
 
-
             var request = new AssociateRequest()
             {
                 Target = customerA.ToEntityReference(),
@@ -77,20 +75,19 @@ namespace FakeXrmEasy.Tests.Issues
 
             string fetchQuery = string.Format(@"<fetch distinct='false' mapping='logical' output-format='xml-platform' version='1.0' >
                           <entity name='gbp_customaddress' >
-                            <attribute name='gbp_country' />                                
+                            <attribute name='gbp_country' />
                             <link-entity name='gbp_gbp_customaddress_contact' from='gbp_customaddressid' to='gbp_customaddressid' alias='NtoN' intersect='true' >
                               <link-entity name='contact' from='contactid' to='contactid' alias='Contact' >
                                 <filter>
                                   <condition attribute='contactid' operator='eq' value='{0}' />
                                 </filter>
                               </link-entity>
-                            </link-entity>                                
+                            </link-entity>
                           </entity>
                         </fetch> ", contact.Id);
 
             EntityCollection result = fakedService.RetrieveMultiple(new FetchExpression(fetchQuery));
             Assert.Equal(1, result.Entities.Count);
-
         }
     }
 }

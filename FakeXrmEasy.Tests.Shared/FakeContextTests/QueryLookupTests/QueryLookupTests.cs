@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Xunit;
-using Microsoft.Xrm.Sdk.Query;
+﻿using Crm;
 using Microsoft.Xrm.Sdk;
-
-using Crm;
 using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.QueryLookupTests
 {
@@ -101,4 +99,3 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryLookupTests
         }
     }
 }
-

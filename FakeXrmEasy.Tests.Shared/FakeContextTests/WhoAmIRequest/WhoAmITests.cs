@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Xunit;
-using FakeItEasy;
-using FakeXrmEasy;
-using Microsoft.Xrm.Sdk.Query;
+﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
-
-using Crm;
-using Microsoft.Xrm.Sdk.Messages;
-using System.Collections.ObjectModel;
-using Microsoft.Crm.Sdk.Messages;
+using System;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.WhoAmIRequestTests
 {

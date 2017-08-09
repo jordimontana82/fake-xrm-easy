@@ -1,17 +1,13 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
-using FakeItEasy;
-using FakeXrmEasy;
-using Microsoft.Xrm.Sdk.Query;
-
-using System.Collections.Generic;
-using System.Reflection;
+﻿using Crm;
 using Microsoft.Xrm.Sdk;
-using System.ServiceModel;
-using Crm;
 using Microsoft.Xrm.Sdk.Client;
+using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.ServiceModel;
+using Xunit;
 
 namespace FakeXrmEasy.Tests
 {
@@ -23,7 +19,7 @@ namespace FakeXrmEasy.Tests
             var context = new XrmFakedContext();
             var service = context.GetFakedOrganizationService();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => service.Delete(null,Guid.Empty));
+            var ex = Assert.Throws<InvalidOperationException>(() => service.Delete(null, Guid.Empty));
             Assert.Equal(ex.Message, "The entity logical name must not be null or empty.");
 
             ex = Assert.Throws<InvalidOperationException>(() => service.Delete("", Guid.Empty));
@@ -70,7 +66,7 @@ namespace FakeXrmEasy.Tests
 
             //Initialize the context with a single entity
             var nonExistingGuid = Guid.NewGuid();
-            
+
             var service = context.GetFakedOrganizationService();
 
             var ex = Assert.Throws<InvalidOperationException>(() => service.Delete("account", nonExistingGuid));

@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Crm
+﻿namespace Crm
 {
-
-
     [System.Runtime.Serialization.DataContractAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "8.1.0.7711")]
     public enum Gbp_customaddressState
     {
-
         [System.Runtime.Serialization.EnumMemberAttribute()]
         Active = 0,
 
@@ -19,14 +12,13 @@ namespace Crm
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [System.Runtime.Serialization.DataContractAttribute()]
     [Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("gbp_customaddress")]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "8.1.0.7711")]
     public partial class gbp_customaddress : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
     {
-
         /// <summary>
         /// Default Constructor.
         /// </summary>
@@ -96,7 +88,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_account")]
         public Microsoft.Xrm.Sdk.EntityReference gbp_account
@@ -114,7 +106,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_addresstype")]
         public Microsoft.Xrm.Sdk.OptionSetValue gbp_addresstype
@@ -132,7 +124,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_addrline1")]
         public string gbp_addrline1
@@ -150,7 +142,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_addrline2")]
         public string gbp_addrline2
@@ -168,7 +160,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_addrline3")]
         public string gbp_addrline3
@@ -186,7 +178,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_alternativeorgs")]
         public string gbp_alternativeorgs
@@ -204,7 +196,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_city")]
         public string gbp_city
@@ -222,7 +214,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_contact")]
         public Microsoft.Xrm.Sdk.EntityReference gbp_contact
@@ -240,7 +232,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_country")]
         public Microsoft.Xrm.Sdk.EntityReference gbp_country
@@ -297,7 +289,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_departmentname")]
         public string gbp_departmentname
@@ -333,7 +325,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_noswitchboard")]
         public string gbp_noswitchboard
@@ -351,7 +343,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_postalcode")]
         public string gbp_postalcode
@@ -369,7 +361,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_region")]
         public Microsoft.Xrm.Sdk.EntityReference gbp_region
@@ -387,7 +379,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_status")]
         public Microsoft.Xrm.Sdk.OptionSetValue gbp_status
@@ -405,7 +397,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_usmailstop")]
         public string gbp_usmailstop
@@ -636,7 +628,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
         public System.Nullable<long> VersionNumber
@@ -982,14 +974,10 @@ namespace Crm
         }
     }
 
-
-
-
     [System.Runtime.Serialization.DataContractAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "8.1.0.7711")]
     public enum Gbp_globecountryState
     {
-
         [System.Runtime.Serialization.EnumMemberAttribute()]
         Active = 0,
 
@@ -998,14 +986,13 @@ namespace Crm
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [System.Runtime.Serialization.DataContractAttribute()]
     [Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("gbp_globecountry")]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "8.1.0.7711")]
     public partial class gbp_globecountry : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
     {
-
         /// <summary>
         /// Default Constructor.
         /// </summary>
@@ -1075,7 +1062,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_code")]
         public string gbp_code
@@ -1363,7 +1350,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
         public System.Nullable<long> VersionNumber
@@ -1705,18 +1692,14 @@ namespace Crm
         }
     }
 
-
-
-
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [System.Runtime.Serialization.DataContractAttribute()]
     [Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("gbp_gbp_customaddress_contact")]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "8.1.0.7711")]
     public partial class gbp_gbp_customaddress_contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
     {
-
         /// <summary>
         /// Default Constructor.
         /// </summary>
@@ -1750,7 +1733,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("contactid")]
         public System.Nullable<System.Guid> contactid
@@ -1762,7 +1745,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_customaddressid")]
         public System.Nullable<System.Guid> gbp_customaddressid
@@ -1774,7 +1757,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gbp_gbp_customaddress_contactid")]
         public System.Nullable<System.Guid> gbp_gbp_customaddress_contactId
@@ -1799,7 +1782,7 @@ namespace Crm
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
         public System.Nullable<long> VersionNumber
@@ -1828,9 +1811,4 @@ namespace Crm
             }
         }
     }
-
-
-
-
-
 }

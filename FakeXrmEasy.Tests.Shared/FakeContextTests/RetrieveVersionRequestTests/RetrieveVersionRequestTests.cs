@@ -59,9 +59,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveVersionRequestTests
 #elif FAKE_XRM_EASY
 
             Assert.True(version.StartsWith("5"));
-
 #endif
-
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.Issues
@@ -70,7 +68,7 @@ namespace FakeXrmEasy.Tests.Issues
 
             var results = service.RetrieveMultiple(query2);
             Assert.Equal(true, results.Entities[0].Attributes.ContainsKey("child.contactid"));
-            Assert.Equal(true, results.Entities[0].Attributes.ContainsKey("pet.childid")); //test fails unless link22 is Inner join 
+            Assert.Equal(true, results.Entities[0].Attributes.ContainsKey("pet.childid")); //test fails unless link22 is Inner join
         }
     }
 }

@@ -1,18 +1,11 @@
-﻿using System;
+﻿using Crm;
+using FakeItEasy;
+using Microsoft.Xrm.Sdk;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using FakeItEasy;
-using FakeXrmEasy;
-using Xunit;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Query;
-using Microsoft.Xrm.Sdk.Client;
-using Crm;
-using Microsoft.Xrm.Sdk.Messages;
 using System.Reflection;  //TypedEntities generated code for testing
-
-
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
 {
@@ -23,7 +16,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
         {
             var fakedContext = new XrmFakedContext();
             fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
-           
+
             //Empty contecxt (no Initialize), but we should be able to query any typed entity without an entity not found exception
 
             var service = fakedContext.GetFakedOrganizationService();

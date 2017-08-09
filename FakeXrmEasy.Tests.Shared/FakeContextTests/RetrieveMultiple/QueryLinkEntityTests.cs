@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Crm;
+﻿using Crm;
 using Microsoft.Xrm.Sdk;
-using Xunit;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests
 {
@@ -33,7 +33,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 BusinessUnitId = new EntityReference(BusinessUnit.EntityLogicalName, businessId)
             };
 
-            fakedContext.Initialize(new Entity[] {testUser, testRole});
+            fakedContext.Initialize(new Entity[] { testUser, testRole });
 
             fakedContext.AddRelationship("systemuserroles_association", new XrmFakedRelationship
             {
@@ -123,7 +123,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 BusinessUnitId = new EntityReference(BusinessUnit.EntityLogicalName, businessId)
             };
 
-            fakedContext.Initialize(new Entity[] {testUser, testRole, testUser2, testRole2});
+            fakedContext.Initialize(new Entity[] { testUser, testRole, testUser2, testRole2 });
 
             fakedContext.AddRelationship("systemuserroles_association", new XrmFakedRelationship
             {
@@ -213,7 +213,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 BusinessUnitId = new EntityReference(BusinessUnit.EntityLogicalName, businessId)
             };
 
-            fakedContext.Initialize(new Entity[] {testUser, testRole});
+            fakedContext.Initialize(new Entity[] { testUser, testRole });
 
             fakedContext.AddRelationship("systemuserroles_association", new XrmFakedRelationship
             {
@@ -302,7 +302,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 BusinessUnitId = new EntityReference(BusinessUnit.EntityLogicalName, businessId)
             };
 
-            fakedContext.Initialize(new Entity[] {testUser, testRole});
+            fakedContext.Initialize(new Entity[] { testUser, testRole });
 
             fakedContext.AddRelationship("systemuserroles", new XrmFakedRelationship
             {
@@ -376,7 +376,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 BusinessUnitId = new EntityReference(BusinessUnit.EntityLogicalName, businessId)
             };
 
-            fakedContext.Initialize(new Entity[] {testUser, testRole});
+            fakedContext.Initialize(new Entity[] { testUser, testRole });
 
             fakedContext.AddRelationship("systemuserroles", new XrmFakedRelationship
             {
@@ -471,12 +471,12 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             fakedContext.AddRelationship(testRelation.Entity2LogicalName, testRelation);
             fakedService.Associate(testEntity1.LogicalName, testEntity1.Id,
                 new Relationship(testRelation.Entity2LogicalName),
-                new EntityReferenceCollection {testEntity2.ToEntityReference()});
+                new EntityReferenceCollection { testEntity2.ToEntityReference() });
 
             var query = new QueryExpression
             {
                 EntityName = "entity1",
-                Criteria = new FilterExpression {FilterOperator = LogicalOperator.And},
+                Criteria = new FilterExpression { FilterOperator = LogicalOperator.And },
                 ColumnSet = new ColumnSet(true)
             };
 
@@ -557,7 +557,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
                 }
             };
 
-            fakedContext.Initialize(new[] {entity1, entity2, entity3});
+            fakedContext.Initialize(new[] { entity1, entity2, entity3 });
 
             var result = fakedService.RetrieveMultiple(query);
 
@@ -570,7 +570,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             ()
         {
             var ctx = new XrmFakedContext();
-            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof (Contact));
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
 
             var service = ctx.GetFakedOrganizationService();
             ctx.Initialize(new List<Entity>()
@@ -587,8 +587,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             using (var context = new XrmServiceContext(service))
             {
                 var contacts = (from c in context.ContactSet
-                    where c.FirstName == name || c.LastName == name
-                    select new Contact {Id = c.Id, FirstName = c.FirstName, LastName = c.LastName}).ToList();
+                                where c.FirstName == name || c.LastName == name
+                                select new Contact { Id = c.Id, FirstName = c.FirstName, LastName = c.LastName }).ToList();
 
                 Assert.Equal(1, contacts.Count);
                 Assert.Null(contacts[0].FirstName);
@@ -599,7 +599,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public void When_sorting_by_an_attribute_which_wasnt_initialised_an_exception_is_not_thrown()
         {
             var ctx = new XrmFakedContext();
-            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof (Contact));
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
 
             var service = ctx.GetFakedOrganizationService();
             ctx.Initialize(new List<Entity>()
@@ -611,8 +611,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             using (var context = new XrmServiceContext(service))
             {
                 var contacts = (from c in context.ContactSet
-                    orderby c.FirstName
-                    select new Contact {Id = c.Id, FirstName = c.FirstName, LastName = c.LastName}).ToList();
+                                orderby c.FirstName
+                                select new Contact { Id = c.Id, FirstName = c.FirstName, LastName = c.LastName }).ToList();
 
                 Assert.Equal(2, contacts.Count);
                 Assert.Null(contacts[0].FirstName);
@@ -694,7 +694,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
             incident["createdon"] = DateTime.UtcNow.AddDays(-6);
 
-            context.Initialize(new[] {incident});
+            context.Initialize(new[] { incident });
 
             // Remove either incident createdon conditionexpression, or LinkEntities and the e-mail conditionexpression and it will pass
             // What this query expresses: Get all incidents, that are older than given number of days and that also didn't receive emails for this number of days

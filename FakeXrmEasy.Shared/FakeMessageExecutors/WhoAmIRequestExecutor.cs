@@ -1,13 +1,10 @@
 ﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
-    public class WhoAmIRequestExecutor: IFakeMessageExecutor
+    public class WhoAmIRequestExecutor : IFakeMessageExecutor
     {
         public bool CanExecute(OrganizationRequest request)
         {
@@ -22,7 +19,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 Results = new ParameterCollection
                                 { { "UserId", ctx.CallerId.Id } }
-
             };
             return response;
         }

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-using System.ServiceModel;
-using System.Text;
+﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Collections.Generic;
+using System.ServiceModel;
+using System.Xml.Linq;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -20,11 +18,9 @@ namespace FakeXrmEasy.FakeMessageExecutors
             return request is ExecuteFetchRequest;
         }
 
-
         public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
         {
             var executeFetchRequest = (ExecuteFetchRequest)request;
-
 
             if (executeFetchRequest.FetchXml == null)
             {
@@ -39,16 +35,14 @@ namespace FakeXrmEasy.FakeMessageExecutors
             };
             var queryResult = (service.Execute(retrieveMultiple) as RetrieveMultipleResponse).EntityCollection;
 
-
-
             XDocument doc = new XDocument(new XElement("resultset",
                 new XAttribute("morerecords", Convert.ToInt16(queryResult.MoreRecords))));
             if (queryResult.PagingCookie != null)
             {
                 doc.Root.Add(new XAttribute("paging-cookie", queryResult.PagingCookie));
             }
-            
-            foreach(var row in queryResult.Entities)
+
+            foreach (var row in queryResult.Entities)
             {
                 doc.Root.Add(CreateXmlResult(row, ctx));
             }
@@ -57,7 +51,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 Results = new ParameterCollection
                                  {
-
                                     { "FetchXmlResult", doc.ToString() }
                                  }
             };
@@ -74,8 +67,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 XElement attributeValueElement = AttributeValueToFetchResult(entAtt, formattedValues, ctx);
 
-                
-
                 if (attributeValueElement == null)
                     continue;
                 row.Add(attributeValueElement);
@@ -83,7 +74,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             return row;
         }
 
-        public XElement AttributeValueToFetchResult(KeyValuePair<string,object> entAtt, FormattedValueCollection formattedValues, XrmFakedContext  ctx)
+        public XElement AttributeValueToFetchResult(KeyValuePair<string, object> entAtt, FormattedValueCollection formattedValues, XrmFakedContext ctx)
         {
             XElement attributeValueElement;
             if (entAtt.Value == null)
@@ -97,7 +88,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 var entRef = (EntityReference)entAtt.Value;
                 if (!_typeCodes.ContainsKey(entRef.LogicalName))
                 {
-                    var entType =  RetrieveEntityRequestExecutor.GetEntityProxyType(entRef.LogicalName, ctx);
+                    var entType = RetrieveEntityRequestExecutor.GetEntityProxyType(entRef.LogicalName, ctx);
                     var typeCode = entType.GetField("EntityTypeCode").GetValue(null);
 
                     _typeCodes.Add(entRef.LogicalName, (int?)typeCode);
@@ -107,7 +98,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
             else if (entAtt.Value is bool?)
             {
-
                 var boolValue = (bool?)entAtt.Value;
 
                 var formattedValue = boolValue.ToString();
@@ -117,7 +107,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
             else if (entAtt.Value is OptionSetValue)
             {
-
                 var osValue = (OptionSetValue)entAtt.Value;
 
                 var formattedValue = osValue.Value.ToString();
@@ -127,7 +116,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
             else if (entAtt.Value is Enum)
             {
-
                 var osValue = (Enum)entAtt.Value;
 
                 var formattedValue = osValue.ToString();
@@ -137,7 +125,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
             else if (entAtt.Value is Money)
             {
-
                 var moneyValue = (Money)entAtt.Value;
 
                 var formattedValue = moneyValue.Value.ToString();
@@ -147,7 +134,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
             else if (entAtt.Value is decimal?)
             {
-
                 var decimalVal = (decimal?)entAtt.Value;
 
                 attributeValueElement = XElement.Parse(String.Format("<{0}>{1:0.####}</{0}>", entAtt.Key, decimalVal.Value));

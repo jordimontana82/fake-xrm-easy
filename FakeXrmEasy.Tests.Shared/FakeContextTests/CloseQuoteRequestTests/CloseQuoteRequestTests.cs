@@ -1,12 +1,9 @@
 ﻿using FakeXrmEasy.FakeMessageExecutors;
+using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
-using System;
-using System.Collections.Generic;
-using System.ServiceModel;
-using System.Text;
-using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using System;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.CloseQuoteRequestTests
@@ -37,14 +34,15 @@ namespace FakeXrmEasy.Tests.FakeContextTests.CloseQuoteRequestTests
                 }
             };
 
-            context.Initialize(new []
+            context.Initialize(new[]
             {
                 quote
             });
 
             var executor = new CloseQuoteRequestExecutor();
 
-            var req = new CloseQuoteRequest {
+            var req = new CloseQuoteRequest
+            {
                 QuoteClose = new Entity
                 {
                     Attributes = new AttributeCollection

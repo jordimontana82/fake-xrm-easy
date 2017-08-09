@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ServiceModel;
-using System.Text;
-using Microsoft.Crm.Sdk.Messages;
+﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
+using System;
 using System.Linq;
+using System.ServiceModel;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -44,13 +41,13 @@ namespace FakeXrmEasy.FakeMessageExecutors
                         .Where(e => e.Id == req.ListId)
                         .FirstOrDefault();
 
-            if(list == null)
+            if (list == null)
             {
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("List with Id {0} wasn't found", req.ListId.ToString()));
             }
-            
+
             //Find the member
-            if(!list.Attributes.ContainsKey("createdfromcode"))
+            if (!list.Attributes.ContainsKey("createdfromcode"))
             {
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("List with Id {0} must have a CreatedFromCode attribute defined and it has to be an option set value.", req.ListId.ToString()));
             }
@@ -64,15 +61,18 @@ namespace FakeXrmEasy.FakeMessageExecutors
             string memberEntityName = "";
             switch (createdFromCodeValue)
             {
-                case (int) ListCreatedFromCode.Account:
+                case (int)ListCreatedFromCode.Account:
                     memberEntityName = "account";
                     break;
-                case (int) ListCreatedFromCode.Contact:
+
+                case (int)ListCreatedFromCode.Contact:
                     memberEntityName = "contact";
                     break;
-                case (int) ListCreatedFromCode.Lead:
+
+                case (int)ListCreatedFromCode.Lead:
                     memberEntityName = "lead";
                     break;
+
                 default:
                     throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("List with Id {0} must have a supported CreatedFromCode value (Account, Contact or Lead).", req.ListId.ToString()));
             }
@@ -94,7 +94,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 listmember["entityid"] = new EntityReference(memberEntityName, memberId);
 
                 service.Create(listmember);
-            }            
+            }
 
             return new AddListMembersListResponse();
         }

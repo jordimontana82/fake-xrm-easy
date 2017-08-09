@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using FakeXrmEasy.FakeMessageExecutors;
+using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Crm.Sdk.Messages;
+using System;
+using System.Linq;
 using Xunit;
-using FakeXrmEasy.FakeMessageExecutors;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.AddToQueueRequestTests
 {

@@ -1,8 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace FakeXrmEasy.Tests.PluginsForTesting
 {
@@ -43,7 +40,5 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
             if (context.Stage != 20)
                 throw new InvalidPluginExecutionException("Stage does not equals PreOperation");
         }
-
     }
-
 }

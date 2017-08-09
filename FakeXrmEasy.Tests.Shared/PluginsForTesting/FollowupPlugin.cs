@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
 
 namespace FakeXrmEasy.Tests.PluginsForTesting
 {
@@ -43,7 +40,7 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
 
                 try
                 {
-                    // Create a task activity to follow up with the account customer in 7 days. 
+                    // Create a task activity to follow up with the account customer in 7 days.
                     Entity followup = new Entity("task");
 
                     followup["subject"] = "Send e-mail to the new customer.";
@@ -79,7 +76,6 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
                     throw new InvalidPluginExecutionException("An error occurred in the FollupupPlugin plug-in.", ex);
                 }
                 //</snippetFollowupPlugin3>
-
                 catch (Exception ex)
                 {
                     tracingService.Trace("FollowupPlugin: {0}", ex.ToString());

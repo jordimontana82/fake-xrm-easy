@@ -1,13 +1,13 @@
 ﻿#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
 
-using System;
-using System.ServiceModel;
+using FakeXrmEasy.FakeMessageExecutors;
+using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
-using Microsoft.Crm.Sdk.Messages;
+using System;
+using System.ServiceModel;
 using Xunit;
-using FakeXrmEasy.FakeMessageExecutors;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.PickFromQueueRequestTests
 {
@@ -20,7 +20,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PickFromQueueRequestTests
             var anotherRequest = new RetrieveMultipleRequest();
             Assert.False(executor.CanExecute(anotherRequest));
         }
-
 
         [Fact]
         public void When_a_request_is_called_worker_is_set()
@@ -45,7 +44,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PickFromQueueRequestTests
                 LogicalName = Crm.SystemUser.EntityLogicalName,
                 Id = Guid.NewGuid(),
             };
-
 
             var queueItem = new Entity
             {
@@ -82,7 +80,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PickFromQueueRequestTests
             Assert.True(after >= queueItemUpdated.GetAttributeValue<DateTime>("workeridmodifiedon").Ticks);
         }
 
-
         [Fact]
         public void When_a_request_is_called_with_removal_queueitem_is_deleted()
         {
@@ -106,7 +103,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PickFromQueueRequestTests
                 LogicalName = Crm.SystemUser.EntityLogicalName,
                 Id = Guid.NewGuid(),
             };
-
 
             var queueItem = new Entity
             {
@@ -137,7 +133,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PickFromQueueRequestTests
 
             Assert.Empty(context.Data[Crm.QueueItem.EntityLogicalName]);
         }
-
 
         [Fact]
         public void When_a_request_is_for_non_existing_woker_an_exception_is_thrown()
@@ -177,7 +172,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PickFromQueueRequestTests
 
             Assert.Throws<FaultException<OrganizationServiceFault>>(() => executor.Execute(req, context));
         }
-
 
         [Fact]
         public void When_a_request_is_for_non_existing_queueitem_an_exception_is_thrown()
