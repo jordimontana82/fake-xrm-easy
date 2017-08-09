@@ -617,5 +617,57 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             Assert.Equal(firstEntity.Id, result.Entities[0].Id);
             Assert.Equal(secondEntity.Id, result.Entities[1].Id);
         }
+
+        [Fact]
+        public void When_ordering_an_entity_reference_column_with_null_names_order_is_correct()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            var erNull = new EntityReference("account", Guid.NewGuid());
+            erNull.Name = null;
+
+            var erAnotherNull = new EntityReference("account", Guid.NewGuid());
+            erAnotherNull.Name = null;
+
+            var er1 = new EntityReference("account", Guid.NewGuid());
+            er1.Name = "first";
+
+            var er2 = new EntityReference("account", Guid.NewGuid());
+            er2.Name = "second";
+
+            Entity secondEntity = new Entity("entity");
+            secondEntity.Id = Guid.NewGuid();
+            secondEntity["lookup"] = er2;
+            initialEntities.Add(secondEntity);
+
+            Entity firstEntity = new Entity("entity");
+            firstEntity.Id = Guid.NewGuid();
+            firstEntity["lookup"] = er1;
+            initialEntities.Add(firstEntity);
+
+            Entity nullEntity = new Entity("entity");
+            nullEntity.Id = Guid.NewGuid();
+            nullEntity["lookup"] = erNull;
+            initialEntities.Add(nullEntity);
+
+            Entity anotherNullEntity = new Entity("entity");
+            anotherNullEntity.Id = Guid.NewGuid();
+            anotherNullEntity["lookup"] = erAnotherNull;
+            initialEntities.Add(anotherNullEntity);
+
+            context.Initialize(initialEntities);
+
+            QueryExpression query = new QueryExpression("entity");
+            query.ColumnSet = new ColumnSet("text");
+            query.AddOrder("lookup", OrderType.Ascending);
+
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(nullEntity.Id, result.Entities[0].Id);
+            Assert.Equal(anotherNullEntity.Id, result.Entities[1].Id);
+            Assert.Equal(firstEntity.Id, result.Entities[2].Id);
+            Assert.Equal(secondEntity.Id, result.Entities[3].Id);
+        }
     }
 }
