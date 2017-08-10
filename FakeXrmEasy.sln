@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy", "FakeXrmEasy\FakeXrmEasy.csproj", "{1FF34479-D38A-4B6B-86A7-B48182403437}"
 EndProject
@@ -200,6 +200,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "365", "365", "{DABE779C-790
 		Install-scripts\365\Install.ps1 = Install-scripts\365\Install.ps1
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy.Tests.PartialGenerated", "FakeXrmEasy.Tests.PartialGenerated\FakeXrmEasy.Tests.PartialGenerated.csproj", "{7380D6EC-8B48-4C65-9926-04F550C80BF9}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{08798ee6-7d8c-478e-a102-9424ad5dd321}*SharedItemsImports = 4
@@ -260,6 +262,10 @@ Global
 		{2290F5CB-9FF9-42EE-9602-D7222E05DCBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2290F5CB-9FF9-42EE-9602-D7222E05DCBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2290F5CB-9FF9-42EE-9602-D7222E05DCBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7380D6EC-8B48-4C65-9926-04F550C80BF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7380D6EC-8B48-4C65-9926-04F550C80BF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7380D6EC-8B48-4C65-9926-04F550C80BF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7380D6EC-8B48-4C65-9926-04F550C80BF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

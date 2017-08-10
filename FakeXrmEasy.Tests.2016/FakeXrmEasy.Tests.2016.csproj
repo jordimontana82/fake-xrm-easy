@@ -126,6 +126,10 @@
       <Project>{08798ee6-7d8c-478e-a102-9424ad5dd321}</Project>
       <Name>FakeXrmEasy.2016</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FakeXrmEasy.Tests.PartialGenerated\FakeXrmEasy.Tests.PartialGenerated.csproj">
+      <Project>{7380d6ec-8b48-4c65-9926-04f550c80bf9}</Project>
+      <Name>FakeXrmEasy.Tests.PartialGenerated</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -362,5 +362,38 @@ namespace FakeXrmEasy.Tests
             Assert.Contains($"Entity Logical Name: {Contact.EntityLogicalName}", trace);
             Assert.Contains($"Entity ID: {id}", trace);
         }
+
+        [Fact]
+        public void When_PluginStepRegisteredAsCreatePostOperationAsyncronous_Expect_CorrectValues2()
+        {
+            // Arange
+            var context = new XrmFakedContext
+            {
+                ProxyTypesAssembly = typeof(PartialGenerated.Crm.Account).Assembly
+            };
+
+            var id = Guid.NewGuid();
+
+            // Act
+            context.RegisterPluginStep<ValidatePipelinePlugin, Contact>("Create", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous);
+
+            var newEntity = new Contact
+            {
+                Id = id
+            };
+
+            var service = context.GetOrganizationService();
+            service.Create(newEntity);
+
+            // Assert
+            var trace = context.GetFakeTracingService().DumpTrace().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            Assert.Equal(5, trace.Length);
+            Assert.Contains("Message Name: Create", trace);
+            Assert.Contains("Stage: 40", trace);
+            Assert.Contains("Mode: 1", trace);
+            Assert.Contains($"Entity Logical Name: {Contact.EntityLogicalName}", trace);
+            Assert.Contains($"Entity ID: {id}", trace);
+        }
     }
 }

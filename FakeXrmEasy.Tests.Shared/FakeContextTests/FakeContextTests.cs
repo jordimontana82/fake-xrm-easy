@@ -250,7 +250,7 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
-        public void When_using_proxy_types_entity_names_are_validated()
+        public void When_using_proxy_types_allow_dynamic_entities_to_coexist()
         {
             var context = new XrmFakedContext();
             var service = context.GetFakedOrganizationService();
@@ -258,7 +258,9 @@ namespace FakeXrmEasy.Tests
             var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Jordi" };
             context.Initialize(new List<Entity>() { c });
 
-            Assert.Throws<Exception>(() => service.Create(new Entity("thisDoesntExist")));
+            service.Create(new Entity("thisDoesntExist"));
+
+            Assert.Equal(1, context.CreateQuery("thisDoesntExist").Count());
         }
 
         [Fact]

@@ -117,14 +117,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\FakeXrmEasy.365\FakeXrmEasy.365.csproj">
       <Project>{ba4e8486-58fb-458a-80b9-09ec721ba2b7}</Project>
       <Name>FakeXrmEasy.365</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
+    <ProjectReference Include="..\FakeXrmEasy.Tests.PartialGenerated\FakeXrmEasy.Tests.PartialGenerated.csproj">
+      <Project>{7380d6ec-8b48-4c65-9926-04f550c80bf9}</Project>
+      <Name>FakeXrmEasy.Tests.PartialGenerated</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
