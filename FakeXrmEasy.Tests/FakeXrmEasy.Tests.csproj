@@ -91,6 +91,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FakeXrmEasy.Tests.PartialGenerated\FakeXrmEasy.Tests.PartialGenerated.csproj">
+      <Project>{7380d6ec-8b48-4c65-9926-04f550c80bf9}</Project>
+      <Name>FakeXrmEasy.Tests.PartialGenerated</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FakeXrmEasy\FakeXrmEasy.csproj">
       <Project>{1ff34479-d38a-4b6b-86a7-b48182403437}</Project>
       <Name>FakeXrmEasy</Name>

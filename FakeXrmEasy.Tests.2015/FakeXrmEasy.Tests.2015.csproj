@@ -149,6 +149,10 @@
       <Project>{efd34e08-a235-462e-a853-bd9559112c15}</Project>
       <Name>FakeXrmEasy.2015</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FakeXrmEasy.Tests.PartialGenerated\FakeXrmEasy.Tests.PartialGenerated.csproj">
+      <Project>{7380d6ec-8b48-4c65-9926-04f550c80bf9}</Project>
+      <Name>FakeXrmEasy.Tests.PartialGenerated</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="..\FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems" Label="Shared" />

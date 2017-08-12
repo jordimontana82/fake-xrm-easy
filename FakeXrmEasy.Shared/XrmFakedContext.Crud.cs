@@ -380,16 +380,16 @@ namespace FakeXrmEasy
 
         protected internal void AddEntity(Entity e)
         {
-            //Automatically detect proxy types assembly if an early bound type was used.
+            // Automatically detect proxy types assembly if an early bound type was used.
             if (ProxyTypesAssembly == null &&
                 e.GetType().IsSubclassOf(typeof(Entity)))
             {
                 ProxyTypesAssembly = Assembly.GetAssembly(e.GetType());
             }
 
-            ValidateEntity(e); //Entity must have a logical name and an Id
+            ValidateEntity(e); // Entity must have a logical name and an Id
 
-            //Add the entity collection
+            // Add the entity collection
             if (!Data.ContainsKey(e.LogicalName))
             {
                 Data.Add(e.LogicalName, new Dictionary<Guid, Entity>());
@@ -403,16 +403,27 @@ namespace FakeXrmEasy
             {
                 Data[e.LogicalName].Add(e.Id, e);
             }
-
-
-            //Update metadata for that entity
+            
+            // Update metadata for that entity
             if (!AttributeMetadataNames.ContainsKey(e.LogicalName))
+            {
                 AttributeMetadataNames.Add(e.LogicalName, new Dictionary<string, string>());
+            }
 
-            //Update attribute metadata
+            // If dynamic entities are being used, then the only way of guessing if a property exists is just by checking
+            // if the entity has the attribute in the dictionary
+            foreach (var attKey in e.Attributes.Keys)
+            {
+                if (!AttributeMetadataNames[e.LogicalName].ContainsKey(attKey))
+                {
+                    AttributeMetadataNames[e.LogicalName].Add(attKey, attKey);
+                }
+            }
+
+            // Update attribute metadata
             if (ProxyTypesAssembly != null)
             {
-                //If the context is using a proxy types assembly then we can just guess the metadata from the generated attributes
+                // If the context is using a proxy types assembly, enhance the metadata from the generated attributes
                 var type = FindReflectedType(e.LogicalName);
                 if (type != null)
                 {
@@ -420,25 +431,12 @@ namespace FakeXrmEasy
                     foreach (var p in props)
                     {
                         if (!AttributeMetadataNames[e.LogicalName].ContainsKey(p.Name))
+                        {
                             AttributeMetadataNames[e.LogicalName].Add(p.Name, p.Name);
+                        }
                     }
                 }
-                else
-                    throw new Exception(string.Format("Couldnt find reflected type for {0}", e.LogicalName));
-
             }
-            else
-            {
-                //If dynamic entities are being used, then the only way of guessing if a property exists is just by checking
-                //if the entity has the attribute in the dictionary
-                foreach (var attKey in e.Attributes.Keys)
-                {
-                    if (!AttributeMetadataNames[e.LogicalName].ContainsKey(attKey))
-                        AttributeMetadataNames[e.LogicalName].Add(attKey, attKey);
-                }
-            }
-
-            
         }
 
         protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
@@ -465,10 +463,9 @@ namespace FakeXrmEasy
 
                     return attributeFound != null;
                 }
-                return false;
             }
 
-            //Dynamic entities => just return true
+            // Dynamic entities => just return true
             return true;
         }
         #endregion
