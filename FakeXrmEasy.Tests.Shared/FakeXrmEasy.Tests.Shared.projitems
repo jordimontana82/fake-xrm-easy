@@ -70,6 +70,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FakeContextTestFormattedValues.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OperatorTests\DateTime\DateTimeOperatorsTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OperatorTests\Strings\StringOperatorsTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OrderByTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\PaginationTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WhoAmIRequest\WhoAmITests.cs" />

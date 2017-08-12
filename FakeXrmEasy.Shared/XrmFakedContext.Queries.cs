@@ -544,7 +544,7 @@ namespace FakeXrmEasy
                         throw new Exception("Older than X months requires a value greater than 0.");
                     }
 
-                    var olderThanDate = DateTime.Now.AddMonths(monthsToAdd);
+                    var olderThanDate = DateTime.Now.AddMonths(-monthsToAdd);
 
                     operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression, olderThanDate);
                     break;
