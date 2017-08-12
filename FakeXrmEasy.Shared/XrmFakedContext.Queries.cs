@@ -1058,9 +1058,13 @@ namespace FakeXrmEasy
 
         protected static Expression TranslateConditionExpressionOlderThan(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr, DateTime olderThanDate)
         {
-            return Expression.LessThan(
+            var lessThanExpression = Expression.LessThan(
                             GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, olderThanDate),
                             GetAppropiateTypedValueAndType(olderThanDate, tc.AttributeType));
+
+            return Expression.AndAlso(containsAttributeExpr,
+                            Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                lessThanExpression));
         }
 
         protected static Expression TranslateConditionExpressionEndsWith(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
