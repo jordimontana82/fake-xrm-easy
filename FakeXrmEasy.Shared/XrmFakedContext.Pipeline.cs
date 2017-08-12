@@ -9,6 +9,8 @@ namespace FakeXrmEasy
 {
     public partial class XrmFakedContext : IXrmContext
     {
+        public bool UsePipelineSimulation { get; set; }
+
         /// <summary>
         /// Registers the <typeparamref name="TPlugin"/> as a SDK Message Processing Step for the Entity <typeparamref name="TEntity"/>.
         /// </summary>

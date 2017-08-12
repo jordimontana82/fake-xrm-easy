@@ -92,7 +92,7 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Create(A<Entity>._))
                 .ReturnsLazily((Entity e) =>
                 {
-                    context.CreateEntity(e, true);
+                    context.CreateEntity(e);
            
                     return e.Id;
                 });
@@ -103,11 +103,11 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Update(A<Entity>._))
                 .Invokes((Entity e) =>
                 {
-                    context.UpdateEntity(e, true);
+                    context.UpdateEntity(e);
                 });
         }
 
-        protected void UpdateEntity(Entity e, bool usePluginPipeline = false)
+        protected void UpdateEntity(Entity e)
         {
             ValidateEntity(e);
 
@@ -136,7 +136,7 @@ namespace FakeXrmEasy
                     }
                 }
 
-                if (usePluginPipeline)
+                if (this.UsePipelineSimulation)
                 {
                     ExecutePipelineStage("Update", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);
                 }
@@ -152,7 +152,7 @@ namespace FakeXrmEasy
                 cachedEntity["modifiedon"] = DateTime.UtcNow;
                 cachedEntity["modifiedby"] = CallerId;
 
-                if (usePluginPipeline)
+                if (this.UsePipelineSimulation)
                 {
                     ExecutePipelineStage("Update", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, e);
 
@@ -189,11 +189,11 @@ namespace FakeXrmEasy
 
                     var entityReference = new EntityReference(entityName, id);
 
-                    context.DeleteEntity(entityReference, true);
+                    context.DeleteEntity(entityReference);
                 });
         }
 
-        protected void DeleteEntity(EntityReference er, bool usePluginPipeline = false)
+        protected void DeleteEntity(EntityReference er)
         {
             // Don't fail with invalid operation exception, if no record of this entity exists, but entity is known
             if (!this.Data.ContainsKey(er.LogicalName))
@@ -213,7 +213,7 @@ namespace FakeXrmEasy
             if (this.Data.ContainsKey(er.LogicalName) && this.Data[er.LogicalName] != null &&
                 this.Data[er.LogicalName].ContainsKey(er.Id))
             {
-                if (usePluginPipeline)
+                if (this.UsePipelineSimulation)
                 {
                     ExecutePipelineStage("Delete", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, er);
                 }
@@ -221,7 +221,7 @@ namespace FakeXrmEasy
                 // Entity found => return only the subset of columns specified or all of them
                 this.Data[er.LogicalName].Remove(er.Id);
 
-                if (usePluginPipeline)
+                if (this.UsePipelineSimulation)
                 {
                     ExecutePipelineStage("Delete", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, er);
                     ExecutePipelineStage("Delete", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous, er);
@@ -234,23 +234,6 @@ namespace FakeXrmEasy
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{er.LogicalName} with Id {er.Id} Does Not Exist");
             }
         }
-
-        //protected static void FakeEnableProxyTypes(XrmFakedContext context, OrganizationServiceProxy fakedService)
-        //{
-        //    A.CallTo(() => fakedService.EnableProxyTypes(A<Assembly>._))
-        //        .Invokes((Assembly a) =>
-        //        {
-        //            context.ProxyTypesAssembly = a;
-        //        });
-
-        //    A.CallTo(() => fakedService.EnableProxyTypes())
-        //        .Invokes(() =>
-        //        {
-        //            //Do nothing, we implicitily allow proxy types
-
-        //        });
-
-        //}
         #endregion
 
         #region Other protected methods
@@ -309,7 +292,7 @@ namespace FakeXrmEasy
             }
         }
 
-        protected internal void CreateEntity(Entity e, bool usePluginPipeline = false)
+        protected internal void CreateEntity(Entity e)
         {
             if (e == null)
             {
@@ -343,7 +326,7 @@ namespace FakeXrmEasy
                 throw new InvalidOperationException($"When creating an entity with logical name '{e.LogicalName}', or any other entity, it is not possible to create records with the statecode property. Statecode must be set after creation.");
             }
 
-            AddEntityWithDefaults(e, usePluginPipeline);
+            AddEntityWithDefaults(e, this.UsePipelineSimulation);
 
             if (e.RelatedEntities.Count > 0)
             {

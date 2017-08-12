@@ -85,6 +85,8 @@ namespace FakeXrmEasy
             DateBehaviour = DefaultDateBehaviour();
 
             EntityMetadata = new Dictionary<string, EntityMetadata>();
+
+            UsePipelineSimulation = false;
         }
 
         /// <summary>
@@ -219,7 +221,7 @@ namespace FakeXrmEasy
         }
 
         /// <summary>
-        /// Returns a faked organization service that works against this context
+        /// Deprecated. Use GetOrganizationService instead
         /// </summary>
         /// <returns></returns>
         public IOrganizationService GetFakedOrganizationService()
