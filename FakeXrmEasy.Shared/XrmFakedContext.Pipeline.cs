@@ -178,10 +178,12 @@ namespace FakeXrmEasy
                 {
                     new LinkEntity("sdkmessageprocessingstep", "sdkmessagefilter", "sdkmessagefilterid", "sdkmessagefilterid", JoinOperator.LeftOuter)
                     {
+                        EntityAlias = "sdkmessagefilter",
                         Columns = new ColumnSet("primaryobjecttypecode")
                     },
                     new LinkEntity("sdkmessageprocessingstep", "sdkmessage", "sdkmessageid", "sdkmessageid", JoinOperator.Inner)
                     {
+                        EntityAlias = "sdkmessage",
                         Columns = new ColumnSet("name"),
                         LinkCriteria =
                         {
@@ -193,6 +195,7 @@ namespace FakeXrmEasy
                     },
                     new LinkEntity("sdkmessageprocessingstep", "plugintype", "eventhandler", "plugintypeid", JoinOperator.Inner)
                     {
+                        EntityAlias = "plugintype",
                         Columns = new ColumnSet("assemblyname", "typename")
                     }
                 }

@@ -272,5 +272,82 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             var rowsWithLinkedData = rows.Where(r => r.Element("aa.firstname") != null);
             Assert.Equal(1, rowsWithLinkedData.Count());
         }
+
+        [Fact]
+        public void When_querying_fetchxml_with_multiple_linked_entities_with_the_same_entity_right_result_is_returned()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var user1 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User1"
+            };
+
+            var user2 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User2",
+                ["modifiedby"] = user1.ToEntityReference()
+            };
+
+            var user3 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User3",
+                ["modifiedby"] = user2.ToEntityReference()
+            };
+
+            var user4 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User4",
+                ["modifiedby"] = user3.ToEntityReference()
+            };
+
+            context.Initialize(new List<Entity>
+            {
+                user1,
+                user2,
+                user3,
+                user4
+            });
+
+            const string fetchXml = @"
+                    <fetch top=""1"" >
+                      <entity name=""systemuser"" >
+                        <attribute name=""fullname"" />
+                        <link-entity name=""systemuser"" from=""modifiedby"" to=""systemuserid"" link-type=""inner"" >
+                          <attribute name=""fullname"" />
+                          <link-entity name=""systemuser"" from=""modifiedby"" to=""systemuserid"" >
+                            <attribute name=""fullname"" />
+                            <link-entity name=""systemuser"" from=""modifiedby"" to=""systemuserid"" link-type=""inner"" >
+                              <attribute name=""fullname"" />
+                            </link-entity>
+                          </link-entity>
+                        </link-entity>
+                      </entity>
+                    </fetch>";
+
+            var response = service.Execute(new ExecuteFetchRequest { FetchXml = fetchXml }) as ExecuteFetchResponse;
+
+            Assert.NotNull(response);
+            Assert.NotEmpty(response.FetchXmlResult);
+
+            var responseXml = XDocument.Parse(response.FetchXmlResult);
+            Assert.NotNull(responseXml);
+            Assert.NotNull(responseXml.Element("resultset"));
+
+            var rows = responseXml.Element("resultset").Elements("result");
+            Assert.Equal(1, rows.Count());
+
+            var linkedAttributes = rows.First().Elements("systemuser.fullname");
+            Assert.Equal(3, linkedAttributes.Count());
+
+            Assert.Equal(1, linkedAttributes.Count(e => e.Value == "User2"));
+            Assert.Equal(1, linkedAttributes.Count(e => e.Value == "User3"));
+            Assert.Equal(1, linkedAttributes.Count(e => e.Value == "User4"));
+        }
     }
 }

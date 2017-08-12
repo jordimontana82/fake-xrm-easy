@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.ServiceModel;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using FakeXrmEasy.Extensions;
 using FakeXrmEasy.Extensions.FetchXml;
@@ -168,7 +169,15 @@ namespace FakeXrmEasy
             return Data[s].Values.AsQueryable();
         }
 
-        public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, string linkFromAlias = "", string linkFromEntity = "") {
+        public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, Dictionary<string, int> linkedEntities, string linkFromAlias = "", string linkFromEntity = "")
+        {
+            if (!string.IsNullOrEmpty(le.EntityAlias))
+            {
+                if (!Regex.IsMatch(le.EntityAlias, "^[A-Za-z_]\\w*$", RegexOptions.ECMAScript))
+                {
+                    throw new FaultException(new FaultReason($"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _."));
+                }
+            }
 
             var leAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
             context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName != linkFromAlias ? le.LinkFromEntityName : linkFromEntity);
@@ -221,17 +230,38 @@ namespace FakeXrmEasy
 
             }
 
-            //Process nested linked entities recursively
-            foreach (LinkEntity nestedLinkedEntity in le.LinkEntities)
+            // Process nested linked entities recursively
+            foreach (var nestedLinkedEntity in le.LinkEntities)
             {
                 if (string.IsNullOrWhiteSpace(le.EntityAlias))
+                {
                     le.EntityAlias = le.LinkToEntityName;
+                }
 
-                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, query, le.Columns, le.EntityAlias, le.LinkToEntityName);
+                if (string.IsNullOrWhiteSpace(nestedLinkedEntity.EntityAlias))
+                {
+                    nestedLinkedEntity.EntityAlias = EnsureUniqueLinkedEntityAlias(linkedEntities, nestedLinkedEntity.LinkToEntityName);
+                }
+
+                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, query, le.Columns, linkedEntities, le.EntityAlias, le.LinkToEntityName);
             }
+
             return query;
         }
 
+        private static string EnsureUniqueLinkedEntityAlias(IDictionary<string, int> linkedEntities, string entityName)
+        {
+            if (linkedEntities.ContainsKey(entityName))
+            {
+                linkedEntities[entityName]++;
+            }
+            else
+            {
+                linkedEntities[entityName] = 1;
+            }
+
+            return $"{entityName}{linkedEntities[entityName]}";
+        }
 
 
         protected static XElement RetrieveFetchXmlNode(XDocument xlDoc, string sName)
@@ -313,10 +343,17 @@ namespace FakeXrmEasy
 
             query = context.CreateQuery<Entity>(qe.EntityName);
 
-            //Add as many Joins as linked entities
-            foreach (LinkEntity le in qe.LinkEntities)
+            var linkedEntities = new Dictionary<string, int>();
+
+            // Add as many Joins as linked entities
+            foreach (var le in qe.LinkEntities)
             {
-                query = TranslateLinkedEntityToLinq(context, le, query, qe.ColumnSet);
+                if (string.IsNullOrWhiteSpace(le.EntityAlias))
+                {
+                    le.EntityAlias = EnsureUniqueLinkedEntityAlias(linkedEntities, le.LinkToEntityName);
+                }
+
+                query = TranslateLinkedEntityToLinq(context, le, query, qe.ColumnSet, linkedEntities);
             }
 
             // Compose the expression tree that represents the parameter to the predicate.
