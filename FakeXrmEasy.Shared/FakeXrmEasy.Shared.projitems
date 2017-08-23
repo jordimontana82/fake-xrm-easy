@@ -49,6 +49,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\SetStateRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\UpdateRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\WhoAmIRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\WinOpportunityRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IXrmFakedContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Metadata\DateTimeAttributeBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\TypedConditionExpression.cs" />

@@ -75,6 +75,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OrderByTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\PaginationTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WhoAmIRequest\WhoAmITests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WinOpportunityRequestTests\WinOpportunityTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\XrmFakedRelationshipTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GeneratedCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issue116.cs" />
