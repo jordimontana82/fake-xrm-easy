@@ -51,11 +51,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\MetadataInferenceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\MinClientContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LoseOpportunityTests\LoseOpportunityTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\OptionSetValuesRequestTests\OptionSetValueRequestsTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\OrgServiceContextTests\OrgServiceContextTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\PermissionsTests\PermissionsTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\PickFromQueueRequestTests\PickFromQueueRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\PublishXml\PublishXmlRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QualifyLeadTests\QualifyLeadTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QueryByAttribute\QueryByAttributeTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QueryLookupTests\QueryLookupTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OrderByTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\PaginationTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WhoAmIRequest\WhoAmITests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WinOpportunityRequestTests\WinOpportunityTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\XrmFakedRelationshipTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GeneratedCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issue116.cs" />
