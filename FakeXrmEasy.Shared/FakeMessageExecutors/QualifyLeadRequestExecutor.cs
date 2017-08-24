@@ -63,6 +63,34 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 {
                     Id = Guid.NewGuid()
                 };
+
+                // Set OpportunityCurrencyId if given
+                // MSDN link:
+                // https://msdn.microsoft.com/en-us/library/microsoft.crm.sdk.messages.qualifyleadrequest.opportunitycurrencyid.aspx
+                if (req.OpportunityCurrencyId != null)
+                {
+                    opportunity.Attributes["transactioncurrencyid"] = req.OpportunityCurrencyId;
+                }
+
+                // Associate Account or Contact with Opportunity
+                // MSDN link:
+                // https://msdn.microsoft.com/en-us/library/microsoft.crm.sdk.messages.qualifyleadrequest.opportunitycustomerid.aspx
+                if (req.OpportunityCustomerId != null)
+                {
+                    var logicalName = req.OpportunityCustomerId.LogicalName;
+
+                    // Associate Account or Contact
+                    if (logicalName.Equals("account") || logicalName.Equals("contact"))
+                    {
+                        opportunity.Attributes["customerid"] = req.OpportunityCustomerId;
+                    }
+                    // Wrong Entity was given as parameter
+                    else
+                    {
+                        throw new Exception(string.Format("Opportunity Customer Id should be connected with Account or Contact. Instead OpportunityCustomerId was given with Entity.LogicalName = {0}", logicalName));
+                    }
+                }
+
                 opportunity.Attributes["originatingleadid"] = req.LeadId;
                 orgService.Create(opportunity);
                 response.CreatedEntities.Add(opportunity.ToEntityReference());
