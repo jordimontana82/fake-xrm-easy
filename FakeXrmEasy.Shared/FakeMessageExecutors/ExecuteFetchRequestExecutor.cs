@@ -4,6 +4,7 @@ using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel;
 using System.Xml.Linq;
 
@@ -42,9 +43,18 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 doc.Root.Add(new XAttribute("paging-cookie", queryResult.PagingCookie));
             }
 
+            var allowedAliases = new string[0];
+
+            var fetchXmlDocument = XDocument.Parse(executeFetchRequest.FetchXml).Root;
+            if (fetchXmlDocument != null)
+            {
+                var linkedEntityName = fetchXmlDocument.Descendants("link-entity").Attributes("name").Select(a => a.Value).Distinct();
+                allowedAliases = linkedEntityName.Concat(fetchXmlDocument.Descendants("link-entity").Attributes("alias").Select(a => a.Value).Distinct()).ToArray();
+            }
+
             foreach (var row in queryResult.Entities)
             {
-                doc.Root.Add(CreateXmlResult(row, ctx));
+                doc.Root.Add(CreateXmlResult(row, ctx, allowedAliases));
             }
 
             var response = new ExecuteFetchResponse
@@ -58,19 +68,45 @@ namespace FakeXrmEasy.FakeMessageExecutors
             return response;
         }
 
-        private XElement CreateXmlResult(Entity entity, XrmFakedContext ctx)
+        private XElement CreateXmlResult(Entity entity, XrmFakedContext ctx, string[] allowedAliases)
         {
-            XElement row = new XElement("result");
+            var row = new XElement("result");
             var formattedValues = entity.FormattedValues;
 
             foreach (var entAtt in entity.Attributes)
             {
-                XElement attributeValueElement = AttributeValueToFetchResult(entAtt, formattedValues, ctx);
+                var attribute = entAtt;
 
+                // Depricated ExecuteFetch doesn't use implicitly numbered enitity aliases
+                if (attribute.Key.Contains("."))
+                {
+                    var alias = attribute.Key.Substring(0, attribute.Key.IndexOf(".", StringComparison.Ordinal));
+                    if (!allowedAliases.Contains(alias))
+                    {
+                        // The maximum amount of linked entities is 10, 
+                        var newAlias = alias.Substring(0, alias.Length - (!alias.EndsWith("10") ? 1 : 2));
+                        if (allowedAliases.Contains(newAlias))
+                        {
+                            var newKey = attribute.Key.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+                            newKey[0] = newAlias;
+                            attribute = new KeyValuePair<string, object>(string.Join(".", newKey), attribute.Value);
+                        }
+                        else
+                        {
+                            // unknow alias, just leave it
+                        }
+                    }
+                }
+
+                var attributeValueElement = AttributeValueToFetchResult(attribute, formattedValues, ctx);
                 if (attributeValueElement == null)
+                {
                     continue;
+                }
+
                 row.Add(attributeValueElement);
             }
+
             return row;
         }
 
