@@ -6,13 +6,19 @@ using Microsoft.Xrm.Sdk.Query;
 
 namespace FakeXrmEasy.Services
 {
+    public enum EntityInitializationLevel
+    {
+        Default = 0,  //Minimal initialization of common attributes
+        PerEntity = 1 //More detailed initialization of entities, on an entity per entity basis
+    }
     public class DefaultEntityInitializerService : IEntityInitializerService
     {
-        Dictionary<string, IEntityInitializerService> initializerServiceDictionary;
+        
+        public Dictionary<string, IEntityInitializerService> InitializerServiceDictionary;
 
         public DefaultEntityInitializerService()
         {
-            initializerServiceDictionary = new Dictionary<string, IEntityInitializerService>()
+            InitializerServiceDictionary = new Dictionary<string, IEntityInitializerService>()
             {
                 { InvoiceDetailInitializerService.EntityLogicalName, new InvoiceDetailInitializerService() },
                 { InvoiceInitializerService.EntityLogicalName, new InvoiceInitializerService() }
@@ -51,8 +57,8 @@ namespace FakeXrmEasy.Services
             e.SetValueIfEmpty("ownerid", CallerId);
             e.SetValueIfEmpty("statecode", new OptionSetValue(0)); //Active by default
 
-            if (!string.IsNullOrEmpty(e.LogicalName) && initializerServiceDictionary.ContainsKey(e.LogicalName))
-                initializerServiceDictionary[e.LogicalName].Initialize(e, gCallerId, ctx, isManyToManyRelationshipEntity);
+            if (!string.IsNullOrEmpty(e.LogicalName) && InitializerServiceDictionary.ContainsKey(e.LogicalName))
+                InitializerServiceDictionary[e.LogicalName].Initialize(e, gCallerId, ctx, isManyToManyRelationshipEntity);
 
             return e;
         }

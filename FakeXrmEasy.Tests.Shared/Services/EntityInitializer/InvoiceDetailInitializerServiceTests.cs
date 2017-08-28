@@ -4,11 +4,31 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
+using FakeItEasy;
+using FakeXrmEasy.Services;
+
 
 namespace FakeXrmEasy.Tests.Services.EntityInitializer
 {
     public class InvoiceDetailInitializerServiceTests
     {
+        [Fact]
+        public void When_using_default_entity_initialization_level_invoice_detail_init_service_is_not_called()
+        {
+            XrmFakedContext context = new XrmFakedContext(); //By default it is using the default setting
+            IOrganizationService service = context.GetOrganizationService();
+            var fakeService = A.Fake<IEntityInitializerService>();
+            var overridenDefaultInitializer = new DefaultEntityInitializerService();
+            overridenDefaultInitializer.InitializerServiceDictionary["invoicedetail"] = fakeService;
+            context.EntityInitializerService = overridenDefaultInitializer;
+
+            Entity invoiceDetail = new Entity("invoicedetail");
+            invoiceDetail.Id = Guid.NewGuid();
+            invoiceDetail["ispriceoverridden"] = false;
+            context.Initialize(invoiceDetail);
+
+            A.CallTo(() => fakeService.Initialize(A<Entity>._, A<XrmFakedContext>._, A<bool>._)).MustNotHaveHappened();
+        }
         [Fact]
         public void No_Invoice_And_Price_Overriden_Is_False_Result_0()
         {
