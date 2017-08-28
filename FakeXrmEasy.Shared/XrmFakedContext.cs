@@ -58,6 +58,8 @@ namespace FakeXrmEasy
 
         public int MaxRetrieveCount { get; set; }
 
+        public EntityInitializationLevel InitializationLevel { get; set; }
+
         public XrmFakedContext()
         {
             MaxRetrieveCount = 5000;
@@ -87,6 +89,8 @@ namespace FakeXrmEasy
             EntityMetadata = new Dictionary<string, EntityMetadata>();
 
             UsePipelineSimulation = false;
+
+            InitializationLevel = EntityInitializationLevel.Default;
         }
 
         /// <summary>
