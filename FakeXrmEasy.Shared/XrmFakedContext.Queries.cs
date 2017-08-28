@@ -898,6 +898,29 @@ namespace FakeXrmEasy
                                                         typeof(int)),
                                                     Expression.Convert(input, typeof(int)));
         }
+
+        protected static Expression TransformExpressionGetDateOnlyPart(Expression input)
+        {
+            return Expression.Call(input, typeof(DateTime).GetMethod("get_Date"));
+        }
+
+        protected static Expression TransformExpressionValueBasedOnOperator(ConditionOperator op, Expression input)
+        {
+            switch (op)
+            {
+                case ConditionOperator.Today:
+                case ConditionOperator.Yesterday:
+                case ConditionOperator.Tomorrow:
+                case ConditionOperator.On:
+                case ConditionOperator.OnOrAfter:
+                case ConditionOperator.OnOrBefore:
+                    return TransformExpressionGetDateOnlyPart(input);
+
+                default:
+                    return input; //No transformation
+            }
+        }
+
         protected static Expression TranslateConditionExpressionEqual(XrmFakedContext context, TypedConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
 
@@ -921,20 +944,25 @@ namespace FakeXrmEasy
                     unaryOperatorValue = context.CallerId.Id;
                     break;
             }
+
             if (unaryOperatorValue != null)
             {
                 //c.Values empty in this case
-                expOrValues = Expression.Equal(
-                                GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, unaryOperatorValue),
+                var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, unaryOperatorValue);
+                var transformedExpression = TransformExpressionValueBasedOnOperator(c.CondExpression.Operator, leftHandSideExpression);
+
+                expOrValues = Expression.Equal(transformedExpression,
                                 GetAppropiateTypedValueAndType(unaryOperatorValue, c.AttributeType));
             }
             else
             {
                 foreach (object value in c.CondExpression.Values)
                 {
+                    var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, value);
+                    var transformedExpression = TransformExpressionValueBasedOnOperator(c.CondExpression.Operator, leftHandSideExpression);
 
                     expOrValues = Expression.Or(expOrValues, Expression.Equal(
-                                GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, value),
+                                transformedExpression,
                                 GetAppropiateTypedValueAndType(value, c.AttributeType)));
 
 
