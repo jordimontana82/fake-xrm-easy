@@ -57,8 +57,11 @@ namespace FakeXrmEasy.Services
             e.SetValueIfEmpty("ownerid", CallerId);
             e.SetValueIfEmpty("statecode", new OptionSetValue(0)); //Active by default
 
-            if (!string.IsNullOrEmpty(e.LogicalName) && InitializerServiceDictionary.ContainsKey(e.LogicalName))
-                InitializerServiceDictionary[e.LogicalName].Initialize(e, gCallerId, ctx, isManyToManyRelationshipEntity);
+            if (ctx.InitializationLevel == EntityInitializationLevel.PerEntity)
+            {
+                if (!string.IsNullOrEmpty(e.LogicalName) && InitializerServiceDictionary.ContainsKey(e.LogicalName))
+                    InitializerServiceDictionary[e.LogicalName].Initialize(e, gCallerId, ctx, isManyToManyRelationshipEntity);
+            }
 
             return e;
         }

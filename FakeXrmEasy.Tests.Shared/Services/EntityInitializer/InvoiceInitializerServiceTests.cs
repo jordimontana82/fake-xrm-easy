@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
+using FakeXrmEasy.Services;
 
 namespace FakeXrmEasy.Tests.Services.EntityInitializer
 {
@@ -12,7 +13,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void TestPopulateFields()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();

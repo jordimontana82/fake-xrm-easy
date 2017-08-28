@@ -27,12 +27,12 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
             invoiceDetail["ispriceoverridden"] = false;
             context.Initialize(invoiceDetail);
 
-            A.CallTo(() => fakeService.Initialize(A<Entity>._, A<XrmFakedContext>._, A<bool>._)).MustNotHaveHappened();
+            A.CallTo(() => fakeService.Initialize(A<Entity>._, A<Guid>._, A<XrmFakedContext>._, A<bool>._)).MustNotHaveHappened();
         }
         [Fact]
         public void No_Invoice_And_Price_Overriden_Is_False_Result_0()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
@@ -53,7 +53,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void Invoice_And_Price_Overriden_Is_False_Result_0()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
@@ -82,7 +82,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void Invoice_Product_And_Price_Overriden_Is_False_Result_0()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
@@ -116,7 +116,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void Invoice_Product_Pricelist_And_Price_Overriden_Is_False_Result_0()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
@@ -156,7 +156,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void Invoice_Product_Pricelist_UoM_And_Price_Overriden_Is_False_Result_0()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
@@ -201,7 +201,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void Invoice_Product_Pricelist_UoM_And_Price_Overriden_Is_False_Price_Is_In_ProductPriceLevel()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
@@ -263,7 +263,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void Invoice_Product_Pricelist_And_Price_Overriden_Is_False_Price_Is_In_ProductPriceLevel_UoM_In_Product()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
@@ -326,7 +326,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void Invoice_Product_Pricelist_And_Price_Overriden_Is_False_Price_Is_In_ProductPriceLevel_UoM_In_Product_2()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
@@ -389,7 +389,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void Invoice_Product_Pricelist_UoM_And_Price_Overriden_Is_False_Price_Is_In_ProductPriceLevel_Quantity_3()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
@@ -452,7 +452,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void Invoice_Product_Pricelist_UoM_And_Price_Overriden_Is_False_Price_Is_In_ProductPriceLevel_Quantity_3_ManualDiscount_Tax()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
@@ -517,7 +517,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void Invoice_Product_Pricelist_UoM_And_Price_Overriden_Is_False_Price_Is_In_ProductPriceLevel_Quantity_3_AddsAmountToInvoice()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
@@ -581,7 +581,7 @@ namespace FakeXrmEasy.Tests.Services.EntityInitializer
         [Fact]
         public void Invoice_And_Price_Overriden_Is_True()
         {
-            XrmFakedContext context = new XrmFakedContext();
+            var context = new XrmFakedContext() { InitializationLevel = EntityInitializationLevel.PerEntity };
             IOrganizationService service = context.GetOrganizationService();
 
             List<Entity> initialEntities = new List<Entity>();
