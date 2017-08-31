@@ -46,7 +46,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 if(!ctx.EntityMetadata.ContainsKey(req.LogicalName))
                 {
-                    throw new Exception("The specified entity name wasn't found in the metadata cache");
+                    throw new Exception($"Entity '{req.LogicalName}' is now found in the metadata cache");
                 }
 
                 var entityMetadata = ctx.GetEntityMetadataByName(req.LogicalName);
