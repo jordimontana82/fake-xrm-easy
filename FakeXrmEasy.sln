@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy", "FakeXrmEasy\FakeXrmEasy.csproj", "{1FF34479-D38A-4B6B-86A7-B48182403437}"
 EndProject
@@ -136,31 +136,54 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "reports", "reports", "{2AFD
 		test\reports\badge_combined.svg = test\reports\badge_combined.svg
 		test\reports\badge_linecoverage.svg = test\reports\badge_linecoverage.svg
 		test\reports\combined.js = test\reports\combined.js
+		test\reports\FakeXrmEasy_AccessRightsRepository.htm = test\reports\FakeXrmEasy_AccessRightsRepository.htm
+		test\reports\FakeXrmEasy_AddListMembersListRequestExecutor.htm = test\reports\FakeXrmEasy_AddListMembersListRequestExecutor.htm
 		test\reports\FakeXrmEasy_AddMemberListRequestExecutor.htm = test\reports\FakeXrmEasy_AddMemberListRequestExecutor.htm
+		test\reports\FakeXrmEasy_AddToQueueRequestExecutor.htm = test\reports\FakeXrmEasy_AddToQueueRequestExecutor.htm
+		test\reports\FakeXrmEasy_ArrayExtensions.htm = test\reports\FakeXrmEasy_ArrayExtensions.htm
+		test\reports\FakeXrmEasy_ArrayTraverse.htm = test\reports\FakeXrmEasy_ArrayTraverse.htm
 		test\reports\FakeXrmEasy_AssignRequestExecutor.htm = test\reports\FakeXrmEasy_AssignRequestExecutor.htm
 		test\reports\FakeXrmEasy_AssociateRequestExecutor.htm = test\reports\FakeXrmEasy_AssociateRequestExecutor.htm
 		test\reports\FakeXrmEasy_CloseQuoteRequestExecutor.htm = test\reports\FakeXrmEasy_CloseQuoteRequestExecutor.htm
 		test\reports\FakeXrmEasy_CreateRequestExecutor.htm = test\reports\FakeXrmEasy_CreateRequestExecutor.htm
+		test\reports\FakeXrmEasy_DefaultEntityInitializerService.htm = test\reports\FakeXrmEasy_DefaultEntityInitializerService.htm
 		test\reports\FakeXrmEasy_DeleteRequestExecutor.htm = test\reports\FakeXrmEasy_DeleteRequestExecutor.htm
 		test\reports\FakeXrmEasy_DisassociateRequestExecutor.htm = test\reports\FakeXrmEasy_DisassociateRequestExecutor.htm
 		test\reports\FakeXrmEasy_EntityExtensions.htm = test\reports\FakeXrmEasy_EntityExtensions.htm
+		test\reports\FakeXrmEasy_EntityMetadataExtensions.htm = test\reports\FakeXrmEasy_EntityMetadataExtensions.htm
+		test\reports\FakeXrmEasy_ExecuteFetchRequestExecutor.htm = test\reports\FakeXrmEasy_ExecuteFetchRequestExecutor.htm
 		test\reports\FakeXrmEasy_ExecuteMultipleRequestExecutor.htm = test\reports\FakeXrmEasy_ExecuteMultipleRequestExecutor.htm
 		test\reports\FakeXrmEasy_ExecuteTransactionExecutor.htm = test\reports\FakeXrmEasy_ExecuteTransactionExecutor.htm
+		test\reports\FakeXrmEasy_GrantAccessRequestExecutor.htm = test\reports\FakeXrmEasy_GrantAccessRequestExecutor.htm
 		test\reports\FakeXrmEasy_InitializeFromRequestExecutor.htm = test\reports\FakeXrmEasy_InitializeFromRequestExecutor.htm
 		test\reports\FakeXrmEasy_InsertOptionValueRequestExecutor.htm = test\reports\FakeXrmEasy_InsertOptionValueRequestExecutor.htm
+		test\reports\FakeXrmEasy_InvoiceDetailInitializerService.htm = test\reports\FakeXrmEasy_InvoiceDetailInitializerService.htm
+		test\reports\FakeXrmEasy_InvoiceInitializerService.htm = test\reports\FakeXrmEasy_InvoiceInitializerService.htm
+		test\reports\FakeXrmEasy_LoseOpportunityRequestExecutor.htm = test\reports\FakeXrmEasy_LoseOpportunityRequestExecutor.htm
+		test\reports\FakeXrmEasy_ObjectExtensions.htm = test\reports\FakeXrmEasy_ObjectExtensions.htm
 		test\reports\FakeXrmEasy_OrganizationServiceFaultQueryBuilderNoAttributeException.htm = test\reports\FakeXrmEasy_OrganizationServiceFaultQueryBuilderNoAttributeException.htm
+		test\reports\FakeXrmEasy_PickFromQueueRequestExecutor.htm = test\reports\FakeXrmEasy_PickFromQueueRequestExecutor.htm
 		test\reports\FakeXrmEasy_PublishXmlRequestExecutor.htm = test\reports\FakeXrmEasy_PublishXmlRequestExecutor.htm
 		test\reports\FakeXrmEasy_PullRequestException.htm = test\reports\FakeXrmEasy_PullRequestException.htm
+		test\reports\FakeXrmEasy_QualifyLeadRequestExecutor.htm = test\reports\FakeXrmEasy_QualifyLeadRequestExecutor.htm
 		test\reports\FakeXrmEasy_QueryExpressionExtensions.htm = test\reports\FakeXrmEasy_QueryExpressionExtensions.htm
+		test\reports\FakeXrmEasy_ReferenceEqualityComparer.htm = test\reports\FakeXrmEasy_ReferenceEqualityComparer.htm
 		test\reports\FakeXrmEasy_RetrieveAttributeRequestExecutor.htm = test\reports\FakeXrmEasy_RetrieveAttributeRequestExecutor.htm
 		test\reports\FakeXrmEasy_RetrieveEntityRequestExecutor.htm = test\reports\FakeXrmEasy_RetrieveEntityRequestExecutor.htm
 		test\reports\FakeXrmEasy_RetrieveMultipleRequestExecutor.htm = test\reports\FakeXrmEasy_RetrieveMultipleRequestExecutor.htm
+		test\reports\FakeXrmEasy_RetrieveOptionSetRequestExecutor.htm = test\reports\FakeXrmEasy_RetrieveOptionSetRequestExecutor.htm
+		test\reports\FakeXrmEasy_RetrievePrincipalAccessRequestExecutor.htm = test\reports\FakeXrmEasy_RetrievePrincipalAccessRequestExecutor.htm
+		test\reports\FakeXrmEasy_RetrieveRequestExecutor.htm = test\reports\FakeXrmEasy_RetrieveRequestExecutor.htm
+		test\reports\FakeXrmEasy_RetrieveSharedPrincipalsAndAccessRequestExecutor.htm = test\reports\FakeXrmEasy_RetrieveSharedPrincipalsAndAccessRequestExecutor.htm
+		test\reports\FakeXrmEasy_RetrieveVersionRequestExecutor.htm = test\reports\FakeXrmEasy_RetrieveVersionRequestExecutor.htm
 		test\reports\FakeXrmEasy_ReviseQuoteRequestExecutor.htm = test\reports\FakeXrmEasy_ReviseQuoteRequestExecutor.htm
+		test\reports\FakeXrmEasy_RevokeAccessRequestExecutor.htm = test\reports\FakeXrmEasy_RevokeAccessRequestExecutor.htm
 		test\reports\FakeXrmEasy_SetStateRequestExecutor.htm = test\reports\FakeXrmEasy_SetStateRequestExecutor.htm
 		test\reports\FakeXrmEasy_TypedConditionExpression.htm = test\reports\FakeXrmEasy_TypedConditionExpression.htm
 		test\reports\FakeXrmEasy_TypeExtensions.htm = test\reports\FakeXrmEasy_TypeExtensions.htm
 		test\reports\FakeXrmEasy_UpdateRequestExecutor.htm = test\reports\FakeXrmEasy_UpdateRequestExecutor.htm
 		test\reports\FakeXrmEasy_WhoAmIRequestExecutor.htm = test\reports\FakeXrmEasy_WhoAmIRequestExecutor.htm
+		test\reports\FakeXrmEasy_WinOpportunityRequestExecutor.htm = test\reports\FakeXrmEasy_WinOpportunityRequestExecutor.htm
 		test\reports\FakeXrmEasy_XmlExtensionsForFetchXml.htm = test\reports\FakeXrmEasy_XmlExtensionsForFetchXml.htm
 		test\reports\FakeXrmEasy_XrmFakedContext.htm = test\reports\FakeXrmEasy_XrmFakedContext.htm
 		test\reports\FakeXrmEasy_XrmFakedPluginExecutionContext.htm = test\reports\FakeXrmEasy_XrmFakedPluginExecutionContext.htm
