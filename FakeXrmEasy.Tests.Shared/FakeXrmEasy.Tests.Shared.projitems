@@ -22,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssociateRequestTests\AssociateRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\BasePluginTests\BasePluginTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\CloseQuoteRequestTests\CloseQuoteRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\CustomRequestTests\NavigateToNextEntityRequestTests\NavigateToNextEntityRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\DateTimeBehaviourTests\DateTimeBehaviourTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\DeleteRequestTests\DeleteRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\DisassociateRequestTests\DisassociateRequestTests.cs" />
