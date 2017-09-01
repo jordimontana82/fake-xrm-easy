@@ -2,6 +2,7 @@
 using FakeXrmEasy.FakeMessageExecutors.CustomExecutors;
 using Microsoft.Xrm.Sdk;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.CustomRequestTests.NavigateToNextEntityRequestTests
@@ -73,8 +74,13 @@ namespace FakeXrmEasy.Tests.FakeContextTests.CustomRequestTests.NavigateToNextEn
             var response = service.Execute(request);
             var traversedPath = response.Results[NavigateToNextEntityOrganizationRequestExecutor.ParameterTraversedPath];
 
+            var oppAfterSet = (from o in context.CreateQuery("opportunity")
+                               where o.Id == opp.Id
+                               select o).First();
+
             Assert.True(response != null);
             Assert.True(traversedPath.ToString() == (currentStage.Id + "," + nextStage.Id));
+            Assert.True(traversedPath.ToString() == oppAfterSet["traversedpath"].ToString());
         }
     }
 }

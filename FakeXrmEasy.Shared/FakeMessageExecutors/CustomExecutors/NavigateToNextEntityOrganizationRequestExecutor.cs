@@ -74,6 +74,7 @@ namespace FakeXrmEasy.FakeMessageExecutors.CustomExecutors
             var currentEntity = currentEntities.First();
             currentEntity["stageid"] = newActiveStageId;
             currentEntity["processid"] = processId;
+            currentEntity["traversedpath"] = traversedPath;
 
             orgService.Update(currentEntity);
 
@@ -88,6 +89,7 @@ namespace FakeXrmEasy.FakeMessageExecutors.CustomExecutors
             var nextEntity = nextEntities.First();
             nextEntity["stageid"] = newActiveStageId;
             nextEntity["processid"] = processId;
+            nextEntity["traversedpath"] = traversedPath;
 
             orgService.Update(nextEntity);
 
