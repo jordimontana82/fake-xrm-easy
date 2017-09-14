@@ -804,14 +804,13 @@ namespace FakeXrmEasy
 
         protected static Expression GetAppropiateCastExpressionBasedOnDateTime(Expression input, object value)
         {
-            //Convert to DateTime if string
-            DateTime dtDateTimeConversion;
-            if (value != null && DateTime.TryParse(value.ToString(), out dtDateTimeConversion))
+            // Convert to DateTime if string
+            if (value is DateTime || value is string && DateTime.TryParse(value.ToString(), out _))
             {
                 return Expression.Convert(input, typeof(DateTime));
             }
 
-            return input; //return directly
+            return input; // return directly
         }
 
         protected static Expression GetAppropiateCastExpressionDefault(Expression input, object value)
@@ -963,7 +962,7 @@ namespace FakeXrmEasy
 
                     expOrValues = Expression.Or(expOrValues, Expression.Equal(
                                 transformedExpression,
-                                GetAppropiateTypedValueAndType(value, c.AttributeType)));
+                                TransformExpressionValueBasedOnOperator(c.CondExpression.Operator, GetAppropiateTypedValueAndType(value, c.AttributeType))));
 
 
                 }
@@ -1043,10 +1042,13 @@ namespace FakeXrmEasy
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             foreach (object value in c.Values)
             {
+                var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value);
+                var transformedExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, leftHandSideExpression);
+
                 expOrValues = Expression.Or(expOrValues,
                         Expression.GreaterThan(
-                            GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value),
-                            GetAppropiateTypedValueAndType(value, tc.AttributeType)));
+                            transformedExpression,
+                            TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType))));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
@@ -1070,10 +1072,13 @@ namespace FakeXrmEasy
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             foreach (object value in c.Values)
             {
+                var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value);
+                var transformedExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, leftHandSideExpression);
+
                 expOrValues = Expression.Or(expOrValues,
                         Expression.LessThan(
-                            GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value),
-                            GetAppropiateTypedValueAndType(value, tc.AttributeType)));
+                            transformedExpression,
+                            TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType))));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
