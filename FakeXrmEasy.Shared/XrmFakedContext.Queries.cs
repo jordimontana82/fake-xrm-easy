@@ -805,6 +805,7 @@ namespace FakeXrmEasy
         protected static Expression GetAppropiateCastExpressionBasedOnDateTime(Expression input, object value)
         {
             // Convert to DateTime if string
+            DateTime _;
             if (value is DateTime || value is string && DateTime.TryParse(value.ToString(), out _))
             {
                 return Expression.Convert(input, typeof(DateTime));
