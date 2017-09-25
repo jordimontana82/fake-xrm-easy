@@ -317,11 +317,8 @@ namespace FakeXrmEasy
 
             query.TopCount = xlDoc.ToTopCount();
 
-            if (query.TopCount != null)
-            {
-                query.PageInfo.Count = query.TopCount.Value;
-                query.PageInfo.PageNumber = xlDoc.ToPageNumber() ?? 1;
-            }
+            query.PageInfo.Count = xlDoc.ToCount() ?? 0;
+            query.PageInfo.PageNumber = xlDoc.ToPageNumber() ?? 1;
 
             var linkedEntities = xlDoc.ToLinkEntities(context);
             foreach (var le in linkedEntities)
@@ -391,21 +388,6 @@ namespace FakeXrmEasy
 
             //Project the attributes in the root column set  (must be applied after the where and order clauses, not before!!)
             query = query.Select(x => x.Clone(x.GetType()).ProjectAttributes(qe, context));
-
-            //Apply TopCount
-
-            if (qe.PageInfo != null && qe.PageInfo.Count > 0 && qe.PageInfo.PageNumber > 0)
-            {
-                //selecting 1 extra to get calculate if there are more records to fetch
-                query = query.Skip(qe.PageInfo.Count * (qe.PageInfo.PageNumber - 1));
-            }
-
-            if (qe.TopCount == null)
-            {
-                qe.TopCount = context.MaxRetrieveCount;
-            }
-
-            query = query.Take(qe.TopCount.Value);
 
             return query;
         }
