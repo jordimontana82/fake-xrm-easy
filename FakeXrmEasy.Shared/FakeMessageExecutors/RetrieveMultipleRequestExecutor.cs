@@ -22,6 +22,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             List<Entity> list = null;
             PagingInfo pageInfo = null;
             int? topCount = null;
+            string entityName = null;
 
             if (request.Query is QueryExpression)
             {
@@ -36,6 +37,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
                 if (qe.PageInfo.Count > 0)
                     qe.TopCount = qe.PageInfo.Count + 1;
+                    
+                entityName = qe.EntityName;
 
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, request.Query as QueryExpression);
                 list = linqQuery.ToList();
@@ -56,6 +59,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 {
                     queryExpression.TopCount = queryExpression.PageInfo.Count + 1;
                 }
+
+                entityName = queryExpression.EntityName;
 
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, queryExpression);
                 list = linqQuery.ToList();
@@ -88,6 +93,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 {
                     qe.TopCount = qe.PageInfo.Count + 1;
                 }
+                
+                entityName = qe.EntityName;
 
                 //QueryExpression now done... execute it!
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe as QueryExpression);
@@ -116,6 +123,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                                     { "EntityCollection", new EntityCollection(list.Take(pageSize).ToList()) }
                                  }
             };
+            response.EntityCollection.EntityName = entityName;
             response.EntityCollection.MoreRecords = recordCount > pageSize;
             if (response.EntityCollection.MoreRecords)
             {
