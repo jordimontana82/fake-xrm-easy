@@ -25,9 +25,9 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             if (request.Query is QueryExpression)
             {
-                qe = request.Query as QueryExpression;
+                qe = (request.Query as QueryExpression).Clone();
 
-                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, request.Query as QueryExpression);
+                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();
             }
             else if (request.Query is FetchExpression)
@@ -97,8 +97,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 numberToGet = list.Count - (pageSize * (pageNumber - 1));
             }
-
-            var recordsToReturn = list.GetRange(startPosition, numberToGet);
+            
+            var recordsToReturn = startPosition + numberToGet > list.Count ? new List<Entity>() : list.GetRange(startPosition, numberToGet);
 
             recordsToReturn.ForEach(e => e.ApplyDateBehaviour(ctx));
             recordsToReturn.ForEach(e => PopulateFormattedValues(e));
