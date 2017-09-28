@@ -1,17 +1,10 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
-using FakeItEasy;
-using FakeXrmEasy;
-using Microsoft.Xrm.Sdk.Query;
-
-using System.Collections.Generic;
-using Microsoft.Xrm.Sdk;
-using System.Reflection;
-using System.ServiceModel;
-using Crm;
+﻿using Crm;
 using FakeXrmEasy.Extensions;
+using Microsoft.Xrm.Sdk;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 {
@@ -55,7 +48,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
                 account
             });
 
-            using(var ctx = new XrmServiceContext(service))
+            using (var ctx = new XrmServiceContext(service))
             {
                 var a = (from acc in ctx.CreateQuery<Account>()
                          select acc).FirstOrDefault();
@@ -66,7 +59,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             }
         }
 
-
         [Fact]
         public void When_an_entity_is_returned_formatted_values_are_also_cloned()
         {
@@ -75,7 +67,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var account = new Account() { Id = Guid.NewGuid() };
             account["statecode"] = new OptionSetValue(0);
-
 
             var formattedValues = new FormattedValueCollection();
             formattedValues.Add("statecode", "Active");
@@ -96,6 +87,5 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
                 Assert.Equal("Active", a.FormattedValues["statecode"]);
             }
         }
-
     }
 }

@@ -1,16 +1,15 @@
 ﻿using FakeItEasy;
+using FakeXrmEasy.FakeMessageExecutors;
+using FakeXrmEasy.Permissions;
+using FakeXrmEasy.Services;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Metadata;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xrm.Sdk.Query;
-using Microsoft.Xrm.Sdk.Messages;
 using System.Reflection;
-using FakeXrmEasy.FakeMessageExecutors;
-using Microsoft.Xrm.Sdk.Metadata;
-
-using FakeXrmEasy.Services;
-using FakeXrmEasy.Permissions;
 
 namespace FakeXrmEasy
 {
@@ -21,9 +20,12 @@ namespace FakeXrmEasy
     /// </summary>
     public partial class XrmFakedContext : IXrmContext
     {
-        protected Dictionary<string, Dictionary<string, string>> AttributeMetadata { get; set; }
 
         protected internal IOrganizationService Service { get; set; }
+
+        private readonly Lazy<XrmFakedTracingService> _tracingService = new Lazy<XrmFakedTracingService>(() => new XrmFakedTracingService());
+
+        protected internal XrmFakedTracingService TracingService => _tracingService.Value;
 
         protected internal bool Initialised { get; set; }
 
@@ -50,16 +52,19 @@ namespace FakeXrmEasy
 
         private Dictionary<string, XrmFakedRelationship> Relationships { get; set; }
 
-        public Dictionary<string, OptionSetMetadata> OptionSetValuesMetadata { get; set; }
-
-        protected internal XrmFakedTracingService _tracingService { get; set; }
 
         public IEntityInitializerService EntityInitializerService { get; set; }
         public IAccessRightsRepository AccessRightsRepository { get; set; }
 
+        public int MaxRetrieveCount { get; set; }
+
+        public EntityInitializationLevel InitializationLevel { get; set; }
+
         public XrmFakedContext()
         {
-            AttributeMetadata = new Dictionary<string, Dictionary<string, string>>();
+            MaxRetrieveCount = 5000;
+
+            AttributeMetadataNames = new Dictionary<string, Dictionary<string, string>>();
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
             ExecutionMocks = new Dictionary<Type, ServiceRequestExecution>();
             OptionSetValuesMetadata = new Dictionary<string, OptionSetMetadata>();
@@ -77,6 +82,15 @@ namespace FakeXrmEasy
             EntityInitializerService = new DefaultEntityInitializerService();
 
             AccessRightsRepository = new AccessRightsRepository();
+
+            SystemTimeZone = TimeZoneInfo.Local;
+            DateBehaviour = DefaultDateBehaviour();
+
+            EntityMetadata = new Dictionary<string, EntityMetadata>();
+
+            UsePipelineSimulation = false;
+
+            InitializationLevel = EntityInitializationLevel.Default;
         }
 
         /// <summary>
@@ -101,6 +115,11 @@ namespace FakeXrmEasy
             }
 
             Initialised = true;
+        }
+
+        public void Initialize(Entity e)
+        {
+            this.Initialize(new List<Entity>() { e });
         }
 
         public void AddExecutionMock<T>(ServiceRequestExecution mock) where T : OrganizationRequest
@@ -128,6 +147,7 @@ namespace FakeXrmEasy
         {
             FakeMessageExecutors.Remove(typeof(T));
         }
+
         public void AddGenericFakeMessageExecutor(string message, IFakeMessageExecutor executor)
         {
             if (!GenericFakeMessageExecutors.ContainsKey(message))
@@ -135,6 +155,7 @@ namespace FakeXrmEasy
             else
                 GenericFakeMessageExecutors[message] = executor;
         }
+
         public void RemoveGenericFakeMessageExecutor(string message)
         {
             if (GenericFakeMessageExecutors.ContainsKey(message))
@@ -204,7 +225,7 @@ namespace FakeXrmEasy
         }
 
         /// <summary>
-        /// Returns a faked organization service that works against this context
+        /// Deprecated. Use GetOrganizationService instead
         /// </summary>
         /// <returns></returns>
         public IOrganizationService GetFakedOrganizationService()
@@ -250,7 +271,6 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Execute(A<OrganizationRequest>._))
                 .ReturnsLazily((OrganizationRequest req) =>
                 {
-
                     if (context.ExecutionMocks.ContainsKey(req.GetType()))
                     {
                         return context.ExecutionMocks[req.GetType()].Invoke(req);
@@ -261,7 +281,7 @@ namespace FakeXrmEasy
                     }
                     if (req.GetType() == typeof(OrganizationRequest) && context.GenericFakeMessageExecutors.ContainsKey(req.RequestName))
                     {
-                        return context.GenericFakeMessageExecutors[req.RequestName].Execute(req,context);
+                        return context.GenericFakeMessageExecutors[req.RequestName].Execute(req, context);
                     }
 
                     throw PullRequestException.NotImplementedOrganizationRequest(req.GetType());
@@ -273,7 +293,6 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Associate(A<string>._, A<Guid>._, A<Relationship>._, A<EntityReferenceCollection>._))
                 .Invokes((string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection entityCollection) =>
                 {
-
                     if (context.FakeMessageExecutors.ContainsKey(typeof(AssociateRequest)))
                     {
                         var request = new AssociateRequest()
@@ -294,7 +313,6 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Disassociate(A<string>._, A<Guid>._, A<Relationship>._, A<EntityReferenceCollection>._))
                 .Invokes((string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection entityCollection) =>
                 {
-
                     if (context.FakeMessageExecutors.ContainsKey(typeof(DisassociateRequest)))
                     {
                         var request = new DisassociateRequest()
@@ -327,7 +345,5 @@ namespace FakeXrmEasy
                     return response.EntityCollection;
                 });
         }
-
-
     }
 }

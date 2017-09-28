@@ -27,7 +27,7 @@ namespace FakeXrmEasy.Tests
         public void When_initializing_the_context_with_a_null_list_of_entities_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
-            var ex = Assert.Throws<InvalidOperationException>(() => context.Initialize(null));
+            var ex = Assert.Throws<InvalidOperationException>(() => context.Initialize(entities: null));
             Assert.Equal(ex.Message, "The entities parameter must be not null");
         }
 
@@ -63,7 +63,7 @@ namespace FakeXrmEasy.Tests
                 new Entity("account") { Id = Guid.NewGuid() }
             };
 
-            Assert.DoesNotThrow(() => context.Initialize(data));
+            context.Initialize(data);
             Assert.True(context.Data.Count == 1);
             Assert.True(context.Data["account"].Count == 1);
         }
@@ -77,7 +77,7 @@ namespace FakeXrmEasy.Tests
                 new Entity("account") { Id = Guid.NewGuid(), Attributes = new AttributeCollection { { "accountid", Guid.NewGuid() } }  }
             };
 
-            Assert.DoesNotThrow(() => context.Initialize(data));
+            context.Initialize(data);
             Assert.True(context.Data.Count == 1);
             Assert.True(context.Data["account"].Count == 1);
         }
@@ -97,6 +97,19 @@ namespace FakeXrmEasy.Tests
             Assert.True(context.Data["account"].Count == 1);
             Assert.Equal(context.Data["account"][guid].Id, data.FirstOrDefault().Id);
         }
+
+        [Fact]
+        public void When_initializing_the_context_with_the_single_entity_overload_the_context_has_that_entity()
+        {
+            var context = new XrmFakedContext();
+            var guid = Guid.NewGuid();
+
+            context.Initialize(new Entity("account") { Id = guid });
+            Assert.True(context.Data.Count == 1);
+            Assert.True(context.Data["account"].Count == 1);
+            Assert.Equal(context.Data["account"][guid].Id, guid);
+        }
+
         [Fact]
         public void When_initializing_with_two_entities_with_the_same_guid_only_the_latest_will_be_in_the_context()
         {
@@ -214,8 +227,8 @@ namespace FakeXrmEasy.Tests
             }
 
             //Query faked context directly
-            Assert.DoesNotThrow(() => context.CreateQuery<Contact>());
-
+            var ex = Record.Exception(() => context.CreateQuery<Contact>());
+            Assert.Null(ex);
 
         }
 
@@ -253,7 +266,8 @@ namespace FakeXrmEasy.Tests
         {
             var context = new XrmFakedContext();
             var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Lionel" };
-            Assert.DoesNotThrow(() => context.Initialize(new List<Entity>() { c }));
+            var ex = Record.Exception(() => context.Initialize(new List<Entity>() { c }));
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -261,7 +275,8 @@ namespace FakeXrmEasy.Tests
         {
             var context = new XrmFakedContext();
             var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Lionel" };
-            Assert.DoesNotThrow(() => context.Initialize(new List<Entity>() { c }));
+            var ex = Record.Exception(() => context.Initialize(new List<Entity>() { c }));
+            Assert.Null(ex);
             Assert.Throws<Exception>(() => context.Initialize(new List<Entity>() { c }));
         }
 

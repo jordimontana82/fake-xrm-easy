@@ -1,6 +1,5 @@
 ﻿using FakeXrmEasy.Extensions.FetchXml;
 using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,18 +18,17 @@ namespace FakeXrmEasy
             {
                 throw new Exception("Can't have <all-attributes /> present when using aggregate");
             }
-            
+
             var ns = xmlDoc.Root.Name.Namespace;
 
             var entityName = RetrieveFetchXmlNode(xmlDoc, "entity")?.GetAttribute("name")?.Value;
-            if(string.IsNullOrEmpty(entityName))
+            if (string.IsNullOrEmpty(entityName))
             {
                 throw new Exception("Can't find entity name for aggregate query");
             }
 
             var aggregates = new List<FetchAggregate>();
             var groups = new List<FetchGrouping>();
-
 
             foreach (var attr in xmlDoc.Descendants(ns + "attribute"))
             {
@@ -53,7 +51,7 @@ namespace FakeXrmEasy
                     if (dategrouping != null)
                     {
                         DateGroupType t;
-                        if(!Enum.TryParse(dategrouping, true, out t))
+                        if (!Enum.TryParse(dategrouping, true, out t))
                         {
                             throw new Exception("Unknown dategrouping value '" + dategrouping + "'");
                         }
@@ -76,7 +74,7 @@ namespace FakeXrmEasy
                 else
                 {
                     var agrFn = attr.GetAttribute("aggregate")?.Value;
-                    if(string.IsNullOrEmpty(agrFn))
+                    if (string.IsNullOrEmpty(agrFn))
                     {
                         throw new Exception("Attributes must have be aggregated or grouped by when using aggregation");
                     }
@@ -87,7 +85,8 @@ namespace FakeXrmEasy
                         case "count":
                             newAgr = new CountAggregate();
                             break;
-                        case "countcolumn":                            
+
+                        case "countcolumn":
                             if (attr.IsAttributeTrue("distinct"))
                             {
                                 newAgr = new CountDistinctAggregate();
@@ -105,12 +104,15 @@ namespace FakeXrmEasy
                         case "max":
                             newAgr = new MaxAggregate();
                             break;
+
                         case "avg":
                             newAgr = new AvgAggregate();
                             break;
+
                         case "sum":
                             newAgr = new SumAggregate();
                             break;
+
                         default:
                             throw new Exception("Unknown aggregate function '" + agrFn + "'");
                     }
@@ -126,24 +128,24 @@ namespace FakeXrmEasy
             if (groups.Any())
             {
                 aggregateResult = ProcessGroupedAggregate(entityName, resultOfQuery, aggregates, groups);
-            } else
+            }
+            else
             {
                 aggregateResult = new List<Entity>();
                 var ent = ProcessAggregatesForSingleGroup(entityName, resultOfQuery, aggregates);
                 aggregateResult.Add(ent);
             }
-            
-            return OrderAggregateResult(xmlDoc, aggregateResult.AsQueryable());            
+
+            return OrderAggregateResult(xmlDoc, aggregateResult.AsQueryable());
         }
 
         private static List<Entity> OrderAggregateResult(XDocument xmlDoc, IQueryable<Entity> result)
         {
             var ns = xmlDoc.Root.Name.Namespace;
-            foreach(var order in 
+            foreach (var order in
                 xmlDoc.Root.Element(ns + "entity")
                 .Elements(ns + "order"))
             {
-                
                 var alias = order.GetAttribute("alias")?.Value;
 
                 // These error is also thrown by CRM
@@ -151,11 +153,11 @@ namespace FakeXrmEasy
                 {
                     throw new Exception("An attribute cannot be specified for an order clause for an aggregate Query. Use an alias");
                 }
-                if(string.IsNullOrEmpty("alias"))
+                if (string.IsNullOrEmpty("alias"))
                 {
                     throw new Exception("An alias is required for an order clause for an aggregate Query.");
                 }
-                
+
                 if (order.IsAttributeTrue("descending"))
                     result = result.OrderByDescending(e => e.Attributes.ContainsKey(alias) ? e.Attributes[alias] : null, new XrmOrderByAttributeComparer());
                 else
@@ -189,7 +191,7 @@ namespace FakeXrmEasy
 
         private static List<Entity> ProcessGroupedAggregate(string entityName, IList<Entity> resultOfQuery, IList<FetchAggregate> aggregates, IList<FetchGrouping> groups)
         {
-            // Group by the groupBy-attribute            
+            // Group by the groupBy-attribute
             var grouped = resultOfQuery.GroupBy(e =>
             {
                 return groups
@@ -214,17 +216,18 @@ namespace FakeXrmEasy
                         ent[groups[rule].OutputAlias] = new AliasedValue(null, groups[rule].Attribute, g.Key[rule]);
                     }
                 }
-                
+
                 result.Add(ent);
             }
 
             return result;
         }
 
-        abstract class FetchAggregate
+        private abstract class FetchAggregate
         {
             public string Attribute { get; set; }
             public string OutputAlias { get; set; }
+
             public object Process(IEnumerable<Entity> entities)
             {
                 return AggregateValues(entities.Select(e =>
@@ -235,7 +238,7 @@ namespace FakeXrmEasy
             public abstract object AggregateValues(IEnumerable<object> values);
         }
 
-        class CountAggregate : FetchAggregate
+        private class CountAggregate : FetchAggregate
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
@@ -243,7 +246,7 @@ namespace FakeXrmEasy
             }
         }
 
-        class CountColumnAggregate : FetchAggregate
+        private class CountColumnAggregate : FetchAggregate
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
@@ -251,7 +254,7 @@ namespace FakeXrmEasy
             }
         }
 
-        class CountDistinctAggregate : FetchAggregate
+        private class CountDistinctAggregate : FetchAggregate
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
@@ -259,7 +262,7 @@ namespace FakeXrmEasy
             }
         }
 
-        class MinAggregate : FetchAggregate
+        private class MinAggregate : FetchAggregate
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
@@ -280,7 +283,7 @@ namespace FakeXrmEasy
             }
         }
 
-        class MaxAggregate : FetchAggregate
+        private class MaxAggregate : FetchAggregate
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
@@ -292,7 +295,7 @@ namespace FakeXrmEasy
                 var firstValue = lst.Where(x => x != null).First();
                 var valType = firstValue.GetType();
 
-                if(valType == typeof(Money))
+                if (valType == typeof(Money))
                 {
                     return new Money(values.Select(x => (x as Money)?.Value ?? 0m).Max());
                 }
@@ -301,7 +304,7 @@ namespace FakeXrmEasy
             }
         }
 
-        class AvgAggregate : FetchAggregate
+        private class AvgAggregate : FetchAggregate
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
@@ -341,7 +344,7 @@ namespace FakeXrmEasy
             }
         }
 
-        class SumAggregate : FetchAggregate
+        private class SumAggregate : FetchAggregate
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
@@ -381,22 +384,24 @@ namespace FakeXrmEasy
             }
         }
 
-        abstract class FetchGrouping
+        private abstract class FetchGrouping
         {
             public string Attribute { get; set; }
             public string OutputAlias { get; set; }
+
             public IComparable Process(Entity entity)
             {
                 var attr = entity.Contains(Attribute) ? entity[Attribute] : null;
                 return FindGroupValue(attr);
             }
+
             public abstract IComparable FindGroupValue(object attributeValue);
         }
 
         /// <summary>
         /// Used to compare array of objects, in order to group by a variable number of conditions.
         /// </summary>
-        class ArrayComparer : IEqualityComparer<IComparable[]>
+        private class ArrayComparer : IEqualityComparer<IComparable[]>
         {
             public bool Equals(IComparable[] x, IComparable[] y)
             {
@@ -409,7 +414,7 @@ namespace FakeXrmEasy
             }
         }
 
-        class SimpleValueGroup : FetchGrouping
+        private class SimpleValueGroup : FetchGrouping
         {
             public override IComparable FindGroupValue(object attributeValue)
             {
@@ -417,7 +422,7 @@ namespace FakeXrmEasy
             }
         }
 
-        enum DateGroupType
+        private enum DateGroupType
         {
             DateTime,
             Day,
@@ -427,7 +432,7 @@ namespace FakeXrmEasy
             Year
         }
 
-        class DateTimeGroup : FetchGrouping
+        private class DateTimeGroup : FetchGrouping
         {
             public DateGroupType Type { get; set; }
 
@@ -446,17 +451,23 @@ namespace FakeXrmEasy
                 {
                     case DateGroupType.DateTime:
                         return d;
+
                     case DateGroupType.Day:
                         return d?.Day;
+
                     case DateGroupType.Week:
                         var cal = System.Globalization.DateTimeFormatInfo.InvariantInfo;
                         return cal.Calendar.GetWeekOfYear(d.Value, cal.CalendarWeekRule, cal.FirstDayOfWeek);
+
                     case DateGroupType.Month:
                         return d?.Month;
+
                     case DateGroupType.Quarter:
                         return (d?.Month + 2) / 3;
+
                     case DateGroupType.Year:
                         return d?.Year;
+
                     default:
                         throw new Exception("Unhandled date group type");
                 }

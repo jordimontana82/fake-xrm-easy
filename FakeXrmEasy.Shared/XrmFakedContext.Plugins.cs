@@ -32,10 +32,21 @@ namespace FakeXrmEasy
                 PostEntityImages = new EntityImageCollection()
             };
         }
+
         protected IPluginExecutionContext GetFakedPluginContext(XrmFakedPluginExecutionContext ctx)
         {
             var context = A.Fake<IPluginExecutionContext>();
 
+            PopulateExecutionContextPropertiesFromFakedContext(context, ctx);
+
+            A.CallTo(() => context.ParentContext).ReturnsLazily(() => ctx.ParentContext);
+            A.CallTo(() => context.Stage).ReturnsLazily(() => ctx.Stage);
+
+            return context;
+        }
+
+        protected void PopulateExecutionContextPropertiesFromFakedContext(IExecutionContext context, XrmFakedPluginExecutionContext ctx)
+        {
             var newUserId = Guid.NewGuid();
 
             A.CallTo(() => context.Depth).ReturnsLazily(() => ctx.Depth <= 0 ? 1 : ctx.Depth);
@@ -50,11 +61,11 @@ namespace FakeXrmEasy
             A.CallTo(() => context.OrganizationId).ReturnsLazily(() => ctx.OrganizationId);
             A.CallTo(() => context.InitiatingUserId).ReturnsLazily(() => ctx.InitiatingUserId == Guid.Empty ? newUserId : ctx.InitiatingUserId);
             A.CallTo(() => context.UserId).ReturnsLazily(() => ctx.UserId == Guid.Empty ? newUserId : ctx.UserId);
-            A.CallTo(() => context.ParentContext).ReturnsLazily(() => ctx.ParentContext);
-            A.CallTo(() => context.Stage).ReturnsLazily(() => ctx.Stage);
             A.CallTo(() => context.PrimaryEntityName).ReturnsLazily(() => ctx.PrimaryEntityName);
             A.CallTo(() => context.SecondaryEntityName).ReturnsLazily(() => ctx.SecondaryEntityName);
             A.CallTo(() => context.SharedVariables).ReturnsLazily(() => ctx.SharedVariables);
+            A.CallTo(() => context.BusinessUnitId).ReturnsLazily(() => ctx.BusinessUnitId);
+            A.CallTo(() => context.CorrelationId).ReturnsLazily(() => ctx.CorrelationId);
 
             //Create message will pass an Entity as the target but this is not always true
             //For instance, a Delete request will receive an EntityReference
@@ -66,6 +77,12 @@ namespace FakeXrmEasy
                 A.CallTo(() => context.PrimaryEntityId).ReturnsLazily(() => target.Id);
                 A.CallTo(() => context.PrimaryEntityName).ReturnsLazily(() => target.LogicalName);
             }
+        }
+        protected IExecutionContext GetFakedExecutionContext(XrmFakedPluginExecutionContext ctx)
+        {
+            var context = A.Fake<IExecutionContext>();
+
+            PopulateExecutionContextPropertiesFromFakedContext(context, ctx);
 
             return context;
         }
@@ -85,9 +102,13 @@ namespace FakeXrmEasy
             fakedPlugin.Execute(fakedServiceProvider); //Execute the plugin
             return fakedPlugin;
         }
-        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx) where T : IPlugin, new()
+
+        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx = null) where T : IPlugin, new()
         {
-            return this.ExecutePluginWith<T>(ctx, new T());
+            if (ctx == null)
+                ctx = GetDefaultPluginContext();
+
+            return this.ExecutePluginWith(ctx, new T());
         }
 
         public IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
@@ -210,12 +231,15 @@ namespace FakeXrmEasy
                    }
                    else if (t.Equals(typeof(ITracingService)))
                    {
-                       _tracingService = new XrmFakedTracingService();
-                       return _tracingService;
+                       return TracingService;
                    }
                    else if (t.Equals(typeof(IPluginExecutionContext)))
                    {
                        return GetFakedPluginContext(plugCtx);
+                   }
+                   else if (t.Equals(typeof(IExecutionContext)))
+                   {
+                       return GetFakedExecutionContext(plugCtx);
                    }
                    else if (t.Equals(typeof(IOrganizationServiceFactory)))
                    {
@@ -240,7 +264,7 @@ namespace FakeXrmEasy
 
         public XrmFakedTracingService GetFakeTracingService()
         {
-            return _tracingService;
+            return TracingService;
         }
 
     }

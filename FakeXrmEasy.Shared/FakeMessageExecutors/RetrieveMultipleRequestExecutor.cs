@@ -1,16 +1,15 @@
-﻿using Microsoft.Crm.Sdk.Messages;
+﻿using FakeXrmEasy.Extensions;
+using FakeXrmEasy.Extensions.FetchXml;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using FakeXrmEasy.Extensions.FetchXml;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
-    public class RetrieveMultipleRequestExecutor: IFakeMessageExecutor
+    public class RetrieveMultipleRequestExecutor : IFakeMessageExecutor
     {
         public bool CanExecute(OrganizationRequest request)
         {
@@ -35,13 +34,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 if (topCount != null)
                     qe.TopCount = topCount + 1;
 
-
                 if (qe.PageInfo.Count > 0)
                     qe.TopCount = qe.PageInfo.Count + 1;
 
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, request.Query as QueryExpression);
                 list = linqQuery.ToList();
-
             }
             else if (request.Query is FetchExpression)
             {
@@ -67,8 +64,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 {
                     list = XrmFakedContext.ProcessAggregateFetchXml(ctx, xmlDoc, list);
                 }
-
-                
             }
             else if (request.Query is QueryByAttribute)
             {
@@ -94,20 +89,20 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     qe.TopCount = qe.PageInfo.Count + 1;
                 }
 
-
                 //QueryExpression now done... execute it!
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe as QueryExpression);
                 list = linqQuery.ToList();
-
             }
             else
                 throw PullRequestException.NotImplementedOrganizationRequest(request.Query.GetType());
 
+            list.ForEach(e => e.ApplyDateBehaviour(ctx));
             list.ForEach(e => PopulateFormattedValues(e));
             var recordCount = list.Count();
-            var pageSize = recordCount ;
+            var pageSize = recordCount;
             int pageNumber = 1;
-            if (pageInfo != null && pageInfo.PageNumber > 0 && pageInfo.Count>0) {
+            if (pageInfo != null && pageInfo.PageNumber > 0 && pageInfo.Count > 0)
+            {
                 pageSize = pageInfo.Count;
                 pageNumber = pageInfo.PageNumber;
             }
@@ -116,7 +111,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             var response = new RetrieveMultipleResponse
             {
-                
                 Results = new ParameterCollection
                                  {
                                     { "EntityCollection", new EntityCollection(list.Take(pageSize).ToList()) }
@@ -127,15 +121,13 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 var first = response.EntityCollection.Entities.First();
                 var last = response.EntityCollection.Entities.Last();
-                response.EntityCollection.PagingCookie= String.Format(
+                response.EntityCollection.PagingCookie = String.Format(
                     "<cookie page=\"{0}\"><{1}id last=\"{2}\" first=\"{3}\" /></cookie>",
-                    pageNumber, first.LogicalName , last.Id.ToString("B").ToUpper(), first.Id.ToString("B").ToUpper());
+                    pageNumber, first.LogicalName, last.Id.ToString("B").ToUpper(), first.Id.ToString("B").ToUpper());
             }
 
             return response;
         }
-
-        
 
         /// <summary>
         /// Populates the formmated values property of this entity record based on the proxy types
@@ -144,18 +136,18 @@ namespace FakeXrmEasy.FakeMessageExecutors
         protected void PopulateFormattedValues(Entity e)
         {
             //Iterate through attributes and retrieve formatted values based on type
-            foreach(var attKey in e.Attributes.Keys)
+            foreach (var attKey in e.Attributes.Keys)
             {
                 var value = e[attKey];
                 string formattedValue = "";
-                if(value != null)
+                if (value != null)
                 {
                     bool bShouldAdd = false;
                     formattedValue = GetFormattedValueForValue(value, out bShouldAdd);
-                    if(bShouldAdd)
+                    if (bShouldAdd)
                     {
                         e.FormattedValues.Add(attKey, formattedValue);
-                    } 
+                    }
                 }
             }
         }
@@ -165,14 +157,13 @@ namespace FakeXrmEasy.FakeMessageExecutors
             bShouldAddFormattedValue = false;
             string sFormattedValue = "";
 
-            if(value is Enum)
+            if (value is Enum)
             {
                 // Retrieve the enum type
                 sFormattedValue = Enum.GetName(value.GetType(), value);
                 bShouldAddFormattedValue = true;
             }
-
-            else if(value is AliasedValue)
+            else if (value is AliasedValue)
             {
                 return GetFormattedValueForValue((value as AliasedValue)?.Value, out bShouldAddFormattedValue);
             }

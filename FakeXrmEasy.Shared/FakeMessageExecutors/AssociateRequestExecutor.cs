@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using System;
+using System.Linq;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -37,8 +35,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 throw new Exception("Association without target is invalid!");
             }
-           
-
 
             foreach (var relatedEntityReference in associateRequest.RelatedEntities)
             {
@@ -57,7 +53,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                                                 .Where(e => e.Id == associateRequest.Target.Id)
                                                 .FirstOrDefault() != null;
 
-                    if(!targetExists)
+                    if (!targetExists)
                     {
                         throw new Exception(string.Format("{0} with Id {1} doesn't exist", fromEntityName, associateRequest.Target.Id.ToString()));
                     }
@@ -94,11 +90,9 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     entityToUpdate[fakeRelationShip.Entity2Attribute] = associateRequest.Target;
                     service.Update(entityToUpdate);
                 }
-
-
             }
 
-            return new AssociateResponse ();
+            return new AssociateResponse();
         }
 
         public Type GetResponsibleRequestType()

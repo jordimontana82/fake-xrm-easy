@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
+using System;
 
 namespace FakeXrmEasy.Tests
 {
@@ -12,9 +9,9 @@ namespace FakeXrmEasy.Tests
     {
         public void Execute(IServiceProvider serviceProvider)
         {
-            var tracing = (ITracingService) serviceProvider.GetService(typeof (ITracingService));
-            var context = (IPluginExecutionContext) serviceProvider.GetService(typeof (IPluginExecutionContext));
-            var factory = (IOrganizationServiceFactory) serviceProvider.GetService(typeof (IOrganizationServiceFactory));
+            var tracing = (ITracingService)serviceProvider.GetService(typeof(ITracingService));
+            var context = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
+            var factory = (IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory));
             var service = factory.CreateOrganizationService(context.UserId);
 
             var request = new RetrieveEntityRequest
@@ -26,7 +23,7 @@ namespace FakeXrmEasy.Tests
 
             var response = (RetrieveEntityResponse)service.Execute(request);
 
-            var target = ((Entity) context.InputParameters["Target"]);
+            var target = ((Entity)context.InputParameters["Target"]);
             target["response"] = response.ResponseName;
         }
     }

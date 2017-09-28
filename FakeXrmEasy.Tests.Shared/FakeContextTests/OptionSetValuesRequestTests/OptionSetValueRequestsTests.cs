@@ -1,11 +1,9 @@
-﻿using Microsoft.Xrm.Sdk;
+﻿using Crm;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
 using System.Linq;
-using Crm;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.OptionSetValuesRequestTests
 {
@@ -74,9 +72,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.OptionSetValuesRequestTests
                 Label = new Label("Yeah! This is a fake label!", 0)
             };
 
-            Assert.DoesNotThrow(() => service.Execute(req));
+            service.Execute(req);
 
-            
             //Check the optionsetmetadata was updated
             Assert.True(ctx.OptionSetValuesMetadata.ContainsKey("GlobalOptionSet"));
 
@@ -84,7 +81,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.OptionSetValuesRequestTests
             Assert.NotEqual(null, option);
             Assert.Equal("Yeah! This is a fake label!", option.Label.LocalizedLabels[0].Label);
         }
-
 
         [Fact]
         public void When_calling_insert_option_set_value_for_local_optionset_optionmetadata_contains_it()
@@ -99,8 +95,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.OptionSetValuesRequestTests
                 Label = new Label("Yeah! This is a fake label!", 0)
             };
 
-            Assert.DoesNotThrow(() => service.Execute(req));
-
+            service.Execute(req);
 
             //Check the optionsetmetadata was updated
             var key = string.Format("{0}#{1}", req.EntityLogicalName, req.AttributeLogicalName);

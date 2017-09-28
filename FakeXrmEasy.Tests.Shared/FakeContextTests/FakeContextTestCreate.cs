@@ -1,17 +1,13 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
-using FakeItEasy;
-using FakeXrmEasy;
-using Microsoft.Xrm.Sdk.Query;
-
-using System.Collections.Generic;
-using System.Reflection;
-using Crm;
+﻿using Crm;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Xunit;
 
 namespace FakeXrmEasy.Tests
 {
@@ -27,7 +23,7 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(ex.Message, "The entity must not be null");
         }
 
-       [Fact]
+        [Fact]
         public void When_an_entity_is_created_with_an_empty_logical_name_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
@@ -45,7 +41,6 @@ namespace FakeXrmEasy.Tests
             var context = new XrmFakedContext();
             var service = context.GetFakedOrganizationService();
 
-            
             var e = new Entity("account") { Id = Guid.Empty };
             var guid = service.Create(e);
 
@@ -106,6 +101,23 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_Creating_With_A_StateCode_Property_Exception_Is_Thrown()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+            var accId = Guid.NewGuid();
+
+            var account = new Account
+            {
+                Name = "TestAcc",
+                Id = accId
+            };
+            account["statecode"] = 2;
+
+            Assert.Throws<InvalidOperationException>(() => service.Create(account));
+        }
+
+        [Fact]
         public void When_Creating_Using_Organization_Context_Record_Should_Be_Created()
         {
             var context = new XrmFakedContext();
@@ -155,7 +167,7 @@ namespace FakeXrmEasy.Tests
 
             //Retrieve the record created
             var contact = (from con in context.CreateQuery<Contact>()
-                          select con).FirstOrDefault();
+                           select con).FirstOrDefault();
 
             Assert.True(contact.Attributes.ContainsKey("contactid"));
             Assert.Equal(id, contact["contactid"]);
@@ -177,7 +189,6 @@ namespace FakeXrmEasy.Tests
 
             Assert.True(record.Attributes.ContainsKey("new_myentityid"));
             Assert.Equal(id, record["new_myentityid"]);
-
         }
 
         [Fact]
@@ -228,7 +239,6 @@ namespace FakeXrmEasy.Tests
 
             var exception = Assert.Throws<Exception>(() => service.Execute(request));
             Assert.Equal(exception.Message, "Relationship order_details does not exist in the metadata cache");
-            
         }
 
         [Fact]
@@ -246,7 +256,6 @@ namespace FakeXrmEasy.Tests
                     Entity2Attribute = "salesorderid",              //Lookup attribute
                     RelationshipType = XrmFakedRelationship.enmFakeRelationshipType.OneToMany
                 });
-
 
             var order = new SalesOrder();
 
@@ -353,6 +362,26 @@ namespace FakeXrmEasy.Tests
             Assert.True(createdAccount.Attributes.ContainsKey("modifiedon"));
             Assert.True(createdAccount.Attributes.ContainsKey("modifiedby"));
             Assert.True(createdAccount.Attributes.ContainsKey("statecode"));
+        }
+
+        [Fact]
+        public void When_creating_a_record_overridencreatedon_should_override_created_on()
+        {
+            var ctx = new XrmFakedContext();
+            var service = ctx.GetOrganizationService();
+
+            var now = DateTime.Now.Date;
+
+            var account = new Account()
+            {
+                OverriddenCreatedOn = now,
+                ["createdon"] = now.AddDays(-1)
+            };
+
+            service.Create(account);
+
+            var createdAccount = ctx.CreateQuery<Account>().FirstOrDefault();
+            Assert.Equal(now, createdAccount.CreatedOn);
         }
     }
 }

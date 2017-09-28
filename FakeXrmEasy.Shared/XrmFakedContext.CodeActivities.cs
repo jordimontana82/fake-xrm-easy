@@ -1,18 +1,9 @@
 ﻿using FakeItEasy;
 using Microsoft.Xrm.Sdk;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xrm.Sdk.Query;
-using System.ServiceModel;
-using Microsoft.Xrm.Sdk.Messages;
-using System.Dynamic;
-using System.Linq.Expressions;
-using FakeXrmEasy.Extensions;
-using System.Activities;
 using Microsoft.Xrm.Sdk.Workflow;
-using System.Activities.Hosting;
+using System;
+using System.Activities;
+using System.Collections.Generic;
 
 namespace FakeXrmEasy
 {
@@ -46,7 +37,6 @@ namespace FakeXrmEasy
             return this.ExecuteCodeActivity<T>(wfContext, inputs, instance);
         }
 
-
         public IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new()
         {
             var wfContext = GetDefaultWorkflowContext();
@@ -63,26 +53,25 @@ namespace FakeXrmEasy
         public IDictionary<string, object> ExecuteCodeActivity<T>(XrmFakedWorkflowContext wfContext, Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new()
         {
             WorkflowInvoker invoker = null;
-            WorkflowInstanceExtensionManager mngr = null;
             string sDebug = "";
             try
             {
                 sDebug = "Creating instance..." + System.Environment.NewLine;
-                if (instance == null) 
+                if (instance == null)
                     instance = new T();
                 invoker = new WorkflowInvoker(instance);
                 sDebug += "Invoker created" + System.Environment.NewLine;
                 sDebug += "Adding extensions..." + System.Environment.NewLine;
                 invoker.Extensions.Add<ITracingService>(() =>
                 {
-                    _tracingService = new XrmFakedTracingService();
-                    return _tracingService;
+                    return TracingService;
                 });
                 invoker.Extensions.Add<IWorkflowContext>(() =>
                 {
                     return wfContext;
                 });
-                invoker.Extensions.Add<IOrganizationServiceFactory>(() => {
+                invoker.Extensions.Add<IOrganizationServiceFactory>(() =>
+                {
                     var fakedServiceFactory = A.Fake<IOrganizationServiceFactory>();
                     A.CallTo(() => fakedServiceFactory.CreateOrganizationService(A<Guid?>._))
                          .ReturnsLazily((Guid? g) =>
@@ -102,6 +91,5 @@ namespace FakeXrmEasy
                 throw new TypeLoadException("When loading type: " + typeName + "." + tlex.Message + "in domain directory: " + AppDomain.CurrentDomain.BaseDirectory + "Debug=" + sDebug);
             }
         }
-
     }
 }

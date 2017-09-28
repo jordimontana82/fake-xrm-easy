@@ -3,24 +3,22 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xrm.Sdk;
 using System.Configuration;
-using System.Xml.Serialization;
 using System.IO;
 
 using System.Xml.Linq;
 using System.Linq;
 
 using System.IO.Compression;
-using System.ComponentModel;
 using System.Runtime.Serialization;
-using System.Xml;
 
 #if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
 using Microsoft.Xrm.Tooling.Connector;
 #else
+
 using Microsoft.Xrm.Client;
 using Microsoft.Xrm.Client.Services;
-#endif
 
+#endif
 
 namespace FakeXrmEasy
 {
@@ -85,23 +83,22 @@ namespace FakeXrmEasy
             OrganizationService service = new OrganizationService(crmConnection);
             return service;
 #endif
-
         }
 
         public XrmFakedPluginExecutionContext GetContextFromSerialisedCompressedProfile(string sCompressedProfile)
         {
             byte[] data = Convert.FromBase64String(sCompressedProfile);
 
-            using(var memStream = new MemoryStream(data))
+            using (var memStream = new MemoryStream(data))
             {
-                using(var decompressedStream = new DeflateStream(memStream, CompressionMode.Decompress, false))
+                using (var decompressedStream = new DeflateStream(memStream, CompressionMode.Decompress, false))
                 {
                     byte[] buffer = new byte[0x1000];
 
-                    using(var tempStream = new MemoryStream())
+                    using (var tempStream = new MemoryStream())
                     {
                         int numBytesRead = decompressedStream.Read(buffer, 0, buffer.Length);
-                        while(numBytesRead > 0)
+                        while (numBytesRead > 0)
                         {
                             tempStream.Write(buffer, 0, numBytesRead);
                             numBytesRead = decompressedStream.Read(buffer, 0, buffer.Length);
@@ -129,6 +126,5 @@ namespace FakeXrmEasy
                 }
             }
         }
-
     }
 }

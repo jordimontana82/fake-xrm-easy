@@ -1,9 +1,12 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using Xunit;
+
+#if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+using Xunit.Sdk;
+#endif
+
 using System.Linq;
 using Microsoft.Crm.Sdk.Messages;
 using Crm;
@@ -28,15 +31,14 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddListMembersListRequestTests
 
             AddListMembersListRequest addListMembersListRequest = new AddListMembersListRequest
             {
-                MemberIds = new []
+                MemberIds = new[]
                 {
                     Guid.NewGuid()
                 },
                 ListId = Guid.NewGuid()
             };
-            
 
-            // Execute the request. 
+            // Execute the request.
             Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Execute(addListMembersListRequest));
         }
 
@@ -48,14 +50,14 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddListMembersListRequestTests
 
             AddListMembersListRequest addListMembersListRequest = new AddListMembersListRequest
             {
-                MemberIds = new []
+                MemberIds = new[]
                 {
                     Guid.NewGuid()
                 },
                 ListId = Guid.Empty
             };
 
-            // Execute the request. 
+            // Execute the request.
             Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Execute(addListMembersListRequest));
         }
 
@@ -74,7 +76,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddListMembersListRequestTests
                 ListId = Guid.NewGuid()
             };
 
-            // Execute the request. 
+            // Execute the request.
             Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Execute(addListMembersListRequest));
         }
 
@@ -212,7 +214,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddListMembersListRequestTests
                 ListId = list.ToEntityReference().Id
             };
 
-            Assert.DoesNotThrow(() => service.Execute(addListMembersListRequest));
+            service.Execute(addListMembersListRequest);
 
             using (var context = new XrmServiceContext(service))
             {
@@ -260,7 +262,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddListMembersListRequestTests
                 ListId = list.ToEntityReference().Id
             };
 
-            Assert.DoesNotThrow(() => service.Execute(addListMembersListRequest));
+            service.Execute(addListMembersListRequest);
 
             using (var context = new XrmServiceContext(service))
             {
@@ -308,7 +310,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AddListMembersListRequestTests
                 ListId = list.ToEntityReference().Id
             };
 
-            Assert.DoesNotThrow(() => service.Execute(addListMembersListRequest));
+            service.Execute(addListMembersListRequest);
 
             using (var context = new XrmServiceContext(service))
             {

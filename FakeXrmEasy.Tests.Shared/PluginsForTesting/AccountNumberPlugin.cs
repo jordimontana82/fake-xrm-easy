@@ -1,8 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace FakeXrmEasy.Tests.PluginsForTesting
 {
@@ -60,5 +57,4 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
             }
         }
     }
-
 }

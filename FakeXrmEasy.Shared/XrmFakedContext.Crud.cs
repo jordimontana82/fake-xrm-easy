@@ -3,21 +3,16 @@ using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Xrm.Sdk.Query;
 using System.ServiceModel;
 using Microsoft.Xrm.Sdk.Messages;
-using System.Dynamic;
-using System.Linq.Expressions;
 using FakeXrmEasy.Extensions;
-using Microsoft.Xrm.Sdk.Client;
 using System.Reflection;
 
 namespace FakeXrmEasy
 {
     public partial class XrmFakedContext : IXrmContext
     {
-
         #region CRUD
         /// <summary>
         /// A fake retrieve method that will query the FakedContext to retrieve the specified
@@ -51,14 +46,12 @@ namespace FakeXrmEasy
                     {
                         if (context.ProxyTypesAssembly == null)
                         {
-                            throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.",
-                            entityName));
+                            throw new InvalidOperationException($"The entity logical name {entityName} is not valid.");
                         }
 
                         if (!context.ProxyTypesAssembly.GetTypes().Any(type => context.FindReflectedType(entityName) != null))
                         {
-                            throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.",
-                            entityName));
+                            throw new InvalidOperationException($"The entity logical name {entityName} is not valid.");
                         }
                     }
 
@@ -70,20 +63,22 @@ namespace FakeXrmEasy
                         && context.Data[entityName].ContainsKey(id))
                     {
                         //Entity found => return only the subset of columns specified or all of them
-                        if (columnSet.AllColumns)
-                            return context.Data[entityName][id].Clone(reflectedType);
+                        var foundEntity = context.Data[entityName][id].Clone(reflectedType);
+                        if (columnSet.AllColumns) { 
+                            foundEntity.ApplyDateBehaviour(context);
+                            return foundEntity;
+                        }
                         else
                         {
-                            Entity foundEntity = null;
-                            foundEntity = context.Data[entityName][id].Clone(reflectedType);
-                            Entity projected = foundEntity.ProjectAttributes(columnSet, context);
+                            var projected = foundEntity.ProjectAttributes(columnSet, context);
+                            projected.ApplyDateBehaviour(context);
                             return projected;
                         }
                     }
                     else
                     {
-                        //Entity not found in the context => return null
-                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("{0} With Id = {1} Does Not Exist", entityName, id.ToString("D")));
+                        // Entity not found in the context => FaultException
+                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{entityName} With Id = {id:D} Does Not Exist");
                     }
                 });
         }
@@ -101,7 +96,6 @@ namespace FakeXrmEasy
            
                     return e.Id;
                 });
-
         }
 
         protected static void FakeUpdate(XrmFakedContext context, IOrganizationService fakedService)
@@ -109,30 +103,68 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Update(A<Entity>._))
                 .Invokes((Entity e) =>
                 {
-                    context.ValidateEntity(e);
+                    context.UpdateEntity(e);
+                });
+        }
 
-                    //Update specific validations: The entity record must exist in the context
-                    if (context.Data.ContainsKey(e.LogicalName) &&
-                        context.Data[e.LogicalName].ContainsKey(e.Id))
+        protected void UpdateEntity(Entity e)
+        {
+            ValidateEntity(e);
+
+            // Update specific validations: The entity record must exist in the context
+            if (Data.ContainsKey(e.LogicalName) &&
+                Data[e.LogicalName].ContainsKey(e.Id))
+            {
+                var originalEntity = CreateQuery(e.LogicalName).First(entity => entity.Id == e.Id);
+                if (originalEntity.Attributes.ContainsKey("statecode"))
+                {
+                    var statecode = originalEntity["statecode"];
+                    var stateCodeValue = 1;
+                    if (statecode is OptionSetValue)
                     {
-                        //Add as many attributes to the entity as the ones received (this will keep existing ones)
-                        var cachedEntity = context.Data[e.LogicalName][e.Id];
-                        foreach (var sAttributeName in e.Attributes.Keys.ToList())
-                        {
-                            cachedEntity[sAttributeName] = e[sAttributeName];
-                        }
-
-                        // Update ModifiedOn
-                        cachedEntity["modifiedon"] = DateTime.UtcNow;
-                        cachedEntity["modifiedby"] = context.CallerId;
+                        stateCodeValue = (statecode as OptionSetValue).Value;
                     }
                     else
                     {
-                        //The entity record was not found, return a CRM-ish update error message
-                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("{0} with Id {1} Does Not Exist", e.LogicalName, e.Id));
+                        stateCodeValue = Convert.ToInt32(statecode);
                     }
-                });
 
+                    if (stateCodeValue != 0)
+                    {
+                        // The entity record was not found, return a CRM-ish update error message
+                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{e.LogicalName} with Id {e.Id} can't be updated because it is in inactive status. Please use SetStateRequest to activate the record first.");
+                    }
+                }
+
+                if (this.UsePipelineSimulation)
+                {
+                    ExecutePipelineStage("Update", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);
+                }
+
+                // Add as many attributes to the entity as the ones received (this will keep existing ones)
+                var cachedEntity = Data[e.LogicalName][e.Id];
+                foreach (var sAttributeName in e.Attributes.Keys.ToList())
+                {
+                    cachedEntity[sAttributeName] = e[sAttributeName];
+                }
+
+                // Update ModifiedOn
+                cachedEntity["modifiedon"] = DateTime.UtcNow;
+                cachedEntity["modifiedby"] = CallerId;
+
+                if (this.UsePipelineSimulation)
+                {
+                    ExecutePipelineStage("Update", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, e);
+
+                    var clone = e.Clone(e.GetType());
+                    ExecutePipelineStage("Update", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous, clone);
+                }
+            }
+            else
+            {
+                // The entity record was not found, return a CRM-ish update error message
+                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{e.LogicalName} with Id {e.Id} Does Not Exist");
+            }
         }
 
         /// <summary>
@@ -155,52 +187,53 @@ namespace FakeXrmEasy
                         throw new InvalidOperationException("The id must not be empty.");
                     }
 
-                    // Don't fail with invalid operation exception, if no record of this entity exists, but entity is known
-                    if (!context.Data.ContainsKey(entityName))
-                    {
-                        if (context.ProxyTypesAssembly == null)
-                        {
-                            throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.", entityName));
-                        }
+                    var entityReference = new EntityReference(entityName, id);
 
-                        if (!context.ProxyTypesAssembly.GetTypes().Any(type => context.FindReflectedType(entityName) != null))
-                        {
-                            throw new InvalidOperationException(string.Format("The entity logical name {0} is not valid.", entityName));
-                        }
-                    }
-
-                    //Entity logical name exists, so , check if the requested entity exists
-                    if (context.Data.ContainsKey(entityName) && context.Data[entityName] != null && context.Data[entityName].ContainsKey(id))
-                    {
-                        //Entity found => return only the subset of columns specified or all of them
-                        context.Data[entityName].Remove(id);
-                    }
-                    else
-                    {
-                        //Entity not found in the context => throw not found exception
-                        //The entity record was not found, return a CRM-ish update error message
-                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(),
-                            string.Format("{0} with Id {1} Does Not Exist", entityName, id));
-                    }
+                    context.DeleteEntity(entityReference);
                 });
         }
 
-        //protected static void FakeEnableProxyTypes(XrmFakedContext context, OrganizationServiceProxy fakedService)
-        //{
-        //    A.CallTo(() => fakedService.EnableProxyTypes(A<Assembly>._))
-        //        .Invokes((Assembly a) =>
-        //        {
-        //            context.ProxyTypesAssembly = a;
-        //        });
+        protected void DeleteEntity(EntityReference er)
+        {
+            // Don't fail with invalid operation exception, if no record of this entity exists, but entity is known
+            if (!this.Data.ContainsKey(er.LogicalName))
+            {
+                if (this.ProxyTypesAssembly == null)
+                {
+                    throw new InvalidOperationException($"The entity logical name {er.LogicalName} is not valid.");
+                }
 
-        //    A.CallTo(() => fakedService.EnableProxyTypes())
-        //        .Invokes(() =>
-        //        {
-        //            //Do nothing, we implicitily allow proxy types
+                if (!this.ProxyTypesAssembly.GetTypes().Any(type => this.FindReflectedType(er.LogicalName) != null))
+                {
+                    throw new InvalidOperationException($"The entity logical name {er.LogicalName} is not valid.");
+                }
+            }
 
-        //        });
+            // Entity logical name exists, so , check if the requested entity exists
+            if (this.Data.ContainsKey(er.LogicalName) && this.Data[er.LogicalName] != null &&
+                this.Data[er.LogicalName].ContainsKey(er.Id))
+            {
+                if (this.UsePipelineSimulation)
+                {
+                    ExecutePipelineStage("Delete", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, er);
+                }
 
-        //}
+                // Entity found => return only the subset of columns specified or all of them
+                this.Data[er.LogicalName].Remove(er.Id);
+
+                if (this.UsePipelineSimulation)
+                {
+                    ExecutePipelineStage("Delete", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, er);
+                    ExecutePipelineStage("Delete", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous, er);
+                }
+            }
+            else
+            {
+                // Entity not found in the context => throw not found exception
+                // The entity record was not found, return a CRM-ish update error message
+                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{er.LogicalName} with Id {er.Id} Does Not Exist");
+            }
+        }
         #endregion
 
         #region Other protected methods
@@ -210,13 +243,14 @@ namespace FakeXrmEasy
             {
                 return;
             }
-            //Entity metadata is checked differently when we are using a ProxyTypesAssembly => we can infer that from the generated types assembly
+
+            // Entity metadata is checked differently when we are using a ProxyTypesAssembly => we can infer that from the generated types assembly
             if (ProxyTypesAssembly != null)
             {
                 var subClassType = FindReflectedType(sEntityName);
                 if (subClassType == null)
                 {
-                    throw new Exception(string.Format("Entity {0} does not exist in the metadata cache", sEntityName));
+                    throw new Exception($"Entity {sEntityName} does not exist in the metadata cache");
                 }
             }
             //else if (!Data.ContainsKey(sEntityName))
@@ -228,11 +262,15 @@ namespace FakeXrmEasy
 
         protected void AddEntityDefaultAttributes(Entity e)
         {
-            //Add createdon, modifiedon, createdby, modifiedby properties
+            // Add createdon, modifiedon, createdby, modifiedby properties
             if (CallerId == null)
-                CallerId = new EntityReference("systemuser", Guid.NewGuid()); //Create a new instance by default
+            {
+                CallerId = new EntityReference("systemuser", Guid.NewGuid()); // Create a new instance by default
+            }
 
-            EntityInitializerService.Initialize(e, CallerId.Id);
+            var isManyToManyRelationshipEntity = e.LogicalName != null && this.Relationships.ContainsKey(e.LogicalName);
+
+            EntityInitializerService.Initialize(e, CallerId.Id, this, isManyToManyRelationshipEntity);
         }
 
         protected void ValidateEntity(Entity e)
@@ -242,7 +280,7 @@ namespace FakeXrmEasy
                 throw new InvalidOperationException("The entity must not be null");
             }
 
-            //Validate the entity
+            // Validate the entity
             if (string.IsNullOrWhiteSpace(e.LogicalName))
             {
                 throw new InvalidOperationException("The LogicalName property must not be empty");
@@ -263,11 +301,11 @@ namespace FakeXrmEasy
 
             if (e.Id == Guid.Empty)
             {
-                e.Id = Guid.NewGuid(); //Add default guid if none present
+                e.Id = Guid.NewGuid(); // Add default guid if none present
             }
 
-            //Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
-            var primaryKeyAttribute = string.Format("{0}id", e.LogicalName);
+            // Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
+            var primaryKeyAttribute = $"{e.LogicalName}id";
             if (!e.Attributes.ContainsKey(primaryKeyAttribute))
             {
                 e[primaryKeyAttribute] = e.Id;
@@ -275,20 +313,26 @@ namespace FakeXrmEasy
 
             ValidateEntity(e);
 
-            //Create specific validations
+            // Create specific validations
             if (e.Id != Guid.Empty && Data.ContainsKey(e.LogicalName) &&
                 Data[e.LogicalName].ContainsKey(e.Id))
             {
-                throw new InvalidOperationException(string.Format("There is already a record of entity {0} with id {1}, can't create with this Id.", e.LogicalName, e.Id));
+                throw new InvalidOperationException($"There is already a record of entity {e.LogicalName} with id {e.Id}, can't create with this Id.");
             }
 
-            AddEntityWithDefaults(e);
+            // Create specific validations
+            if (e.Attributes.ContainsKey("statecode"))
+            {
+                throw new InvalidOperationException($"When creating an entity with logical name '{e.LogicalName}', or any other entity, it is not possible to create records with the statecode property. Statecode must be set after creation.");
+            }
+
+            AddEntityWithDefaults(e, this.UsePipelineSimulation);
 
             if (e.RelatedEntities.Count > 0)
             {
                 foreach (var relationshipSet in e.RelatedEntities)
                 {
-                    Relationship relationship = relationshipSet.Key;
+                    var relationship = relationshipSet.Key;
                     foreach (var relatedEntity in relationshipSet.Value.Entities)
                     {
                         CreateEntity(relatedEntity);
@@ -297,25 +341,41 @@ namespace FakeXrmEasy
                     if (FakeMessageExecutors.ContainsKey(typeof(AssociateRequest)))
                     {
                         var entityReferenceCollection = new EntityReferenceCollection(relationshipSet.Value.Entities.Select(en => en.ToEntityReference()).ToList());
-                        var request = new AssociateRequest()
+                        var request = new AssociateRequest
                         {
-                            Target = new EntityReference() { Id = e.Id, LogicalName = e.LogicalName },
+                            Target = e.ToEntityReference(),
                             Relationship = relationship,
                             RelatedEntities = entityReferenceCollection
                         };
                         FakeMessageExecutors[typeof(AssociateRequest)].Execute(request, this);
                     }
                     else
+                    {
                         throw PullRequestException.NotImplementedOrganizationRequest(typeof(AssociateRequest));
+                    }
                 }
             }
         }
 
-        protected internal void AddEntityWithDefaults(Entity e)
+        protected internal void AddEntityWithDefaults(Entity e, bool usePluginPipeline = false)
         {
+            // Create the entity with defaults
+            AddEntityDefaultAttributes(e);
+
+            if (usePluginPipeline)
+            {
+                ExecutePipelineStage("Create", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);
+                ExecutePipelineStage("Create", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, e);
+            }
+
+            // Store
             var clone = e.Clone(e.GetType());
-            AddEntityDefaultAttributes(clone);
             AddEntity(clone);
+
+            if (usePluginPipeline)
+            {
+                ExecutePipelineStage("Create", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous, e);
+            }
         }
 
         protected internal void AddEntity(Entity e)
@@ -344,10 +404,9 @@ namespace FakeXrmEasy
                 Data[e.LogicalName].Add(e.Id, e);
             }
 
-
             //Update metadata for that entity
-            if (!AttributeMetadata.ContainsKey(e.LogicalName))
-                AttributeMetadata.Add(e.LogicalName, new Dictionary<string, string>());
+            if (!AttributeMetadataNames.ContainsKey(e.LogicalName))
+                AttributeMetadataNames.Add(e.LogicalName, new Dictionary<string, string>());
 
             //Update attribute metadata
             if (ProxyTypesAssembly != null)
@@ -359,8 +418,8 @@ namespace FakeXrmEasy
                     var props = type.GetProperties();
                     foreach (var p in props)
                     {
-                        if (!AttributeMetadata[e.LogicalName].ContainsKey(p.Name))
-                            AttributeMetadata[e.LogicalName].Add(p.Name, p.Name);
+                        if (!AttributeMetadataNames[e.LogicalName].ContainsKey(p.Name))
+                            AttributeMetadataNames[e.LogicalName].Add(p.Name, p.Name);
                     }
                 }
                 else
@@ -373,8 +432,8 @@ namespace FakeXrmEasy
                 //if the entity has the attribute in the dictionary
                 foreach (var attKey in e.Attributes.Keys)
                 {
-                    if (!AttributeMetadata[e.LogicalName].ContainsKey(attKey))
-                        AttributeMetadata[e.LogicalName].Add(attKey, attKey);
+                    if (!AttributeMetadataNames[e.LogicalName].ContainsKey(attKey))
+                        AttributeMetadataNames[e.LogicalName].Add(attKey, attKey);
                 }
             }
 
@@ -383,6 +442,12 @@ namespace FakeXrmEasy
 
         protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
         {
+            var relationships = this.Relationships.Values.Where(value => new[] { value.Entity1LogicalName, value.Entity2LogicalName, value.IntersectEntity }.Contains(sEntityName, StringComparer.InvariantCultureIgnoreCase)).ToArray();
+            if (relationships.Any(e => e.Entity1Attribute == sAttributeName || e.Entity2Attribute == sAttributeName))
+            {
+                return true;
+            }
+
             //Early bound types
             if (ProxyTypesAssembly != null)
             {
@@ -406,6 +471,5 @@ namespace FakeXrmEasy
             return true;
         }
         #endregion
-
     }
 }

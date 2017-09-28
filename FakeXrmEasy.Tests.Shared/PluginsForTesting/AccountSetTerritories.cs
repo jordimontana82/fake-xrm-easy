@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FakeXrmEasy.Tests.PluginsForTesting
 {
@@ -9,8 +7,6 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
     {
         //public AccountSetTerritories()
         //{
-
-
         //}
 
         public AccountSetTerritories(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
@@ -28,8 +24,6 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
                     localContext.Trace("Error: Context Depth is over 1. Quit the Plug-in process.");
                     return;
                 }
-
-
             }
         }
     }

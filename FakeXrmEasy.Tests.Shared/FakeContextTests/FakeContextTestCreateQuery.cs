@@ -1,21 +1,16 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
+﻿using Crm;
 using FakeItEasy;
-using FakeXrmEasy;
-using Microsoft.Xrm.Sdk.Query;
-
-using System.Collections.Generic;
 using Microsoft.Xrm.Sdk;
-using Crm;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Xunit;
 
 namespace FakeXrmEasy.Tests
 {
     public class FakeContextTestCreateQuery
     {
-
         [Fact]
         public void After_querying_the_context_with_an_invalid_entity_name_exception_is_thrown()
         {
@@ -31,7 +26,8 @@ namespace FakeXrmEasy.Tests
 
             context.Initialize(data);
 
-            Assert.Throws<Exception>(() => {
+            Assert.Throws<Exception>(() =>
+            {
                 var query = (from c in context.CreateQuery("    ")
                              select c);
             });
@@ -51,13 +47,12 @@ namespace FakeXrmEasy.Tests
             }.AsQueryable();
 
             context.Initialize(data);
-            
+
             //Find the contact
             var contact = (from c in context.CreateQuery<Contact>()
                            where c.ContactId == guid
                            select c).FirstOrDefault();
 
-            
             Assert.False(contact == null);
             Assert.Equal(guid, contact.Id);
         }
@@ -65,7 +60,6 @@ namespace FakeXrmEasy.Tests
         [Fact]
         public void Querying_an_early_bound_entity_not_present_in_the_context_should_return_no_records()
         {
-
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
 

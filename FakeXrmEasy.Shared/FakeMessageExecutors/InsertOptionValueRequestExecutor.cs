@@ -2,8 +2,6 @@
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -18,15 +16,15 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             var req = request as InsertOptionValueRequest;
 
-            if(req.Label == null)
+            if (req.Label == null)
                 throw new Exception("Label must not be null");
 
             if (string.IsNullOrWhiteSpace(req.Label.LocalizedLabels[0].Label))
             {
                 throw new Exception("Label must not be empty");
             }
-            
-            if(string.IsNullOrEmpty(req.OptionSetName)
+
+            if (string.IsNullOrEmpty(req.OptionSetName)
                 && (string.IsNullOrEmpty(req.EntityLogicalName)
                 || string.IsNullOrEmpty(req.AttributeLogicalName)))
             {
@@ -49,7 +47,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 Value = req.Value,
                 Label = req.Label
             });
-
 
             return new InsertOptionValueResponse();
         }

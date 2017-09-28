@@ -1,12 +1,4 @@
-﻿using System;
-
-using Xunit;
-using FakeItEasy;
-using FakeXrmEasy;
-
-using System.Collections.Generic;
-using Microsoft.Xrm.Sdk;
-using System.Linq;
+﻿using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests
 {
@@ -27,4 +19,3 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         }
     }
 }
-

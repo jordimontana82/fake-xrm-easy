@@ -194,3 +194,6 @@ tools/
 nuget/
 test/
 build/
+
+#Visual Studio
+.vs/

@@ -1,7 +1,5 @@
 ﻿using Microsoft.Crm.Sdk.Messages;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.PublishXml
@@ -33,7 +31,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PublishXml
                 ParameterXml = "<somexml></somexml>"
             };
 
-            Assert.DoesNotThrow(() => service.Execute(req));
+            var ex = Record.Exception(() => service.Execute(req));
+            Assert.Null(ex);
         }
     }
 }

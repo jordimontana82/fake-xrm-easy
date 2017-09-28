@@ -4,7 +4,6 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
@@ -54,7 +53,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         {
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' aggregate='true'>
                               <entity name='contact'>
-                                    <attribute name='lastname' alias='count' aggregate='countcolumn' distinct='true'/>                                    
+                                    <attribute name='lastname' alias='count' aggregate='countcolumn' distinct='true'/>
                                   </entity>
                             </fetch>";
             var ctx = new XrmFakedContext();
@@ -77,13 +76,12 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(3, ent.GetAttributeValue<AliasedValue>("count")?.Value);
         }
 
-
         [Fact]
         public void FetchXml_Aggregate_Sum_Int()
         {
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' aggregate='true'>
                               <entity name='contact'>
-                                    <attribute name='numberofchildren' alias='sum' aggregate='sum'/>                                    
+                                    <attribute name='numberofchildren' alias='sum' aggregate='sum'/>
                                   </entity>
                             </fetch>";
             var ctx = new XrmFakedContext();
@@ -107,7 +105,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         {
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' aggregate='true'>
                               <entity name='salesorderdetail'>
-                                    <attribute name='priceperunit' alias='sum' aggregate='sum'/>                                    
+                                    <attribute name='priceperunit' alias='sum' aggregate='sum'/>
                                   </entity>
                             </fetch>";
             var ctx = new XrmFakedContext();
@@ -127,8 +125,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(200m, (ent.GetAttributeValue<AliasedValue>("sum")?.Value as Money)?.Value);
         }
 
-
-        Contact[] BirthdateContacts = new[]
+        private Contact[] BirthdateContacts = new[]
         {
                 new Contact() { Id = Guid.NewGuid(), BirthDate = new DateTime(1980, 1, 1), NumberOfChildren = 1 },
                 new Contact() { Id = Guid.NewGuid(), BirthDate = new DateTime(1980, 2, 1), NumberOfChildren = 2 },
@@ -235,9 +232,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' aggregate='true'>
                               <entity name='contact'>
                                     <attribute name='contactid' alias='count' aggregate='count' />
-                                    <attribute name='birthdate' alias='month' groupby='true' dategrouping='month'  /> 
-                                    <order alias='month' />     
-                               </entity>      
+                                    <attribute name='birthdate' alias='month' groupby='true' dategrouping='month'  />
+                                    <order alias='month' />
+                               </entity>
                             </fetch>";
 
             var ctx = new XrmFakedContext();
@@ -253,10 +250,10 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         {
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' aggregate='true'>
                               <entity name='contact'>
-                                    <attribute name='contactid' alias='count' aggregate='count' />                                    
-                                    <attribute name='birthdate' alias='month' groupby='true' dategrouping='month'  /> 
-                                    <order alias='month' descending='true' />  
-                               </entity>      
+                                    <attribute name='contactid' alias='count' aggregate='count' />
+                                    <attribute name='birthdate' alias='month' groupby='true' dategrouping='month'  />
+                                    <order alias='month' descending='true' />
+                               </entity>
                             </fetch>";
 
             var ctx = new XrmFakedContext();
@@ -272,10 +269,10 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         {
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' aggregate='true'>
                               <entity name='contact'>
-                                    <attribute name='contactid' alias='count' aggregate='count' />                                    
-                                    <attribute name='birthdate' alias='month' groupby='true' dategrouping='month'  /> 
-                                    <order alias='count' />  
-                               </entity>      
+                                    <attribute name='contactid' alias='count' aggregate='count' />
+                                    <attribute name='birthdate' alias='month' groupby='true' dategrouping='month'  />
+                                    <order alias='count' />
+                               </entity>
                             </fetch>";
 
             var ctx = new XrmFakedContext();
@@ -289,13 +286,12 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         [Fact]
         public void FetchXml_Aggregate_NoRows_NoGroups_Count()
         {
-
             // When there are no groupings and no matching rows, a count should return a single entity with the count alias set to 0
 
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' aggregate='true'>
                               <entity name='contact'>
-                                    <attribute name='contactid' alias='count.contacts' aggregate='count' />      
-                               </entity>      
+                                    <attribute name='contactid' alias='count.contacts' aggregate='count' />
+                               </entity>
                             </fetch>";
 
             var ctx = new XrmFakedContext();
@@ -308,18 +304,17 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         [Fact]
         public void FetchXml_Aggregate_NoRows_NoGroups_Sum()
         {
-
             // When there are no groupings and no matching rows, a sum returns a single entity, with no attributes set
 
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' aggregate='true'>
                               <entity name='contact'>
-                                    <attribute name='numberofchildren' alias='sum' aggregate='sum' />      
-                               </entity>      
+                                    <attribute name='numberofchildren' alias='sum' aggregate='sum' />
+                               </entity>
                             </fetch>";
 
             var ctx = new XrmFakedContext();
             var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
-            
+
             Assert.Equal(1, collection.Entities.Count);
             Assert.Equal(1, collection.Entities.First().Attributes.Count);
             Assert.True(collection.Entities.First().Contains("sum"));
@@ -328,13 +323,12 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         [Fact]
         public void FetchXml_Aggregate_NoRows_NoGroups_Avg()
         {
-
             // When there are no groupings and no matching rows, an avg returns a single entity, with no attributes set
 
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' aggregate='true'>
                               <entity name='contact'>
-                                    <attribute name='numberofchildren' alias='avg' aggregate='avg' />      
-                               </entity>      
+                                    <attribute name='numberofchildren' alias='avg' aggregate='avg' />
+                               </entity>
                             </fetch>";
 
             var ctx = new XrmFakedContext();
@@ -376,10 +370,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             EntityCollection collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
-
             Assert.Equal(1, collection.Entities.Count);
         }
-
-
     }
 }

@@ -45,8 +45,8 @@ let nugetDeployDir          = @"[Enter_NuGet_Url]"
 let packagesDir             = @".\packages\"
 
 let nuGetCommandLine           = @".\tools\nuget\nuget286.exe"
-let mutable previousVersion = "1.29.0"
-let mutable version         = "1.29.1" //Copy this into previousVersion before publishing packages...
+let mutable previousVersion = "1.35.3"
+let mutable version         = "1.36.1" //Copy this into previousVersion before publishing packages...
 let mutable build           = buildVersion
 let mutable nugetVersion    = version
 let mutable asmVersion      = version
@@ -322,7 +322,7 @@ Target "CodeCoverage.2013" (fun _ ->
 
 Target "CodeCoverage.2015" (fun _ ->
     OpenCover (fun p -> { p with 
-                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.2.0/tools/xunit.console.exe"
                                 ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
                                 Register = RegisterType.RegisterUser
                                 WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.2015")
@@ -334,7 +334,7 @@ Target "CodeCoverage.2015" (fun _ ->
 
 Target "CodeCoverage.2016" (fun _ ->
     OpenCover (fun p -> { p with 
-                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.2.0/tools/xunit.console.exe"
                                 ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
                                 Register = RegisterType.RegisterUser
                                 WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.2016")
@@ -346,7 +346,7 @@ Target "CodeCoverage.2016" (fun _ ->
 
 Target "CodeCoverage.365" (fun _ ->
     OpenCover (fun p -> { p with 
-                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.2.0/tools/xunit.console.exe"
                                 ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
                                 Register = RegisterType.RegisterUser
                                 WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.365")

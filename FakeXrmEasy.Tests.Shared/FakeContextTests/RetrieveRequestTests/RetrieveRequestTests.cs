@@ -6,7 +6,6 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests
@@ -927,7 +926,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             //check relationship
             Assert.NotNull(resultAccount.accountleads_association);
-            //The 
+            //The
             Assert.Equal(20, resultAccount.accountleads_association.Count());
         }
 
@@ -954,7 +953,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             A.CallTo(() => fakedService.Retrieve(A<string>.Ignored, A<Guid>.Ignored, A<ColumnSet>.Ignored))
                 .Returns<Entity>(new Entity());
-            
+
             var request = new RetrieveRequest
             {
                 Target = new EntityReference(Account.EntityLogicalName, Guid.NewGuid()),

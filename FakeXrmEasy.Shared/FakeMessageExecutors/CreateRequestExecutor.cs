@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using System;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -17,7 +15,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             var createRequest = (CreateRequest)request;
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var guid = service.Create(createRequest.Target);
 

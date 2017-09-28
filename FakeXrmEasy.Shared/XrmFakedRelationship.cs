@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace FakeXrmEasy
+﻿namespace FakeXrmEasy
 {
     public class XrmFakedRelationship
     {
-
         /// <summary>
         /// Schema name of the many to many intersect entity
         /// </summary>
         public string IntersectEntity { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// Entity name and attribute of the first entity participating in the relationship
         /// </summary>
         public string Entity1Attribute { get; set; }
@@ -27,7 +21,8 @@ namespace FakeXrmEasy
         /// </summary>
         public string Entity2Attribute { get; set; }
 
-        public XrmFakedRelationship() {
+        public XrmFakedRelationship()
+        {
             RelationshipType = enmFakeRelationshipType.ManyToMany;
         }
 
@@ -48,14 +43,14 @@ namespace FakeXrmEasy
         /// <param name="entity1LogicalName"></param>
         /// <param name="entity2LogicalName"></param>
         public XrmFakedRelationship(string entityName, string entity1Attribute, string entity2Attribute, string entity1LogicalName, string entity2LogicalName)
-		{
-			IntersectEntity = entityName;
+        {
+            IntersectEntity = entityName;
             Entity1Attribute = entity1Attribute;
             Entity2Attribute = entity2Attribute;
-		    Entity1LogicalName = entity1LogicalName;
-		    Entity2LogicalName = entity2LogicalName;
+            Entity1LogicalName = entity1LogicalName;
+            Entity2LogicalName = entity2LogicalName;
             RelationshipType = enmFakeRelationshipType.ManyToMany;
-		}
+        }
 
         public XrmFakedRelationship(string entity1Attribute, string entity2Attribute, string entity1LogicalName, string entity2LogicalName)
         {

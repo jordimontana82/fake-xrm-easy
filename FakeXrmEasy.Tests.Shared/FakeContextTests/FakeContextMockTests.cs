@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using FakeXrmEasy.FakeMessageExecutors;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Xrm.Sdk.Query;
+using System;
 using Xunit;
-using FakeXrmEasy.FakeMessageExecutors;
 
 namespace FakeXrmEasy.Tests.FakeContextTests
 {
@@ -30,7 +26,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             context.ExecutePluginWith<CustomMockPlugin>(inputs, new ParameterCollection(), new EntityImageCollection(), new EntityImageCollection());
 
             Assert.Equal("Successful", (string)e["response"]);
-            Assert.DoesNotThrow(() => context.RemoveExecutionMock<RetrieveEntityRequest>());
+            var ex = Record.Exception(() => context.RemoveExecutionMock<RetrieveEntityRequest>());
+            Assert.Null(ex);
         }
 
         public OrganizationResponse RetrieveEntityMock(OrganizationRequest req)
@@ -42,7 +39,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         {
             return new RetrieveEntityResponse { ResponseName = "Another" };
         }
-
 
         [Fact]
         public void Should_Override_Execution_Mock()
@@ -63,7 +59,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             context.ExecutePluginWith<CustomMockPlugin>(inputs, new ParameterCollection(), new EntityImageCollection(), new EntityImageCollection());
 
             Assert.Equal("Another", (string)e["response"]);
-            Assert.DoesNotThrow(() => context.RemoveExecutionMock<RetrieveEntityRequest>());
+            var ex = Record.Exception(() => context.RemoveExecutionMock<RetrieveEntityRequest>());
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -84,7 +81,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             context.ExecutePluginWith<CustomMockPlugin>(inputs, new ParameterCollection(), new EntityImageCollection(), new EntityImageCollection());
 
             Assert.Equal("Successful", (string)e["response"]);
-            Assert.DoesNotThrow(() => context.RemoveFakeMessageExecutor<RetrieveEntityRequest>());
+            var ex = Record.Exception(() => context.RemoveFakeMessageExecutor<RetrieveEntityRequest>());
+            Assert.Null(ex);
         }
 
         protected class FakeRetrieveEntityRequestExecutor : IFakeMessageExecutor

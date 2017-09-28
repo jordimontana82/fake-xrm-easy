@@ -4,17 +4,16 @@ using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using Xunit;
 using System.Linq;
+using System.Reflection;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 {
     /// <summary>
     /// This will test that a fetchxml is correctly translated into a QueryExpression
     /// which was already tested
-    /// 
+    ///
     /// We'll leave FetchXml aggregations for a later version
     /// </summary>
     public class FakeContextTestFetchXmlTranslation
@@ -32,7 +31,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         {
             var ctx = new XrmFakedContext();
 
-            Assert.DoesNotThrow(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'></entity></fetch>"));
+            var ex = Record.Exception(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'></entity></fetch>"));
+            Assert.Null(ex);
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<attribute></attribute>"));
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<entity></entity>"));
         }
@@ -43,7 +43,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ctx = new XrmFakedContext();
 
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity></entity></fetch>"));
-            Assert.DoesNotThrow(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'></entity></fetch>"));
+            var ex = Record.Exception(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'></entity></fetch>"));
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -52,7 +53,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ctx = new XrmFakedContext();
 
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'><attribute></attribute></entity></fetch>"));
-            Assert.DoesNotThrow(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'><attribute name='firstname'></attribute></entity></fetch>"));
+            var ex = Record.Exception(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'><attribute name='firstname'></attribute></entity></fetch>"));
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -65,7 +67,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'><order></order></entity></fetch>"));
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'><order descending=''></order></entity></fetch>"));
-            Assert.DoesNotThrow(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'><order attribute='firstname' descending='true'></order></entity></fetch>"));
+            var ex = Record.Exception(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<fetch><entity name='contact'><order attribute='firstname' descending='true'></order></entity></fetch>"));
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -74,7 +77,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ctx = new XrmFakedContext();
             Assert.Throws<Exception>(() => XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, "<thisdoesntexist></thisdoesntexist>"));
         }
-        
+
         [Fact]
         public void When_translating_a_fetch_xml_expression_queryexpression_name_matches_entity_node()
         {
@@ -192,8 +195,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal("telephone1", query.Orders[1].AttributeName);
             Assert.Equal(OrderType.Ascending, query.Orders[1].OrderType);
         }
-
-        
 
         [Fact]
         public void When_translating_a_fetch_xml_filter_default_operator_is_and()
@@ -315,7 +316,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                     </fetch>
                     ";
 
-
             var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
 
             Assert.True(query.LinkEntities != null);
@@ -347,7 +347,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                     </fetch>
                     ";
 
-
             var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
 
             Assert.True(query.LinkEntities != null);
@@ -375,7 +374,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                       </entity>
                     </fetch>
                     ";
-
 
             var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
 
@@ -412,7 +410,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                     </fetch>
                     ";
 
-
             var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
 
             Assert.True(query.LinkEntities != null);
@@ -422,7 +419,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(1, query.LinkEntities[0].LinkCriteria.Conditions.Count);
             Assert.Equal(2, query.LinkEntities[0].LinkCriteria.Filters[0].Conditions.Count);
         }
-
 
         [Fact]
         public void When_executing_fetchxml_right_result_is_returned()
@@ -453,7 +449,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                                   </entity>
                             </fetch>";
 
-
             var retrieveMultiple = new RetrieveMultipleRequest()
             {
                 Query = new FetchExpression(fetchXml)
@@ -467,7 +462,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             //Executing the same via ExecuteMultiple returns also the same
             var response2 = service.RetrieveMultiple(retrieveMultiple.Query);
             Assert.Equal(2, response2.Entities.Count);
-
         }
 
         [Fact]
@@ -479,7 +473,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             //Arrange
             var contactList = new List<Entity>();
-            for(var i=0; i < 20; i++)
+            for (var i = 0; i < 20; i++)
             {
                 contactList.Add(new Contact() { Id = Guid.NewGuid() });
             }
@@ -490,10 +484,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                               <entity name='contact'>
                                     <attribute name='fullname' />
                                     <attribute name='telephone1' />
-                                    <attribute name='contactid' /> 
+                                    <attribute name='contactid' />
                                   </entity>
                             </fetch>";
-
 
             var retrieveMultiple = new RetrieveMultipleRequest()
             {
@@ -519,10 +512,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                               <entity name='contact'>
                                     <attribute name='fullname' />
                                     <attribute name='telephone1' />
-                                    <attribute name='contactid' /> 
+                                    <attribute name='contactid' />
                                   </entity>
                             </fetch>";
-
 
             var retrieveMultiple = new RetrieveMultipleRequest()
             {
@@ -709,27 +701,25 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                 Title = "Unit Test Case"
             };
 
-            entityCase["statecode"] = new OptionSetValue((int) IncidentState.Active);
+            entityCase["statecode"] = new OptionSetValue((int)IncidentState.Active);
 
             fakedContext.Initialize(new List<Entity>() {
                entityAccount,entityContact, entityCase
             });
 
-
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' >
               <entity name='incident' >
                 <attribute name='incidentid' />
-                <attribute name='statecode' /> 
-                <order attribute='createdon' descending='true' /> 
-                 <filter type='and' > 
-                  <condition attribute='statecode' operator='neq' value='2' /> 
+                <attribute name='statecode' />
+                <order attribute='createdon' descending='true' />
+                 <filter type='and' >
+                  <condition attribute='statecode' operator='neq' value='2' />
                 </filter>
               </entity>
             </fetch>";
 
             var rows = fakedContext.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
             Assert.Equal(rows.Entities.Count, 1);
-
         }
 
         [Fact]
@@ -787,7 +777,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                entityBusinessUnit,entityAccount,entityContact,initiatingUser
             });
 
-
             var fetchXml = @"
                     <fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
                       <entity name='systemuser'>
@@ -814,7 +803,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal("TestBU", (entities[0]["bu.name"] as AliasedValue).Value.ToString());
         }
 
-
         [Fact]
         public void When_querying_fetchxml_with_linked_entities_linked_entity_properties_match_the_equivalent_linq_expression()
         {
@@ -835,7 +823,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             context.Initialize(new List<Entity>
             {
-                contact, account    
+                contact, account
             });
 
             var fetchXml = @"
@@ -856,9 +844,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                     </fetch>
                 ";
 
-
             //Equivalent linq query
-            using(var ctx = new XrmServiceContext(service))
+            using (var ctx = new XrmServiceContext(service))
             {
                 var linqQuery = (from a in ctx.CreateQuery<Account>()
                                  join c in ctx.CreateQuery<Contact>() on a.PrimaryContactId.Id equals c.ContactId
@@ -868,7 +855,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                                      Account = a,
                                      Contact = c
                                  }).ToList();
-
             }
 
             var queryExpression = XrmFakedContext.TranslateFetchXmlToQueryExpression(context, fetchXml);
@@ -878,7 +864,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(linkedEntity.LinkFromAttributeName, "primarycontactid");
             Assert.Equal(linkedEntity.LinkToAttributeName, "contactid");
             Assert.Equal(linkedEntity.JoinOperator, JoinOperator.Inner);
-
 
             var request = new RetrieveMultipleRequest { Query = new FetchExpression(fetchXml) };
             var response = ((RetrieveMultipleResponse)service.Execute(request));
@@ -902,8 +887,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                 FirstName = "Lionel"
             };
 
-            var account = new Account() {  Id = Guid.NewGuid(),  PrimaryContactId = contact.ToEntityReference() };
-            var account2 = new Account()  { Id = Guid.NewGuid(), PrimaryContactId = null };
+            var account = new Account() { Id = Guid.NewGuid(), PrimaryContactId = contact.ToEntityReference() };
+            var account2 = new Account() { Id = Guid.NewGuid(), PrimaryContactId = null };
 
             context.Initialize(new List<Entity>
             {

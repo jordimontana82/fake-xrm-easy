@@ -1,10 +1,7 @@
 ﻿using FakeXrmEasy.FakeMessageExecutors;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
-using System;
-using System.Collections.Generic;
 using System.ServiceModel;
-using System.Text;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.DeleteRequestTests

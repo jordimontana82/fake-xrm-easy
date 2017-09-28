@@ -1,18 +1,14 @@
 ﻿using Crm;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
-using System.Linq;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Linq;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.OrgServiceContextTests
 {
     public class OrgServiceContextTests
     {
-
         [Fact]
         public void When_calling_context_add_and_save_changes_entity_is_added_to_the_faked_context()
         {
@@ -83,7 +79,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.OrgServiceContextTests
 
                 Assert.NotNull(resultaccount);
                 Assert.Equal("Test account", resultaccount.Name);
-                
+
                 var reaultlead = ctx.CreateQuery<Lead>()
                                     .ToList()
                                     .FirstOrDefault();

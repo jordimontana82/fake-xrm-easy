@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xrm.Sdk;
 using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
+using System;
 using System.ServiceModel;
 
 namespace FakeXrmEasy.FakeMessageExecutors
@@ -16,7 +14,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
         public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
         {
-			var addToQueueRequest = (AddToQueueRequest)request;            
+            var addToQueueRequest = (AddToQueueRequest)request;
 
             var target = addToQueueRequest.Target;
             var destinationQueueId = addToQueueRequest.DestinationQueueId;
@@ -31,22 +29,22 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "Can not add to queue without destination queue");
             }
 
-            var service = ctx.GetOrganizationService();			
-			
+            var service = ctx.GetOrganizationService();
+
             var createQueueItem = new Entity
             {
                 LogicalName = "queueitem",
                 Attributes = new AttributeCollection
                 {
                     { "queueid", new EntityReference("queue", destinationQueueId) },
-					{ "objectid", target }
+                    { "objectid", target }
                 }
             };
-            
+
             var guid = service.Create(createQueueItem);
 
             return new AddToQueueResponse()
-            {   
+            {
                 ResponseName = "AddToQueue",
                 Results = new ParameterCollection { { "QueueItemId", guid } }
             };
@@ -58,4 +56,3 @@ namespace FakeXrmEasy.FakeMessageExecutors
         }
     }
 }
-

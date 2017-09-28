@@ -1,17 +1,14 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
+﻿using Crm;
 using FakeItEasy;
-using FakeXrmEasy;
-using Microsoft.Xrm.Sdk.Query;
-
-using System.Collections.Generic;
 using Microsoft.Xrm.Sdk;
-using System.ServiceModel;
-using Crm;
-using System.Reflection;
 using Microsoft.Xrm.Sdk.Client;
+using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.ServiceModel;
+using Xunit;
 
 namespace FakeXrmEasy.Tests
 {
@@ -98,7 +95,7 @@ namespace FakeXrmEasy.Tests
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
 
-            var existingAccount = new Account() { Id = Guid.NewGuid(),  Name = "Super Great Customer", AccountNumber = "69" };
+            var existingAccount = new Account() { Id = Guid.NewGuid(), Name = "Super Great Customer", AccountNumber = "69" };
             context.Initialize(new List<Entity>()
             {
                 existingAccount
@@ -169,7 +166,7 @@ namespace FakeXrmEasy.Tests
                 ctx.UpdateObject(existingAccount);
                 ctx.SaveChanges();
             }
-            
+
             //Make other account wasn't updated
             var account = context.CreateQuery<Account>().Where(e => e.Id == existingAccount.Id).FirstOrDefault();
             Assert.Equal(account.Name, "Super Great Customer Name Updated!");
@@ -270,7 +267,6 @@ namespace FakeXrmEasy.Tests
                 firstRetrieve = ctx.CreateQuery<Account>()
                                     .Where(a => a.AccountId == entityId)
                                     .FirstOrDefault();
-
             }
 
             using (var ctx = new XrmServiceContext(service))
@@ -278,17 +274,36 @@ namespace FakeXrmEasy.Tests
                 secondRetrieve = ctx.CreateQuery<Account>()
                                     .Where(a => a.AccountId == entityId)
                                     .FirstOrDefault();
-
             }
-
 
             firstRetrieve.Name = "Updated locally";
 
             Assert.False(firstRetrieve == secondRetrieve);
             Assert.Equal("Updated locally", firstRetrieve.Name);
             Assert.Equal("Adventure Works", secondRetrieve.Name);
-            
+        }
 
+        [Fact]
+        public void Should_Raise_An_Exception_When_Updating_An_Inactive_Record()
+        {
+            var entityId = Guid.NewGuid();
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            context.Initialize(new[] {
+                new Account()
+                {
+                    Id = entityId,
+                    Attributes = new AttributeCollection
+                    {
+                        { "statecode", 1 }  //0 = Active, anything else: Inactive
+                    }
+                }
+            });
+
+            var accountToUpdate = new Account() { Id = entityId, Name = "FC Barcelona" };
+
+            Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Update(accountToUpdate));
         }
     }
 }

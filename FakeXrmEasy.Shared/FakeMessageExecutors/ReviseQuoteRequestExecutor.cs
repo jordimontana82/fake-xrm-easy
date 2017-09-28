@@ -54,7 +54,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
                 if (columnSet.AllColumns || columnSet.Columns.Contains(attribute.Key))
                 {
-                    revisedQuote[attribute.Key] = attribute.Value; 
+                    if(attribute.Key != "statecode")  //Skip statecode on create
+                        revisedQuote[attribute.Key] = attribute.Value; 
                 }
             }
 
@@ -89,8 +90,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     {
                         continue;
                     }
-
-                    revisedDetail[attribute.Key] = attribute.Value;
+                    if (attribute.Key != "statecode")  //Skip statecode on create
+                        revisedDetail[attribute.Key] = attribute.Value;
                 }
 
                 service.Create(revisedDetail);
