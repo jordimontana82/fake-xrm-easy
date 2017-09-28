@@ -118,18 +118,33 @@ namespace FakeXrmEasy
                 var originalEntity = CreateQuery(e.LogicalName).First(entity => entity.Id == e.Id);
                 if (originalEntity.Attributes.ContainsKey("statecode"))
                 {
-                    var statecode = originalEntity["statecode"];
-                    var stateCodeValue = 1;
-                    if (statecode is OptionSetValue)
+                    var originalStatecode = originalEntity["statecode"];
+                    var originalStateCodeValue = 1;
+                    if (originalStatecode is OptionSetValue)
                     {
-                        stateCodeValue = (statecode as OptionSetValue).Value;
+                        originalStateCodeValue = (originalStatecode as OptionSetValue).Value;
                     }
                     else
                     {
-                        stateCodeValue = Convert.ToInt32(statecode);
+                        originalStateCodeValue = Convert.ToInt32(originalStatecode);
                     }
 
-                    if (stateCodeValue != 0)
+                    object newStateCode = null;
+                    int newStateCodeValue = -1;
+                    if (e.Attributes.ContainsKey("statecode"))
+                    {
+                        newStateCode = e["statecode"];
+                        if (newStateCode is OptionSetValue)
+                        {
+                            newStateCodeValue = (newStateCode as OptionSetValue).Value;
+                        }
+                        else
+                        {
+                            newStateCodeValue = Convert.ToInt32(newStateCode);
+                        }
+                    }
+
+                    if (originalStateCodeValue != 0 && newStateCode != null && (int)newStateCodeValue != 0)
                     {
                         // The entity record was not found, return a CRM-ish update error message
                         throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{e.LogicalName} with Id {e.Id} can't be updated because it is in inactive status. Please use SetStateRequest to activate the record first.");
