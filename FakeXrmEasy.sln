@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy", "FakeXrmEasy\FakeXrmEasy.csproj", "{1FF34479-D38A-4B6B-86A7-B48182403437}"
 EndProject
@@ -160,6 +160,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "reports", "reports", "{2AFD
 		test\reports\FakeXrmEasy_InvoiceDetailInitializerService.htm = test\reports\FakeXrmEasy_InvoiceDetailInitializerService.htm
 		test\reports\FakeXrmEasy_InvoiceInitializerService.htm = test\reports\FakeXrmEasy_InvoiceInitializerService.htm
 		test\reports\FakeXrmEasy_LoseOpportunityRequestExecutor.htm = test\reports\FakeXrmEasy_LoseOpportunityRequestExecutor.htm
+		test\reports\FakeXrmEasy_NavigateToNextEntityOrganizationRequestExecutor.htm = test\reports\FakeXrmEasy_NavigateToNextEntityOrganizationRequestExecutor.htm
 		test\reports\FakeXrmEasy_ObjectExtensions.htm = test\reports\FakeXrmEasy_ObjectExtensions.htm
 		test\reports\FakeXrmEasy_OrganizationServiceFaultQueryBuilderNoAttributeException.htm = test\reports\FakeXrmEasy_OrganizationServiceFaultQueryBuilderNoAttributeException.htm
 		test\reports\FakeXrmEasy_PickFromQueueRequestExecutor.htm = test\reports\FakeXrmEasy_PickFromQueueRequestExecutor.htm
