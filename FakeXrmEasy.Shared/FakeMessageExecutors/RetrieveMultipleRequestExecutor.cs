@@ -23,9 +23,12 @@ namespace FakeXrmEasy.FakeMessageExecutors
             PagingInfo pageInfo = null;
             QueryExpression qe;
 
+            string entityName = null;
+
             if (request.Query is QueryExpression)
             {
                 qe = (request.Query as QueryExpression).Clone();
+                entityName = qe.EntityName;
 
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();
@@ -35,6 +38,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 var fetchXml = (request.Query as FetchExpression).Query;
                 var xmlDoc = XrmFakedContext.ParseFetchXml(fetchXml);
                 qe = XrmFakedContext.TranslateFetchXmlDocumentToQueryExpression(ctx, xmlDoc);
+                entityName = qe.EntityName;
 
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();
@@ -49,6 +53,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 //We instantiate a QueryExpression to be executed as we have the implementation done already
                 var query = request.Query as QueryByAttribute;
                 qe = new QueryExpression(query.EntityName);
+                entityName = qe.EntityName;
 
                 qe.ColumnSet = query.ColumnSet;
                 qe.Criteria = new FilterExpression();
@@ -63,6 +68,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
             else
                 throw PullRequestException.NotImplementedOrganizationRequest(request.Query.GetType());
+
 
             // Handle the top count before taking paging into account
             if (qe.TopCount != null && qe.TopCount.Value < list.Count)
@@ -110,6 +116,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                                     { "EntityCollection", new EntityCollection(recordsToReturn) }
                                  }
             };
+            response.EntityCollection.EntityName = entityName;
             response.EntityCollection.MoreRecords = (list.Count - pageSize * pageNumber) > 0;
             if (response.EntityCollection.MoreRecords)
             {
