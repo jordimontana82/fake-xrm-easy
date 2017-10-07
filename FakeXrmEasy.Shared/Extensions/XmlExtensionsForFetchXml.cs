@@ -112,6 +112,18 @@ namespace FakeXrmEasy.Extensions.FetchXml
 
         public static int? ToTopCount(this XElement el)
         {
+            var countAttr = el.GetAttribute("top");
+            if (countAttr == null) return null;
+
+            int iCount;
+            if (!int.TryParse(countAttr.Value, out iCount))
+                throw new Exception("Top attribute in fetch node must be an integer");
+
+            return iCount;
+        }
+
+        public static int? ToCount(this XElement el)
+        {
             var countAttr = el.GetAttribute("count");
             if (countAttr == null) return null;
 
@@ -150,6 +162,14 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return xlDoc.Elements()   //fetch
                     .FirstOrDefault()
                     .ToTopCount();
+        }
+
+        public static int? ToCount(this XDocument xlDoc)
+        {
+            //Check if all-attributes exist
+            return xlDoc.Elements()   //fetch
+                    .FirstOrDefault()
+                    .ToCount();
         }
 
         public static int? ToPageNumber(this XDocument xlDoc)
