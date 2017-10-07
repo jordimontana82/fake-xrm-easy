@@ -13,6 +13,9 @@ namespace FakeXrmEasy
 {
     public partial class XrmFakedContext : IXrmContext
     {
+        protected const int EntityActiveStateCode = 0;
+        protected const int EntityInactiveStateCode = 1;
+
         #region CRUD
         /// <summary>
         /// A fake retrieve method that will query the FakedContext to retrieve the specified
@@ -115,23 +118,39 @@ namespace FakeXrmEasy
             if (Data.ContainsKey(e.LogicalName) &&
                 Data[e.LogicalName].ContainsKey(e.Id))
             {
+                
                 var originalEntity = CreateQuery(e.LogicalName).First(entity => entity.Id == e.Id);
                 if (originalEntity.Attributes.ContainsKey("statecode"))
                 {
-                    var statecode = originalEntity["statecode"];
-                    var stateCodeValue = 1;
-                    if (statecode is OptionSetValue)
+                    var originalStateCode = originalEntity["statecode"];
+                    var originalStateCodeValue = EntityInactiveStateCode;
+                    if (originalStateCode is OptionSetValue)
                     {
-                        stateCodeValue = (statecode as OptionSetValue).Value;
+                        originalStateCodeValue = (originalStateCode as OptionSetValue).Value;
                     }
                     else
                     {
-                        stateCodeValue = Convert.ToInt32(statecode);
+                        originalStateCodeValue = Convert.ToInt32(originalStateCode);
                     }
 
-                    if (stateCodeValue != 0)
+
+                    object newStateCode = null;
+                    int newStateCodeValue = -1;
+                    if (e.Attributes.ContainsKey("statecode"))
                     {
-                        // The entity record was not found, return a CRM-ish update error message
+                        newStateCode = e["statecode"];
+                        if (newStateCode is OptionSetValue)
+                        {
+                            newStateCodeValue = (newStateCode as OptionSetValue).Value;
+                        }
+                        else
+                        {
+                            newStateCodeValue = Convert.ToInt32(newStateCode);
+                        }
+                    }
+
+                    if (originalStateCodeValue != EntityActiveStateCode && newStateCodeValue != EntityActiveStateCode)
+                    {
                         throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{e.LogicalName} with Id {e.Id} can't be updated because it is in inactive status. Please use SetStateRequest to activate the record first.");
                     }
                 }
