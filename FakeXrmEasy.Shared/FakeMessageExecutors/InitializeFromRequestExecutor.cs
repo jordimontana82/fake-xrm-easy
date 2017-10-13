@@ -36,11 +36,24 @@ namespace FakeXrmEasy.FakeMessageExecutors
             var columnSet = sourceAttributes.Length == 0 ? new ColumnSet(true) : new ColumnSet(sourceAttributes);
             var source = service.Retrieve(req.EntityMoniker.LogicalName, req.EntityMoniker.Id, columnSet);
 
-            var entity = new Entity
+            // If we are using proxy types, and the appropriate proxy type is found in 
+            // the assembly create an instance of the appropiate class
+            // Othersise return a simple Entity
+            Entity entity = new Entity
             {
                 LogicalName = req.TargetEntityName,
                 Id = Guid.Empty
             };
+
+            if (ctx.ProxyTypesAssembly != null)
+            {                
+                var subClassType = ctx.FindReflectedType(req.TargetEntityName);
+                if (subClassType != null)
+                {
+                    var instance = Activator.CreateInstance(subClassType);
+                    entity = (Entity) instance;                    
+                }
+            }
 
             if (mapping.Entities.Count > 0)
             {
