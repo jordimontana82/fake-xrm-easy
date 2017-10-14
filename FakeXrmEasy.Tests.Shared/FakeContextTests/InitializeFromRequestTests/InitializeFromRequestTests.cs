@@ -67,7 +67,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.InitializeFromRequestTests
             };
 
             var result = (InitializeFromResponse)service.Execute(req);
-            Assert.IsType<Entity>(result.Entity);
+            Assert.IsType<Contact>(result.Entity);
             Assert.Equal(Contact.EntityLogicalName, result.Entity.LogicalName);
         }
 
@@ -170,6 +170,65 @@ namespace FakeXrmEasy.Tests.FakeContextTests.InitializeFromRequestTests
             var result = (InitializeFromResponse)service.Execute(req);
             var contact = result.Entity.ToEntity<Contact>();
             Assert.Equal(Guid.Empty, contact.Id);
+        }
+
+        [Fact]
+        public void When_Calling_InitializeFromRequest_With_Early_Bound_Classes_Should_Return_Early_Bound_Entity()
+        {
+            var ctx = new XrmFakedContext();
+
+            var service = ctx.GetFakedOrganizationService();
+
+            var lead = new Lead
+            {
+                Id = Guid.NewGuid()
+            };
+
+            // This will set ProxyTypesAssembly = true
+            ctx.Initialize(new List<Entity> { lead });
+
+            var entityReference = new EntityReference(Lead.EntityLogicalName, lead.Id);
+            var req = new InitializeFromRequest
+            {
+                EntityMoniker = entityReference,
+                TargetEntityName = Contact.EntityLogicalName,
+                TargetFieldType = TargetFieldType.All
+            };
+
+            var result = (InitializeFromResponse)service.Execute(req);
+
+            Assert.IsType<Contact>(result.Entity);
+        }
+
+        [Fact]
+        public void When_Calling_InitializeFromRequest_With_Late_Bound_Classes_Should_Return_Late_Bound_Entity()
+        {
+            var ctx = new XrmFakedContext();
+            string sourceEntityLogicalName = "lead";
+            string targetEntityLogicalName = "contact";
+
+            var service = ctx.GetFakedOrganizationService();
+
+            var lead = new Entity
+            {
+                Id = Guid.NewGuid(),
+                LogicalName = sourceEntityLogicalName
+            };
+
+            ctx.Initialize(new List<Entity> { lead });
+
+            var entityReference = new EntityReference(sourceEntityLogicalName, lead.Id);
+            var req = new InitializeFromRequest
+            {
+                EntityMoniker = entityReference,
+                TargetEntityName = targetEntityLogicalName,
+                TargetFieldType = TargetFieldType.All
+            };
+
+            var result = (InitializeFromResponse)service.Execute(req);
+
+            Assert.IsType<Entity>(result.Entity);
+            Assert.Equal(targetEntityLogicalName, result.Entity.LogicalName);
         }
     }
 }
