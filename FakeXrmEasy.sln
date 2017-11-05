@@ -224,6 +224,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "365", "365", "{DABE779C-790
 		Install-scripts\365\Install.ps1 = Install-scripts\365\Install.ps1
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy.9", "FakeXrmEasy.9\FakeXrmEasy.9.csproj", "{33BA68B6-1085-4110-ACFC-D4EDCF3FBC32}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{08798ee6-7d8c-478e-a102-9424ad5dd321}*SharedItemsImports = 4
@@ -231,6 +233,7 @@ Global
 		FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems*{19a1f076-fbe5-42fd-9792-b98d90615b6f}*SharedItemsImports = 4
 		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{1ff34479-d38a-4b6b-86a7-b48182403437}*SharedItemsImports = 4
 		FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems*{2290f5cb-9ff9-42ee-9602-d7222e05dcba}*SharedItemsImports = 4
+		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{33ba68b6-1085-4110-acfc-d4edcf3fbc32}*SharedItemsImports = 4
 		FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems*{3d747ba8-0c4c-456b-8c3b-f4320e256e55}*SharedItemsImports = 13
 		FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems*{3f49c92f-f830-4e59-8042-6a7720367c19}*SharedItemsImports = 4
 		FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems*{5211b83c-12a0-423f-b8cf-61f9c650f525}*SharedItemsImports = 4
@@ -284,6 +287,10 @@ Global
 		{2290F5CB-9FF9-42EE-9602-D7222E05DCBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2290F5CB-9FF9-42EE-9602-D7222E05DCBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2290F5CB-9FF9-42EE-9602-D7222E05DCBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33BA68B6-1085-4110-ACFC-D4EDCF3FBC32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33BA68B6-1085-4110-ACFC-D4EDCF3FBC32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33BA68B6-1085-4110-ACFC-D4EDCF3FBC32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33BA68B6-1085-4110-ACFC-D4EDCF3FBC32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

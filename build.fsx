@@ -20,6 +20,7 @@ let FakeXrmEasy2013BuildDir                = buildDir + @"\FakeXrmEasy.2013"
 let FakeXrmEasy2015BuildDir                = buildDir + @"\FakeXrmEasy.2015"
 let FakeXrmEasy2016BuildDir                = buildDir + @"\FakeXrmEasy.2016"
 let FakeXrmEasy365BuildDir                 = buildDir + @"\FakeXrmEasy.365"
+let FakeXrmEasy9BuildDir                   = buildDir + @"\FakeXrmEasy.9"
 let FakeXrmEasySharedBuildDir              = buildDir + @"\FakeXrmEasy.Shared"
 
 let testDir              = @".\test"
@@ -29,6 +30,7 @@ let FakeXrmEasyTests2013BuildDir           = testDir + @"\FakeXrmEasy.Tests.2013
 let FakeXrmEasyTests2015BuildDir           = testDir + @"\FakeXrmEasy.Tests.2015"
 let FakeXrmEasyTests2016BuildDir           = testDir + @"\FakeXrmEasy.Tests.2016"
 let FakeXrmEasyTests365BuildDir            = testDir + @"\FakeXrmEasy.Tests.365"
+let FakeXrmEasyTests9BuildDir              = testDir + @"\FakeXrmEasy.Tests.9"
 let FakeXrmEasyTestsSharedBuildDir         = testDir + @"\FakeXrmEasy.Tests.Shared"
 
 let deployDir               = @".\Publish"
@@ -38,6 +40,7 @@ let FakeXrmEasy2013DeployDir                = deployDir + @"\FakeXrmEasy.2013"
 let FakeXrmEasy2015DeployDir                = deployDir + @"\FakeXrmEasy.2015"
 let FakeXrmEasy2016DeployDir                = deployDir + @"\FakeXrmEasy.2016"
 let FakeXrmEasy365DeployDir                 = deployDir + @"\FakeXrmEasy.365"
+let FakeXrmEasy9DeployDir                   = deployDir + @"\FakeXrmEasy.9"
 let FakeXrmEasySharedDeployDir              = deployDir + @"\FakeXrmEasy.Shared"
 
 let nugetDir                = @".\nuget\"
@@ -131,6 +134,14 @@ Target "BuildFakeXrmEasy.365" (fun _->
       |> Log "Build - Output: "
 )
 
+Target "BuildFakeXrmEasy.9" (fun _->
+    let properties =
+        [ ("DefineConstants", "FAKE_XRM_EASY_9") ]
+    !! @"FakeXrmEasy.9\*.csproj"
+      |> MSBuild FakeXrmEasy9BuildDir "Rebuild" (properties)
+      |> Log "Build - Output: "
+)
+
 Target "BuildFakeXrmEasy.Tests" (fun _->
     let properties =
         [ ("DefineConstants", "") ]
@@ -171,6 +182,14 @@ Target "BuildFakeXrmEasy.Tests.365" (fun _->
       |> Log "Build - Output: "
 )
 
+Target "BuildFakeXrmEasy.Tests.9" (fun _->
+    let properties =
+        [ ("DefineConstants", "FAKE_XRM_EASY_9") ]
+    !! @"FakeXrmEasy.Tests.9\*.csproj"
+      |> MSBuild FakeXrmEasyTests9BuildDir "Rebuild" (properties)
+      |> Log "Build - Output: "
+)
+
 Target "Test.2011" (fun _ ->
     !! (testDir @@ "\FakeXrmEasy.Tests\FakeXrmEasy.Tests.dll")
       |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.2011.html") })
@@ -194,6 +213,11 @@ Target "Test.2016" (fun _ ->
 Target "Test.365" (fun _ ->
     !! (testDir @@ "\FakeXrmEasy.Tests.365\FakeXrmEasy.Tests.365.dll")
       |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.365.html") })
+)
+
+Target "Test.9" (fun _ ->
+    !! (testDir @@ "\FakeXrmEasy.Tests.9\FakeXrmEasy.Tests.9.dll")
+      |> xUnit2 (fun p -> { p with HtmlOutputPath = Some (testDir @@ "xunit.9.html") })
 )
 
 Target "NuGet" (fun _ ->
@@ -253,6 +277,17 @@ Target "NuGet" (fun _ ->
                OutputPath = nugetDir
                ReleaseNotes = releaseNotes
                Publish = true })
+
+    "FakeXrmEasy.9.nuspec"
+     |> NuGet (fun p -> 
+           {p with     
+               Project = "FakeXrmEasy.9"              
+               Version = version
+               NoPackageAnalysis = true
+               ToolPath = nuGetCommandLine                            
+               OutputPath = nugetDir
+               ReleaseNotes = releaseNotes
+               Publish = true })
 )
 
 Target "PublishNuGet" (fun _ ->
@@ -274,6 +309,7 @@ Target "Publish" (fun _ ->
     CreateDir FakeXrmEasy2015DeployDir
     CreateDir FakeXrmEasy2016DeployDir
     CreateDir FakeXrmEasy365DeployDir
+    CreateDir FakeXrmEasy9DeployDir
 
     !! (FakeXrmEasyBuildDir @@ @"/**/*.* ")
       -- " *.pdb"
@@ -294,6 +330,10 @@ Target "Publish" (fun _ ->
     !! (FakeXrmEasy365BuildDir @@ @"/**/*.* ")
       -- " *.pdb"
         |> CopyTo FakeXrmEasy365DeployDir
+
+    !! (FakeXrmEasy9BuildDir @@ @"/**/*.* ")
+      -- " *.pdb"
+        |> CopyTo FakeXrmEasy9DeployDir
 )
 
 Target "CodeCoverage.2011" (fun _ ->
@@ -356,13 +396,25 @@ Target "CodeCoverage.365" (fun _ ->
     
 )
 
+Target "CodeCoverage.9" (fun _ ->
+    OpenCover (fun p -> { p with 
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.2.0/tools/xunit.console.exe"
+                                ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
+                                Register = RegisterType.RegisterUser
+                                WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.9")
+                                Filter = "+[FakeXrmEasy*]* -[*.Tests*]*"
+                                Output = "../coverage.9.xml"
+                        }) "FakeXrmEasy.Tests.9.dll"
+    
+)
+
 Target "ReportCodeCoverage" (fun _ ->
     ReportGenerator (fun p -> { p with 
                                     ExePath = "./packages/ReportGenerator.2.4.5.0/tools/ReportGenerator"
                                     WorkingDir = (testDir @@ "\FakeXrmEasy.Tests")
                                     TargetDir = "../reports"
                                     ReportTypes = [ReportGeneratorReportType.Html; ReportGeneratorReportType.Badges ]
-                               }) [ "..\coverage.2011.xml";  "..\coverage.2013.xml";  "..\coverage.2015.xml";  "..\coverage.2016.xml"; "..\coverage.365.xml" ]
+                               }) [ "..\coverage.2011.xml";  "..\coverage.2013.xml";  "..\coverage.2015.xml";  "..\coverage.2016.xml"; "..\coverage.365.xml"; "..\coverage.9.xml" ]
     
 )
 
@@ -372,6 +424,7 @@ Target "ReplaceVersion" (fun _ ->
     RegexReplaceInFileWithEncoding previousVersion version System.Text.Encoding.UTF8 "./Install-scripts/2013/Install.ps1"
     RegexReplaceInFileWithEncoding previousVersion version System.Text.Encoding.UTF8 "./Install-scripts/2015/Install.ps1"
     RegexReplaceInFileWithEncoding previousVersion version System.Text.Encoding.UTF8 "./Install-scripts/2016/Install.ps1"
+    RegexReplaceInFileWithEncoding previousVersion version System.Text.Encoding.UTF8 "./Install-scripts/9/Install.ps1"
     RegexReplaceInFileWithEncoding previousVersion version System.Text.Encoding.UTF8 "README.md"
 )
 
@@ -384,21 +437,25 @@ Target "ReplaceVersion" (fun _ ->
   ==> "BuildFakeXrmEasy.2015"
   ==> "BuildFakeXrmEasy.2016"
   ==> "BuildFakeXrmEasy.365"
+  ==> "BuildFakeXrmEasy.9"
   ==> "BuildFakeXrmEasy.Tests"
   ==> "BuildFakeXrmEasy.Tests.2013"
   ==> "BuildFakeXrmEasy.Tests.2015"
   ==> "BuildFakeXrmEasy.Tests.2016"
   ==> "BuildFakeXrmEasy.Tests.365"
+  ==> "BuildFakeXrmEasy.Tests.9"
   ==> "Test.2011"
   ==> "Test.2013"
   ==> "Test.2015"
   ==> "Test.2016"
   ==> "Test.365"
+  ==> "Test.9"
   ==> "CodeCoverage.2011"
   ==> "CodeCoverage.2013"
   ==> "CodeCoverage.2015"
   ==> "CodeCoverage.2016"
   ==> "CodeCoverage.365"
+  ==> "CodeCoverage.9"
   ==> "ReportCodeCoverage"
   ==> "ReplaceVersion"
   ==> "Publish"
