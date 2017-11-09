@@ -674,7 +674,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             Assert.Equal(4, entities.Entities.Count);
         }
 
-#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
         [Fact]
         public void Should_Not_Apply_Left_Outer_Join_Filters_When_The_Right_hand_side_of_the_expression_wasnt_found()
         {

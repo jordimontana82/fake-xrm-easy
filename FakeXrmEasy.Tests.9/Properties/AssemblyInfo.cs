@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FakeXrmEasy.Tests.2015")]
+[assembly: AssemblyTitle("FakeXrmEasy.Tests.9")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("FakeXrmEasy.Tests.2015")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyProduct("FakeXrmEasy.Tests.9")]
+[assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("19a1f076-fbe5-42fd-9792-b98d90615b6f")]
+[assembly: Guid("783f88ea-f23f-48f4-9089-8b0ad8ae1772")]
 
 // Version information for an assembly consists of the following four values:
 //

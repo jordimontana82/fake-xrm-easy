@@ -87,7 +87,7 @@ namespace FakeXrmEasy
                 }
                 catch { }
             }
-#if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
             else if (attributeInfo.PropertyType.FullName.StartsWith("System.Nullable"))
             {
                 return attributeInfo.PropertyType.GenericTypeArguments[0];
@@ -403,7 +403,7 @@ namespace FakeXrmEasy
 
             //If the attribute comes from a joined entity, then we need to access the attribute from the join
             //But the entity name attribute only exists >= 2013
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
             string attributeName = "";
 
             //Do not prepend the entity name if the EntityLogicalName is the same as the QueryExpression main logical name
@@ -1211,7 +1211,7 @@ namespace FakeXrmEasy
                 if (context.ProxyTypesAssembly != null)
                 {
 
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
                     if (c.EntityName != null)
                         sEntityName = qe.GetEntityNameFromAlias(c.EntityName);
                     else
@@ -1230,7 +1230,7 @@ namespace FakeXrmEasy
 
 #else
                     //CRM 2011
-                    if(c.AttributeName.IndexOf(".") >= 0) {
+                    if (c.AttributeName.IndexOf(".") >= 0) {
                         var alias = c.AttributeName.Split('.')[0];
                         sEntityName = qe.GetEntityNameFromAlias(alias);
                         sAttributeName = c.AttributeName.Split('.')[1];

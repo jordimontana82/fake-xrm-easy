@@ -11,7 +11,7 @@ using System.Linq;
 using System.IO.Compression;
 using System.Runtime.Serialization;
 
-#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
 using Microsoft.Xrm.Tooling.Connector;
 #else
 
@@ -72,7 +72,7 @@ namespace FakeXrmEasy
                 throw new Exception("The connectionString property must not be blank");
             }
 
-#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
 
             // Connect to the CRM web service using a connection string.
             CrmServiceClient client = new Microsoft.Xrm.Tooling.Connector.CrmServiceClient(connection.ConnectionString);
