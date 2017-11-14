@@ -115,6 +115,96 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests.Opera
             Assert.True(result.Count() == 2);
         }
 
+        [Fact]
+        public void When_executing_a_query_expression_with_lessthan_operator_right_result_is_returned()
+        {
+            var ctx = new XrmFakedContext();
+            var ct1 = new Contact() { Id = Guid.NewGuid(), NickName = "Al" };
+            var ct2 = new Contact() { Id = Guid.NewGuid(), NickName = "Bob" };
+            var ct3 = new Contact() { Id = Guid.NewGuid(), NickName = "Charlie" };
+
+            ctx.Initialize(new[] { ct2, ct3, ct1 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+            qe.ColumnSet = new ColumnSet(true);
+            qe.Criteria = new FilterExpression(LogicalOperator.And);
+            var condition = new ConditionExpression("nickname", ConditionOperator.LessThan, "B");
+            qe.Criteria.AddCondition(condition);
+
+            var result = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe).ToList();
+
+            Assert.Equal(1, result.Count);
+            Assert.Equal("Al", result[0]["nickname"]);
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_with_lessthanorequal_operator_right_result_is_returned()
+        {
+            var ctx = new XrmFakedContext();
+            var ct1 = new Contact() { Id = Guid.NewGuid(), NickName = "Al" };
+            var ct2 = new Contact() { Id = Guid.NewGuid(), NickName = "Bob" };
+            var ct3 = new Contact() { Id = Guid.NewGuid(), NickName = "Charlie" };
+
+            ctx.Initialize(new[] { ct2, ct3, ct1 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+            qe.ColumnSet = new ColumnSet(true);
+            qe.Criteria = new FilterExpression(LogicalOperator.And);
+            var condition = new ConditionExpression("nickname", ConditionOperator.LessEqual, "Bob");
+            qe.Criteria.AddCondition(condition);
+
+            var result = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Equal("Bob", result[0]["nickname"]);
+            Assert.Equal("Al",  result[1]["nickname"]);
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_with_greaterthan_operator_right_result_is_returned()
+        {
+            var ctx = new XrmFakedContext();
+            var ct1 = new Contact() { Id = Guid.NewGuid(), NickName = "Al" };
+            var ct2 = new Contact() { Id = Guid.NewGuid(), NickName = "Bob" };
+            var ct3 = new Contact() { Id = Guid.NewGuid(), NickName = "Charlie" };
+
+            ctx.Initialize(new[] { ct2, ct3, ct1 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+            qe.ColumnSet = new ColumnSet(true);
+            qe.Criteria = new FilterExpression(LogicalOperator.And);
+            var condition = new ConditionExpression("nickname", ConditionOperator.GreaterThan, "Bob");
+            qe.Criteria.AddCondition(condition);
+
+            var result = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe).ToList();
+
+            Assert.Equal(1, result.Count);
+            Assert.Equal("Charlie", result[0]["nickname"]);
+        }
+
+        [Fact]
+        public void When_executing_a_query_expression_with_greaterthanorequal_operator_right_result_is_returned()
+        {
+            var ctx = new XrmFakedContext();
+            var ct1 = new Contact() { Id = Guid.NewGuid(), NickName = "Al" };
+            var ct2 = new Contact() { Id = Guid.NewGuid(), NickName = "Bob" };
+            var ct3 = new Contact() { Id = Guid.NewGuid(), NickName = "Charlie" };
+
+            ctx.Initialize(new[] { ct2, ct3, ct1 });
+
+            var qe = new QueryExpression() { EntityName = "contact" };
+            qe.ColumnSet = new ColumnSet(true);
+            qe.Criteria = new FilterExpression(LogicalOperator.And);
+            var condition = new ConditionExpression("nickname", ConditionOperator.GreaterEqual, "Bob");
+            qe.Criteria.AddCondition(condition);
+
+            var result = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Equal("Bob", result[0]["nickname"]);
+            Assert.Equal("Charlie", result[1]["nickname"]);
+        }
+
 
     }
 }

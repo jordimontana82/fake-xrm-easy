@@ -1022,16 +1022,50 @@ namespace FakeXrmEasy
                 throw new FaultException(new FaultReason($"The ConditonOperator.{c.Operator} requires 1 value/s, not {c.Values.Count(v => v != null)}. Parameter Name: {c.AttributeName}"));
             }
 
+            if (tc.AttributeType == typeof(string))
+            {
+                return TranslateConditionExpressionGreaterThanString(tc, getAttributeValueExpr, containsAttributeExpr);
+            }
+            else
+            {
+                BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+                foreach (object value in c.Values)
+                {
+                    var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value);
+                    var transformedExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, leftHandSideExpression);
+
+                    expOrValues = Expression.Or(expOrValues,
+                            Expression.GreaterThan(
+                                transformedExpression,
+                                TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType))));
+                }
+                return Expression.AndAlso(
+                                containsAttributeExpr,
+                                Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                    expOrValues));
+            }
+            
+        }
+
+        protected static Expression TranslateConditionExpressionGreaterThanString(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             foreach (object value in c.Values)
             {
                 var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value);
                 var transformedExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, leftHandSideExpression);
 
+                var left = transformedExpression;
+                var right = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType));
+
+                var methodCallExpr = GetCompareToExpression<string>(left, right);
+
                 expOrValues = Expression.Or(expOrValues,
                         Expression.GreaterThan(
-                            transformedExpression,
-                            TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType))));
+                            methodCallExpr,
+                            Expression.Constant(0)));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
@@ -1048,7 +1082,13 @@ namespace FakeXrmEasy
                                 TranslateConditionExpressionLessThan(tc, getAttributeValueExpr, containsAttributeExpr));
 
         }
-        protected static Expression TranslateConditionExpressionLessThan(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+
+        protected static Expression GetCompareToExpression<T>(Expression left, Expression right)
+        {
+            return Expression.Call(left, typeof(T).GetMethod("CompareTo", new Type[] { typeof(string) }), new[] { right });
+        }
+
+        protected static Expression TranslateConditionExpressionLessThanString(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             var c = tc.CondExpression;
 
@@ -1056,17 +1096,54 @@ namespace FakeXrmEasy
             foreach (object value in c.Values)
             {
                 var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value);
-                var transformedExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, leftHandSideExpression);
+                var transformedLeftHandSideExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, leftHandSideExpression);
+
+                var rightHandSideExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType));
+
+                //var compareToMethodCall = Expression.Call(transformedLeftHandSideExpression, typeof(string).GetMethod("CompareTo", new Type[] { typeof(string) }), new[] { rightHandSideExpression });
+                var compareToMethodCall = GetCompareToExpression<string>(transformedLeftHandSideExpression, rightHandSideExpression);
 
                 expOrValues = Expression.Or(expOrValues,
-                        Expression.LessThan(
-                            transformedExpression,
-                            TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType))));
+                        Expression.LessThan(compareToMethodCall, Expression.Constant(0)));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
                             Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
                                 expOrValues));
+        }
+
+        protected static Expression TranslateConditionExpressionLessThan(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
+            if (c.Values.Count(v => v != null) != 1)
+            {
+                throw new FaultException(new FaultReason($"The ConditonOperator.{c.Operator} requires 1 value/s, not {c.Values.Count(v => v != null)}. Parameter Name: {c.AttributeName}"));
+            }
+
+            if (tc.AttributeType == typeof(string))
+            {
+                return TranslateConditionExpressionLessThanString(tc, getAttributeValueExpr, containsAttributeExpr);
+            }
+            else
+            {
+                BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+                foreach (object value in c.Values)
+                {
+                    var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value);
+                    var transformedExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, leftHandSideExpression);
+
+                    expOrValues = Expression.Or(expOrValues,
+                            Expression.LessThan(
+                                transformedExpression,
+                                TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType))));
+                }
+                return Expression.AndAlso(
+                                containsAttributeExpr,
+                                Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                    expOrValues));
+            }
+            
         }
 
         protected static Expression TranslateConditionExpressionBetween(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
