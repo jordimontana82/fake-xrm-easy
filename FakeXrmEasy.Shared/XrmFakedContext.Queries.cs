@@ -616,6 +616,26 @@ namespace FakeXrmEasy
             return Expression.Constant(value);
         }
 
+        protected static Type GetAppropiateTypeForValue(object value)
+        {
+            //Basic types conversions
+            //Special case => datetime is sent as a string
+            if (value is string)
+            {
+                DateTime dtDateTimeConversion;
+                if (DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out dtDateTimeConversion))
+                {
+                    return typeof(DateTime);
+                }
+                else
+                {
+                    return typeof(string);
+                }
+            }
+            else
+                return value.GetType();
+        }
+
         protected static Expression GetAppropiateTypedValueAndType(object value, Type attributeType)
         {
             if (attributeType == null)
@@ -1026,6 +1046,10 @@ namespace FakeXrmEasy
             {
                 return TranslateConditionExpressionGreaterThanString(tc, getAttributeValueExpr, containsAttributeExpr);
             }
+            else if (GetAppropiateTypeForValue(c.Values[0]) == typeof(string))
+            {
+                return TranslateConditionExpressionGreaterThanString(tc, getAttributeValueExpr, containsAttributeExpr);
+            }
             else
             {
                 BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
@@ -1122,6 +1146,10 @@ namespace FakeXrmEasy
             }
 
             if (tc.AttributeType == typeof(string))
+            {
+                return TranslateConditionExpressionLessThanString(tc, getAttributeValueExpr, containsAttributeExpr);
+            }
+            else if(GetAppropiateTypeForValue(c.Values[0]) == typeof(string))
             {
                 return TranslateConditionExpressionLessThanString(tc, getAttributeValueExpr, containsAttributeExpr);
             }
