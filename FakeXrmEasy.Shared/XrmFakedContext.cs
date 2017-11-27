@@ -58,6 +58,8 @@ namespace FakeXrmEasy
 
         public int MaxRetrieveCount { get; set; }
 
+        public EntityInitializationLevel InitializationLevel { get; set; }
+
         public XrmFakedContext()
         {
             MaxRetrieveCount = 5000;
@@ -85,6 +87,10 @@ namespace FakeXrmEasy
             DateBehaviour = DefaultDateBehaviour();
 
             EntityMetadata = new Dictionary<string, EntityMetadata>();
+
+            UsePipelineSimulation = false;
+
+            InitializationLevel = EntityInitializationLevel.Default;
         }
 
         /// <summary>
@@ -219,7 +225,7 @@ namespace FakeXrmEasy
         }
 
         /// <summary>
-        /// Returns a faked organization service that works against this context
+        /// Deprecated. Use GetOrganizationService instead
         /// </summary>
         /// <returns></returns>
         public IOrganizationService GetFakedOrganizationService()

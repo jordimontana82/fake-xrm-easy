@@ -80,10 +80,10 @@ namespace FakeXrmEasy.Tests
             Assert.True(secondContact.Attributes.Count == 3);
 
             Assert.True(firstContact["fullname"].Equals(contact1["fullname"]));
-            Assert.True((firstContact["account.name"] as AliasedValue).Value.Equals(account["name"]));
+            Assert.True((firstContact["account1.name"] as AliasedValue).Value.Equals(account["name"]));
 
             Assert.True(secondContact["fullname"].Equals(contact2["fullname"]));
-            Assert.True((secondContact["account.name"] as AliasedValue).Value.Equals(account["name"]));
+            Assert.True((secondContact["account1.name"] as AliasedValue).Value.Equals(account["name"]));
         }
 
         [Fact]
@@ -417,11 +417,11 @@ namespace FakeXrmEasy.Tests
             Assert.True(firstContact.Attributes.Count == 1); //Contact 1
             Assert.True(lastContact.Attributes.Count == 1);  //Contact 2
 
-            Assert.True(firstContact.Attributes.ContainsKey("account.name")); //Contact 1
-            Assert.True(lastContact.Attributes.ContainsKey("account.name"));  //Contact 2
+            Assert.True(firstContact.Attributes.ContainsKey("account1.name")); //Contact 1
+            Assert.True(lastContact.Attributes.ContainsKey("account1.name"));  //Contact 2
 
-            Assert.True(firstContact.Attributes["account.name"] is AliasedValue); //Contact 1
-            Assert.True(lastContact.Attributes["account.name"] is AliasedValue);  //Contact 2
+            Assert.True(firstContact.Attributes["account1.name"] is AliasedValue); //Contact 1
+            Assert.True(lastContact.Attributes["account1.name"] is AliasedValue);  //Contact 2
         }
 
         [Fact]

@@ -70,66 +70,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             Assert.True(result.Count() == 2);
         }
 
-        [Fact]
-        public void When_executing_a_query_expression_with_endswith_operator_right_result_is_returned()
-        {
-            var context = new XrmFakedContext();
-            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "Contact 1"; contact1["firstname"] = "First 1";
-            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "Contact 2"; contact2["firstname"] = "First 2";
-
-            context.Initialize(new List<Entity>() { contact1, contact2 });
-
-            var qe = new QueryExpression() { EntityName = "contact" };
-            qe.ColumnSet = new ColumnSet(true);
-            qe.Criteria = new FilterExpression(LogicalOperator.And);
-            var condition = new ConditionExpression("fullname", ConditionOperator.EndsWith, "2");
-            qe.Criteria.AddCondition(condition);
-
-            var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
-
-            Assert.True(result.Count() == 1);
-        }
-
-        [Fact]
-        public void When_executing_a_query_expression_with_beginswith_operator_right_result_is_returned()
-        {
-            var context = new XrmFakedContext();
-            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "1 Contact"; contact1["firstname"] = "First 1";
-            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "2 Contact"; contact2["firstname"] = "First 2";
-
-            context.Initialize(new List<Entity>() { contact1, contact2 });
-
-            var qe = new QueryExpression() { EntityName = "contact" };
-            qe.ColumnSet = new ColumnSet(true);
-            qe.Criteria = new FilterExpression(LogicalOperator.And);
-            var condition = new ConditionExpression("fullname", ConditionOperator.BeginsWith, "2");
-            qe.Criteria.AddCondition(condition);
-
-            var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
-
-            Assert.True(result.Count() == 1);
-        }
-
-        [Fact]
-        public void When_executing_a_query_expression_with_contains_operator_right_result_is_returned()
-        {
-            var context = new XrmFakedContext();
-            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["fullname"] = "1 Contact"; contact1["firstname"] = "First 1";
-            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["fullname"] = "2 Contact"; contact2["firstname"] = "First 2";
-            var contact3 = new Entity("contact") { Id = Guid.NewGuid() }; contact3["fullname"] = "Other"; contact3["firstname"] = "First 2";
-
-            context.Initialize(new List<Entity>() { contact1, contact2, contact3 });
-
-            var qe = new QueryExpression() { EntityName = "contact" };
-            qe.ColumnSet = new ColumnSet(true);
-            qe.Criteria = new FilterExpression(LogicalOperator.And);
-            var condition = new ConditionExpression("fullname", ConditionOperator.Contains, "Contact");
-            qe.Criteria.AddCondition(condition);
-
-            var result = XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList();
-
-            Assert.True(result.Count() == 2);
-        }
 
         [Fact]
         public void When_executing_a_query_expression_with_null_operator_right_result_is_returned()
@@ -194,19 +134,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             Assert.True(result.Count() == 2);
         }
 
-        [Fact]
-        public void When_executing_a_query_expression_like_operator_is_case_insensitive()
-        {
-            var context = new XrmFakedContext { ProxyTypesAssembly = Assembly.GetExecutingAssembly() };
-            var service = context.GetFakedOrganizationService();
-
-            service.Create(new Contact { FirstName = "Jimmy" });
-
-            var qe = new QueryExpression("contact");
-            qe.Criteria.AddCondition("firstname", ConditionOperator.Like, "JIM%");
-
-            Assert.Equal(1, service.RetrieveMultiple(qe).Entities.Count);
-        }
 
         [Fact]
         public void When_executing_a_query_expression_equals_operator_is_case_insensitive()
@@ -222,33 +149,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             Assert.Equal(1, service.RetrieveMultiple(qe).Entities.Count);
         }
 
-        [Fact]
-        public void When_executing_a_query_expression_begins_with_operator_is_case_insensitive()
-        {
-            var context = new XrmFakedContext();
-
-            var service = context.GetFakedOrganizationService();
-            service.Create(new Contact { FirstName = "Jimmy" });
-
-            var qe = new QueryExpression("contact");
-            qe.Criteria.AddCondition("firstname", ConditionOperator.BeginsWith, "jim");
-
-            Assert.Equal(1, service.RetrieveMultiple(qe).Entities.Count);
-        }
-
-        [Fact]
-        public void When_executing_a_query_expression_ends_with_operator_is_case_insensitive()
-        {
-            var context = new XrmFakedContext();
-
-            var service = context.GetFakedOrganizationService();
-            service.Create(new Contact { FirstName = "JimmY" });
-
-            var qe = new QueryExpression("contact");
-            qe.Criteria.AddCondition("firstname", ConditionOperator.EndsWith, "y");
-
-            Assert.Equal(1, service.RetrieveMultiple(qe).Entities.Count);
-        }
 
         [Fact]
         public void When_executing_a_query_expression_attributes_returned_are_case_sensitive()
@@ -307,7 +207,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
             Assert.True(ec.Entities.Count == 2);
         }
 
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
 
         [Fact]
         public void ConditionExpression_Test()

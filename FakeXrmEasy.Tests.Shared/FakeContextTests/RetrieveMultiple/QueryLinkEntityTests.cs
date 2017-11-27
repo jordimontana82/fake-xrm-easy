@@ -565,9 +565,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         }
 
         [Fact]
-        public void
-            When_querying_by_an_attribute_which_wasnt_initialised_null_value_is_returned_for_early_bound_and_not_an_exception
-            ()
+        public void When_querying_by_an_attribute_which_wasnt_initialised_null_value_is_returned_for_early_bound_and_not_an_exception()
         {
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
@@ -676,7 +674,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             Assert.Equal(4, entities.Entities.Count);
         }
 
-#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
         [Fact]
         public void Should_Not_Apply_Left_Outer_Join_Filters_When_The_Right_hand_side_of_the_expression_wasnt_found()
         {
@@ -829,5 +827,236 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             Assert.Equal(1, incidents.Count);
         }
 #endif
+
+        [Fact]
+        public void When_There_Is_A_LinkedEntity_The_Output_EntityAlias_Should_Be_Suffixed_With_1()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            var entities = new List<Entity>();
+
+            var user1 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User1"
+            };
+            entities.Add(user1);
+
+            var user2 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User2",
+                ["modifiedby"] = user1.ToEntityReference()
+            };
+            entities.Add(user2);
+
+            context.Initialize(entities);
+
+            var query = new QueryExpression(SystemUser.EntityLogicalName)
+            {
+                LinkEntities =
+                {
+                    new LinkEntity(SystemUser.EntityLogicalName, SystemUser.EntityLogicalName, "modifiedby", "systemuserid", JoinOperator.Inner)
+                    {
+                        Columns = new ColumnSet("fullname"),
+                    }
+                }
+            };
+
+            var result = service.RetrieveMultiple(query);
+            var resultingEntity = result.Entities[0];
+            Assert.Equal(2, resultingEntity.Attributes.Count);
+            Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
+        }
+
+        [Fact]
+        public void When_There_Are_Multiple_LinkedEntities_The_Output_EntityAlias_Should_All_Be_Suffixed_With_1()
+
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            var entities = new List<Entity>();
+
+            var user1 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User1"
+            };
+            entities.Add(user1);
+
+            var businessUnit = new BusinessUnit
+            {
+                Id = Guid.NewGuid(),
+                Name = "BusinessUnit1"
+            };
+            entities.Add(businessUnit);
+
+            var user2 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                BusinessUnitId = businessUnit.ToEntityReference(),
+                ["fullname"] = "User2",
+                ["modifiedby"] = user1.ToEntityReference()
+            };
+            entities.Add(user2);
+
+            context.Initialize(entities);
+
+            var query = new QueryExpression(SystemUser.EntityLogicalName)
+            {
+                LinkEntities =
+                {
+                    new LinkEntity(SystemUser.EntityLogicalName, SystemUser.EntityLogicalName, "modifiedby", "systemuserid", JoinOperator.Inner)
+                    {
+                        Columns = new ColumnSet("fullname"),
+                    },
+                    new LinkEntity(SystemUser.EntityLogicalName, BusinessUnit.EntityLogicalName, "businessunitid", "businessunitid", JoinOperator.Inner)
+                    {
+                        Columns = new ColumnSet("name"),
+                    }
+                }
+            };
+
+            var result = service.RetrieveMultiple(query);
+            var resultingEntity = result.Entities[0];
+            Assert.Equal(3, resultingEntity.Attributes.Count);
+            Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
+            Assert.Equal("BusinessUnit1", ((AliasedValue)resultingEntity["businessunit1.name"]).Value);
+        }
+
+        [Fact]
+        public void When_There_Are_Multiple_LinkedEntities_With_The_Same_Entitiy_The_Output_EntityAlias_Should_All_Be_Suffixed_With_Incrementally()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            var entities = new List<Entity>();
+
+            var user1 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User1"
+            };
+            entities.Add(user1);
+
+            var user2 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User2",
+                ["modifiedby"] = user1.ToEntityReference()
+            };
+            entities.Add(user2);
+
+            var user3 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User3",
+                ["modifiedby"] = user2.ToEntityReference()
+            };
+            entities.Add(user3);
+
+            context.Initialize(entities);
+
+            var query = new QueryExpression(SystemUser.EntityLogicalName)
+            {
+                LinkEntities =
+                {
+                    new LinkEntity(SystemUser.EntityLogicalName, SystemUser.EntityLogicalName, "modifiedby", "systemuserid", JoinOperator.Inner)
+                    {
+                        Columns = new ColumnSet("fullname"),
+                        LinkEntities =
+                        {
+                            new LinkEntity(SystemUser.EntityLogicalName, SystemUser.EntityLogicalName, "modifiedby", "systemuserid", JoinOperator.Inner)
+                            {
+                                Columns = new ColumnSet("fullname"),
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = service.RetrieveMultiple(query);
+            var resultingEntity = result.Entities[0];
+            Assert.Equal(3, resultingEntity.Attributes.Count);
+            Assert.Equal("User2", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
+            Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser2.fullname"]).Value);
+        }
+
+        [Fact]
+        public void When_There_Are_Multiple_LinkedEntities_With_The_Same_Entitiy_And_One_Has_An_Alias_The_Output_EntityAlias_Should_All_Be_Suffixed_With_Incrementally_Ignoring_The_Aliased_One()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            var entities = new List<Entity>();
+
+            var user1 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User1"
+            };
+            entities.Add(user1);
+
+            var user2 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User2",
+                ["modifiedby"] = user1.ToEntityReference()
+            };
+            entities.Add(user2);
+
+            var user3 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User3",
+                ["modifiedby"] = user2.ToEntityReference()
+            };
+            entities.Add(user3);
+
+            var user4 = new SystemUser
+            {
+                Id = Guid.NewGuid(),
+                ["fullname"] = "User4",
+                ["modifiedby"] = user3.ToEntityReference()
+            };
+            entities.Add(user4);
+
+            context.Initialize(entities);
+
+            var query = new QueryExpression(SystemUser.EntityLogicalName)
+            {
+                LinkEntities =
+                {
+                    new LinkEntity(SystemUser.EntityLogicalName, SystemUser.EntityLogicalName, "modifiedby", "systemuserid", JoinOperator.Inner)
+                    {
+                        Columns = new ColumnSet("fullname"),
+                        LinkEntities =
+                        {
+                            new LinkEntity(SystemUser.EntityLogicalName, SystemUser.EntityLogicalName, "modifiedby", "systemuserid", JoinOperator.Inner)
+                            {
+                                EntityAlias = "systemuserwithalias",
+                                Columns = new ColumnSet("fullname"),
+                                LinkEntities =
+                                {
+                                    new LinkEntity(SystemUser.EntityLogicalName, SystemUser.EntityLogicalName, "modifiedby", "systemuserid", JoinOperator.Inner)
+                                    {
+                                        Columns = new ColumnSet("fullname")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = service.RetrieveMultiple(query);
+            var resultingEntity = result.Entities[0];
+            Assert.Equal(4, resultingEntity.Attributes.Count);
+            Assert.Equal("User3", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
+            Assert.Equal("User2", ((AliasedValue)resultingEntity["systemuserwithalias.fullname"]).Value);
+            Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser2.fullname"]).Value);
+        }
     }
 }

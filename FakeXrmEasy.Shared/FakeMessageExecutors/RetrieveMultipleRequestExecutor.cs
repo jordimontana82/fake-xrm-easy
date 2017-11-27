@@ -21,43 +21,26 @@ namespace FakeXrmEasy.FakeMessageExecutors
             var request = req as RetrieveMultipleRequest;
             List<Entity> list = null;
             PagingInfo pageInfo = null;
-            int? topCount = null;
+            QueryExpression qe;
+
+            string entityName = null;
 
             if (request.Query is QueryExpression)
             {
-                var qe = request.Query as QueryExpression;
+                qe = (request.Query as QueryExpression).Clone();
+                entityName = qe.EntityName;
 
-                pageInfo = qe.PageInfo;
-                topCount = qe.TopCount;
-
-                //need to request 1 extra to get a fill if there are more records
-                if (topCount != null)
-                    qe.TopCount = topCount + 1;
-
-                if (qe.PageInfo.Count > 0)
-                    qe.TopCount = qe.PageInfo.Count + 1;
-
-                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, request.Query as QueryExpression);
+                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();
             }
             else if (request.Query is FetchExpression)
             {
                 var fetchXml = (request.Query as FetchExpression).Query;
                 var xmlDoc = XrmFakedContext.ParseFetchXml(fetchXml);
-                var queryExpression = XrmFakedContext.TranslateFetchXmlDocumentToQueryExpression(ctx, xmlDoc);
+                qe = XrmFakedContext.TranslateFetchXmlDocumentToQueryExpression(ctx, xmlDoc);
+                entityName = qe.EntityName;
 
-                pageInfo = queryExpression.PageInfo;
-                topCount = queryExpression.TopCount;
-
-                //need to request 1 extra to get a fill if there are more records
-                if (topCount != null)
-                    queryExpression.TopCount = topCount + 1;
-                if (queryExpression.PageInfo.Count > 0)
-                {
-                    queryExpression.TopCount = queryExpression.PageInfo.Count + 1;
-                }
-
-                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, queryExpression);
+                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();
 
                 if (xmlDoc.IsAggregateFetchXml())
@@ -69,24 +52,14 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 //We instantiate a QueryExpression to be executed as we have the implementation done already
                 var query = request.Query as QueryByAttribute;
-                var qe = new QueryExpression(query.EntityName);
+                qe = new QueryExpression(query.EntityName);
+                entityName = qe.EntityName;
 
                 qe.ColumnSet = query.ColumnSet;
                 qe.Criteria = new FilterExpression();
                 for (var i = 0; i < query.Attributes.Count; i++)
                 {
                     qe.Criteria.AddCondition(new ConditionExpression(query.Attributes[i], ConditionOperator.Equal, query.Values[i]));
-                }
-
-                pageInfo = qe.PageInfo;
-                topCount = qe.TopCount;
-
-                //need to request 1 extra to be able check if there are more records
-                if (topCount != null)
-                    qe.TopCount = topCount + 1;
-                if (qe.PageInfo.Count > 0)
-                {
-                    qe.TopCount = qe.PageInfo.Count + 1;
                 }
 
                 //QueryExpression now done... execute it!
@@ -96,27 +69,55 @@ namespace FakeXrmEasy.FakeMessageExecutors
             else
                 throw PullRequestException.NotImplementedOrganizationRequest(request.Query.GetType());
 
-            list.ForEach(e => e.ApplyDateBehaviour(ctx));
-            list.ForEach(e => PopulateFormattedValues(e));
-            var recordCount = list.Count();
-            var pageSize = recordCount;
-            int pageNumber = 1;
-            if (pageInfo != null && pageInfo.PageNumber > 0 && pageInfo.Count > 0)
+
+            // Handle the top count before taking paging into account
+            if (qe.TopCount != null && qe.TopCount.Value < list.Count)
             {
-                pageSize = pageInfo.Count;
-                pageNumber = pageInfo.PageNumber;
+                list = list.Take(qe.TopCount.Value).ToList();
             }
-            else if (topCount != null)
-                pageSize = topCount.Value;
+
+            // Handle paging
+            var pageSize = ctx.MaxRetrieveCount;
+            pageInfo = qe.PageInfo;
+            int pageNumber = 1;
+            if (pageInfo != null && pageInfo.PageNumber > 0)
+            {
+                pageNumber = pageInfo.PageNumber;
+                pageSize = pageInfo.Count == 0 ? ctx.MaxRetrieveCount : pageInfo.Count;
+            }
+
+            // Figure out where in the list we need to start and how many items we need to grab
+            int numberToGet = pageSize;
+            int startPosition = 0;
+
+            if (pageNumber != 1)
+            {
+                startPosition = (pageNumber - 1) * pageSize - 1;
+            }
+
+            if (list.Count < pageSize)
+            {
+                numberToGet = list.Count;
+            }
+            else if (list.Count - pageSize * (pageNumber - 1) < pageSize)
+            {
+                numberToGet = list.Count - (pageSize * (pageNumber - 1));
+            }
+            
+            var recordsToReturn = startPosition + numberToGet > list.Count ? new List<Entity>() : list.GetRange(startPosition, numberToGet);
+
+            recordsToReturn.ForEach(e => e.ApplyDateBehaviour(ctx));
+            recordsToReturn.ForEach(e => PopulateFormattedValues(e));
 
             var response = new RetrieveMultipleResponse
             {
                 Results = new ParameterCollection
                                  {
-                                    { "EntityCollection", new EntityCollection(list.Take(pageSize).ToList()) }
+                                    { "EntityCollection", new EntityCollection(recordsToReturn) }
                                  }
             };
-            response.EntityCollection.MoreRecords = recordCount > pageSize;
+            response.EntityCollection.EntityName = entityName;
+            response.EntityCollection.MoreRecords = (list.Count - pageSize * pageNumber) > 0;
             if (response.EntityCollection.MoreRecords)
             {
                 var first = response.EntityCollection.Entities.First();

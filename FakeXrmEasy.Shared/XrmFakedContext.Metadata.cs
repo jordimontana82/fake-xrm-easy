@@ -10,7 +10,7 @@ using FakeXrmEasy.Extensions;
 
 namespace FakeXrmEasy
 {
-    public partial class XrmFakedContext
+    public partial class XrmFakedContext: IXrmContext
     {
         /// <summary>
         /// Stores some minimal metadata info if dynamic entities are used and no injected metadata was used

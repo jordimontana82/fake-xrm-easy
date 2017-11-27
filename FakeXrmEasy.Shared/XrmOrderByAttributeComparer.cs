@@ -33,6 +33,14 @@ namespace FakeXrmEasy
                 // Name might well be Null in an entity reference?
                 EntityReference entityRefA = (EntityReference)objectA;
                 EntityReference entityRefB = (EntityReference)objectB;
+
+                if (entityRefA.Name == null && entityRefB.Name == null) return 0;  //Equal
+
+                if (entityRefA.Name == null)
+                    return -1;
+                if (entityRefB.Name == null)
+                    return 1;
+
                 return entityRefA.Name.CompareTo(entityRefB.Name);
             }
             else if (attributeType == typeof(Money))

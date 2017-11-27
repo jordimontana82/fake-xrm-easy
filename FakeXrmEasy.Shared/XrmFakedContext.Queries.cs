@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.ServiceModel;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using FakeXrmEasy.Extensions;
 using FakeXrmEasy.Extensions.FetchXml;
@@ -86,7 +87,7 @@ namespace FakeXrmEasy
                 }
                 catch { }
             }
-#if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
             else if (attributeInfo.PropertyType.FullName.StartsWith("System.Nullable"))
             {
                 return attributeInfo.PropertyType.GenericTypeArguments[0];
@@ -168,11 +169,18 @@ namespace FakeXrmEasy
             return Data[s].Values.AsQueryable();
         }
 
-        public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, string linkFromAlias = "")
+        public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, Dictionary<string, int> linkedEntities, string linkFromAlias = "", string linkFromEntity = "")
         {
+            if (!string.IsNullOrEmpty(le.EntityAlias))
+            {
+                if (!Regex.IsMatch(le.EntityAlias, "^[A-Za-z_]\\w*$", RegexOptions.ECMAScript))
+                {
+                    throw new FaultException(new FaultReason($"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _."));
+                }
+            }
 
             var leAlias = string.IsNullOrWhiteSpace(le.EntityAlias) ? le.LinkToEntityName : le.EntityAlias;
-            context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName);
+            context.EnsureEntityNameExistsInMetadata(le.LinkFromEntityName != linkFromAlias ? le.LinkFromEntityName : linkFromEntity);
             context.EnsureEntityNameExistsInMetadata(le.LinkToEntityName);
 
             if (!context.AttributeExistsInMetadata(le.LinkToEntityName, le.LinkToAttributeName))
@@ -222,17 +230,38 @@ namespace FakeXrmEasy
 
             }
 
-            //Process nested linked entities recursively
-            foreach (LinkEntity nestedLinkedEntity in le.LinkEntities)
+            // Process nested linked entities recursively
+            foreach (var nestedLinkedEntity in le.LinkEntities)
             {
                 if (string.IsNullOrWhiteSpace(le.EntityAlias))
+                {
                     le.EntityAlias = le.LinkToEntityName;
+                }
 
-                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, query, le.Columns, le.EntityAlias);
+                if (string.IsNullOrWhiteSpace(nestedLinkedEntity.EntityAlias))
+                {
+                    nestedLinkedEntity.EntityAlias = EnsureUniqueLinkedEntityAlias(linkedEntities, nestedLinkedEntity.LinkToEntityName);
+                }
+
+                query = TranslateLinkedEntityToLinq(context, nestedLinkedEntity, query, le.Columns, linkedEntities, le.EntityAlias, le.LinkToEntityName);
             }
+
             return query;
         }
 
+        private static string EnsureUniqueLinkedEntityAlias(IDictionary<string, int> linkedEntities, string entityName)
+        {
+            if (linkedEntities.ContainsKey(entityName))
+            {
+                linkedEntities[entityName]++;
+            }
+            else
+            {
+                linkedEntities[entityName] = 1;
+            }
+
+            return $"{entityName}{linkedEntities[entityName]}";
+        }
 
 
         protected static XElement RetrieveFetchXmlNode(XDocument xlDoc, string sName)
@@ -288,11 +317,8 @@ namespace FakeXrmEasy
 
             query.TopCount = xlDoc.ToTopCount();
 
-            if (query.TopCount != null)
-            {
-                query.PageInfo.Count = query.TopCount.Value;
-                query.PageInfo.PageNumber = xlDoc.ToPageNumber() ?? 1;
-            }
+            query.PageInfo.Count = xlDoc.ToCount() ?? 0;
+            query.PageInfo.PageNumber = xlDoc.ToPageNumber() ?? 1;
 
             var linkedEntities = xlDoc.ToLinkEntities(context);
             foreach (var le in linkedEntities)
@@ -314,10 +340,17 @@ namespace FakeXrmEasy
 
             query = context.CreateQuery<Entity>(qe.EntityName);
 
-            //Add as many Joins as linked entities
-            foreach (LinkEntity le in qe.LinkEntities)
+            var linkedEntities = new Dictionary<string, int>();
+
+            // Add as many Joins as linked entities
+            foreach (var le in qe.LinkEntities)
             {
-                query = TranslateLinkedEntityToLinq(context, le, query, qe.ColumnSet);
+                if (string.IsNullOrWhiteSpace(le.EntityAlias))
+                {
+                    le.EntityAlias = EnsureUniqueLinkedEntityAlias(linkedEntities, le.LinkToEntityName);
+                }
+
+                query = TranslateLinkedEntityToLinq(context, le, query, qe.ColumnSet, linkedEntities);
             }
 
             // Compose the expression tree that represents the parameter to the predicate.
@@ -356,21 +389,6 @@ namespace FakeXrmEasy
             //Project the attributes in the root column set  (must be applied after the where and order clauses, not before!!)
             query = query.Select(x => x.Clone(x.GetType()).ProjectAttributes(qe, context));
 
-            //Apply TopCount
-
-            if (qe.PageInfo != null && qe.PageInfo.Count > 0 && qe.PageInfo.PageNumber > 0)
-            {
-                //selecting 1 extra to get calculate if there are more records to fetch
-                query = query.Skip(qe.PageInfo.Count * (qe.PageInfo.PageNumber - 1));
-            }
-
-            if (qe.TopCount == null)
-            {
-                qe.TopCount = context.MaxRetrieveCount;
-            }
-
-            query = query.Take(qe.TopCount.Value);
-
             return query;
         }
 
@@ -385,7 +403,7 @@ namespace FakeXrmEasy
 
             //If the attribute comes from a joined entity, then we need to access the attribute from the join
             //But the entity name attribute only exists >= 2013
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
             string attributeName = "";
 
             //Do not prepend the entity name if the EntityLogicalName is the same as the QueryExpression main logical name
@@ -545,7 +563,7 @@ namespace FakeXrmEasy
                         throw new Exception("Older than X months requires a value greater than 0.");
                     }
 
-                    var olderThanDate = DateTime.Now.AddMonths(monthsToAdd);
+                    var olderThanDate = DateTime.Now.AddMonths(-monthsToAdd);
 
                     operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression, olderThanDate);
                     break;
@@ -596,6 +614,26 @@ namespace FakeXrmEasy
                 return Expression.Constant(cast);
             }
             return Expression.Constant(value);
+        }
+
+        protected static Type GetAppropiateTypeForValue(object value)
+        {
+            //Basic types conversions
+            //Special case => datetime is sent as a string
+            if (value is string)
+            {
+                DateTime dtDateTimeConversion;
+                if (DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out dtDateTimeConversion))
+                {
+                    return typeof(DateTime);
+                }
+                else
+                {
+                    return typeof(string);
+                }
+            }
+            else
+                return value.GetType();
         }
 
         protected static Expression GetAppropiateTypedValueAndType(object value, Type attributeType)
@@ -768,14 +806,14 @@ namespace FakeXrmEasy
 
         protected static Expression GetAppropiateCastExpressionBasedOnDateTime(Expression input, object value)
         {
-            //Convert to DateTime if string
-            DateTime dtDateTimeConversion;
-            if (value != null && DateTime.TryParse(value.ToString(), out dtDateTimeConversion))
+            // Convert to DateTime if string
+            DateTime _;
+            if (value is DateTime || value is string && DateTime.TryParse(value.ToString(), out _))
             {
                 return Expression.Convert(input, typeof(DateTime));
             }
 
-            return input; //return directly
+            return input; // return directly
         }
 
         protected static Expression GetAppropiateCastExpressionDefault(Expression input, object value)
@@ -862,6 +900,29 @@ namespace FakeXrmEasy
                                                         typeof(int)),
                                                     Expression.Convert(input, typeof(int)));
         }
+
+        protected static Expression TransformExpressionGetDateOnlyPart(Expression input)
+        {
+            return Expression.Call(input, typeof(DateTime).GetMethod("get_Date"));
+        }
+
+        protected static Expression TransformExpressionValueBasedOnOperator(ConditionOperator op, Expression input)
+        {
+            switch (op)
+            {
+                case ConditionOperator.Today:
+                case ConditionOperator.Yesterday:
+                case ConditionOperator.Tomorrow:
+                case ConditionOperator.On:
+                case ConditionOperator.OnOrAfter:
+                case ConditionOperator.OnOrBefore:
+                    return TransformExpressionGetDateOnlyPart(input);
+
+                default:
+                    return input; //No transformation
+            }
+        }
+
         protected static Expression TranslateConditionExpressionEqual(XrmFakedContext context, TypedConditionExpression c, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
 
@@ -885,21 +946,26 @@ namespace FakeXrmEasy
                     unaryOperatorValue = context.CallerId.Id;
                     break;
             }
+
             if (unaryOperatorValue != null)
             {
                 //c.Values empty in this case
-                expOrValues = Expression.Equal(
-                                GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, unaryOperatorValue),
+                var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, unaryOperatorValue);
+                var transformedExpression = TransformExpressionValueBasedOnOperator(c.CondExpression.Operator, leftHandSideExpression);
+
+                expOrValues = Expression.Equal(transformedExpression,
                                 GetAppropiateTypedValueAndType(unaryOperatorValue, c.AttributeType));
             }
             else
             {
                 foreach (object value in c.CondExpression.Values)
                 {
+                    var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, value);
+                    var transformedExpression = TransformExpressionValueBasedOnOperator(c.CondExpression.Operator, leftHandSideExpression);
 
                     expOrValues = Expression.Or(expOrValues, Expression.Equal(
-                                GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, value),
-                                GetAppropiateTypedValueAndType(value, c.AttributeType)));
+                                transformedExpression,
+                                TransformExpressionValueBasedOnOperator(c.CondExpression.Operator, GetAppropiateTypedValueAndType(value, c.AttributeType))));
 
 
                 }
@@ -976,13 +1042,54 @@ namespace FakeXrmEasy
                 throw new FaultException(new FaultReason($"The ConditonOperator.{c.Operator} requires 1 value/s, not {c.Values.Count(v => v != null)}. Parameter Name: {c.AttributeName}"));
             }
 
+            if (tc.AttributeType == typeof(string))
+            {
+                return TranslateConditionExpressionGreaterThanString(tc, getAttributeValueExpr, containsAttributeExpr);
+            }
+            else if (GetAppropiateTypeForValue(c.Values[0]) == typeof(string))
+            {
+                return TranslateConditionExpressionGreaterThanString(tc, getAttributeValueExpr, containsAttributeExpr);
+            }
+            else
+            {
+                BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+                foreach (object value in c.Values)
+                {
+                    var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value);
+                    var transformedExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, leftHandSideExpression);
+
+                    expOrValues = Expression.Or(expOrValues,
+                            Expression.GreaterThan(
+                                transformedExpression,
+                                TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType))));
+                }
+                return Expression.AndAlso(
+                                containsAttributeExpr,
+                                Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                    expOrValues));
+            }
+            
+        }
+
+        protected static Expression TranslateConditionExpressionGreaterThanString(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             foreach (object value in c.Values)
             {
+                var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value);
+                var transformedExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, leftHandSideExpression);
+
+                var left = transformedExpression;
+                var right = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType));
+
+                var methodCallExpr = GetCompareToExpression<string>(left, right);
+
                 expOrValues = Expression.Or(expOrValues,
                         Expression.GreaterThan(
-                            GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value),
-                            GetAppropiateTypedValueAndType(value, tc.AttributeType)));
+                            methodCallExpr,
+                            Expression.Constant(0)));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
@@ -999,22 +1106,72 @@ namespace FakeXrmEasy
                                 TranslateConditionExpressionLessThan(tc, getAttributeValueExpr, containsAttributeExpr));
 
         }
-        protected static Expression TranslateConditionExpressionLessThan(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+
+        protected static Expression GetCompareToExpression<T>(Expression left, Expression right)
+        {
+            return Expression.Call(left, typeof(T).GetMethod("CompareTo", new Type[] { typeof(string) }), new[] { right });
+        }
+
+        protected static Expression TranslateConditionExpressionLessThanString(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             var c = tc.CondExpression;
 
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
             foreach (object value in c.Values)
             {
+                var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value);
+                var transformedLeftHandSideExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, leftHandSideExpression);
+
+                var rightHandSideExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType));
+
+                //var compareToMethodCall = Expression.Call(transformedLeftHandSideExpression, typeof(string).GetMethod("CompareTo", new Type[] { typeof(string) }), new[] { rightHandSideExpression });
+                var compareToMethodCall = GetCompareToExpression<string>(transformedLeftHandSideExpression, rightHandSideExpression);
+
                 expOrValues = Expression.Or(expOrValues,
-                        Expression.LessThan(
-                            GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value),
-                            GetAppropiateTypedValueAndType(value, tc.AttributeType)));
+                        Expression.LessThan(compareToMethodCall, Expression.Constant(0)));
             }
             return Expression.AndAlso(
                             containsAttributeExpr,
                             Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
                                 expOrValues));
+        }
+
+        protected static Expression TranslateConditionExpressionLessThan(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
+            if (c.Values.Count(v => v != null) != 1)
+            {
+                throw new FaultException(new FaultReason($"The ConditonOperator.{c.Operator} requires 1 value/s, not {c.Values.Count(v => v != null)}. Parameter Name: {c.AttributeName}"));
+            }
+
+            if (tc.AttributeType == typeof(string))
+            {
+                return TranslateConditionExpressionLessThanString(tc, getAttributeValueExpr, containsAttributeExpr);
+            }
+            else if(GetAppropiateTypeForValue(c.Values[0]) == typeof(string))
+            {
+                return TranslateConditionExpressionLessThanString(tc, getAttributeValueExpr, containsAttributeExpr);
+            }
+            else
+            {
+                BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
+                foreach (object value in c.Values)
+                {
+                    var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value);
+                    var transformedExpression = TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, leftHandSideExpression);
+
+                    expOrValues = Expression.Or(expOrValues,
+                            Expression.LessThan(
+                                transformedExpression,
+                                TransformExpressionValueBasedOnOperator(tc.CondExpression.Operator, GetAppropiateTypedValueAndType(value, tc.AttributeType))));
+                }
+                return Expression.AndAlso(
+                                containsAttributeExpr,
+                                Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                    expOrValues));
+            }
+            
         }
 
         protected static Expression TranslateConditionExpressionBetween(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
@@ -1059,9 +1216,13 @@ namespace FakeXrmEasy
 
         protected static Expression TranslateConditionExpressionOlderThan(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr, DateTime olderThanDate)
         {
-            return Expression.LessThan(
+            var lessThanExpression = Expression.LessThan(
                             GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, olderThanDate),
                             GetAppropiateTypedValueAndType(olderThanDate, tc.AttributeType));
+
+            return Expression.AndAlso(containsAttributeExpr,
+                            Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                                lessThanExpression));
         }
 
         protected static Expression TranslateConditionExpressionEndsWith(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
@@ -1155,7 +1316,7 @@ namespace FakeXrmEasy
                 if (context.ProxyTypesAssembly != null)
                 {
 
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
                     if (c.EntityName != null)
                         sEntityName = qe.GetEntityNameFromAlias(c.EntityName);
                     else
@@ -1174,7 +1335,7 @@ namespace FakeXrmEasy
 
 #else
                     //CRM 2011
-                    if(c.AttributeName.IndexOf(".") >= 0) {
+                    if (c.AttributeName.IndexOf(".") >= 0) {
                         var alias = c.AttributeName.Split('.')[0];
                         sEntityName = qe.GetEntityNameFromAlias(alias);
                         sAttributeName = c.AttributeName.Split('.')[1];

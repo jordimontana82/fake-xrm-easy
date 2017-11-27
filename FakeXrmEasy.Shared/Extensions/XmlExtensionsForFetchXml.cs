@@ -13,7 +13,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
     {
         private static IEnumerable<ConditionOperator> OperatorsNotToConvertArray = new []
         {
-#if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
             ConditionOperator.OlderThanXWeeks,
             ConditionOperator.OlderThanXYears,
             ConditionOperator.OlderThanXDays,
@@ -112,6 +112,18 @@ namespace FakeXrmEasy.Extensions.FetchXml
 
         public static int? ToTopCount(this XElement el)
         {
+            var countAttr = el.GetAttribute("top");
+            if (countAttr == null) return null;
+
+            int iCount;
+            if (!int.TryParse(countAttr.Value, out iCount))
+                throw new Exception("Top attribute in fetch node must be an integer");
+
+            return iCount;
+        }
+
+        public static int? ToCount(this XElement el)
+        {
             var countAttr = el.GetAttribute("count");
             if (countAttr == null) return null;
 
@@ -150,6 +162,14 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return xlDoc.Elements()   //fetch
                     .FirstOrDefault()
                     .ToTopCount();
+        }
+
+        public static int? ToCount(this XDocument xlDoc)
+        {
+            //Check if all-attributes exist
+            return xlDoc.Elements()   //fetch
+                    .FirstOrDefault()
+                    .ToCount();
         }
 
         public static int? ToPageNumber(this XDocument xlDoc)
@@ -463,7 +483,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             //Otherwise, a single value was used
             if (value != null)
             {
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
                 if(string.IsNullOrWhiteSpace(conditionEntityName))
                 {
                     return new ConditionExpression(attributeName, op, GetConditionExpressionValueCast(value, ctx, entityName, attributeName, op));
@@ -479,7 +499,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
 #endif
             }
 
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
 
             if (string.IsNullOrWhiteSpace(conditionEntityName))
             {

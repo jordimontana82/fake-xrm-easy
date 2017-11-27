@@ -9,6 +9,9 @@
     <Import_RootNamespace>FakeXrmEasy</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepImageType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepStage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityMetadataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\ObjectExtensions.cs" />
@@ -17,6 +20,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\XmlExtensionsForFetchXml.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddListMembersListRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddMemberListRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\CustomExecutors\NavigateToNextEntityOrganizationRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\LoseOpportunityRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\PickFromQueueRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddToQueueRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AssignRequestExecutor.cs" />
@@ -24,6 +29,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\CloseQuoteRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\CreateRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\GrantAccessRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\QualifyLeadRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveOptionSetRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\DeleteRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\DisassociateRequestExecutor.cs" />
@@ -46,6 +52,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\SetStateRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\UpdateRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\WhoAmIRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\WinOpportunityRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IXrmFakedContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Metadata\DateTimeAttributeBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\TypedConditionExpression.cs" />
@@ -54,7 +61,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Permissions\IAccessRightsRepository.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PullRequestException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\EntityInitializer\DefaultEntityInitializerService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\EntityInitializer\InvoiceDetailInitializerService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\EntityInitializer\InvoiceInitializerService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\IEntityInitializerService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XrmFakedContext.Pipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedContext.DateTime.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedContext.Aggregations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmFakedContext.CodeActivities.cs" />

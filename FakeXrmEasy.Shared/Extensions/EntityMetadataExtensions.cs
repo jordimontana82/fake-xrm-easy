@@ -20,6 +20,11 @@ namespace FakeXrmEasy.Extensions
             entityMetadata.GetType().GetProperty("Attributes").SetValue(entityMetadata, attributes.ToList().ToArray(), null);
         }
 
+        public static void SetSealedPropertyValue(this EntityMetadata entityMetadata, string sPropertyName, object value)
+        {
+            entityMetadata.GetType().GetProperty(sPropertyName).SetValue(entityMetadata, value, null);
+        }
+
         public static void SetSealedPropertyValue(this AttributeMetadata attributeMetadata, string sPropertyName, object value)
         {
             attributeMetadata.GetType().GetProperty(sPropertyName).SetValue(attributeMetadata, value, null);
