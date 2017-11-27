@@ -47,11 +47,11 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="eq-userid" />
       <xs:enumeration value="ne-userid" />
       <xs:enumeration value="olderthan-x-months" />
+      <xs:enumeration value="last-seven-days" />
 
     TODO:
 
-      DATEs:
-      <xs:enumeration value="last-seven-days" />
+      DATEs:      
       <xs:enumeration value="next-seven-days" />
       <xs:enumeration value="last-week" />
       <xs:enumeration value="this-week" />
@@ -644,6 +644,66 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal("birthdate", query.Criteria.Conditions[0].AttributeName);
             Assert.Equal(ConditionOperator.OlderThanXMonths, query.Criteria.Conditions[0].Operator);
             Assert.Equal(3, query.Criteria.Conditions[0].Values[0]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Last_Seven_Days_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='createdon' operator='last-seven-days' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var ct = new Contact();
+
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("createdon", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.Last7Days, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(0, query.Criteria.Conditions[0].Values.Count);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Last_Seven_Days_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                                        <filter type='and'>
+                                            <condition attribute='birthdate' operator='last-seven-days' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var date = DateTime.UtcNow;
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), BirthDate = date.AddDays(-1) }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), BirthDate = date.AddDays(-8) }; //Shouldn't be returned
+            var ct3 = new Contact() { Id = Guid.NewGuid(), BirthDate = date.AddDays(1) }; //Shouldn't be returned
+            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            Assert.Equal(ct1.Id, collection.Entities[0].Id);
         }
 
         [Fact]
