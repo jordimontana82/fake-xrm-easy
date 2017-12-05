@@ -462,6 +462,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "olderthan-x-months":
                     op = ConditionOperator.OlderThanXMonths;
                     break;
+                case "last-seven-days":
+                    op = ConditionOperator.Last7Days;
+                    break;
                 default:
                     throw PullRequestException.FetchXmlOperatorNotImplemented(elem.GetAttribute("operator").Value);
             }
