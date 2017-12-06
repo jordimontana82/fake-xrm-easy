@@ -3,7 +3,7 @@
 
 |Build|Line Coverage|Branch Coverage|
 |-----------|-----|-----------------|
-|[![Build status](https://ci.appveyor.com/api/projects/status/2g8yc8jg817746du?svg=true)](https://ci.appveyor.com/project/Jordi/fake-xrm-easy)|[![Line coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_linecoverage.svg?v=1.37.4)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.37.4)|[![Branch coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_branchcoverage.svg?v=1.37.4)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.37.4)|
+|[![Build status](https://ci.appveyor.com/api/projects/status/2g8yc8jg817746du?svg=true)](https://ci.appveyor.com/project/Jordi/fake-xrm-easy)|[![Line coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_linecoverage.svg?v=1.38.0)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.38.0)|[![Branch coverage](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/badge_branchcoverage.svg?v=1.38.0)](https://cdn.rawgit.com/jordimontana82/fake-xrm-easy/master/test/reports/index.htm?v=1.38.0)|
 
 <b>Streamline unit testing</b> in Dynamics CRM by faking the `IOrganizationService` to work with an in-memory context.
 
@@ -11,12 +11,12 @@
 
 |Version|NuGet|
 |-----------|-----|
-|Dynamics v9|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.9?v=1.37.4)](https://www.nuget.org/packages/fakexrmeasy.9)|
-|Dynamics 365|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.365?v=1.37.4)](https://www.nuget.org/packages/fakexrmeasy.365)|
-|Dynamics CRM 2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.37.4)](https://www.nuget.org/packages/fakexrmeasy.2016)|
-|Dynamics CRM 2015|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2015?v=1.37.4)](https://www.nuget.org/packages/fakexrmeasy.2015)|
-|Dynamics CRM 2013|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2013?v=1.37.4)](https://www.nuget.org/packages/fakexrmeasy.2013)|
-|Dynamics CRM 2011|[![Nuget](https://buildstats.info/nuget/fakexrmeasy?v=1.37.4)](https://www.nuget.org/packages/fakexrmeasy)|
+|Dynamics v9|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.9?v=1.38.0)](https://www.nuget.org/packages/fakexrmeasy.9)|
+|Dynamics 365|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.365?v=1.38.0)](https://www.nuget.org/packages/fakexrmeasy.365)|
+|Dynamics CRM 2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.38.0)](https://www.nuget.org/packages/fakexrmeasy.2016)|
+|Dynamics CRM 2015|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2015?v=1.38.0)](https://www.nuget.org/packages/fakexrmeasy.2015)|
+|Dynamics CRM 2013|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2013?v=1.38.0)](https://www.nuget.org/packages/fakexrmeasy.2013)|
+|Dynamics CRM 2011|[![Nuget](https://buildstats.info/nuget/fakexrmeasy?v=1.38.0)](https://www.nuget.org/packages/fakexrmeasy)|
 
 Supports Dynamics CRM 2011, 2013, 2015, 2016, and Dynamics 365 (8.x and 9.x). <b>NOTE:</b> With the release of Dynamics 365 v9 we are changing the naming convention for new packages to match the major version.
 
@@ -38,8 +38,8 @@ Please consider the below guidelines for contributing to the project:
 
 ## Roadmap
 
-*   TODO:  Add support for date operators. See `ConditionOperator` implementation status [here](https://github.com/jordimontana82/fake-xrm-easy/blob/master/FakeXrmEasy.Tests.Shared/FakeContextTests/FetchXml/ConditionOperatorTests.cs#L19-L110). Feel free to add missing ones!
-*    TODO: Implement remaining CRM messages. To know which ones have been implemented so far, see `FakeMessageExecutor` implementation status [here](https://github.com/jordimontana82/fake-xrm-easy/tree/master/FakeXrmEasy.Shared/FakeMessageExecutors).
+*  TODO:  Add support for date operators. See `ConditionOperator` implementation status [here](https://github.com/jordimontana82/fake-xrm-easy/blob/master/FakeXrmEasy.Tests.Shared/FakeContextTests/FetchXml/ConditionOperatorTests.cs#L19-L110). Feel free to add missing ones!
+*  TODO: Implement remaining CRM messages. To know which ones have been implemented so far, see `FakeMessageExecutor` implementation status [here](https://github.com/jordimontana82/fake-xrm-easy/tree/master/FakeXrmEasy.Shared/FakeMessageExecutors).
 *  TODO: Increase test coverage.
 
 ## Backlog

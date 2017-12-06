@@ -47,9 +47,9 @@ let nugetDir                = @".\nuget\"
 let nugetDeployDir          = @"[Enter_NuGet_Url]"
 let packagesDir             = @".\packages\"
 
-let nuGetCommandLine           = @".\tools\nuget\nuget286.exe"
-let mutable previousVersion = "1.37.3"
-let mutable version         = "1.37.4" //Copy this into previousVersion before publishing packages...
+let nuGetCommandLine           = @".\tools\nuget\nuget410.exe"
+let mutable previousVersion = "1.37.4"
+let mutable version         = "1.38.0" //Copy this into previousVersion before publishing packages...
 let mutable build           = buildVersion
 let mutable nugetVersion    = version
 let mutable asmVersion      = version
