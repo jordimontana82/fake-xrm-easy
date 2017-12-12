@@ -745,7 +745,7 @@ namespace FakeXrmEasy
             if (attributeType != null)
             {
 
-#if FAKE_XRM_EASY
+#if FAKE_XRM_EASY || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015
                     if (attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference))
                             return GetAppropiateCastExpressionBasedGuid(input);
 #endif
