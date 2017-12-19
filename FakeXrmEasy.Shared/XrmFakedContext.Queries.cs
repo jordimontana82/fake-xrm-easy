@@ -527,6 +527,9 @@ namespace FakeXrmEasy
                                TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression),
                                TranslateConditionExpressionGreaterThan(c, getNonBasicValueExpr, containsAttributeExpression));
                     break;
+                case ConditionOperator.Last7Days:
+                    operatorExpression = TranslateConditionExpressionLast(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
 
                 case ConditionOperator.OnOrBefore:
                     operatorExpression = Expression.Or(
@@ -1172,6 +1175,26 @@ namespace FakeXrmEasy
                                     expOrValues));
             }
             
+        }
+
+        protected static Expression TranslateConditionExpressionLast(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
+            var beforeDateTime = default(DateTime);
+            var currentDateTime = DateTime.UtcNow;
+
+            switch (c.Operator)
+            {
+                case ConditionOperator.Last7Days:
+                    beforeDateTime = currentDateTime.AddDays(-7);
+                    break;
+            }
+
+            c.Values.Add(beforeDateTime);
+            c.Values.Add(currentDateTime);
+
+            return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
 
         protected static Expression TranslateConditionExpressionBetween(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
