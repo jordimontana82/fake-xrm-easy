@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
+using System;
 using Microsoft.Xrm.Sdk;
 using System.ServiceModel;
 using Microsoft.Crm.Sdk.Messages;
@@ -12,7 +13,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             return request is AddUserToRecordTeamRequest;
         }
 
-        public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
+        public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx) 
         {
             AddUserToRecordTeamRequest addReq = (AddUserToRecordTeamRequest)request;
 
@@ -29,7 +30,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "Can not add to team without user");
             }
-
+            
             if (teamTemplateId == Guid.Empty)
             {
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "Can not add to team without team");
@@ -50,7 +51,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
         public Type GetResponsibleRequestType()
         {
-            return typeof(AddUserToRecordTeamRequestExecutor);
+            return typeof(AddUserToRecordTeamRequest);
         }
     }
 }
+#endif
