@@ -20,7 +20,6 @@ namespace FakeXrmEasy
     /// </summary>
     public partial class XrmFakedContext : IXrmContext
     {
-
         protected internal IOrganizationService Service { get; set; }
 
         private readonly Lazy<XrmFakedTracingService> _tracingService = new Lazy<XrmFakedTracingService>(() => new XrmFakedTracingService());
