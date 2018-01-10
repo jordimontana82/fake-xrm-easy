@@ -284,7 +284,7 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
-        public void Should_Raise_An_Exception_When_Updating_An_Inactive_Record()
+        public void Should_Not_Raise_An_Exception_When_Updating_Status()
         {
             var entityId = Guid.NewGuid();
             var context = new XrmFakedContext();
@@ -296,30 +296,7 @@ namespace FakeXrmEasy.Tests
                     Id = entityId,
                     Attributes = new AttributeCollection
                     {
-                        { "statecode", 1 }  //0 = Active, anything else: Inactive
-                    }
-                }
-            });
-
-            var accountToUpdate = new Account() { Id = entityId, Name = "FC Barcelona" };
-
-            Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Update(accountToUpdate));
-        }
-
-        [Fact]
-        public void Should_Not_Raise_An_Exception_When_Updating_An_Inactive_Record_If_It_Is_Being_Activated_Again()
-        {
-            var entityId = Guid.NewGuid();
-            var context = new XrmFakedContext();
-            var service = context.GetOrganizationService();
-
-            context.Initialize(new[] {
-                new Account()
-                {
-                    Id = entityId,
-                    Attributes = new AttributeCollection
-                    {
-                        { "statecode", 1 }  //0 = Active, anything else: Inactive
+                        { "statecode", 0 }  //0 = Active, anything else: Inactive
                     }
                 }
             });
@@ -327,12 +304,12 @@ namespace FakeXrmEasy.Tests
             var accountToUpdate = new Account() {
                 Id = entityId,
                 Name = "FC Barcelona",
-                ["statecode"] = new OptionSetValue(0)
+                ["statecode"] = new OptionSetValue(1)
             };
 
             service.Update(accountToUpdate);
             var updatedAccount = context.CreateQuery<Account>().FirstOrDefault();
-            Assert.Equal(0, (int) updatedAccount.StateCode.Value);
+            Assert.Equal(1, (int) updatedAccount.StateCode.Value);
         }
     }
 }
