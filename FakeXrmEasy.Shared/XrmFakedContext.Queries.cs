@@ -19,47 +19,46 @@ namespace FakeXrmEasy
 {
     public partial class XrmFakedContext : IXrmContext
     {
-        protected internal Type FindReflectedType(string sLogicalName)
+        protected internal Type FindReflectedType(string logicalName)
         {
-            Assembly assembly = this.ProxyTypesAssembly;
+            var assembly = this.ProxyTypesAssembly;
             try
             {
                 if (assembly == null)
                 {
                     assembly = Assembly.GetExecutingAssembly();
                 }
+
                 var subClassType = assembly.GetTypes()
                         .Where(t => typeof(Entity).IsAssignableFrom(t))
-                        .Where(t => t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
-                        .Where(t => ((EntityLogicalNameAttribute)t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0]).LogicalName.Equals(sLogicalName.ToLower()))
-                        .FirstOrDefault();
+                        .Where(t => t.GetCustomAttributes<EntityLogicalNameAttribute>(true).Any())
+                        .FirstOrDefault(t => t.GetCustomAttributes<EntityLogicalNameAttribute>(true).First().LogicalName.Equals(logicalName, StringComparison.OrdinalIgnoreCase));
 
                 return subClassType;
             }
-            catch (System.Reflection.ReflectionTypeLoadException ex)
+            catch (ReflectionTypeLoadException exception)
             {
                 // now look at ex.LoaderExceptions - this is an Exception[], so:
-                string s = "";
-                foreach (Exception inner in ex.LoaderExceptions)
+                var s = "";
+                foreach (var innerException in exception.LoaderExceptions)
                 {
                     // write details of "inner", in particular inner.Message
-                    s += inner.Message + " ";
+                    s += innerException.Message + " ";
                 }
 
                 throw new Exception("XrmFakedContext.FindReflectedType: " + s);
             }
-
         }
 
-        protected internal Type FindReflectedAttributeType(Type earlyBoundType, string sAttributeName)
+        protected internal Type FindReflectedAttributeType(Type earlyBoundType, string attributeName)
         {
             //Get that type properties
-            var attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, sAttributeName);
-            if (attributeInfo == null && sAttributeName.EndsWith("name"))
+            var attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, attributeName);
+            if (attributeInfo == null && attributeName.EndsWith("name"))
             {
                 // Special case for referencing the name of a EntityReference
-                sAttributeName = sAttributeName.Substring(0, sAttributeName.Length - 4);
-                attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, sAttributeName);
+                attributeName = attributeName.Substring(0, attributeName.Length - 4);
+                attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, attributeName);
 
                 if (attributeInfo.PropertyType != typeof(EntityReference))
                 {
@@ -68,24 +67,30 @@ namespace FakeXrmEasy
                 }
             }
 
-            if (attributeInfo == null)
+            if (attributeInfo == null || attributeInfo.PropertyType.FullName == null)
             {
-                throw new Exception(string.Format("XrmFakedContext.FindReflectedAttributeType: Attribute {0} not found for type {1}", sAttributeName, earlyBoundType.ToString()));
+                throw new Exception($"XrmFakedContext.FindReflectedAttributeType: Attribute {attributeName} not found for type {earlyBoundType}");
             }
-            else if (attributeInfo.PropertyType.FullName.EndsWith("Enum"))
+
+            if (attributeInfo.PropertyType.FullName.EndsWith("Enum"))
             {
-                return typeof(System.Int32);
+                return typeof(int);
             }
-            else if (!attributeInfo.PropertyType.FullName.StartsWith("System."))
+
+            if (!attributeInfo.PropertyType.FullName.StartsWith("System."))
             {
                 try
                 {
-                    var inst = Activator.CreateInstance(attributeInfo.PropertyType);
-
-                    if (inst is Entity)
+                    var instance = Activator.CreateInstance(attributeInfo.PropertyType);
+                    if (instance is Entity)
+                    {
                         return typeof(EntityReference);
+                    }
                 }
-                catch { }
+                catch
+                {
+                    // ignored
+                }
             }
 #if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
             else if (attributeInfo.PropertyType.FullName.StartsWith("System.Nullable"))
@@ -97,12 +102,11 @@ namespace FakeXrmEasy
             return attributeInfo.PropertyType;
         }
 
-        private static PropertyInfo GetEarlyBoundTypeAttribute(Type earlyBoundType, string sAttributeName)
+        private static PropertyInfo GetEarlyBoundTypeAttribute(Type earlyBoundType, string attributeName)
         {
             var attributeInfo = earlyBoundType.GetProperties()
-                .Where(pi => pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true).Length > 0)
-                .Where(pi => (pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true)[0] as AttributeLogicalNameAttribute).LogicalName.Equals(sAttributeName))
-                .FirstOrDefault();
+                .Where(pi => pi.GetCustomAttributes<AttributeLogicalNameAttribute>(true).Any())
+                .FirstOrDefault(pi => pi.GetCustomAttributes<AttributeLogicalNameAttribute>(true).First().LogicalName.Equals(attributeName, StringComparison.OrdinalIgnoreCase));
 
             return attributeInfo;
         }
@@ -112,42 +116,44 @@ namespace FakeXrmEasy
             return this.CreateQuery<Entity>(entityLogicalName);
         }
 
-        public IQueryable<T> CreateQuery<T>() where T : Entity
+        public IQueryable<T> CreateQuery<T>()
+            where T : Entity
         {
-            Type typeParameter = typeof(T);
+            var typeParameter = typeof(T);
 
             if (ProxyTypesAssembly == null)
             {
                 //Try to guess proxy types assembly
-                var asm = Assembly.GetAssembly(typeof(T));
-                if (asm != null)
+                var assembly = Assembly.GetAssembly(typeof(T));
+                if (assembly != null)
                 {
-                    ProxyTypesAssembly = asm;
+                    ProxyTypesAssembly = assembly;
                 }
             }
-            string sLogicalName = "";
 
-            if (typeParameter.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
+            var logicalName = "";
+
+            if (typeParameter.GetCustomAttributes<EntityLogicalNameAttribute>(true).Any())
             {
-                sLogicalName = (typeParameter.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0] as EntityLogicalNameAttribute).LogicalName;
+                logicalName = typeParameter.GetCustomAttributes<EntityLogicalNameAttribute>(true).First().LogicalName;
             }
 
-            return this.CreateQuery<T>(sLogicalName);
+            return this.CreateQuery<T>(logicalName);
         }
 
-        protected IQueryable<T> CreateQuery<T>(string entityLogicalName) where T : Entity
+        protected IQueryable<T> CreateQuery<T>(string entityLogicalName)
+            where T : Entity
         {
-            List<T> lst = new List<T>();
             var subClassType = FindReflectedType(entityLogicalName);
-            if ((subClassType == null && !(typeof(T).Equals(typeof(Entity))))
-                || (typeof(T).Equals(typeof(Entity)) && string.IsNullOrWhiteSpace(entityLogicalName)))
+            if (subClassType == null && !(typeof(T) == typeof(Entity)) || (typeof(T) == typeof(Entity) && string.IsNullOrWhiteSpace(entityLogicalName)))
             {
-                throw new Exception(string.Format("The type {0} was not found", entityLogicalName));
+                throw new Exception($"The type {entityLogicalName} was not found");
             }
 
+            var lst = new List<T>();
             if (!Data.ContainsKey(entityLogicalName))
             {
-                return lst.AsQueryable<T>(); //Empty list
+                return lst.AsQueryable(); //Empty list
             }
 
             foreach (var e in Data[entityLogicalName].Values)
@@ -161,12 +167,12 @@ namespace FakeXrmEasy
                     lst.Add((T)e.Clone());
             }
 
-            return lst.AsQueryable<T>();
+            return lst.AsQueryable();
         }
 
-        public IQueryable<Entity> CreateQueryFromEntityName(string s)
+        public IQueryable<Entity> CreateQueryFromEntityName(string entityName)
         {
-            return Data[s].Values.AsQueryable();
+            return Data[entityName].Values.AsQueryable();
         }
 
         public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, Dictionary<string, int> linkedEntities, string linkFromAlias = "", string linkFromEntity = "")
