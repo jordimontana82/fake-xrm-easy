@@ -57,6 +57,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\MetadataInferenceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\MinClientContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LoseOpportunityTests\LoseOpportunityTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ModifyAccessRightsTests\ModifyAccessRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\OptionSetValuesRequestTests\OptionSetValueRequestsTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\OrgServiceContextTests\OrgServiceContextTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\PermissionsTests\PermissionsTests.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QualifyLeadTests\QualifyLeadTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QueryByAttribute\QueryByAttributeTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QueryLookupTests\QueryLookupTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RemoveFromQueueRequestTests\RemoveFromQueueRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveEntityRequestTests\RetrieveEntityRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs" />
@@ -74,6 +76,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveVersionRequestTests\RetrieveVersionRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ReviseQuoteRequestTests\ReviseQuoteRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TestGenericMessageExecutors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FakeContextTestFormattedValues.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs" />
