@@ -47,3 +47,10 @@ Please consider the below guidelines for contributing to the project:
 FetchXml implementation:
 *   DONE: Add support for arithmetic operators
 *   DONE:  Add support for FetchXml aggregations
+
+
+##Tests dissapeared?
+
+Try deleting anything under the VS test explorer cache:
+
+%Temp%\VisualStudioTestExplorerExtensions
