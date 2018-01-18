@@ -29,13 +29,5 @@ namespace FakeXrmEasy.Extensions
                 && t.GetGenericTypeDefinition() == typeof(Nullable<>)
                 && t.GetGenericArguments()[0].IsEnum;
         }
-
-#if FAKE_XRM_EASY || FAKE_XRM_EASY_2013
-        public static IEnumerable<T> GetCustomAttributes<T>(this MemberInfo element, bool inherit)
-            where T : Attribute
-        {
-            return (IEnumerable<T>)Attribute.GetCustomAttributes(element, typeof(T), inherit);
-        }
-#endif
     }
 }

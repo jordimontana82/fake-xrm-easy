@@ -29,11 +29,19 @@ namespace FakeXrmEasy
                     assembly = Assembly.GetExecutingAssembly();
                 }
 
+                /* This wasn't building within the CI FAKE build script...
                 var subClassType = assembly.GetTypes()
                         .Where(t => typeof(Entity).IsAssignableFrom(t))
                         .Where(t => t.GetCustomAttributes<EntityLogicalNameAttribute>(true).Any())
                         .FirstOrDefault(t => t.GetCustomAttributes<EntityLogicalNameAttribute>(true).First().LogicalName.Equals(logicalName, StringComparison.OrdinalIgnoreCase));
 
+                */
+                var subClassType = assembly.GetTypes()
+                        .Where(t => typeof(Entity).IsAssignableFrom(t))
+                        .Where(t => t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
+                        .Where(t => ((EntityLogicalNameAttribute)t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0]).LogicalName.Equals(logicalName.ToLower()))
+                        .FirstOrDefault();
+                
                 return subClassType;
             }
             catch (ReflectionTypeLoadException exception)
@@ -105,8 +113,9 @@ namespace FakeXrmEasy
         private static PropertyInfo GetEarlyBoundTypeAttribute(Type earlyBoundType, string attributeName)
         {
             var attributeInfo = earlyBoundType.GetProperties()
-                .Where(pi => pi.GetCustomAttributes<AttributeLogicalNameAttribute>(true).Any())
-                .FirstOrDefault(pi => pi.GetCustomAttributes<AttributeLogicalNameAttribute>(true).First().LogicalName.Equals(attributeName, StringComparison.OrdinalIgnoreCase));
+                .Where(pi => pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true).Length > 0)
+                .Where(pi => (pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true)[0] as AttributeLogicalNameAttribute).LogicalName.Equals(attributeName))
+                .FirstOrDefault();
 
             return attributeInfo;
         }
@@ -133,9 +142,9 @@ namespace FakeXrmEasy
 
             var logicalName = "";
 
-            if (typeParameter.GetCustomAttributes<EntityLogicalNameAttribute>(true).Any())
+            if (typeParameter.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
             {
-                logicalName = typeParameter.GetCustomAttributes<EntityLogicalNameAttribute>(true).First().LogicalName;
+                logicalName = (typeParameter.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0] as EntityLogicalNameAttribute).LogicalName;
             }
 
             return this.CreateQuery<T>(logicalName);

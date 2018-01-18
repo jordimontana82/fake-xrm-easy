@@ -43,7 +43,6 @@
       <HintPath>..\packages\FakeItEasy.3.2.0\lib\net40\FakeItEasy.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="microsoft.crm.sdk.proxy">
       <HintPath>..\packages\Microsoft.Crm.Sdk.Proxy.2011.5.0.18\lib\net40\microsoft.crm.sdk.proxy.dll</HintPath>
     </Reference>
