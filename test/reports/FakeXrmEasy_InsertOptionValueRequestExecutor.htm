@@ -15,11 +15,11 @@
 <tr><th>Class:</th><td>FakeXrmEasy.FakeMessageExecutors.InsertOptionValueRequestExecutor</td></tr>
 <tr><th>Assembly:</th><td>FakeXrmEasy</td></tr>
 <tr><th>File(s):</th><td><a href="#CCodefakexrmeasyFakeXrmEasySharedFakeMessageExecutorsInsertOptionValueRequestExecutorcs">C:\Code\fake-xrm-easy\FakeXrmEasy.Shared\FakeMessageExecutors\InsertOptionValueRequestExecutor.cs</a></td></tr>
-<tr><th>Covered lines:</th><td>29</td></tr>
-<tr><th>Uncovered lines:</th><td>4</td></tr>
+<tr><th>Covered lines:</th><td>32</td></tr>
+<tr><th>Uncovered lines:</th><td>1</td></tr>
 <tr><th>Coverable lines:</th><td>33</td></tr>
 <tr><th>Total lines:</th><td>59</td></tr>
-<tr><th>Line coverage:</th><td>87.8%</td></tr>
+<tr><th>Line coverage:</th><td>96.9%</td></tr>
 <tr><th>Branch coverage:</th><td>80%</td></tr>
 </tbody>
 </table>
@@ -27,7 +27,7 @@
 <table class="overview">
 <thead><tr><th>Method</th><th>Cyclomatic Complexity</th><th>Sequence Coverage</th><th>Branch Coverage</th></tr></thead>
 <tbody>
-<tr><td title="System.Boolean FakeXrmEasy.FakeMessageExecutors.InsertOptionValueRequestExecutor::CanExecute(Microsoft.Xrm.Sdk.OrganizationRequest)">CanExecute(...)</td><td>1</td><td>0</td><td>0</td></tr>
+<tr><td title="System.Boolean FakeXrmEasy.FakeMessageExecutors.InsertOptionValueRequestExecutor::CanExecute(Microsoft.Xrm.Sdk.OrganizationRequest)">CanExecute(...)</td><td>1</td><td>100</td><td>100</td></tr>
 <tr><td title="Microsoft.Xrm.Sdk.OrganizationResponse FakeXrmEasy.FakeMessageExecutors.InsertOptionValueRequestExecutor::Execute(Microsoft.Xrm.Sdk.OrganizationRequest,FakeXrmEasy.XrmFakedContext)">Execute(...)</td><td>9</td><td>95</td><td>81.82</td></tr>
 <tr><td title="System.Type FakeXrmEasy.FakeMessageExecutors.InsertOptionValueRequestExecutor::GetResponsibleRequestType()">GetResponsibleRequestType()</td><td>1</td><td>100</td><td>100</td></tr>
 </tbody>
@@ -47,9 +47,9 @@
 <tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>8</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;class&nbsp;InsertOptionValueRequestExecutor&nbsp;:&nbsp;IFakeMessageExecutor</code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>9</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>10</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;CanExecute(OrganizationRequest&nbsp;request)</code></td></tr>
-<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>11</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>12</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;request&nbsp;is&nbsp;InsertOptionValueRequest;</code></td></tr>
-<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>13</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>11</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>12</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;request&nbsp;is&nbsp;InsertOptionValueRequest;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>13</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>14</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>15</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;OrganizationResponse&nbsp;Execute(OrganizationRequest&nbsp;request,&nbsp;XrmFakedContext&nbsp;ctx)</code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>16</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
@@ -91,13 +91,13 @@
 <tr data-coverage="{'AllTestMethods': {'VC': '12', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">12</td><td class="rightmargin right"><code>52</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>53</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>54</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;Type&nbsp;GetResponsibleRequestType()</code></td></tr>
-<tr data-coverage="{'AllTestMethods': {'VC': '3293', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3293</td><td class="rightmargin right"><code>55</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr data-coverage="{'AllTestMethods': {'VC': '3293', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3293</td><td class="rightmargin right"><code>56</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;typeof(InsertOptionValueRequest);</code></td></tr>
-<tr data-coverage="{'AllTestMethods': {'VC': '3293', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3293</td><td class="rightmargin right"><code>57</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '3357', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3357</td><td class="rightmargin right"><code>55</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '3357', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3357</td><td class="rightmargin right"><code>56</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;typeof(InsertOptionValueRequest);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '3357', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3357</td><td class="rightmargin right"><code>57</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>58</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
 <tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>59</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
 </tbody>
 </table>
-<div class="footer">Generated by: ReportGenerator 2.4.5.0<br />06/12/2017 - 01:04:02<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<div class="footer">Generated by: ReportGenerator 2.4.5.0<br />19/01/2018 - 0:07:23<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
 <script type="text/javascript" src="combined.js"></script>
 </body></html>
