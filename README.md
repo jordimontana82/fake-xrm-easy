@@ -49,8 +49,6 @@ FetchXml implementation:
 *   DONE:  Add support for FetchXml aggregations
 
 
-##Tests dissapeared?
+## Tests disappeared?
 
-Try deleting anything under the VS test explorer cache:
-
-%Temp%\VisualStudioTestExplorerExtensions
+Try deleting anything under the VS test explorer cache: `%Temp%\VisualStudioTestExplorerExtensions`
