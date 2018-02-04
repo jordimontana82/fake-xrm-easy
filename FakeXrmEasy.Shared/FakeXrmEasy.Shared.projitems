@@ -48,6 +48,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveEntityRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrievePrincipalAccessRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveRelationshipRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveSharedPrincipalsAndAccessRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveVersionRequestExecutor.cs" />

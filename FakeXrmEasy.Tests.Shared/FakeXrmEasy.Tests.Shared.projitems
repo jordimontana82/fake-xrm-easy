@@ -90,6 +90,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)GeneratedCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issue116.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue165.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue178.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue180.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue125.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue156.cs" />
