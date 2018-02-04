@@ -96,7 +96,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             if (pageNumber != 1)
             {
-                startPosition = (pageNumber - 1) * pageSize - 1;
+                startPosition = (pageNumber - 1) * pageSize;
             }
 
             if (list.Count < pageSize)

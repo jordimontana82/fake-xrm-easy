@@ -4,6 +4,7 @@ using System.Text;
 using Xunit;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using System.Linq;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
 {
@@ -29,8 +30,10 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
             }
             context.Initialize(initialEntities);
 
+            List<Entity> allRecords = new List<Entity>();
             QueryExpression query = new QueryExpression("entity");
             EntityCollection result = service.RetrieveMultiple(query);
+            allRecords.AddRange(result.Entities);
             Assert.Equal(context.MaxRetrieveCount, result.Entities.Count);
             Assert.True(result.MoreRecords);
             Assert.NotNull(result.PagingCookie);
@@ -41,8 +44,14 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
                 PageNumber = 2,
             };
             result = service.RetrieveMultiple(query);
+            allRecords.AddRange(result.Entities);
             Assert.Equal(excessNumberOfRecords, result.Entities.Count);
             Assert.False(result.MoreRecords);
+
+            foreach (Entity e in initialEntities)
+            {
+                Assert.True(allRecords.Any(r => r.Id == e.Id));
+            }
         }
 
         /// <summary>
