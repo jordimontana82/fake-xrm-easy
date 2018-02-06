@@ -15,10 +15,10 @@
     <tags>dynamics crm 2015 unit testing xrm mock mocking fake fakes</tags>
     <dependencies>
       <dependency id="FakeItEasy" version="[3.2.0]" />
-      <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="7.1.1" />
-      <dependency id="Microsoft.CrmSdk.Workflow" version="7.1.1" />
-      <dependency id="Microsoft.CrmSdk.Deployment" version="7.1.1" />
-      <dependency id="Microsoft.CrmSdk.Extensions" version="7.1.0.1" />
+      <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="7.1" />
+      <dependency id="Microsoft.CrmSdk.Workflow" version="7.1" />
+      <dependency id="Microsoft.CrmSdk.Deployment" version="7.1" />
+      <dependency id="Microsoft.CrmSdk.Extensions" version="7.1" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Activities" targetFramework="net452" />
