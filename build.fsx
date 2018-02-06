@@ -338,7 +338,7 @@ Target "Publish" (fun _ ->
 
 Target "CodeCoverage.2011" (fun _ ->
     OpenCover (fun p -> { p with 
-                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.2.0/tools/xunit.console.exe"
                                 ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
                                 Register = RegisterType.RegisterUser
                                 WorkingDir = (testDir @@ "\FakeXrmEasy.Tests")
@@ -350,7 +350,7 @@ Target "CodeCoverage.2011" (fun _ ->
 
 Target "CodeCoverage.2013" (fun _ ->
     OpenCover (fun p -> { p with 
-                                TestRunnerExePath = "./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe"
+                                TestRunnerExePath = "./packages/xunit.runner.console.2.2.0/tools/xunit.console.exe"
                                 ExePath = "./packages/OpenCover.4.6.519/tools/OpenCover.Console"
                                 Register = RegisterType.RegisterUser
                                 WorkingDir = (testDir @@ "\FakeXrmEasy.Tests.2013")
