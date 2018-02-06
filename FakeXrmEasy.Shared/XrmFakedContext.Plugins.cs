@@ -79,7 +79,6 @@ namespace FakeXrmEasy
                 }
             }
         }
-
         protected IExecutionContext GetFakedExecutionContext(XrmFakedPluginExecutionContext ctx)
         {
             var context = A.Fake<IExecutionContext>();
@@ -151,7 +150,7 @@ namespace FakeXrmEasy
         }
 
         public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, string unsecureConfiguration, string secureConfiguration)
-            where T : class, IPlugin
+            where T : class, IPlugin 
         {
             var pluginType = typeof(T);
             var constructors = pluginType.GetConstructors().ToList();
@@ -164,6 +163,7 @@ namespace FakeXrmEasy
             var pluginInstance = (T)Activator.CreateInstance(typeof(T), unsecureConfiguration, secureConfiguration);
 
             return this.ExecutePluginWithConfigurations(plugCtx, pluginInstance, unsecureConfiguration, secureConfiguration);
+          
         }
 
         public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, T instance, string unsecureConfiguration, string secureConfiguration)
@@ -202,7 +202,7 @@ namespace FakeXrmEasy
         /// <param name="stage">Sets the stage.</param>
         /// <returns></returns>
         public IPlugin ExecutePluginWithTarget<T>(Entity target, string messageName = "Create", int stage = 40)
-            where T : IPlugin, new()
+            where T: IPlugin, new()
         {
             var ctx = GetDefaultPluginContext();
             // Add the target entity to the InputParameters
