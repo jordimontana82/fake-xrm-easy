@@ -49,9 +49,9 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 mtm.IntersectEntityName = fakeRelationShip.IntersectEntity.ToLower();
                 return mtm;
             } else {
+
                 var otm = new Microsoft.Xrm.Sdk.Metadata.OneToManyRelationshipMetadata();
-#if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY
-#else
+#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
                 otm.ReferencedEntityNavigationPropertyName = fakeRelationShip.IntersectEntity;
 #endif
                 otm.ReferencingAttribute = fakeRelationShip.Entity1Attribute;
