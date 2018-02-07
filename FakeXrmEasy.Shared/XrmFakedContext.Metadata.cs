@@ -71,6 +71,14 @@ namespace FakeXrmEasy
                     .FirstOrDefault();
         }
 
+        public void SetEntityMetadata(EntityMetadata em)
+        {
+            if (this.EntityMetadata.ContainsKey(em.LogicalName))
+                this.EntityMetadata[em.LogicalName] = em.Copy();
+            else
+                this.EntityMetadata.Add(em.LogicalName, em.Copy());
+        }
+
         public AttributeMetadata GetAttributeMetadataFor(string sEntityName, string sAttributeName, Type attributeType)
         {
             if (EntityMetadata.ContainsKey(sEntityName))
