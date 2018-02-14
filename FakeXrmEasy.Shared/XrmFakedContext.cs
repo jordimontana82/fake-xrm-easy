@@ -67,6 +67,7 @@ namespace FakeXrmEasy
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
             ExecutionMocks = new Dictionary<Type, ServiceRequestExecution>();
             OptionSetValuesMetadata = new Dictionary<string, OptionSetMetadata>();
+            StatusAttributeMetadata = new Dictionary<string, StatusAttributeMetadata>();
 
             FakeMessageExecutors = Assembly.GetExecutingAssembly()
                 .GetTypes()
