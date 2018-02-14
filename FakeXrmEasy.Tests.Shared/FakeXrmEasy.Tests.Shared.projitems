@@ -23,6 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssignRequestTests\AssignRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AssociateRequestTests\AssociateRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\BasePluginTests\BasePluginTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\CloseIncidentRequestTests\CloseIncidentRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\CloseQuoteRequestTests\CloseQuoteRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\CustomRequestTests\NavigateToNextEntityRequestTests\NavigateToNextEntityRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\DateTimeBehaviourTests\DateTimeBehaviourTests.cs" />
@@ -46,8 +47,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\AggregateTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\ConditionOperatorTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\FakeContextTestFetchXmlTranslation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\OperatorTests\Strings\StringOperatorTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXml\TypeConversionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\InitializeFromRequestTests\InitializeFromRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\InsertOptionValueRequestTests\InsertOptionValueRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -55,6 +58,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\MetadataInferenceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LinqTests\MinClientContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\LoseOpportunityTests\LoseOpportunityTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ModifyAccessRightsTests\ModifyAccessRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\OptionSetValuesRequestTests\OptionSetValueRequestsTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\OrgServiceContextTests\OrgServiceContextTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\PermissionsTests\PermissionsTests.cs" />
@@ -63,6 +67,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QualifyLeadTests\QualifyLeadTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QueryByAttribute\QueryByAttributeTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QueryLookupTests\QueryLookupTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RemoveFromQueueRequestTests\RemoveFromQueueRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveEntityRequestTests\RetrieveEntityRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs" />
@@ -72,6 +77,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveVersionRequestTests\RetrieveVersionRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ReviseQuoteRequestTests\ReviseQuoteRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TestGenericMessageExecutors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FakeContextTestFormattedValues.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs" />
@@ -85,11 +91,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)GeneratedCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issue116.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue165.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue178.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue180.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue125.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue156.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue191.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue226.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue253.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue278.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\ProxyEntities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\TestCRMHandlingOfNullsAndMissingFields.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\PipelineTests.cs" />

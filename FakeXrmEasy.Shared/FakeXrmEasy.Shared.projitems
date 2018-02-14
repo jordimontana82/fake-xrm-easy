@@ -20,8 +20,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\XmlExtensionsForFetchXml.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddListMembersListRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddMemberListRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddUserToRecordTeamRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\CloseIncidentRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RemoveFromQueueRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\CustomExecutors\NavigateToNextEntityOrganizationRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\LoseOpportunityRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\ModifyAccessRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\PickFromQueueRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddToQueueRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AssignRequestExecutor.cs" />
@@ -44,6 +48,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveEntityRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrievePrincipalAccessRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveRelationshipRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveSharedPrincipalsAndAccessRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveVersionRequestExecutor.cs" />

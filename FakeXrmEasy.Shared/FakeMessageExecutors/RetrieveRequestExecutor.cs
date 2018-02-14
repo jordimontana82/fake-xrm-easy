@@ -53,26 +53,32 @@ namespace FakeXrmEasy.FakeMessageExecutors
                             || request.Target.LogicalName != fakeRelationship.Entity1LogicalName
                             || string.IsNullOrWhiteSpace(relatedEntitiesQueryValue.EntityName);
 
-                        var fromAttribute = isFrom1to2 ? fakeRelationship.Entity1Attribute : fakeRelationship.Entity2Attribute;
-                        var toAttribute = isFrom1to2 ? fakeRelationship.Entity2Attribute : fakeRelationship.Entity1Attribute;
-
-                        var linkEntity = new LinkEntity
+                        if (isFrom1to2)
                         {
-                            Columns = new ColumnSet(false),
-                            LinkFromAttributeName = fromAttribute,
-                            LinkFromEntityName = retrieveRelatedEntitiesQuery.EntityName,
-                            LinkToAttributeName = toAttribute,
-                            LinkToEntityName = resultEntity.LogicalName
-                        };
+                            var fromAttribute = isFrom1to2 ? fakeRelationship.Entity1Attribute : fakeRelationship.Entity2Attribute;
+                            var toAttribute = isFrom1to2 ? fakeRelationship.Entity2Attribute : fakeRelationship.Entity1Attribute;
 
-                        if (retrieveRelatedEntitiesQuery.Criteria == null)
-                        {
-                            retrieveRelatedEntitiesQuery.Criteria = new FilterExpression();
+                            var linkEntity = new LinkEntity
+                            {
+                                Columns = new ColumnSet(false),
+                                LinkFromAttributeName = fromAttribute,
+                                LinkFromEntityName = retrieveRelatedEntitiesQuery.EntityName,
+                                LinkToAttributeName = toAttribute,
+                                LinkToEntityName = resultEntity.LogicalName
+                            };
+
+                            if (retrieveRelatedEntitiesQuery.Criteria == null)
+                            {
+                                retrieveRelatedEntitiesQuery.Criteria = new FilterExpression();
+                            }
+
+                            retrieveRelatedEntitiesQuery.Criteria
+                                .AddFilter(LogicalOperator.And)
+                                .AddCondition(linkEntity.LinkFromAttributeName, ConditionOperator.Equal, resultEntity.Id);
+                        } else {
+                            var link = retrieveRelatedEntitiesQuery.AddLink(fakeRelationship.Entity1LogicalName, fakeRelationship.Entity2Attribute, fakeRelationship.Entity1Attribute);
+                            link.LinkCriteria.AddCondition(resultEntity.LogicalName+"id", ConditionOperator.Equal, resultEntity.Id);
                         }
-
-                        retrieveRelatedEntitiesQuery.Criteria
-                            .AddFilter(LogicalOperator.And)
-                            .AddCondition(linkEntity.LinkFromAttributeName, ConditionOperator.Equal, resultEntity.Id);
                     }
                     else
                     {

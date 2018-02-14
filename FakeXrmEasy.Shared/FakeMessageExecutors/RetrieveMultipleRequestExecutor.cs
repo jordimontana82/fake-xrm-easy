@@ -69,6 +69,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
             else
                 throw PullRequestException.NotImplementedOrganizationRequest(request.Query.GetType());
 
+            if (qe.Distinct)
+            {
+                list = GetDistinctEntities(list);
+            }
 
             // Handle the top count before taking paging into account
             if (qe.TopCount != null && qe.TopCount.Value < list.Count)
@@ -92,7 +96,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             if (pageNumber != 1)
             {
-                startPosition = (pageNumber - 1) * pageSize - 1;
+                startPosition = (pageNumber - 1) * pageSize;
             }
 
             if (list.Count < pageSize)
@@ -175,6 +179,21 @@ namespace FakeXrmEasy.FakeMessageExecutors
         public Type GetResponsibleRequestType()
         {
             return typeof(RetrieveMultipleRequest);
+        }
+
+        private List<Entity> GetDistinctEntities(List<Entity> input)
+        {
+            List<Entity> output = new List<Entity>();
+            foreach (Entity currentEntity in input)
+            {
+                if (!output.Any(i => i.LogicalName == currentEntity.LogicalName
+                 && i.Id == currentEntity.Id
+                 && i.Attributes.SequenceEqual(currentEntity.Attributes)))
+                {
+                    output.Add(currentEntity);
+                }
+            }
+            return output;
         }
     }
 }

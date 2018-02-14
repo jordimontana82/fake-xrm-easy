@@ -199,6 +199,20 @@ namespace FakeXrmEasy.Extensions
                 var collection = attributeValue as EntityCollection;
                 return new EntityCollection(collection.Entities.Select(e => e.Clone(e.GetType())).ToList());
             }
+            else if(attributeValue is IEnumerable<Entity>)
+            {
+                var enumerable = attributeValue as IEnumerable<Entity>;
+                return enumerable.Select(e => e.Clone(e.GetType())).ToArray();
+            }
+#if !FAKE_XRM_EASY
+            else if(type == typeof(byte[]))
+            {
+                var original = (attributeValue as byte[]);
+                var copy = new byte[original.Length];
+                original.CopyTo(copy, 0);
+                return copy;
+            }
+#endif
             else if (type == typeof(int) || type == typeof(Int64))
                 return attributeValue; //Not a reference type
             else if (type == typeof(decimal))

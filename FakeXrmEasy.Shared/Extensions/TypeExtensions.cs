@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace FakeXrmEasy.Extensions
 {
@@ -9,15 +11,15 @@ namespace FakeXrmEasy.Extensions
         {
             var nullableType = Nullable.GetUnderlyingType(t);
             return t == typeof(OptionSetValue)
-                || t.IsEnum
-                || nullableType != null && nullableType.IsEnum;
+                   || t.IsEnum
+                   || nullableType != null && nullableType.IsEnum;
         }
 
         public static bool IsDateTime(this Type t)
         {
             var nullableType = Nullable.GetUnderlyingType(t);
             return t == typeof(DateTime)
-                || nullableType != null && nullableType == typeof(DateTime);
+                   || nullableType != null && nullableType == typeof(DateTime);
         }
 
         public static bool IsNullableEnum(this Type t)

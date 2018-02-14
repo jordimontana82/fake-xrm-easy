@@ -4,6 +4,7 @@ using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Xunit;
@@ -19,8 +20,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             var date = new DateTime(2011, 7, 12, 13, 12, 43, DateTimeKind.Local);
             var element = executor.AttributeValueToFetchResult(new KeyValuePair<string, object>("new_startdate", date), null, null);
             var utcOffset = date.ToString("zz");
+            var localizedAMPMDesignator = date.ToString("tt"); //Spanish and other cultures don't have the AM/PM designator
             Assert.NotNull(element);
-            Assert.Equal(@"<new_startdate date=""2011-07-12"" time=""01:12 PM"">2011-07-12T13:12:43" + utcOffset + ":00</new_startdate>", element.ToString());
+            Assert.Equal($"<new_startdate date=\"2011-07-12\" time=\"01:12 {localizedAMPMDesignator}\">2011-07-12T13:12:43{utcOffset}:00</new_startdate>", element.ToString());
         }
 
         [Fact]
@@ -30,8 +32,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             var date = new DateTime(2011, 7, 12, 13, 12, 43, DateTimeKind.Local);
             var element = executor.AttributeValueToFetchResult(new KeyValuePair<string, object>("alias.new_startdate", new AliasedValue(null, null, date)), null, null);
             var utcOffset = date.ToString("zz");
+            var localizedAMPMDesignator = date.ToString("tt"); //Spanish and other cultures don't have the AM/PM designator
             Assert.NotNull(element);
-            Assert.Equal(@"<alias.new_startdate date=""2011-07-12"" time=""01:12 PM"">2011-07-12T13:12:43" + utcOffset + ":00</alias.new_startdate>", element.ToString());
+            Assert.Equal($"<alias.new_startdate date=\"2011-07-12\" time=\"01:12 {localizedAMPMDesignator}\">2011-07-12T13:12:43{utcOffset}:00</alias.new_startdate>", element.ToString());
         }
 
         [Fact]

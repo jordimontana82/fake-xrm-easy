@@ -2,6 +2,8 @@
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using System;
+using System.Linq;
+using FakeXrmEasy.Extensions;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -48,6 +50,42 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 Label = req.Label
             });
 
+            if(!string.IsNullOrEmpty(req.EntityLogicalName))
+            {
+                var entityMetadata = ctx.GetEntityMetadataByName(req.EntityLogicalName);
+                if(entityMetadata != null)
+                {
+                    var attribute = entityMetadata
+                            .Attributes
+                            .Where(a => a.LogicalName == req.AttributeLogicalName)
+                            .FirstOrDefault();
+
+                    if(attribute == null) {
+                        throw new Exception($"You are trying to insert an option set value for entity '{req.EntityLogicalName}' with entity metadata associated but the attribute '{req.AttributeLogicalName}' doesn't exist in metadata");
+                    }
+
+                    if(!(attribute is EnumAttributeMetadata)) {
+                        throw new Exception($"You are trying to insert an option set value for entity '{req.EntityLogicalName}' with entity metadata associated but the attribute '{req.AttributeLogicalName}' is not a valid option set field (not a subtype of EnumAttributeMetadata)");
+                    }
+
+                    var enumAttribute = attribute as EnumAttributeMetadata;
+
+                    OptionMetadataCollection options = null;
+
+                    if (enumAttribute.OptionSet == null)
+                    {
+                        options = new OptionMetadataCollection();
+                    } 
+                    else
+                        options = enumAttribute.OptionSet.Options;
+
+                    options.Add(new OptionMetadata(req.Label, req.Value));
+                    enumAttribute.OptionSet = new OptionSetMetadata(options);
+
+                    entityMetadata.SetAttribute(enumAttribute);
+                    ctx.SetEntityMetadata(entityMetadata);
+                }
+            }
             return new InsertOptionValueResponse();
         }
 

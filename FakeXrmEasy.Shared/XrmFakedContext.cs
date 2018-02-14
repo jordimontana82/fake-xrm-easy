@@ -20,7 +20,6 @@ namespace FakeXrmEasy
     /// </summary>
     public partial class XrmFakedContext : IXrmContext
     {
-
         protected internal IOrganizationService Service { get; set; }
 
         private readonly Lazy<XrmFakedTracingService> _tracingService = new Lazy<XrmFakedTracingService>(() => new XrmFakedTracingService());
@@ -275,10 +274,15 @@ namespace FakeXrmEasy
                     {
                         return context.ExecutionMocks[req.GetType()].Invoke(req);
                     }
+
                     if (context.FakeMessageExecutors.ContainsKey(req.GetType()))
                     {
-                        return context.FakeMessageExecutors[req.GetType()].Execute(req, context);
+                        if (context.FakeMessageExecutors[req.GetType()].CanExecute(req))
+                        {
+                            return context.FakeMessageExecutors[req.GetType()].Execute(req, context);
+                        }
                     }
+
                     if (req.GetType() == typeof(OrganizationRequest) && context.GenericFakeMessageExecutors.ContainsKey(req.RequestName))
                     {
                         return context.GenericFakeMessageExecutors[req.RequestName].Execute(req, context);
