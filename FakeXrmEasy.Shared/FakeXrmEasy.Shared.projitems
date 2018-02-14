@@ -86,7 +86,4 @@
     <Compile Include="$(MSBuildThisFileDirectory)XrmOrderByAttributeComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XrmRealContext.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\NewFolder\" />
-  </ItemGroup>
 </Project>
