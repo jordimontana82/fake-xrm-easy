@@ -14,6 +14,7 @@ using FakeXrmEasy.OrganizationFaults;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Query;
+using Microsoft.Xrm.Sdk.Workflow;
 
 namespace FakeXrmEasy
 {
@@ -461,6 +462,14 @@ namespace FakeXrmEasy
                     break;
 
                 case ConditionOperator.NotEqualUserId:
+                    operatorExpression = Expression.Not(TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression));
+                    break;
+
+                case ConditionOperator.EqualBusinessId:
+                    operatorExpression = TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
+                case ConditionOperator.NotEqualBusinessId:
                     operatorExpression = Expression.Not(TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression));
                     break;
 
@@ -953,6 +962,12 @@ namespace FakeXrmEasy
                 case ConditionOperator.EqualUserId:
                 case ConditionOperator.NotEqualUserId:
                     unaryOperatorValue = context.CallerId.Id;
+                    break;
+
+                case ConditionOperator.EqualBusinessId:
+                case ConditionOperator.NotEqualBusinessId:
+                    IWorkflowContext workflowContext = context.GetDefaultWorkflowContext();
+                    unaryOperatorValue = workflowContext.BusinessUnitId;
                     break;
             }
 

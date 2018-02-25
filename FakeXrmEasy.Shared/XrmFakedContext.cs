@@ -38,6 +38,8 @@ namespace FakeXrmEasy
         /// </summary>
         public EntityReference CallerId { get; set; }
 
+        public EntityReference BusinessUnit { get; set; }
+
         public delegate OrganizationResponse ServiceRequestExecution(OrganizationRequest req);
 
         /// <summary>
