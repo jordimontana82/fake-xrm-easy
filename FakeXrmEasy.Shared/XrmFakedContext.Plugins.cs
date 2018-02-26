@@ -10,6 +10,7 @@ namespace FakeXrmEasy
         public XrmFakedPluginExecutionContext GetDefaultPluginContext()
         {
             var userId = CallerId?.Id ?? Guid.NewGuid();
+            Guid businessUnitId = BusinessUnitId?.Id ?? Guid.NewGuid();
 
             return new XrmFakedPluginExecutionContext
             {
@@ -17,6 +18,7 @@ namespace FakeXrmEasy
                 IsExecutingOffline = false,
                 MessageName = "Create",
                 UserId = userId,
+                BusinessUnitId = businessUnitId,
                 InitiatingUserId = userId,
                 InputParameters = new ParameterCollection(),
                 OutputParameters = new ParameterCollection(),

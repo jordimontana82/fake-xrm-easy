@@ -12,7 +12,7 @@ namespace FakeXrmEasy
         public XrmFakedWorkflowContext GetDefaultWorkflowContext()
         {
             var userId = CallerId?.Id ?? Guid.NewGuid();
-            Guid businessUnitId = BusinessUnit?.Id ?? Guid.Empty;
+            Guid businessUnitId = BusinessUnitId?.Id ?? Guid.NewGuid();
 
             return new XrmFakedWorkflowContext
             {

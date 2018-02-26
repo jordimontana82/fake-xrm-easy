@@ -966,8 +966,7 @@ namespace FakeXrmEasy
 
                 case ConditionOperator.EqualBusinessId:
                 case ConditionOperator.NotEqualBusinessId:
-                    IWorkflowContext workflowContext = context.GetDefaultWorkflowContext();
-                    unaryOperatorValue = workflowContext.BusinessUnitId;
+                    unaryOperatorValue = context.BusinessUnitId.Id;
                     break;
             }
 

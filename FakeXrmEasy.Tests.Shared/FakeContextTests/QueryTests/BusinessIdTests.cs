@@ -61,7 +61,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryTests
                 new Resource() { Id = Guid.Parse(_resource2Id), BusinessUnitId = new EntityReference("resource", Guid.Parse(_business2Id)) }
             };
 
-            _context.BusinessUnit = new EntityReference("businessunit", Guid.Parse(_business2Id));
+            _context.BusinessUnitId = new EntityReference("businessunit", Guid.Parse(_business2Id));
             XrmFakedWorkflowContext _workflowContext = _context.GetDefaultWorkflowContext();
 
             IOrganizationService _service = _context.GetOrganizationService();
