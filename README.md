@@ -20,6 +20,18 @@
 
 Supports Dynamics CRM 2011, 2013, 2015, 2016, and Dynamics 365 (8.x and 9.x). <b>NOTE:</b> With the release of Dynamics 365 v9 we are changing the naming convention for new packages to match the major version.
 
+## Semantic Versioning
+
+The NuGet packages use semantic versioning like this:
+
+    x.y.z  => Major.Minor.Patch
+       
+x: stands for the major version. The package is very stable so that's why the major version didn't change yet.
+
+y: minor version. Any minor updates add new functionality without breaking changes. An example of these would be a new operator or a new fake message executor.
+
+z: patch. Any update to this number means new bug fixes for the existing functionality. A new minor version might also include bug fixes too.
+
 ## Getting Started
 
 <b>NEW!</b> Check out video tutorials about how to use Fake Xrm Easy starting [here](https://www.youtube.com/watch?v=ZLQ2o2P_xJY).
