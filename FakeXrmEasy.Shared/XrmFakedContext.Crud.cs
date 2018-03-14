@@ -118,43 +118,6 @@ namespace FakeXrmEasy
             if (Data.ContainsKey(e.LogicalName) &&
                 Data[e.LogicalName].ContainsKey(e.Id))
             {
-                
-                var originalEntity = CreateQuery(e.LogicalName).First(entity => entity.Id == e.Id);
-                if (originalEntity.Attributes.ContainsKey("statecode"))
-                {
-                    var originalStateCode = originalEntity["statecode"];
-                    var originalStateCodeValue = EntityInactiveStateCode;
-                    if (originalStateCode is OptionSetValue)
-                    {
-                        originalStateCodeValue = (originalStateCode as OptionSetValue).Value;
-                    }
-                    else
-                    {
-                        originalStateCodeValue = Convert.ToInt32(originalStateCode);
-                    }
-
-
-                    object newStateCode = null;
-                    int newStateCodeValue = -1;
-                    if (e.Attributes.ContainsKey("statecode"))
-                    {
-                        newStateCode = e["statecode"];
-                        if (newStateCode is OptionSetValue)
-                        {
-                            newStateCodeValue = (newStateCode as OptionSetValue).Value;
-                        }
-                        else
-                        {
-                            newStateCodeValue = Convert.ToInt32(newStateCode);
-                        }
-                    }
-
-                    if (originalStateCodeValue != EntityActiveStateCode && newStateCodeValue != EntityActiveStateCode)
-                    {
-                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{e.LogicalName} with Id {e.Id} can't be updated because it is in inactive status. Please use SetStateRequest to activate the record first.");
-                    }
-                }
-
                 if (this.UsePipelineSimulation)
                 {
                     ExecutePipelineStage("Update", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);

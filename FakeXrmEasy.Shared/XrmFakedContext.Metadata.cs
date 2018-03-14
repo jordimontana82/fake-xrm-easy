@@ -1,16 +1,12 @@
-﻿using FakeItEasy;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Xrm.Sdk.Metadata;
+﻿using Microsoft.Xrm.Sdk.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FakeXrmEasy.Extensions;
 
 namespace FakeXrmEasy
 {
-    public partial class XrmFakedContext: IXrmContext
+    public partial class XrmFakedContext : IXrmContext
     {
         /// <summary>
         /// Stores some minimal metadata info if dynamic entities are used and no injected metadata was used
@@ -23,6 +19,11 @@ namespace FakeXrmEasy
         public Dictionary<string, OptionSetMetadata> OptionSetValuesMetadata { get; set; }
 
         /// <summary>
+        /// Stores fake global status values metadata
+        /// </summary>
+        public Dictionary<string, StatusAttributeMetadata> StatusAttributeMetadata { get; set; }
+
+        /// <summary>
         /// Stores fake entity metadata
         /// </summary>
         protected internal Dictionary<string, EntityMetadata> EntityMetadata { get; set; }
@@ -30,7 +31,7 @@ namespace FakeXrmEasy
 
         public void InitializeMetadata(IEnumerable<EntityMetadata> entityMetadataList)
         {
-            if(entityMetadataList == null)
+            if (entityMetadataList == null)
             {
                 throw new Exception("Entity metadata parameter can not be null");
             }
@@ -38,7 +39,7 @@ namespace FakeXrmEasy
             this.EntityMetadata = new Dictionary<string, EntityMetadata>();
             foreach (var eMetadata in entityMetadataList)
             {
-                if(string.IsNullOrWhiteSpace(eMetadata.LogicalName))
+                if (string.IsNullOrWhiteSpace(eMetadata.LogicalName))
                 {
                     throw new Exception("An entity metadata record must have a LogicalName property.");
                 }
@@ -67,8 +68,16 @@ namespace FakeXrmEasy
         public EntityMetadata GetEntityMetadataByName(string sLogicalName)
         {
             return CreateMetadataQuery()
-                    .Where(em => em.LogicalName.Equals(sLogicalName))
-                    .FirstOrDefault();
+                .Where(em => em.LogicalName.Equals(sLogicalName))
+                .FirstOrDefault();
+        }
+
+        public void SetEntityMetadata(EntityMetadata em)
+        {
+            if (this.EntityMetadata.ContainsKey(em.LogicalName))
+                this.EntityMetadata[em.LogicalName] = em.Copy();
+            else
+                this.EntityMetadata.Add(em.LogicalName, em.Copy());
         }
 
         public AttributeMetadata GetAttributeMetadataFor(string sEntityName, string sAttributeName, Type attributeType)

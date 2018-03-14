@@ -15,6 +15,16 @@ namespace FakeXrmEasy.Extensions
             entityMetadata.GetType().GetProperty("Attributes").SetValue(entityMetadata, attributes, null);
         }
 
+        public static void SetAttribute(this EntityMetadata entityMetadata, AttributeMetadata attribute)
+        {
+            var currentAttributes = entityMetadata.Attributes;
+            var newAttributesList = currentAttributes.Where(a => a.LogicalName != attribute.LogicalName).ToList();
+            newAttributesList.Add(attribute);
+            var newAttributesArray = newAttributesList.ToArray();
+
+            entityMetadata.GetType().GetProperty("Attributes").SetValue(entityMetadata, newAttributesArray, null);
+        }
+
         public static void SetAttributeCollection(this EntityMetadata entityMetadata, IEnumerable<AttributeMetadata> attributes)
         {
             entityMetadata.GetType().GetProperty("Attributes").SetValue(entityMetadata, attributes.ToList().ToArray(), null);

@@ -37,31 +37,32 @@ namespace FakeXrmEasy
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        IQueryable<T> CreateQuery<T>() where T : Entity;
+        IQueryable<T> CreateQuery<T>()
+            where T : Entity;
 
         /// <summary>
         /// Returns a faked plugin that will be executed against this faked context and the entity passed as the target
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        IPlugin ExecutePluginWithTarget<T>(Entity target) where T : IPlugin, new();
+        IPlugin ExecutePluginWithTarget<T>(Entity target, string messageName = "Create", int stage = 40)
+            where T : IPlugin, new();
 
         /// <summary>
         /// Returns a faked plugin with a target and the specified pre entity images
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        IPlugin ExecutePluginWithTargetAndPreEntityImages<T>(object target, EntityImageCollection preEntityImages) where T : IPlugin, new();
+        IPlugin ExecutePluginWithTargetAndPreEntityImages<T>(object target, EntityImageCollection preEntityImages, string messageName = "Create", int stage = 40)
+            where T : IPlugin, new();
 
         /// <summary>
         /// Execute a plugin with input and output params, as well as entity images
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters,
-                                     ParameterCollection outputParameters,
-                                     EntityImageCollection preEntityImages,
-                                     EntityImageCollection postEntityImages) where T : IPlugin, new();
+        IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters, ParameterCollection outputParameters, EntityImageCollection preEntityImages, EntityImageCollection postEntityImages)
+            where T : IPlugin, new();
 
         /// <summary>
         /// Returns a plugin context with default properties one can override
@@ -75,9 +76,11 @@ namespace FakeXrmEasy
         /// <typeparam name="T">Must be a plugin</typeparam>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx) where T : IPlugin, new();
+        IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx)
+            where T : IPlugin, new();
 
-        IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx, T instance) where T : IPlugin, new();
+        IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx, T instance)
+            where T : IPlugin, new();
 
         /// <summary>
         /// Executes a plugin with a custom context and custom configurations (configurations aren't inherent properties of the context so they need to be passed separately)
@@ -89,12 +92,11 @@ namespace FakeXrmEasy
         /// <returns></returns>
         IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx,
                                      string unsecureConfiguration,
-                                     string secureConfiguration) where T : class, IPlugin;
+                                     string secureConfiguration)
+            where T : class, IPlugin;
 
-        IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx,
-                                     T instance,
-                                     string unsecureConfiguration,
-                                     string secureConfiguration) where T : class, IPlugin;
+        IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, T instance, string unsecureConfiguration, string secureConfiguration)
+            where T : class, IPlugin;
 
         /// <summary>
         /// Executes a code activity against this context
@@ -102,13 +104,15 @@ namespace FakeXrmEasy
         /// This is useful when the codeactivity requires additional mocks that could be stored in the codeactivity itself
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        IDictionary<string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new();
+        IDictionary<string, object> ExecuteCodeActivity<T>(Dictionary<string, object> inputs, T instance = null)
+            where T : CodeActivity, new();
 
         /// <summary>
         /// Executes a code activity passing the primary entity
         /// This is useful when the codeactivity requires additional mocks that could be stored in the codeactivity itself
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs, T instance = null) where T : CodeActivity, new();
+        IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs = null, T instance = null)
+            where T : CodeActivity, new();
     }
 }

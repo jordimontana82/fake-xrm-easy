@@ -465,6 +465,12 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "last-seven-days":
                     op = ConditionOperator.Last7Days;
                     break;
+                case "eq-businessid":
+                    op = ConditionOperator.EqualBusinessId;
+                    break;
+                case "neq-businessid":
+                    op = ConditionOperator.NotEqualBusinessId;
+                    break;
                 default:
                     throw PullRequestException.FetchXmlOperatorNotImplemented(elem.GetAttribute("operator").Value);
             }

@@ -39,5 +39,12 @@ namespace FakeXrmEasy.Permissions
         /// </summary>
         /// <param name="er"></param>
         void GetAllPrincipalAccessFor(EntityReference er);
+
+        /// <summary>
+        /// Modify the access rights for a specific entity
+        /// </summary>
+        /// <param name="er">The entity to of which we are modify access to </param>
+        /// <param name="pa">The modified access</param>
+        void ModifyAccessOn(EntityReference er, PrincipalAccess pa);
     }
 }
