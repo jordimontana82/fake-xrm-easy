@@ -91,10 +91,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FakeXrmEasy.2013\FakeXrmEasy.2013.csproj">
-      <Project>{112188E6-C759-4B2E-B5AE-54E722E26806}</Project>
-      <Name>FakeXrmEasy.2013</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FakeXrmEasy\FakeXrmEasy.csproj">
       <Project>{1ff34479-d38a-4b6b-86a7-b48182403437}</Project>
       <Name>FakeXrmEasy</Name>
