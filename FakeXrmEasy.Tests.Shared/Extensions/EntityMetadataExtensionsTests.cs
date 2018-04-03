@@ -38,5 +38,17 @@ namespace FakeXrmEasy.Tests.Extensions
             Assert.Equal("name", entityMetadata.Attributes[0].LogicalName);
             Assert.Equal("name2", entityMetadata.Attributes[1].LogicalName);
         }
+
+        [Fact]
+        public void SetAttribute_should_not_throw_error()
+        {
+            var entityMetadata = new EntityMetadata();
+            var fakeAttribute = new StringAttributeMetadata() { LogicalName = "name" };
+
+
+            entityMetadata.SetAttribute(fakeAttribute);
+            Assert.Equal(1, entityMetadata.Attributes.Length);
+            Assert.Equal("name", entityMetadata.Attributes[0].LogicalName);
+        }
     }
 }
