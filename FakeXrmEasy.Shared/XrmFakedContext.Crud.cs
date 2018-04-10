@@ -95,9 +95,7 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Create(A<Entity>._))
                 .ReturnsLazily((Entity e) =>
                 {
-                    context.CreateEntity(e);
-           
-                    return e.Id;
+                    return context.CreateEntity(e);
                 });
         }
 
@@ -274,58 +272,63 @@ namespace FakeXrmEasy
             }
         }
 
-        protected internal void CreateEntity(Entity e)
+        protected internal Guid CreateEntity(Entity e)
         {
             if (e == null)
             {
                 throw new InvalidOperationException("The entity must not be null");
             }
 
-            if (e.Id == Guid.Empty)
+            var clone = e.Clone(e.GetType());
+
+            if (clone.Id == Guid.Empty)
             {
-                e.Id = Guid.NewGuid(); // Add default guid if none present
+                clone.Id = Guid.NewGuid(); // Add default guid if none present
             }
 
             // Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
             var primaryKeyAttribute = $"{e.LogicalName}id";
-            if (!e.Attributes.ContainsKey(primaryKeyAttribute))
+            if (!clone.Attributes.ContainsKey(primaryKeyAttribute))
             {
-                e[primaryKeyAttribute] = e.Id;
+                clone[primaryKeyAttribute] = clone.Id;
             }
 
-            ValidateEntity(e);
+            ValidateEntity(clone);
 
             // Create specific validations
-            if (e.Id != Guid.Empty && Data.ContainsKey(e.LogicalName) &&
-                Data[e.LogicalName].ContainsKey(e.Id))
+            if (clone.Id != Guid.Empty && Data.ContainsKey(clone.LogicalName) &&
+                Data[clone.LogicalName].ContainsKey(clone.Id))
             {
-                throw new InvalidOperationException($"There is already a record of entity {e.LogicalName} with id {e.Id}, can't create with this Id.");
+                throw new InvalidOperationException($"There is already a record of entity {clone.LogicalName} with id {clone.Id}, can't create with this Id.");
             }
 
             // Create specific validations
-            if (e.Attributes.ContainsKey("statecode"))
+            if (clone.Attributes.ContainsKey("statecode"))
             {
-                throw new InvalidOperationException($"When creating an entity with logical name '{e.LogicalName}', or any other entity, it is not possible to create records with the statecode property. Statecode must be set after creation.");
+                throw new InvalidOperationException($"When creating an entity with logical name '{clone.LogicalName}', or any other entity, it is not possible to create records with the statecode property. Statecode must be set after creation.");
             }
 
-            AddEntityWithDefaults(e, this.UsePipelineSimulation);
+            AddEntityWithDefaults(clone, false, this.UsePipelineSimulation);
 
             if (e.RelatedEntities.Count > 0)
             {
                 foreach (var relationshipSet in e.RelatedEntities)
                 {
                     var relationship = relationshipSet.Key;
+
+                    var entityReferenceCollection = new EntityReferenceCollection();
+
                     foreach (var relatedEntity in relationshipSet.Value.Entities)
                     {
-                        CreateEntity(relatedEntity);
+                        var relatedId = CreateEntity(relatedEntity);
+                        entityReferenceCollection.Add(new EntityReference(relatedEntity.LogicalName, relatedId));
                     }
 
                     if (FakeMessageExecutors.ContainsKey(typeof(AssociateRequest)))
                     {
-                        var entityReferenceCollection = new EntityReferenceCollection(relationshipSet.Value.Entities.Select(en => en.ToEntityReference()).ToList());
                         var request = new AssociateRequest
                         {
-                            Target = e.ToEntityReference(),
+                            Target = clone.ToEntityReference(),
                             Relationship = relationship,
                             RelatedEntities = entityReferenceCollection
                         };
@@ -337,9 +340,11 @@ namespace FakeXrmEasy
                     }
                 }
             }
+
+            return clone.Id;
         }
 
-        protected internal void AddEntityWithDefaults(Entity e, bool usePluginPipeline = false)
+        protected internal void AddEntityWithDefaults(Entity e, bool clone = false, bool usePluginPipeline = false)
         {
             // Create the entity with defaults
             AddEntityDefaultAttributes(e);
@@ -351,8 +356,7 @@ namespace FakeXrmEasy
             }
 
             // Store
-            var clone = e.Clone(e.GetType());
-            AddEntity(clone);
+            AddEntity(clone ? e.Clone(e.GetType()) : e);
 
             if (usePluginPipeline)
             {
