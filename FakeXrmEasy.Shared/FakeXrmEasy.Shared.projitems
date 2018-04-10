@@ -22,7 +22,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RemoveMembersTeamRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddMembersTeamRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddMemberListRequestExecutor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddUserToRecordTeamRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RemoveUserFromRecordTeamRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddUserToRecordTeamRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\CloseIncidentRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\InsertStatusValueRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RemoveFromQueueRequestExecutor.cs" />
