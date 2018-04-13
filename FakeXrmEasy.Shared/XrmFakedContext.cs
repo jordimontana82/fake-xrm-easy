@@ -113,7 +113,7 @@ namespace FakeXrmEasy
 
             foreach (var e in entities)
             {
-                AddEntityWithDefaults(e);
+                AddEntityWithDefaults(e, true);
             }
 
             Initialised = true;
