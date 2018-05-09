@@ -125,7 +125,15 @@ namespace FakeXrmEasy
                 var cachedEntity = Data[e.LogicalName][e.Id];
                 foreach (var sAttributeName in e.Attributes.Keys.ToList())
                 {
-                    cachedEntity[sAttributeName] = e[sAttributeName];
+                    var attribute = e[sAttributeName];
+                    if (attribute is DateTime)
+                    {
+                        cachedEntity[sAttributeName] = ConvertToUtc((DateTime) e[sAttributeName]);
+                    }
+                    else
+                    {
+                        cachedEntity[sAttributeName] = attribute;
+                    }
                 }
 
                 // Update ModifiedOn
@@ -375,6 +383,15 @@ namespace FakeXrmEasy
 
             ValidateEntity(e); //Entity must have a logical name and an Id
 
+            foreach (var sAttributeName in e.Attributes.Keys.ToList())
+            {
+                var attribute = e[sAttributeName];
+                if (attribute is DateTime)
+                {
+                    e[sAttributeName] = ConvertToUtc((DateTime)e[sAttributeName]);
+                }
+            }
+
             //Add the entity collection
             if (!Data.ContainsKey(e.LogicalName))
             {
@@ -455,6 +472,11 @@ namespace FakeXrmEasy
 
             //Dynamic entities => just return true
             return true;
+        }
+
+        protected internal DateTime ConvertToUtc(DateTime attribute)
+        {
+            return DateTime.SpecifyKind(attribute, DateTimeKind.Utc);
         }
         #endregion
     }
