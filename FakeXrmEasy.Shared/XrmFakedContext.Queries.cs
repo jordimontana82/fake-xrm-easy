@@ -81,7 +81,7 @@ namespace FakeXrmEasy
                 throw new Exception($"XrmFakedContext.FindReflectedAttributeType: Attribute {attributeName} not found for type {earlyBoundType}");
             }
 
-            if (attributeInfo.PropertyType.FullName.EndsWith("Enum"))
+            if (attributeInfo.PropertyType.FullName.EndsWith("Enum") || attributeInfo.PropertyType.BaseType.FullName.EndsWith("Enum"))
             {
                 return typeof(int);
             }
