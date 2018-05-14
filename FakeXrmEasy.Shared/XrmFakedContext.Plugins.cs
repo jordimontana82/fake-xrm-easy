@@ -296,8 +296,7 @@ namespace FakeXrmEasy
 
                    if (t == typeof(IServiceEndpointNotificationService))
                    {
-                       var fakedNotificationService = A.Fake<IServiceEndpointNotificationService>();
-                       return fakedNotificationService;
+                       return GetFakedServiceEndpointNotificationService();
                    }
 
                    throw new PullRequestException("The specified service type is not supported");
