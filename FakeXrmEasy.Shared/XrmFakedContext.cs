@@ -22,6 +22,8 @@ namespace FakeXrmEasy
     {
         protected internal IOrganizationService Service { get; set; }
 
+        private IServiceEndpointNotificationService _serviceEndpointNotificationService;
+
         private readonly Lazy<XrmFakedTracingService> _tracingService = new Lazy<XrmFakedTracingService>(() => new XrmFakedTracingService());
 
         protected internal XrmFakedTracingService TracingService => _tracingService.Value;
@@ -351,6 +353,12 @@ namespace FakeXrmEasy
 
                     return response.EntityCollection;
                 });
+        }
+
+        public IServiceEndpointNotificationService GetFakedServiceEndpointNotificationService()
+        {
+            return _serviceEndpointNotificationService ??
+                   ( _serviceEndpointNotificationService = A.Fake<IServiceEndpointNotificationService>());
         }
     }
 }
