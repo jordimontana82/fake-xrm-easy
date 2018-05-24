@@ -32,6 +32,13 @@ namespace FakeXrmEasy
         ///// <returns></returns>
         //OrganizationServiceProxy GetFakedOrganizationServiceProxy();
 
+
+        /// <summary>
+        /// Returns a faked service endpoint notification service
+        /// </summary>
+        /// <returns></returns>
+        IServiceEndpointNotificationService GetFakedServiceEndpointNotificationService();
+
         /// <summary>
         /// Receives a strong-typed entity type and returns a Queryable of that type
         /// </summary>
