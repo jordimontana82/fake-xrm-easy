@@ -285,5 +285,41 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
 
             Assert.Equal(2, service.RetrieveMultiple(query).Entities.Count);
         }
+
+        /// <summary>
+        /// Tests that if PageInfo's ReturnTotalRecordCount sets total record count.
+        /// </summary>
+        [Fact]
+        public void TestThatPageInfoTotalRecordCountWorks()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity e = new Entity("entity");
+            e.Id = Guid.NewGuid();
+            e["retrieve"] = true;
+            initialEntities.Add(e);
+
+            Entity e2 = new Entity("entity");
+            e2.Id = Guid.NewGuid();
+            e2["retrieve"] = true;
+            initialEntities.Add(e2);
+
+            Entity e3 = new Entity("entity");
+            e3.Id = Guid.NewGuid();
+            e3["retrieve"] = false;
+            initialEntities.Add(e3);
+
+            context.Initialize(initialEntities);
+
+            QueryExpression query = new QueryExpression("entity");
+            query.PageInfo.ReturnTotalRecordCount = true;
+            query.Criteria.AddCondition("retrieve", ConditionOperator.Equal, true);
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(2, result.Entities.Count);
+            Assert.Equal(2, result.TotalRecordCount);
+            Assert.False(result.MoreRecords);
+        }
     }
 }
