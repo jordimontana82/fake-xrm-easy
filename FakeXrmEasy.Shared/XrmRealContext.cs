@@ -71,7 +71,7 @@ namespace FakeXrmEasy
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
-                throw new Exception("The connectionString property must not be blank");
+                throw new Exception("The ConnectionStringName property must be either a connection string or a connection string name");
             }
 
 #if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
