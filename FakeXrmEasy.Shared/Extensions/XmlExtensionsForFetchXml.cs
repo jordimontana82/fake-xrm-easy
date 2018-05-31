@@ -673,7 +673,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 var reflectedType = ctx.FindReflectedType(sEntityName);
                 if (reflectedType != null)
                 {
-                    var attributeType = ctx.FindReflectedAttributeType(reflectedType, sAttributeName);
+                    var attributeType = ctx.FindReflectedAttributeType(reflectedType, sEntityName, sAttributeName);
                     if (attributeType != null)
                     {
                         try

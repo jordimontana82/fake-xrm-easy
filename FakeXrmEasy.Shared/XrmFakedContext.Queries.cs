@@ -59,7 +59,81 @@ namespace FakeXrmEasy
             }
         }
 
-        protected internal Type FindReflectedAttributeType(Type earlyBoundType, string attributeName)
+        protected internal Type FindAttributeTypeInInjectedMetadata(string sEntityName, string sAttributeName)
+        {
+            if (!EntityMetadata.ContainsKey(sEntityName))
+                return null;
+
+            if (EntityMetadata[sEntityName].Attributes == null)
+                return null;
+
+            var attribute = EntityMetadata[sEntityName].Attributes
+                                .Where(a => a.LogicalName == sAttributeName)
+                                .FirstOrDefault();
+
+            if (attribute == null)
+                return null;
+
+            if (attribute.AttributeType == null)
+                return null;
+
+            switch(attribute.AttributeType.Value)
+            {
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.BigInt:
+                    return typeof(long);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Integer:
+                    return typeof(int);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Boolean:
+                    return typeof(bool);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.CalendarRules:
+                    throw new Exception("CalendarRules: Type not yet supported");
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Lookup:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Customer:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Owner:
+                    return typeof(EntityReference);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.DateTime:
+                    return typeof(DateTime);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Decimal:
+                    return typeof(decimal);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Double:
+                    return typeof(double);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.EntityName:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Memo:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.String:
+                    return typeof(string);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Money:
+                    return typeof(Money);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.PartyList:
+                    return typeof(EntityReferenceCollection);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Picklist:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.State:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Status:
+                    return typeof(OptionSetValue);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Uniqueidentifier:
+                    return typeof(Guid);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Virtual:
+                    throw new Exception("Virtual: Type not yet supported");
+
+                default:
+                    return typeof(string);
+
+            }
+
+        }
+        protected internal Type FindReflectedAttributeType(Type earlyBoundType, string sEntityName, string attributeName)
         {
             //Get that type properties
             var attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, attributeName);
@@ -78,7 +152,15 @@ namespace FakeXrmEasy
 
             if (attributeInfo == null || attributeInfo.PropertyType.FullName == null)
             {
-                throw new Exception($"XrmFakedContext.FindReflectedAttributeType: Attribute {attributeName} not found for type {earlyBoundType}");
+                //Try with metadata
+                var injectedType = FindAttributeTypeInInjectedMetadata(sEntityName, attributeName);
+
+                if(injectedType == null)
+                {
+                    throw new Exception($"XrmFakedContext.FindReflectedAttributeType: Attribute {attributeName} not found for type {earlyBoundType}");
+                }
+
+                return injectedType;
             }
 
             if (attributeInfo.PropertyType.FullName.EndsWith("Enum") || attributeInfo.PropertyType.BaseType.FullName.EndsWith("Enum"))
@@ -1397,7 +1479,7 @@ namespace FakeXrmEasy
                     var earlyBoundType = context.FindReflectedType(sEntityName);
                     if (earlyBoundType != null)
                     {
-                        typedExpression.AttributeType = context.FindReflectedAttributeType(earlyBoundType, sAttributeName);
+                        typedExpression.AttributeType = context.FindReflectedAttributeType(earlyBoundType, sEntityName, sAttributeName);
 
                         // Special case when filtering on the name of a Lookup
                         if (typedExpression.AttributeType == typeof(EntityReference) && sAttributeName.EndsWith("name"))

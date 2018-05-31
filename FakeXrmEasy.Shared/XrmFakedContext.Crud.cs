@@ -465,13 +465,37 @@ namespace FakeXrmEasy
                         .Where(pi => (pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true)[0] as AttributeLogicalNameAttribute).LogicalName.Equals(sAttributeName))
                         .FirstOrDefault();
 
-                    return attributeFound != null;
+                    if (attributeFound != null)
+                        return true;
+
+                    if(attributeFound == null && EntityMetadata.ContainsKey(sEntityName))
+                    {
+                        //Try with metadata
+                        return AttributeExistsInInjectedMetadata(sEntityName, sAttributeName);
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
+                //Try with metadata
                 return false;
             }
 
-            //Dynamic entities => just return true
+            if(EntityMetadata.ContainsKey(sEntityName))
+            {
+                //Try with metadata
+                return AttributeExistsInInjectedMetadata(sEntityName, sAttributeName);
+            }
+
+            //Dynamic entities and not entity metadata injected for entity => just return true if not found
             return true;
+        }
+
+        protected internal bool AttributeExistsInInjectedMetadata(string sEntityName, string sAttributeName)
+        {
+            var attributeInMetadata = FindAttributeTypeInInjectedMetadata(sEntityName, sAttributeName);
+            return attributeInMetadata != null;
         }
 
         protected internal DateTime ConvertToUtc(DateTime attribute)
