@@ -161,6 +161,12 @@ namespace FakeXrmEasy
                     return typeof(Guid);
 
                 case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Virtual:
+#if FAKE_XRM_EASY_9
+                    if (attribute.AttributeTypeName.Value == "MultiSelectPicklistType")
+                    {
+                        return typeof(OptionSetValueCollection);
+                    }
+#endif
                     throw new Exception("Virtual: Type not yet supported");
 
                 default:

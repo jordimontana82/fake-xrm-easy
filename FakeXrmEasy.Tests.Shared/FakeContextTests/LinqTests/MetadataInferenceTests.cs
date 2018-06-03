@@ -100,6 +100,67 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
             }
         }
 
+#if FAKE_XRM_EASY_9
+        [Fact]
+        public static void When_using_proxy_types_assembly_multi_select_option_set_metadata_is_inferred_from_injected_metadata_as_a_fallback()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var record1 = new Entity("contact")
+            {
+                Id = Guid.NewGuid(),
+                ["new_multiselectoptionset"] = new OptionSetValueCollection(
+                    new[]
+                    {
+                        new OptionSetValue(100001),
+                        new OptionSetValue(100002)
+                    })
+            };
+
+            var record2 = new Entity("contact")
+            {
+                Id = Guid.NewGuid(),
+                ["new_multiselectoptionset"] = new OptionSetValueCollection(
+                    new[]
+                    {
+                        new OptionSetValue(100002),
+                        new OptionSetValue(100003)
+                    })
+            };
+
+            fakedContext.Initialize(new List<Entity>() { record1, record2 });
+
+            var entityMetadata = new EntityMetadata()
+            {
+                LogicalName = "contact"
+            };
+
+            var injectedAttribute = new MultiSelectPicklistAttributeMetadata()
+            {
+                LogicalName = "new_multiselectoptionset"
+            };
+
+            entityMetadata.SetAttribute(injectedAttribute);
+            fakedContext.InitializeMetadata(entityMetadata);
+
+            var guid = Guid.NewGuid();
+
+            //Empty contecxt (no Initialize), but we should be able to query any typed entity without an entity not found exception
+
+            var service = fakedContext.GetOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var contact = (from c in ctx.CreateQuery<Contact>()
+                               where c["new_multiselectoptionset"].Equals(new OptionSetValueCollection(new[] { new OptionSetValue(100002), new OptionSetValue(100003) }))
+                               select c).ToList();
+
+                Assert.True(contact.Count == 1);
+            }
+        }
+#endif
+
         [Fact]
         public static void When_using_proxy_types_assembly_the_finding_attribute_metadata_fails_if_neither_proxy_type_or_injected_metadata_exist()
         {

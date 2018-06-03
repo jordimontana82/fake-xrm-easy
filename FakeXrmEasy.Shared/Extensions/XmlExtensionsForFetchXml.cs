@@ -536,13 +536,21 @@ namespace FakeXrmEasy.Extensions.FetchXml
         {
             if (t == typeof(int)
                 || t == typeof(int?)
-                || t.IsOptionSet())
+                || t.IsOptionSet()
+#if FAKE_XRM_EASY_9
+                || t.IsOptionSetValueCollection()
+#endif
+            )
             {
                 int intValue = 0;
 
                 if (int.TryParse(value, out intValue))
                 {
-                    if (t.IsOptionSet())
+                    if (t.IsOptionSet()
+#if FAKE_XRM_EASY_9
+                        || t.IsOptionSetValueCollection()
+#endif
+                    )
                     {
                         return new OptionSetValue(intValue);
                     }
