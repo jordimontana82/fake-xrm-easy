@@ -300,5 +300,19 @@ namespace FakeXrmEasy.Tests
             context.ExecutePluginWith<AccountNumberPlugin>();
             Assert.True(true);
         }
+
+        [Fact]
+        public void When_passing_postentityimages_it_get_added_to_context()
+        {
+            var context = new XrmFakedContext();
+            var target = new Entity();
+
+            EntityImageCollection postEntityImages = new EntityImageCollection();
+            postEntityImages.Add("PostImage", new Entity());
+
+            // TODO: assert post entity image collection.
+
+            context.ExecutePluginWithTargetAndPostEntityImages<DoNothingPlugin>(target, postEntityImages);
+        }
     }
 }
