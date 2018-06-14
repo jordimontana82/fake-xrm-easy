@@ -249,6 +249,19 @@ namespace FakeXrmEasy
             return this.ExecutePluginWith<T>(ctx);
         }
 
+        public IPlugin ExecutePluginWithTargetAndPostEntityImages<T>(object target, EntityImageCollection postEntityImages, string messageName = "Create", int stage = 40)
+            where T : IPlugin, new()
+        {
+            var ctx = GetDefaultPluginContext();
+            // Add the target entity to the InputParameters
+            ctx.InputParameters.Add("Target", target);
+            ctx.PostEntityImages.AddRange(postEntityImages);
+            ctx.MessageName = messageName;
+            ctx.Stage = stage;
+
+            return this.ExecutePluginWith<T>(ctx);
+        }
+
         public IPlugin ExecutePluginWithTargetAndInputParameters<T>(Entity target, ParameterCollection inputParameters, string messageName = "Create", int stage = 40)
             where T : IPlugin, new()
         {
