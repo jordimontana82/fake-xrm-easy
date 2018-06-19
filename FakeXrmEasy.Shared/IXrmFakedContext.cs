@@ -64,6 +64,14 @@ namespace FakeXrmEasy
             where T : IPlugin, new();
 
         /// <summary>
+        /// Returns a faked plugin with a target and the specified post entity images
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        IPlugin ExecutePluginWithTargetAndPostEntityImages<T>(object target, EntityImageCollection postEntityImages, string messageName = "Create", int stage = 40)
+            where T : IPlugin, new();
+
+        /// <summary>
         /// Execute a plugin with input and output params, as well as entity images
         /// </summary>
         /// <typeparam name="T"></typeparam>
