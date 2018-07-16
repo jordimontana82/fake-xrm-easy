@@ -1321,7 +1321,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                                   </entity>
                             </fetch>";
 
-            var date = new DateTime(2018, 07, 16);
+            var date = DateTime.Now;
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7*2) }; //Should be returned
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7*4) }; //Shouldnt
             ctx.Initialize(new[] { ct1, ct2});
