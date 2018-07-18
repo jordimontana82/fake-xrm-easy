@@ -42,7 +42,7 @@ namespace FakeXrmEasy
                         .Where(t => t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
                         .Where(t => ((EntityLogicalNameAttribute)t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0]).LogicalName.Equals(logicalName.ToLower()))
                         .FirstOrDefault();
-                
+
                 return subClassType;
             }
             catch (ReflectionTypeLoadException exception)
@@ -77,7 +77,7 @@ namespace FakeXrmEasy
             if (attribute.AttributeType == null)
                 return null;
 
-            switch(attribute.AttributeType.Value)
+            switch (attribute.AttributeType.Value)
             {
                 case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.BigInt:
                     return typeof(long);
@@ -155,7 +155,7 @@ namespace FakeXrmEasy
                 //Try with metadata
                 var injectedType = FindAttributeTypeInInjectedMetadata(sEntityName, attributeName);
 
-                if(injectedType == null)
+                if (injectedType == null)
                 {
                     throw new Exception($"XrmFakedContext.FindReflectedAttributeType: Attribute {attributeName} not found for type {earlyBoundType}");
                 }
@@ -676,6 +676,11 @@ namespace FakeXrmEasy
 
                     operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression, olderThanDate);
                     break;
+
+                case ConditionOperator.NextXWeeks:
+                    operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.CondExpression.Operator.ToString()));
 
@@ -852,8 +857,8 @@ namespace FakeXrmEasy
             {
 
 #if FAKE_XRM_EASY || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015
-                    if (attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference))
-                            return GetAppropiateCastExpressionBasedGuid(input);
+                if (attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference))
+                    return GetAppropiateCastExpressionBasedGuid(input);
 #endif
                 if (attributeType == typeof(Guid))
                     return GetAppropiateCastExpressionBasedGuid(input);
@@ -1182,7 +1187,7 @@ namespace FakeXrmEasy
                                 Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
                                     expOrValues));
             }
-            
+
         }
 
         protected static Expression TranslateConditionExpressionGreaterThanString(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
@@ -1263,7 +1268,7 @@ namespace FakeXrmEasy
             {
                 return TranslateConditionExpressionLessThanString(tc, getAttributeValueExpr, containsAttributeExpr);
             }
-            else if(GetAppropiateTypeForValue(c.Values[0]) == typeof(string))
+            else if (GetAppropiateTypeForValue(c.Values[0]) == typeof(string))
             {
                 return TranslateConditionExpressionLessThanString(tc, getAttributeValueExpr, containsAttributeExpr);
             }
@@ -1285,7 +1290,7 @@ namespace FakeXrmEasy
                                 Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
                                     expOrValues));
             }
-            
+
         }
 
         protected static Expression TranslateConditionExpressionLast(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
@@ -1675,6 +1680,27 @@ namespace FakeXrmEasy
                 return filtersLambda;
 
             return Expression.Constant(true); //Satisfy filter if there are no conditions nor filters
+        }
+        protected static Expression TranslateConditionExpressionNext(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
+            var nextDateTime = default(DateTime);
+            var currentDateTime = DateTime.UtcNow;
+            var numberOfWeeks = (int)c.Values[0];
+
+            switch (c.Operator)
+            {
+                case ConditionOperator.NextXWeeks:
+                    nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
+                    break;
+            }
+
+            c.Values[0] = (currentDateTime);
+            c.Values.Add(nextDateTime);
+            c.Values.Add(numberOfWeeks);
+
+            return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
     }
 }
