@@ -286,8 +286,29 @@ namespace FakeXrmEasy
                 OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(le.LinkToAttributeName);
             }
 
-            var inner = context.CreateQuery<Entity>(le.LinkToEntityName);
+            IQueryable<Entity> inner = null;
+            if(le.JoinOperator == JoinOperator.LeftOuter)
+            {
+                //inner = context.CreateQuery<Entity>(le.LinkToEntityName);
 
+                
+                //filters are applied in the inner query and then ignored during filter evaluation
+                var outerQueryExpression = new QueryExpression()
+                {
+                    EntityName = le.LinkToEntityName,
+                    Criteria = le.LinkCriteria
+                };
+
+                var outerQuery = TranslateQueryExpressionToLinq(context, outerQueryExpression);
+                inner = outerQuery;
+                
+            }
+            else
+            {
+                //Filters are applied after joins
+                inner = context.CreateQuery<Entity>(le.LinkToEntityName);
+            }
+            
             //if (!le.Columns.AllColumns && le.Columns.Columns.Count == 0)
             //{
             //    le.Columns.AllColumns = true;   //Add all columns in the joined entity, otherwise we can't filter by related attributes, then the Select will actually choose which ones we need
@@ -690,7 +711,7 @@ namespace FakeXrmEasy
             if (c.IsOuter)
             {
                 //If outer join, filter is optional, only if there was a value
-                return Expression.Or(Expression.Not(containsAttributeExpression), operatorExpression);
+                return Expression.Constant(true);
             }
             else
                 return operatorExpression;
