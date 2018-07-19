@@ -19,6 +19,12 @@ namespace FakeXrmEasy.Tests.Issues
                 Id = Guid.NewGuid(),
             };
 
+            var contactWithAccountTen = new Entity
+            {
+                LogicalName = "contact",
+                Id = Guid.NewGuid(),
+            };
+
             var accountFive = new Entity
             {
                 LogicalName = "account",
@@ -26,12 +32,6 @@ namespace FakeXrmEasy.Tests.Issues
             };
             accountFive["primarycontactid"] = contactWithAccountFive.ToEntityReference();
             accountFive["accountnumber"] = "5";
-
-            var contactWithAccountTen = new Entity
-            {
-                LogicalName = "contact",
-                Id = Guid.NewGuid(),
-            };
 
             var accountTen = new Entity
             {
@@ -47,6 +47,9 @@ namespace FakeXrmEasy.Tests.Issues
                 EntityName = "contact",
                 ColumnSet = new ColumnSet(true),
             };
+
+            var context = new XrmFakedContext();
+            context.Initialize(new List<Entity> { contactWithAccountFive, accountFive, contactWithAccountTen, accountTen });
 
             // Link in the accounts
             var accountLink = new LinkEntity
@@ -66,8 +69,7 @@ namespace FakeXrmEasy.Tests.Issues
             accountLink.LinkCriteria.AddCondition(new ConditionExpression("accountnumber", ConditionOperator.Equal, "5"));
             query.LinkEntities.Add(accountLink);
 
-            var context = new XrmFakedContext();
-            context.Initialize(new List<Entity> { contactWithAccountFive, accountFive, contactWithAccountTen, accountTen });
+            
             var outerJoinContacts = context.GetOrganizationService().RetrieveMultiple(query);
 
             // Should return our 2 contacts as it was an outer join. Instead it only returns the one contact with account 5.
@@ -76,8 +78,7 @@ namespace FakeXrmEasy.Tests.Issues
             // Now we'll only return contacts with no linked acccounts. This should return only our contactWithAccountTen
             query.Criteria.AddCondition(new ConditionExpression("Account", "accountid", ConditionOperator.Null));
 
-            context = new XrmFakedContext();
-            context.Initialize(new List<Entity> { contactWithAccountFive, accountFive, contactWithAccountTen, accountTen });
+
             var outerJoinContactsWithAccountIdNull = context.GetOrganizationService().RetrieveMultiple(query);
 
             // Should return our 1 contact who was not linked with account 5, instead it returns nothing

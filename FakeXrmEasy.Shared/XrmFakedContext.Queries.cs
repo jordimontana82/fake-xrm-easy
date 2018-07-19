@@ -296,7 +296,8 @@ namespace FakeXrmEasy
                 var outerQueryExpression = new QueryExpression()
                 {
                     EntityName = le.LinkToEntityName,
-                    Criteria = le.LinkCriteria
+                    Criteria = le.LinkCriteria,
+                    ColumnSet = le.Columns
                 };
 
                 var outerQuery = TranslateQueryExpressionToLinq(context, outerQueryExpression);

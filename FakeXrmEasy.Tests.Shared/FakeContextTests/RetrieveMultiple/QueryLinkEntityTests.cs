@@ -866,7 +866,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             var result = service.RetrieveMultiple(query);
             var resultingEntity = result.Entities[0];
-            Assert.Equal(2, resultingEntity.Attributes.Count);
+            Assert.Equal(1, resultingEntity.Attributes.Count);
             Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
         }
 
@@ -921,7 +921,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             var result = service.RetrieveMultiple(query);
             var resultingEntity = result.Entities[0];
-            Assert.Equal(3, resultingEntity.Attributes.Count);
+            Assert.Equal(2, resultingEntity.Attributes.Count);
             Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
             Assert.Equal("BusinessUnit1", ((AliasedValue)resultingEntity["businessunit1.name"]).Value);
         }
@@ -979,7 +979,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             var result = service.RetrieveMultiple(query);
             var resultingEntity = result.Entities[0];
-            Assert.Equal(3, resultingEntity.Attributes.Count);
+            Assert.Equal(2, resultingEntity.Attributes.Count);
             Assert.Equal("User2", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
             Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser2.fullname"]).Value);
         }
@@ -1053,7 +1053,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             var result = service.RetrieveMultiple(query);
             var resultingEntity = result.Entities[0];
-            Assert.Equal(4, resultingEntity.Attributes.Count);
+            Assert.Equal(3, resultingEntity.Attributes.Count);
             Assert.Equal("User3", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
             Assert.Equal("User2", ((AliasedValue)resultingEntity["systemuserwithalias.fullname"]).Value);
             Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser2.fullname"]).Value);
