@@ -147,7 +147,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 var value = e[attKey];
                 if (value != null)
                 {
-                    var formattedValue = this.GetFormattedValueForValue(value, out var bShouldAdd);
+                    bool bShouldAdd;
+                    var formattedValue = this.GetFormattedValueForValue(value, out bShouldAdd);
                     if (bShouldAdd)
                     {
                         e.FormattedValues.Add(attKey, formattedValue);
@@ -167,9 +168,9 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 sFormattedValue = Enum.GetName(value.GetType(), value);
                 bShouldAddFormattedValue = true;
             }
-            else if (value is AliasedValue aliasedValue)
+            else if (value is AliasedValue)
             {
-                return this.GetFormattedValueForValue(aliasedValue?.Value, out bShouldAddFormattedValue);
+                return this.GetFormattedValueForValue((value as AliasedValue)?.Value, out bShouldAddFormattedValue);
             }
 
             return sFormattedValue;
