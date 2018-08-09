@@ -149,7 +149,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 if (!e.FormattedValues.ContainsKey(attKey) && (value != null))
                 {
                     bool bShouldAdd;
-                    var formattedValue = this.GetFormattedValueForValue(value, out bShouldAdd);
+                    formattedValue = this.GetFormattedValueForValue(value, out bShouldAdd);
                     if (bShouldAdd)
                     {
                         e.FormattedValues.Add(attKey, formattedValue);
