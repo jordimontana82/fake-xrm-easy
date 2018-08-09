@@ -107,7 +107,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 numberToGet = list.Count - (pageSize * (pageNumber - 1));
             }
-            
+
             var recordsToReturn = startPosition + numberToGet > list.Count ? new List<Entity>() : list.GetRange(startPosition, numberToGet);
 
             recordsToReturn.ForEach(e => e.ApplyDateBehaviour(ctx));
@@ -145,7 +145,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 var value = e[attKey];
                 string formattedValue = "";
-                if (value != null)
+                if (!e.FormattedValues.ContainsKey(attKey) && (value != null))
                 {
                     bool bShouldAdd = false;
                     formattedValue = GetFormattedValueForValue(value, out bShouldAdd);
