@@ -30,6 +30,25 @@ namespace FakeXrmEasy.Permissions
         }
 
         /// <summary>
+        /// Modify access on a specific record
+        /// </summary>
+        /// <param name="er">The entity for which we are modifying permissions</param>
+        /// <param name="pa">The permissions to overwrite</param>
+        public void ModifyAccessOn(EntityReference er, PrincipalAccess pa)
+        {
+            List<PrincipalAccess> accessList = GetAccessListForRecord(er);
+            PrincipalAccess paMatch = accessList.Where(p => p.Principal.Id == pa.Principal.Id).SingleOrDefault();
+            if (paMatch != null)
+            {
+                accessList[accessList.IndexOf(paMatch)] = pa;
+            }
+            else
+            {
+                accessList.Add(pa);
+            }
+        }
+
+        /// <summary>
         /// Retrieves the RetrievePrincipalAccessResponse for the specified security principal (user or team) and record
         /// </summary>
         /// <param name="er"></param>

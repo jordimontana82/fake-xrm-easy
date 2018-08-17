@@ -30,6 +30,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>fakexrmeasy.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="FakeItEasy, Version=3.2.0.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
       <HintPath>..\packages\FakeItEasy.3.2.0\lib\net40\FakeItEasy.dll</HintPath>
@@ -92,6 +98,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="fakexrmeasy.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="..\FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems" Label="Shared" />

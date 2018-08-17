@@ -14,52 +14,134 @@ using FakeXrmEasy.OrganizationFaults;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Query;
+using Microsoft.Xrm.Sdk.Workflow;
 
 namespace FakeXrmEasy
 {
     public partial class XrmFakedContext : IXrmContext
     {
-        protected internal Type FindReflectedType(string sLogicalName)
+        protected internal Type FindReflectedType(string logicalName)
         {
-            Assembly assembly = this.ProxyTypesAssembly;
+            var assembly = this.ProxyTypesAssembly;
             try
             {
                 if (assembly == null)
                 {
                     assembly = Assembly.GetExecutingAssembly();
                 }
+
+                /* This wasn't building within the CI FAKE build script...
+                var subClassType = assembly.GetTypes()
+                        .Where(t => typeof(Entity).IsAssignableFrom(t))
+                        .Where(t => t.GetCustomAttributes<EntityLogicalNameAttribute>(true).Any())
+                        .FirstOrDefault(t => t.GetCustomAttributes<EntityLogicalNameAttribute>(true).First().LogicalName.Equals(logicalName, StringComparison.OrdinalIgnoreCase));
+
+                */
                 var subClassType = assembly.GetTypes()
                         .Where(t => typeof(Entity).IsAssignableFrom(t))
                         .Where(t => t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
-                        .Where(t => ((EntityLogicalNameAttribute)t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0]).LogicalName.Equals(sLogicalName.ToLower()))
+                        .Where(t => ((EntityLogicalNameAttribute)t.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0]).LogicalName.Equals(logicalName.ToLower()))
                         .FirstOrDefault();
 
                 return subClassType;
             }
-            catch (System.Reflection.ReflectionTypeLoadException ex)
+            catch (ReflectionTypeLoadException exception)
             {
                 // now look at ex.LoaderExceptions - this is an Exception[], so:
-                string s = "";
-                foreach (Exception inner in ex.LoaderExceptions)
+                var s = "";
+                foreach (var innerException in exception.LoaderExceptions)
                 {
                     // write details of "inner", in particular inner.Message
-                    s += inner.Message + " ";
+                    s += innerException.Message + " ";
                 }
 
                 throw new Exception("XrmFakedContext.FindReflectedType: " + s);
             }
-
         }
 
-        protected internal Type FindReflectedAttributeType(Type earlyBoundType, string sAttributeName)
+        protected internal Type FindAttributeTypeInInjectedMetadata(string sEntityName, string sAttributeName)
+        {
+            if (!EntityMetadata.ContainsKey(sEntityName))
+                return null;
+
+            if (EntityMetadata[sEntityName].Attributes == null)
+                return null;
+
+            var attribute = EntityMetadata[sEntityName].Attributes
+                                .Where(a => a.LogicalName == sAttributeName)
+                                .FirstOrDefault();
+
+            if (attribute == null)
+                return null;
+
+            if (attribute.AttributeType == null)
+                return null;
+
+            switch (attribute.AttributeType.Value)
+            {
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.BigInt:
+                    return typeof(long);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Integer:
+                    return typeof(int);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Boolean:
+                    return typeof(bool);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.CalendarRules:
+                    throw new Exception("CalendarRules: Type not yet supported");
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Lookup:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Customer:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Owner:
+                    return typeof(EntityReference);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.DateTime:
+                    return typeof(DateTime);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Decimal:
+                    return typeof(decimal);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Double:
+                    return typeof(double);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.EntityName:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Memo:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.String:
+                    return typeof(string);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Money:
+                    return typeof(Money);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.PartyList:
+                    return typeof(EntityReferenceCollection);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Picklist:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.State:
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Status:
+                    return typeof(OptionSetValue);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Uniqueidentifier:
+                    return typeof(Guid);
+
+                case Microsoft.Xrm.Sdk.Metadata.AttributeTypeCode.Virtual:
+                    throw new Exception("Virtual: Type not yet supported");
+
+                default:
+                    return typeof(string);
+
+            }
+
+        }
+        protected internal Type FindReflectedAttributeType(Type earlyBoundType, string sEntityName, string attributeName)
         {
             //Get that type properties
-            var attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, sAttributeName);
-            if (attributeInfo == null && sAttributeName.EndsWith("name"))
+            var attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, attributeName);
+            if (attributeInfo == null && attributeName.EndsWith("name"))
             {
                 // Special case for referencing the name of a EntityReference
-                sAttributeName = sAttributeName.Substring(0, sAttributeName.Length - 4);
-                attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, sAttributeName);
+                attributeName = attributeName.Substring(0, attributeName.Length - 4);
+                attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, attributeName);
 
                 if (attributeInfo.PropertyType != typeof(EntityReference))
                 {
@@ -68,24 +150,38 @@ namespace FakeXrmEasy
                 }
             }
 
-            if (attributeInfo == null)
+            if (attributeInfo == null || attributeInfo.PropertyType.FullName == null)
             {
-                throw new Exception(string.Format("XrmFakedContext.FindReflectedAttributeType: Attribute {0} not found for type {1}", sAttributeName, earlyBoundType.ToString()));
+                //Try with metadata
+                var injectedType = FindAttributeTypeInInjectedMetadata(sEntityName, attributeName);
+
+                if (injectedType == null)
+                {
+                    throw new Exception($"XrmFakedContext.FindReflectedAttributeType: Attribute {attributeName} not found for type {earlyBoundType}");
+                }
+
+                return injectedType;
             }
-            else if (attributeInfo.PropertyType.FullName.EndsWith("Enum"))
+
+            if (attributeInfo.PropertyType.FullName.EndsWith("Enum") || attributeInfo.PropertyType.BaseType.FullName.EndsWith("Enum"))
             {
-                return typeof(System.Int32);
+                return typeof(int);
             }
-            else if (!attributeInfo.PropertyType.FullName.StartsWith("System."))
+
+            if (!attributeInfo.PropertyType.FullName.StartsWith("System."))
             {
                 try
                 {
-                    var inst = Activator.CreateInstance(attributeInfo.PropertyType);
-
-                    if (inst is Entity)
+                    var instance = Activator.CreateInstance(attributeInfo.PropertyType);
+                    if (instance is Entity)
+                    {
                         return typeof(EntityReference);
+                    }
                 }
-                catch { }
+                catch
+                {
+                    // ignored
+                }
             }
 #if FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
             else if (attributeInfo.PropertyType.FullName.StartsWith("System.Nullable"))
@@ -97,11 +193,11 @@ namespace FakeXrmEasy
             return attributeInfo.PropertyType;
         }
 
-        private static PropertyInfo GetEarlyBoundTypeAttribute(Type earlyBoundType, string sAttributeName)
+        private static PropertyInfo GetEarlyBoundTypeAttribute(Type earlyBoundType, string attributeName)
         {
             var attributeInfo = earlyBoundType.GetProperties()
                 .Where(pi => pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true).Length > 0)
-                .Where(pi => (pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true)[0] as AttributeLogicalNameAttribute).LogicalName.Equals(sAttributeName))
+                .Where(pi => (pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true)[0] as AttributeLogicalNameAttribute).LogicalName.Equals(attributeName))
                 .FirstOrDefault();
 
             return attributeInfo;
@@ -112,42 +208,44 @@ namespace FakeXrmEasy
             return this.CreateQuery<Entity>(entityLogicalName);
         }
 
-        public IQueryable<T> CreateQuery<T>() where T : Entity
+        public IQueryable<T> CreateQuery<T>()
+            where T : Entity
         {
-            Type typeParameter = typeof(T);
+            var typeParameter = typeof(T);
 
             if (ProxyTypesAssembly == null)
             {
                 //Try to guess proxy types assembly
-                var asm = Assembly.GetAssembly(typeof(T));
-                if (asm != null)
+                var assembly = Assembly.GetAssembly(typeof(T));
+                if (assembly != null)
                 {
-                    ProxyTypesAssembly = asm;
+                    ProxyTypesAssembly = assembly;
                 }
             }
-            string sLogicalName = "";
+
+            var logicalName = "";
 
             if (typeParameter.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true).Length > 0)
             {
-                sLogicalName = (typeParameter.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0] as EntityLogicalNameAttribute).LogicalName;
+                logicalName = (typeParameter.GetCustomAttributes(typeof(EntityLogicalNameAttribute), true)[0] as EntityLogicalNameAttribute).LogicalName;
             }
 
-            return this.CreateQuery<T>(sLogicalName);
+            return this.CreateQuery<T>(logicalName);
         }
 
-        protected IQueryable<T> CreateQuery<T>(string entityLogicalName) where T : Entity
+        protected IQueryable<T> CreateQuery<T>(string entityLogicalName)
+            where T : Entity
         {
-            List<T> lst = new List<T>();
             var subClassType = FindReflectedType(entityLogicalName);
-            if ((subClassType == null && !(typeof(T).Equals(typeof(Entity))))
-                || (typeof(T).Equals(typeof(Entity)) && string.IsNullOrWhiteSpace(entityLogicalName)))
+            if (subClassType == null && !(typeof(T) == typeof(Entity)) || (typeof(T) == typeof(Entity) && string.IsNullOrWhiteSpace(entityLogicalName)))
             {
-                throw new Exception(string.Format("The type {0} was not found", entityLogicalName));
+                throw new Exception($"The type {entityLogicalName} was not found");
             }
 
+            var lst = new List<T>();
             if (!Data.ContainsKey(entityLogicalName))
             {
-                return lst.AsQueryable<T>(); //Empty list
+                return lst.AsQueryable(); //Empty list
             }
 
             foreach (var e in Data[entityLogicalName].Values)
@@ -161,12 +259,12 @@ namespace FakeXrmEasy
                     lst.Add((T)e.Clone());
             }
 
-            return lst.AsQueryable<T>();
+            return lst.AsQueryable();
         }
 
-        public IQueryable<Entity> CreateQueryFromEntityName(string s)
+        public IQueryable<Entity> CreateQueryFromEntityName(string entityName)
         {
-            return Data[s].Values.AsQueryable();
+            return Data[entityName].Values.AsQueryable();
         }
 
         public static IQueryable<Entity> TranslateLinkedEntityToLinq(XrmFakedContext context, LinkEntity le, IQueryable<Entity> query, ColumnSet previousColumnSet, Dictionary<string, int> linkedEntities, string linkFromAlias = "", string linkFromEntity = "")
@@ -188,8 +286,30 @@ namespace FakeXrmEasy
                 OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(le.LinkToAttributeName);
             }
 
-            var inner = context.CreateQuery<Entity>(le.LinkToEntityName);
+            IQueryable<Entity> inner = null;
+            if(le.JoinOperator == JoinOperator.LeftOuter)
+            {
+                //inner = context.CreateQuery<Entity>(le.LinkToEntityName);
 
+                
+                //filters are applied in the inner query and then ignored during filter evaluation
+                var outerQueryExpression = new QueryExpression()
+                {
+                    EntityName = le.LinkToEntityName,
+                    Criteria = le.LinkCriteria,
+                    ColumnSet = new ColumnSet(true)
+                };
+
+                var outerQuery = TranslateQueryExpressionToLinq(context, outerQueryExpression);
+                inner = outerQuery;
+                
+            }
+            else
+            {
+                //Filters are applied after joins
+                inner = context.CreateQuery<Entity>(le.LinkToEntityName);
+            }
+            
             //if (!le.Columns.AllColumns && le.Columns.Columns.Count == 0)
             //{
             //    le.Columns.AllColumns = true;   //Add all columns in the joined entity, otherwise we can't filter by related attributes, then the Select will actually choose which ones we need
@@ -458,6 +578,14 @@ namespace FakeXrmEasy
                     operatorExpression = Expression.Not(TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression));
                     break;
 
+                case ConditionOperator.EqualBusinessId:
+                    operatorExpression = TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
+                case ConditionOperator.NotEqualBusinessId:
+                    operatorExpression = Expression.Not(TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression));
+                    break;
+
                 case ConditionOperator.BeginsWith:
                 case ConditionOperator.Like:
                     operatorExpression = TranslateConditionExpressionLike(c, getNonBasicValueExpr, containsAttributeExpression);
@@ -570,6 +698,11 @@ namespace FakeXrmEasy
 
                     operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression, olderThanDate);
                     break;
+
+                case ConditionOperator.NextXWeeks:
+                    operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.CondExpression.Operator.ToString()));
 
@@ -579,7 +712,7 @@ namespace FakeXrmEasy
             if (c.IsOuter)
             {
                 //If outer join, filter is optional, only if there was a value
-                return Expression.Or(Expression.Not(containsAttributeExpression), operatorExpression);
+                return Expression.Constant(true);
             }
             else
                 return operatorExpression;
@@ -745,9 +878,9 @@ namespace FakeXrmEasy
             if (attributeType != null)
             {
 
-#if FAKE_XRM_EASY
-                    if (attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference))
-                            return GetAppropiateCastExpressionBasedGuid(input);
+#if FAKE_XRM_EASY || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015
+                if (attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference))
+                    return GetAppropiateCastExpressionBasedGuid(input);
 #endif
                 if (attributeType == typeof(Guid))
                     return GetAppropiateCastExpressionBasedGuid(input);
@@ -948,6 +1081,11 @@ namespace FakeXrmEasy
                 case ConditionOperator.NotEqualUserId:
                     unaryOperatorValue = context.CallerId.Id;
                     break;
+
+                case ConditionOperator.EqualBusinessId:
+                case ConditionOperator.NotEqualBusinessId:
+                    unaryOperatorValue = context.BusinessUnitId.Id;
+                    break;
             }
 
             if (unaryOperatorValue != null)
@@ -1071,7 +1209,7 @@ namespace FakeXrmEasy
                                 Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
                                     expOrValues));
             }
-            
+
         }
 
         protected static Expression TranslateConditionExpressionGreaterThanString(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
@@ -1152,7 +1290,7 @@ namespace FakeXrmEasy
             {
                 return TranslateConditionExpressionLessThanString(tc, getAttributeValueExpr, containsAttributeExpr);
             }
-            else if(GetAppropiateTypeForValue(c.Values[0]) == typeof(string))
+            else if (GetAppropiateTypeForValue(c.Values[0]) == typeof(string))
             {
                 return TranslateConditionExpressionLessThanString(tc, getAttributeValueExpr, containsAttributeExpr);
             }
@@ -1174,7 +1312,7 @@ namespace FakeXrmEasy
                                 Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
                                     expOrValues));
             }
-            
+
         }
 
         protected static Expression TranslateConditionExpressionLast(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
@@ -1368,7 +1506,7 @@ namespace FakeXrmEasy
                     var earlyBoundType = context.FindReflectedType(sEntityName);
                     if (earlyBoundType != null)
                     {
-                        typedExpression.AttributeType = context.FindReflectedAttributeType(earlyBoundType, sAttributeName);
+                        typedExpression.AttributeType = context.FindReflectedAttributeType(earlyBoundType, sEntityName, sAttributeName);
 
                         // Special case when filtering on the name of a Lookup
                         if (typedExpression.AttributeType == typeof(EntityReference) && sAttributeName.EndsWith("name"))
@@ -1564,6 +1702,27 @@ namespace FakeXrmEasy
                 return filtersLambda;
 
             return Expression.Constant(true); //Satisfy filter if there are no conditions nor filters
+        }
+        protected static Expression TranslateConditionExpressionNext(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
+            var nextDateTime = default(DateTime);
+            var currentDateTime = DateTime.UtcNow;
+            var numberOfWeeks = (int)c.Values[0];
+
+            switch (c.Operator)
+            {
+                case ConditionOperator.NextXWeeks:
+                    nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
+                    break;
+            }
+
+            c.Values[0] = (currentDateTime);
+            c.Values.Add(nextDateTime);
+            c.Values.Add(numberOfWeeks);
+
+            return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
     }
 }

@@ -322,6 +322,38 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void Shouldnt_modify_objects_passed_to_the_service()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+            var account = new Account { Id = Guid.NewGuid(), Name = "Test account" };
+
+            IOrganizationService service = context.GetFakedOrganizationService();
+
+            context.Initialize(new List<Entity>() { account });
+
+            //Retrieve the record created
+            Contact c = new Contact
+            {
+                ParentCustomerId = account.ToEntityReference(),
+                LastName = "Duck",
+            };
+            foreach (var name in new[] { "Huey", "Dewey", "Louie"})
+            {
+                c.FirstName = name;
+                service.Create(c);
+            }
+
+            var createdContacts = context.CreateQuery<Contact>().ToList();
+
+            Assert.Equal(Guid.Empty, c.Id);
+            Assert.Null(c.ContactId);
+            Assert.Null(c.CreatedOn);
+
+            Assert.Equal(3, createdContacts.Count);
+        }
+
+        [Fact]
         public void When_Creating_Without_Default_Attributes_They_Should_Be_Set_By_Default()
         {
             var context = new XrmFakedContext();

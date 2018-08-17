@@ -41,8 +41,9 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new Exception("A logical name property must be specified in the request");
             }
 
-            if (req.EntityFilters == Microsoft.Xrm.Sdk.Metadata.EntityFilters.Entity ||
-                req.EntityFilters == Microsoft.Xrm.Sdk.Metadata.EntityFilters.Attributes)
+            // HasFlag -> used to verify flag matches --> to verify EntityFilters.Entity | EntityFilters.Attributes
+            if (req.EntityFilters.HasFlag(Microsoft.Xrm.Sdk.Metadata.EntityFilters.Entity) ||
+                req.EntityFilters.HasFlag(Microsoft.Xrm.Sdk.Metadata.EntityFilters.Attributes))
             {
                 if(!ctx.EntityMetadata.ContainsKey(req.LogicalName))
                 {

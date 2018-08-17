@@ -95,9 +95,7 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Create(A<Entity>._))
                 .ReturnsLazily((Entity e) =>
                 {
-                    context.CreateEntity(e);
-           
-                    return e.Id;
+                    return context.CreateEntity(e);
                 });
         }
 
@@ -118,43 +116,6 @@ namespace FakeXrmEasy
             if (Data.ContainsKey(e.LogicalName) &&
                 Data[e.LogicalName].ContainsKey(e.Id))
             {
-                
-                var originalEntity = CreateQuery(e.LogicalName).First(entity => entity.Id == e.Id);
-                if (originalEntity.Attributes.ContainsKey("statecode"))
-                {
-                    var originalStateCode = originalEntity["statecode"];
-                    var originalStateCodeValue = EntityInactiveStateCode;
-                    if (originalStateCode is OptionSetValue)
-                    {
-                        originalStateCodeValue = (originalStateCode as OptionSetValue).Value;
-                    }
-                    else
-                    {
-                        originalStateCodeValue = Convert.ToInt32(originalStateCode);
-                    }
-
-
-                    object newStateCode = null;
-                    int newStateCodeValue = -1;
-                    if (e.Attributes.ContainsKey("statecode"))
-                    {
-                        newStateCode = e["statecode"];
-                        if (newStateCode is OptionSetValue)
-                        {
-                            newStateCodeValue = (newStateCode as OptionSetValue).Value;
-                        }
-                        else
-                        {
-                            newStateCodeValue = Convert.ToInt32(newStateCode);
-                        }
-                    }
-
-                    if (originalStateCodeValue != EntityActiveStateCode && newStateCodeValue != EntityActiveStateCode)
-                    {
-                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{e.LogicalName} with Id {e.Id} can't be updated because it is in inactive status. Please use SetStateRequest to activate the record first.");
-                    }
-                }
-
                 if (this.UsePipelineSimulation)
                 {
                     ExecutePipelineStage("Update", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);
@@ -164,7 +125,15 @@ namespace FakeXrmEasy
                 var cachedEntity = Data[e.LogicalName][e.Id];
                 foreach (var sAttributeName in e.Attributes.Keys.ToList())
                 {
-                    cachedEntity[sAttributeName] = e[sAttributeName];
+                    var attribute = e[sAttributeName];
+                    if (attribute is DateTime)
+                    {
+                        cachedEntity[sAttributeName] = ConvertToUtc((DateTime) e[sAttributeName]);
+                    }
+                    else
+                    {
+                        cachedEntity[sAttributeName] = attribute;
+                    }
                 }
 
                 // Update ModifiedOn
@@ -311,58 +280,63 @@ namespace FakeXrmEasy
             }
         }
 
-        protected internal void CreateEntity(Entity e)
+        protected internal Guid CreateEntity(Entity e)
         {
             if (e == null)
             {
                 throw new InvalidOperationException("The entity must not be null");
             }
 
-            if (e.Id == Guid.Empty)
+            var clone = e.Clone(e.GetType());
+
+            if (clone.Id == Guid.Empty)
             {
-                e.Id = Guid.NewGuid(); // Add default guid if none present
+                clone.Id = Guid.NewGuid(); // Add default guid if none present
             }
 
             // Hack for Dynamic Entities where the Id property doesn't populate the "entitynameid" primary key
             var primaryKeyAttribute = $"{e.LogicalName}id";
-            if (!e.Attributes.ContainsKey(primaryKeyAttribute))
+            if (!clone.Attributes.ContainsKey(primaryKeyAttribute))
             {
-                e[primaryKeyAttribute] = e.Id;
+                clone[primaryKeyAttribute] = clone.Id;
             }
 
-            ValidateEntity(e);
+            ValidateEntity(clone);
 
             // Create specific validations
-            if (e.Id != Guid.Empty && Data.ContainsKey(e.LogicalName) &&
-                Data[e.LogicalName].ContainsKey(e.Id))
+            if (clone.Id != Guid.Empty && Data.ContainsKey(clone.LogicalName) &&
+                Data[clone.LogicalName].ContainsKey(clone.Id))
             {
-                throw new InvalidOperationException($"There is already a record of entity {e.LogicalName} with id {e.Id}, can't create with this Id.");
+                throw new InvalidOperationException($"There is already a record of entity {clone.LogicalName} with id {clone.Id}, can't create with this Id.");
             }
 
             // Create specific validations
-            if (e.Attributes.ContainsKey("statecode"))
+            if (clone.Attributes.ContainsKey("statecode"))
             {
-                throw new InvalidOperationException($"When creating an entity with logical name '{e.LogicalName}', or any other entity, it is not possible to create records with the statecode property. Statecode must be set after creation.");
+                throw new InvalidOperationException($"When creating an entity with logical name '{clone.LogicalName}', or any other entity, it is not possible to create records with the statecode property. Statecode must be set after creation.");
             }
 
-            AddEntityWithDefaults(e, this.UsePipelineSimulation);
+            AddEntityWithDefaults(clone, false, this.UsePipelineSimulation);
 
             if (e.RelatedEntities.Count > 0)
             {
                 foreach (var relationshipSet in e.RelatedEntities)
                 {
                     var relationship = relationshipSet.Key;
+
+                    var entityReferenceCollection = new EntityReferenceCollection();
+
                     foreach (var relatedEntity in relationshipSet.Value.Entities)
                     {
-                        CreateEntity(relatedEntity);
+                        var relatedId = CreateEntity(relatedEntity);
+                        entityReferenceCollection.Add(new EntityReference(relatedEntity.LogicalName, relatedId));
                     }
 
                     if (FakeMessageExecutors.ContainsKey(typeof(AssociateRequest)))
                     {
-                        var entityReferenceCollection = new EntityReferenceCollection(relationshipSet.Value.Entities.Select(en => en.ToEntityReference()).ToList());
                         var request = new AssociateRequest
                         {
-                            Target = e.ToEntityReference(),
+                            Target = clone.ToEntityReference(),
                             Relationship = relationship,
                             RelatedEntities = entityReferenceCollection
                         };
@@ -374,25 +348,26 @@ namespace FakeXrmEasy
                     }
                 }
             }
+
+            return clone.Id;
         }
 
-        protected internal void AddEntityWithDefaults(Entity e, bool usePluginPipeline = false)
+        protected internal void AddEntityWithDefaults(Entity e, bool clone = false, bool usePluginPipeline = false)
         {
             // Create the entity with defaults
             AddEntityDefaultAttributes(e);
 
             if (usePluginPipeline)
             {
-                ExecutePipelineStage("Create", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);
-                ExecutePipelineStage("Create", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, e);
+                ExecutePipelineStage("Create", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);               
             }
 
             // Store
-            var clone = e.Clone(e.GetType());
-            AddEntity(clone);
+            AddEntity(clone ? e.Clone(e.GetType()) : e);
 
             if (usePluginPipeline)
             {
+                ExecutePipelineStage("Create", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, e);
                 ExecutePipelineStage("Create", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous, e);
             }
         }
@@ -407,6 +382,15 @@ namespace FakeXrmEasy
             }
 
             ValidateEntity(e); //Entity must have a logical name and an Id
+
+            foreach (var sAttributeName in e.Attributes.Keys.ToList())
+            {
+                var attribute = e[sAttributeName];
+                if (attribute is DateTime)
+                {
+                    e[sAttributeName] = ConvertToUtc((DateTime)e[sAttributeName]);
+                }
+            }
 
             //Add the entity collection
             if (!Data.ContainsKey(e.LogicalName))
@@ -481,13 +465,42 @@ namespace FakeXrmEasy
                         .Where(pi => (pi.GetCustomAttributes(typeof(AttributeLogicalNameAttribute), true)[0] as AttributeLogicalNameAttribute).LogicalName.Equals(sAttributeName))
                         .FirstOrDefault();
 
-                    return attributeFound != null;
+                    if (attributeFound != null)
+                        return true;
+
+                    if(attributeFound == null && EntityMetadata.ContainsKey(sEntityName))
+                    {
+                        //Try with metadata
+                        return AttributeExistsInInjectedMetadata(sEntityName, sAttributeName);
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
+                //Try with metadata
                 return false;
             }
 
-            //Dynamic entities => just return true
+            if(EntityMetadata.ContainsKey(sEntityName))
+            {
+                //Try with metadata
+                return AttributeExistsInInjectedMetadata(sEntityName, sAttributeName);
+            }
+
+            //Dynamic entities and not entity metadata injected for entity => just return true if not found
             return true;
+        }
+
+        protected internal bool AttributeExistsInInjectedMetadata(string sEntityName, string sAttributeName)
+        {
+            var attributeInMetadata = FindAttributeTypeInInjectedMetadata(sEntityName, sAttributeName);
+            return attributeInMetadata != null;
+        }
+
+        protected internal DateTime ConvertToUtc(DateTime attribute)
+        {
+            return DateTime.SpecifyKind(attribute, DateTimeKind.Utc);
         }
         #endregion
     }

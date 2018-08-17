@@ -20,8 +20,9 @@ namespace FakeXrmEasy
     /// </summary>
     public partial class XrmFakedContext : IXrmContext
     {
-
         protected internal IOrganizationService Service { get; set; }
+
+        private IServiceEndpointNotificationService _serviceEndpointNotificationService;
 
         private readonly Lazy<XrmFakedTracingService> _tracingService = new Lazy<XrmFakedTracingService>(() => new XrmFakedTracingService());
 
@@ -38,6 +39,8 @@ namespace FakeXrmEasy
         /// All requests will be executed on behalf of this user
         /// </summary>
         public EntityReference CallerId { get; set; }
+
+        public EntityReference BusinessUnitId { get; set; }
 
         public delegate OrganizationResponse ServiceRequestExecution(OrganizationRequest req);
 
@@ -68,6 +71,7 @@ namespace FakeXrmEasy
             Data = new Dictionary<string, Dictionary<Guid, Entity>>();
             ExecutionMocks = new Dictionary<Type, ServiceRequestExecution>();
             OptionSetValuesMetadata = new Dictionary<string, OptionSetMetadata>();
+            StatusAttributeMetadata = new Dictionary<string, StatusAttributeMetadata>();
 
             FakeMessageExecutors = Assembly.GetExecutingAssembly()
                 .GetTypes()
@@ -111,7 +115,7 @@ namespace FakeXrmEasy
 
             foreach (var e in entities)
             {
-                AddEntityWithDefaults(e);
+                AddEntityWithDefaults(e, true);
             }
 
             Initialised = true;
@@ -275,10 +279,15 @@ namespace FakeXrmEasy
                     {
                         return context.ExecutionMocks[req.GetType()].Invoke(req);
                     }
+
                     if (context.FakeMessageExecutors.ContainsKey(req.GetType()))
                     {
-                        return context.FakeMessageExecutors[req.GetType()].Execute(req, context);
+                        if (context.FakeMessageExecutors[req.GetType()].CanExecute(req))
+                        {
+                            return context.FakeMessageExecutors[req.GetType()].Execute(req, context);
+                        }
                     }
+
                     if (req.GetType() == typeof(OrganizationRequest) && context.GenericFakeMessageExecutors.ContainsKey(req.RequestName))
                     {
                         return context.GenericFakeMessageExecutors[req.RequestName].Execute(req, context);
@@ -342,8 +351,20 @@ namespace FakeXrmEasy
                     var executor = new RetrieveMultipleRequestExecutor();
                     var response = executor.Execute(request, context) as RetrieveMultipleResponse;
 
+                    QueryExpression qe = req as QueryExpression;
+                    if (qe?.PageInfo.ReturnTotalRecordCount == true)
+                    {
+                        response.EntityCollection.TotalRecordCount = response.EntityCollection.Entities.Count;
+                    }
+
                     return response.EntityCollection;
                 });
+        }
+
+        public IServiceEndpointNotificationService GetFakedServiceEndpointNotificationService()
+        {
+            return _serviceEndpointNotificationService ??
+                   ( _serviceEndpointNotificationService = A.Fake<IServiceEndpointNotificationService>());
         }
     }
 }

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html data-ng-app="coverageApp">
+<head>
+<meta charset="utf-8" />
+<title>FakeXrmEasy.FakeMessageExecutors.RetrieveVersionRequestExecutor - Coverage Report</title>
+<link rel="stylesheet" type="text/css" href="report.css" />
+</head><body data-ng-controller="DetailViewCtrl"><div class="container">
+<h1>Summary</h1>
+<table class="overview">
+<colgroup>
+<col class="column135" />
+<col />
+</colgroup>
+<tbody>
+<tr><th>Class:</th><td>FakeXrmEasy.FakeMessageExecutors.RetrieveVersionRequestExecutor</td></tr>
+<tr><th>Assembly:</th><td>FakeXrmEasy</td></tr>
+<tr><th>File(s):</th><td><a href="#CCodefakexrmeasyFakeXrmEasySharedFakeMessageExecutorsRetrieveVersionRequestExecutorcs">C:\Code\fake-xrm-easy\FakeXrmEasy.Shared\FakeMessageExecutors\RetrieveVersionRequestExecutor.cs</a></td></tr>
+<tr><th>Covered lines:</th><td>18</td></tr>
+<tr><th>Uncovered lines:</th><td>0</td></tr>
+<tr><th>Coverable lines:</th><td>18</td></tr>
+<tr><th>Total lines:</th><td>36</td></tr>
+<tr><th>Line coverage:</th><td>100%</td></tr>
+</tbody>
+</table>
+<h1>Metrics</h1>
+<table class="overview">
+<thead><tr><th>Method</th><th>Cyclomatic Complexity</th><th>Sequence Coverage</th><th>Branch Coverage</th></tr></thead>
+<tbody>
+<tr><td title="System.Boolean FakeXrmEasy.FakeMessageExecutors.RetrieveVersionRequestExecutor::CanExecute(Microsoft.Xrm.Sdk.OrganizationRequest)">CanExecute(...)</td><td>1</td><td>100</td><td>100</td></tr>
+<tr><td title="Microsoft.Xrm.Sdk.OrganizationResponse FakeXrmEasy.FakeMessageExecutors.RetrieveVersionRequestExecutor::Execute(Microsoft.Xrm.Sdk.OrganizationRequest,FakeXrmEasy.XrmFakedContext)">Execute(...)</td><td>1</td><td>100</td><td>100</td></tr>
+<tr><td title="System.Type FakeXrmEasy.FakeMessageExecutors.RetrieveVersionRequestExecutor::GetResponsibleRequestType()">GetResponsibleRequestType()</td><td>1</td><td>100</td><td>100</td></tr>
+</tbody>
+</table>
+<h1>File(s)</h1>
+<h2 id="CCodefakexrmeasyFakeXrmEasySharedFakeMessageExecutorsRetrieveVersionRequestExecutorcs">C:\Code\fake-xrm-easy\FakeXrmEasy.Shared\FakeMessageExecutors\RetrieveVersionRequestExecutor.cs</h2>
+<table class="lineAnalysis">
+<thead><tr><th></th><th>#</th><th>Line</th><th></th><th>Line coverage</th></tr></thead>
+<tbody>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>1</code></td><td></td><td class="lightgray"><code>using&nbsp;System;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>2</code></td><td></td><td class="lightgray"><code>using&nbsp;Microsoft.Xrm.Sdk;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>3</code></td><td></td><td class="lightgray"><code>using&nbsp;Microsoft.Crm.Sdk.Messages;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>4</code></td><td></td><td class="lightgray"><code>using&nbsp;System.Reflection;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>5</code></td><td></td><td class="lightgray"><code>using&nbsp;System.Diagnostics;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>6</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>7</code></td><td></td><td class="lightgray"><code>namespace&nbsp;FakeXrmEasy.FakeMessageExecutors</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>8</code></td><td></td><td class="lightgray"><code>{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>9</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;class&nbsp;RetrieveVersionRequestExecutor&nbsp;:&nbsp;IFakeMessageExecutor</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>10</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>11</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;CanExecute(OrganizationRequest&nbsp;request)</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>12</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>13</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;request&nbsp;is&nbsp;RetrieveVersionRequest;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>14</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>15</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>16</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;OrganizationResponse&nbsp;Execute(OrganizationRequest&nbsp;request,&nbsp;XrmFakedContext&nbsp;ctx)</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>17</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>18</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;assemblyPath&nbsp;=&nbsp;Assembly.GetAssembly(typeof(RetrieveVersionRequest)).Location;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>19</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;versionInfo&nbsp;=&nbsp;FileVersionInfo.GetVersionInfo(assemblyPath);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>20</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;version&nbsp;=&nbsp;versionInfo.FileVersion;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>21</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>22</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;new&nbsp;RetrieveVersionResponse</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>23</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>24</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Results&nbsp;=&nbsp;new&nbsp;ParameterCollection</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>25</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>26</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;&quot;Version&quot;,&nbsp;version&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>27</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>28</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;};</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><code>29</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>30</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>31</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;Type&nbsp;GetResponsibleRequestType()</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '3608', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3608</td><td class="rightmargin right"><code>32</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '3608', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3608</td><td class="rightmargin right"><code>33</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;typeof(RetrieveVersionRequest);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '3608', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3608</td><td class="rightmargin right"><code>34</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>35</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>36</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
+</tbody>
+</table>
+<div class="footer">Generated by: ReportGenerator 2.4.5.0<br />10/08/2018 - 0:50:28<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<script type="text/javascript" src="combined.js"></script>
+</body></html>

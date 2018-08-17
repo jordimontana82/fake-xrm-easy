@@ -1,4 +1,4 @@
 ﻿param($installPath, $toolsPath, $package, $project)
 
-$DTE.ItemOperations.Navigate("http://dynamicsvalue.com/get-started/nuget-install-2011?version=1.38.0")
+$DTE.ItemOperations.Navigate("http://dynamicsvalue.com/get-started/nuget-install-2011?version=1.41.0")
 

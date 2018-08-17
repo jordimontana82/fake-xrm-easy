@@ -4,6 +4,7 @@ using System.Text;
 using Xunit;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using System.Linq;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
 {
@@ -29,8 +30,10 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
             }
             context.Initialize(initialEntities);
 
+            List<Entity> allRecords = new List<Entity>();
             QueryExpression query = new QueryExpression("entity");
             EntityCollection result = service.RetrieveMultiple(query);
+            allRecords.AddRange(result.Entities);
             Assert.Equal(context.MaxRetrieveCount, result.Entities.Count);
             Assert.True(result.MoreRecords);
             Assert.NotNull(result.PagingCookie);
@@ -41,8 +44,14 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
                 PageNumber = 2,
             };
             result = service.RetrieveMultiple(query);
+            allRecords.AddRange(result.Entities);
             Assert.Equal(excessNumberOfRecords, result.Entities.Count);
             Assert.False(result.MoreRecords);
+
+            foreach (Entity e in initialEntities)
+            {
+                Assert.True(allRecords.Any(r => r.Id == e.Id));
+            }
         }
 
         /// <summary>
@@ -189,6 +198,128 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
             QueryExpression query = new QueryExpression("entity");
             query.PageInfo = new PagingInfo() { PageNumber = 2, Count = 20 };
             Assert.Equal(0, service.RetrieveMultiple(query).Entities.Count);
+        }
+
+        /// <summary>
+        /// Tests that if distinct is asked for that a distinct number of entities is returned
+        /// </summary>
+        [Fact]
+        public void TestThatDistinctWorks()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service =  context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity first = new Entity("entity");
+            first.Id = Guid.NewGuid();
+            first["field"] = "value";
+            initialEntities.Add(first);
+
+            Entity related = new Entity("related");
+            related.Id = Guid.NewGuid();
+            related["entityid"] = first.ToEntityReference();
+            related["include"] = true;
+            initialEntities.Add(related);
+
+            Entity secondRelated = new Entity("related");
+            secondRelated.Id = Guid.NewGuid();
+            secondRelated["entityid"] = first.ToEntityReference();
+            secondRelated["include"] = true;
+            initialEntities.Add(secondRelated);
+
+            context.Initialize(initialEntities);
+
+            QueryExpression query = new QueryExpression("entity");
+            query.ColumnSet = new ColumnSet("field");
+            query.Distinct = true;
+
+            LinkEntity link = new LinkEntity("entity", "related", "entityid", "entityid", JoinOperator.Inner);
+            link.LinkCriteria.AddCondition("include", ConditionOperator.Equal, true);
+
+            query.LinkEntities.Add(link);
+
+            Assert.Equal(1, service.RetrieveMultiple(query).Entities.Count);
+        }
+
+        /// <summary>
+        /// Tests that if distinct is asked for and fields are pulled in from the link entities that the correct 
+        /// records are returned
+        /// </summary>
+        [Fact]
+        public void TestThatDistinctWorksWithLinkEntityFields()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service =  context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity first = new Entity("entity");
+            first.Id = Guid.NewGuid();
+            first["field"] = "value";
+            initialEntities.Add(first);
+
+            Entity related = new Entity("related");
+            related.Id = Guid.NewGuid();
+            related["entityid"] = first.ToEntityReference();
+            related["include"] = true;
+            related["linkfield"] = "value";
+            initialEntities.Add(related);
+
+            Entity secondRelated = new Entity("related");
+            secondRelated.Id = Guid.NewGuid();
+            secondRelated["entityid"] = first.ToEntityReference();
+            secondRelated["include"] = true;
+            secondRelated["linkfield"] = "other value";
+            initialEntities.Add(secondRelated);
+
+            context.Initialize(initialEntities);
+
+            QueryExpression query = new QueryExpression("entity");
+            query.ColumnSet = new ColumnSet("field");
+            query.Distinct = true;
+
+            LinkEntity link = new LinkEntity("entity", "related", "entityid", "entityid", JoinOperator.Inner);
+            link.LinkCriteria.AddCondition("include", ConditionOperator.Equal, true);
+            link.Columns = new ColumnSet("linkfield");
+
+            query.LinkEntities.Add(link);
+
+            Assert.Equal(2, service.RetrieveMultiple(query).Entities.Count);
+        }
+
+        /// <summary>
+        /// Tests that if PageInfo's ReturnTotalRecordCount sets total record count.
+        /// </summary>
+        [Fact]
+        public void TestThatPageInfoTotalRecordCountWorks()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity e = new Entity("entity");
+            e.Id = Guid.NewGuid();
+            e["retrieve"] = true;
+            initialEntities.Add(e);
+
+            Entity e2 = new Entity("entity");
+            e2.Id = Guid.NewGuid();
+            e2["retrieve"] = true;
+            initialEntities.Add(e2);
+
+            Entity e3 = new Entity("entity");
+            e3.Id = Guid.NewGuid();
+            e3["retrieve"] = false;
+            initialEntities.Add(e3);
+
+            context.Initialize(initialEntities);
+
+            QueryExpression query = new QueryExpression("entity");
+            query.PageInfo.ReturnTotalRecordCount = true;
+            query.Criteria.AddCondition("retrieve", ConditionOperator.Equal, true);
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(2, result.Entities.Count);
+            Assert.Equal(2, result.TotalRecordCount);
+            Assert.False(result.MoreRecords);
         }
     }
 }
