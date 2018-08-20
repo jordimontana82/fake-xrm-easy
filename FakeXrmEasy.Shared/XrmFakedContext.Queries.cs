@@ -27,7 +27,12 @@ namespace FakeXrmEasy
             {
                 assembly = Assembly.GetExecutingAssembly();
             }
-            return FindReflectedType(logicalName, assembly);
+
+            var type =
+                ProxyTypesAssemblies.Select(a => FindReflectedType(logicalName, a))
+                                    .SingleOrDefault();
+
+            return type;
         }
 
         /// <summary>
