@@ -143,6 +143,20 @@ namespace FakeXrmEasy
             this.Initialize(new List<Entity>() { e });
         }
 
+        /// <summary>
+        /// Enables support for the early-cound types exposed in a specified assembly.
+        /// </summary>
+        /// <param name="assembly">
+        /// An assembly containing early-bound entity types.
+        /// </param>
+        public void EnableProxyTypes(Assembly assembly) {
+          if(assembly == null) {
+            throw new ArgumentNullException(nameof(assembly));
+          }
+
+          ProxyTypesAssemblies.Add(assembly);
+        }
+
         public void AddExecutionMock<T>(ServiceRequestExecution mock) where T : OrganizationRequest
         {
             if (!ExecutionMocks.ContainsKey(typeof(T)))
