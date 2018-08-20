@@ -32,9 +32,19 @@ namespace FakeXrmEasy
                 ProxyTypesAssemblies.Select(a => FindReflectedType(logicalName, a))
                                     .Where(t => t != null);
 
-            var type = types.SingleOrDefault();
+            if(types.Count() > 1) {
+                var errorMsg = $"Type { logicalName } is defined in multiple assemblies: ";
+                foreach(var type in types) {
+                    errorMsg += type.Assembly
+                                    .GetName()
+                                    .Name + "; ";
+                }
+                var lastIndex = errorMsg.LastIndexOf("; ");
+                errorMsg = errorMsg.Substring(0, lastIndex) + ".";
+                throw new InvalidOperationException(errorMsg);
+            }
 
-            return type;
+            return types.SingleOrDefault();
         }
 
         /// <summary>
