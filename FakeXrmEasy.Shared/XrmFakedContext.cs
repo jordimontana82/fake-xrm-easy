@@ -149,9 +149,17 @@ namespace FakeXrmEasy
         /// <param name="assembly">
         /// An assembly containing early-bound entity types.
         /// </param>
+        /// <remarks>
+        /// See issue #334 on GitHub. This has quite similar idea as is on SDK method
+        /// https://docs.microsoft.com/en-us/dotnet/api/microsoft.xrm.sdk.client.organizationserviceproxy.enableproxytypes.
+        /// </remarks>
         public void EnableProxyTypes(Assembly assembly) {
           if(assembly == null) {
             throw new ArgumentNullException(nameof(assembly));
+          }
+
+          if(ProxyTypesAssemblies.Contains(assembly)) {
+            throw new InvalidOperationException($"Proxy types assembly { assembly.GetName().Name } is already enabled.");
           }
 
           ProxyTypesAssemblies.Add(assembly);
