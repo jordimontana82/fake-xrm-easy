@@ -23,11 +23,27 @@ namespace FakeXrmEasy
         protected internal Type FindReflectedType(string logicalName)
         {
             var assembly = this.ProxyTypesAssembly;
+            if (assembly == null)
+            {
+                assembly = Assembly.GetExecutingAssembly();
+            }
+            return FindReflectedType(logicalName, assembly);
+        }
+
+        /// <summary>
+        /// Finds reflected type from given assembly.
+        /// </summary>
+        /// <param name="logicalName"></param>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
+        private static Type FindReflectedType(string logicalName,
+                                              Assembly assembly)
+        {
             try
             {
                 if (assembly == null)
                 {
-                    assembly = Assembly.GetExecutingAssembly();
+                    throw new ArgumentNullException(nameof(assembly));
                 }
 
                 /* This wasn't building within the CI FAKE build script...

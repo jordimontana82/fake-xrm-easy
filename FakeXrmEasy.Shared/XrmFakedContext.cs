@@ -26,7 +26,10 @@ namespace FakeXrmEasy
 
         private readonly Lazy<XrmFakedTracingService> _tracingService = new Lazy<XrmFakedTracingService>(() => new XrmFakedTracingService());
 
-        private List<Assembly> _proxyTypesAssemblies = new List<Assembly>();
+        /// <summary>
+        /// All proxy type assemblies available on mocked database.
+        /// </summary>
+        private List<Assembly> ProxyTypesAssemblies { get; set; }
 
         protected internal XrmFakedTracingService TracingService => _tracingService.Value;
 
@@ -36,12 +39,12 @@ namespace FakeXrmEasy
 
         public Assembly ProxyTypesAssembly {
           get {
-            return _proxyTypesAssemblies.FirstOrDefault();
+            return ProxyTypesAssemblies.FirstOrDefault();
           }
           set {
-            _proxyTypesAssemblies = new List<Assembly>();
+            ProxyTypesAssemblies = new List<Assembly>();
             if(value != null) {
-              _proxyTypesAssemblies.Add(value);
+              ProxyTypesAssemblies.Add(value);
             }
           }
         }
@@ -107,6 +110,8 @@ namespace FakeXrmEasy
             UsePipelineSimulation = false;
 
             InitializationLevel = EntityInitializationLevel.Default;
+
+            ProxyTypesAssemblies = new List<Assembly>();
         }
 
         /// <summary>
