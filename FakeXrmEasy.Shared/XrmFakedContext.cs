@@ -26,13 +26,25 @@ namespace FakeXrmEasy
 
         private readonly Lazy<XrmFakedTracingService> _tracingService = new Lazy<XrmFakedTracingService>(() => new XrmFakedTracingService());
 
+        private List<Assembly> _proxyTypesAssemblies = new List<Assembly>();
+
         protected internal XrmFakedTracingService TracingService => _tracingService.Value;
 
         protected internal bool Initialised { get; set; }
 
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
 
-        public Assembly ProxyTypesAssembly { get; set; }
+        public Assembly ProxyTypesAssembly {
+          get {
+            return _proxyTypesAssemblies.FirstOrDefault();
+          }
+          set {
+            _proxyTypesAssemblies = new List<Assembly>();
+            if(value != null) {
+              _proxyTypesAssemblies.Add(value);
+            }
+          }
+        }
 
         /// <summary>
         /// Sets the user to assign the CreatedBy and ModifiedBy properties when entities are added to the context.
