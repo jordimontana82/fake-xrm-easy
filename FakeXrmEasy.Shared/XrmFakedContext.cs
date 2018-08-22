@@ -37,8 +37,17 @@ namespace FakeXrmEasy
 
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
 
+        /// <summary>
+        /// Specify which assembly is used to search for early-bound proxy
+        /// types when used within simulated CRM context.
+        /// 
+        /// If you want to specify multiple different assemblies for early-bound
+        /// proxy types please use <see cref="EnableProxyTypes(Assembly)"/>
+        /// instead.
+        /// </summary>
         public Assembly ProxyTypesAssembly {
           get {
+            // TODO What we should do when ProxyTypesAssemblies contains multiple assemblies? One shouldn't throw exceptions from properties.
             return ProxyTypesAssemblies.FirstOrDefault();
           }
           set {
