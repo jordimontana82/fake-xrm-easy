@@ -42,11 +42,20 @@ namespace FakeXrmEasy
         }
 
         /// <summary>
-        /// Finds reflected type from given assembly.
+        /// Finds reflected type for given entity from given assembly.
         /// </summary>
-        /// <param name="logicalName"></param>
-        /// <param name="assembly"></param>
-        /// <returns></returns>
+        /// <param name="logicalName">
+        /// Entity logical name which type is searched from given
+        /// <paramref name="assembly"/>.
+        /// </param>
+        /// <param name="assembly">
+        /// Assembly where early-bound type is searched for given
+        /// <paramref name="logicalName"/>.
+        /// </param>
+        /// <returns>
+        /// Early-bound type of <paramref name="logicalName"/> if it's found
+        /// from <paramref name="assembly"/>. Otherwise null is returned.
+        /// </returns>
         private static Type FindReflectedType(string logicalName,
                                               Assembly assembly)
         {
