@@ -22,12 +22,6 @@ namespace FakeXrmEasy
     {
         protected internal Type FindReflectedType(string logicalName)
         {
-            var assembly = this.ProxyTypesAssembly;
-            if (assembly == null)
-            {
-                assembly = Assembly.GetExecutingAssembly();
-            }
-
             var types =
                 ProxyTypesAssemblies.Select(a => FindReflectedType(logicalName, a))
                                     .Where(t => t != null);
