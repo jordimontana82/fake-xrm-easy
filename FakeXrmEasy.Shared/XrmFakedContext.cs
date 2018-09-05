@@ -26,13 +26,37 @@ namespace FakeXrmEasy
 
         private readonly Lazy<XrmFakedTracingService> _tracingService = new Lazy<XrmFakedTracingService>(() => new XrmFakedTracingService());
 
+        /// <summary>
+        /// All proxy type assemblies available on mocked database.
+        /// </summary>
+        private List<Assembly> ProxyTypesAssemblies { get; set; }
+
         protected internal XrmFakedTracingService TracingService => _tracingService.Value;
 
         protected internal bool Initialised { get; set; }
 
         public Dictionary<string, Dictionary<Guid, Entity>> Data { get; set; }
 
-        public Assembly ProxyTypesAssembly { get; set; }
+        /// <summary>
+        /// Specify which assembly is used to search for early-bound proxy
+        /// types when used within simulated CRM context.
+        /// 
+        /// If you want to specify multiple different assemblies for early-bound
+        /// proxy types please use <see cref="EnableProxyTypes(Assembly)"/>
+        /// instead.
+        /// </summary>
+        public Assembly ProxyTypesAssembly {
+          get {
+            // TODO What we should do when ProxyTypesAssemblies contains multiple assemblies? One shouldn't throw exceptions from properties.
+            return ProxyTypesAssemblies.FirstOrDefault();
+          }
+          set {
+            ProxyTypesAssemblies = new List<Assembly>();
+            if(value != null) {
+              ProxyTypesAssemblies.Add(value);
+            }
+          }
+        }
 
         /// <summary>
         /// Sets the user to assign the CreatedBy and ModifiedBy properties when entities are added to the context.
@@ -95,6 +119,8 @@ namespace FakeXrmEasy
             UsePipelineSimulation = false;
 
             InitializationLevel = EntityInitializationLevel.Default;
+
+            ProxyTypesAssemblies = new List<Assembly>();
         }
 
         /// <summary>
@@ -124,6 +150,28 @@ namespace FakeXrmEasy
         public void Initialize(Entity e)
         {
             this.Initialize(new List<Entity>() { e });
+        }
+
+        /// <summary>
+        /// Enables support for the early-cound types exposed in a specified assembly.
+        /// </summary>
+        /// <param name="assembly">
+        /// An assembly containing early-bound entity types.
+        /// </param>
+        /// <remarks>
+        /// See issue #334 on GitHub. This has quite similar idea as is on SDK method
+        /// https://docs.microsoft.com/en-us/dotnet/api/microsoft.xrm.sdk.client.organizationserviceproxy.enableproxytypes.
+        /// </remarks>
+        public void EnableProxyTypes(Assembly assembly) {
+          if(assembly == null) {
+            throw new ArgumentNullException(nameof(assembly));
+          }
+
+          if(ProxyTypesAssemblies.Contains(assembly)) {
+            throw new InvalidOperationException($"Proxy types assembly { assembly.GetName().Name } is already enabled.");
+          }
+
+          ProxyTypesAssemblies.Add(assembly);
         }
 
         public void AddExecutionMock<T>(ServiceRequestExecution mock) where T : OrganizationRequest

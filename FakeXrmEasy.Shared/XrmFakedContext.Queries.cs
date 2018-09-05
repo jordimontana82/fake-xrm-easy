@@ -22,12 +22,48 @@ namespace FakeXrmEasy
     {
         protected internal Type FindReflectedType(string logicalName)
         {
-            var assembly = this.ProxyTypesAssembly;
+            var types =
+                ProxyTypesAssemblies.Select(a => FindReflectedType(logicalName, a))
+                                    .Where(t => t != null);
+
+            if(types.Count() > 1) {
+                var errorMsg = $"Type { logicalName } is defined in multiple assemblies: ";
+                foreach(var type in types) {
+                    errorMsg += type.Assembly
+                                    .GetName()
+                                    .Name + "; ";
+                }
+                var lastIndex = errorMsg.LastIndexOf("; ");
+                errorMsg = errorMsg.Substring(0, lastIndex) + ".";
+                throw new InvalidOperationException(errorMsg);
+            }
+
+            return types.SingleOrDefault();
+        }
+
+        /// <summary>
+        /// Finds reflected type for given entity from given assembly.
+        /// </summary>
+        /// <param name="logicalName">
+        /// Entity logical name which type is searched from given
+        /// <paramref name="assembly"/>.
+        /// </param>
+        /// <param name="assembly">
+        /// Assembly where early-bound type is searched for given
+        /// <paramref name="logicalName"/>.
+        /// </param>
+        /// <returns>
+        /// Early-bound type of <paramref name="logicalName"/> if it's found
+        /// from <paramref name="assembly"/>. Otherwise null is returned.
+        /// </returns>
+        private static Type FindReflectedType(string logicalName,
+                                              Assembly assembly)
+        {
             try
             {
                 if (assembly == null)
                 {
-                    assembly = Assembly.GetExecutingAssembly();
+                    throw new ArgumentNullException(nameof(assembly));
                 }
 
                 /* This wasn't building within the CI FAKE build script...
