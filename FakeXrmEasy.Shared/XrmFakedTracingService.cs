@@ -1,27 +1,35 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
+using System.Text;
 
 namespace FakeXrmEasy
 {
     public class XrmFakedTracingService : ITracingService
     {
-        protected string _trace { get; set; }
+        protected StringBuilder _trace { get; set; }
 
         public XrmFakedTracingService()
         {
-            _trace = "";
+            _trace = new StringBuilder();
         }
 
         public void Trace(string format, params object[] args)
         {
-            Console.WriteLine(format, args);
+            if (args.Length == 0)
+            {
+                Trace("{0}", format);
+            }
+            else
+            { 
+                Console.WriteLine(format, args);
 
-            _trace += string.Format(format, args) + System.Environment.NewLine;
+                _trace.AppendLine(string.Format(format, args));
+            };
         }
 
         public string DumpTrace()
         {
-            return _trace;
+            return _trace.ToString();
         }
     }
 }
