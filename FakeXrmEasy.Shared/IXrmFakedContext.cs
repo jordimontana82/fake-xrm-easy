@@ -32,6 +32,13 @@ namespace FakeXrmEasy
         ///// <returns></returns>
         //OrganizationServiceProxy GetFakedOrganizationServiceProxy();
 
+
+        /// <summary>
+        /// Returns a faked service endpoint notification service
+        /// </summary>
+        /// <returns></returns>
+        IServiceEndpointNotificationService GetFakedServiceEndpointNotificationService();
+
         /// <summary>
         /// Receives a strong-typed entity type and returns a Queryable of that type
         /// </summary>
@@ -54,6 +61,14 @@ namespace FakeXrmEasy
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         IPlugin ExecutePluginWithTargetAndPreEntityImages<T>(object target, EntityImageCollection preEntityImages, string messageName = "Create", int stage = 40)
+            where T : IPlugin, new();
+
+        /// <summary>
+        /// Returns a faked plugin with a target and the specified post entity images
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        IPlugin ExecutePluginWithTargetAndPostEntityImages<T>(object target, EntityImageCollection postEntityImages, string messageName = "Create", int stage = 40)
             where T : IPlugin, new();
 
         /// <summary>

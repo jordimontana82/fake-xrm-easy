@@ -18,6 +18,10 @@ namespace FakeXrmEasy.Extensions
         public static void SetAttribute(this EntityMetadata entityMetadata, AttributeMetadata attribute)
         {
             var currentAttributes = entityMetadata.Attributes;
+            if (currentAttributes == null)
+            {
+                currentAttributes = new AttributeMetadata[0];
+            }
             var newAttributesList = currentAttributes.Where(a => a.LogicalName != attribute.LogicalName).ToList();
             newAttributesList.Add(attribute);
             var newAttributesArray = newAttributesList.ToArray();

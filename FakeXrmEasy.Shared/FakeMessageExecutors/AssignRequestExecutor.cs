@@ -1,6 +1,7 @@
 ﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 
 namespace FakeXrmEasy.FakeMessageExecutors
@@ -31,13 +32,20 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             var service = ctx.GetOrganizationService();
 
+            KeyValuePair<string, object> owningX = new KeyValuePair<string, object>();
+            if (assignee.LogicalName == "systemuser")
+                owningX = new KeyValuePair<string, object>("owninguser", assignee);
+            else if (assignee.LogicalName == "team")
+                owningX = new KeyValuePair<string, object>("owningteam", assignee);
+
             var assignment = new Entity
             {
                 LogicalName = target.LogicalName,
                 Id = target.Id,
                 Attributes = new AttributeCollection
                 {
-                    { "ownerid", assignee }
+                    { "ownerid", assignee },
+                    owningX
                 }
             };
 
