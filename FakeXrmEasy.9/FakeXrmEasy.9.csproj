@@ -95,6 +95,243 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\FakeXrmEasy.Shared\Enums\ProcessingStepImageType.cs">
+      <Link>Enums\ProcessingStepImageType.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Enums\ProcessingStepMode.cs">
+      <Link>Enums\ProcessingStepMode.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Enums\ProcessingStepStage.cs">
+      <Link>Enums\ProcessingStepStage.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Extensions\EntityExtensions.cs">
+      <Link>Extensions\EntityExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Extensions\EntityMetadataExtensions.cs">
+      <Link>Extensions\EntityMetadataExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Extensions\ObjectExtensions.cs">
+      <Link>Extensions\ObjectExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Extensions\QueryExpressionExtensions.cs">
+      <Link>Extensions\QueryExpressionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Extensions\TypeExtensions.cs">
+      <Link>Extensions\TypeExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Extensions\XmlExtensionsForFetchXml.cs">
+      <Link>Extensions\XmlExtensionsForFetchXml.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\AddListMembersListRequestExecutor.cs">
+      <Link>FakeMessageExecutors\AddListMembersListRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\AddMemberListRequestExecutor.cs">
+      <Link>FakeMessageExecutors\AddMemberListRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\AddMembersTeamRequestExecutor.cs">
+      <Link>FakeMessageExecutors\AddMembersTeamRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\AddToQueueRequestExecutor.cs">
+      <Link>FakeMessageExecutors\AddToQueueRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\AddUserToRecordTeamRequestExecutor.cs">
+      <Link>FakeMessageExecutors\AddUserToRecordTeamRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\AssignRequestExecutor.cs">
+      <Link>FakeMessageExecutors\AssignRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\AssociateRequestExecutor.cs">
+      <Link>FakeMessageExecutors\AssociateRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\CloseIncidentRequestExecutor.cs">
+      <Link>FakeMessageExecutors\CloseIncidentRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\CloseQuoteRequestExecutor.cs">
+      <Link>FakeMessageExecutors\CloseQuoteRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\CreateRequestExecutor.cs">
+      <Link>FakeMessageExecutors\CreateRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\CustomExecutors\NavigateToNextEntityOrganizationRequestExecutor.cs">
+      <Link>FakeMessageExecutors\CustomExecutors\NavigateToNextEntityOrganizationRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\DeleteRequestExecutor.cs">
+      <Link>FakeMessageExecutors\DeleteRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\DisassociateRequestExecutor.cs">
+      <Link>FakeMessageExecutors\DisassociateRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\ExecuteFetchRequestExecutor.cs">
+      <Link>FakeMessageExecutors\ExecuteFetchRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\ExecuteMultipleRequestExecutor.cs">
+      <Link>FakeMessageExecutors\ExecuteMultipleRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\ExecuteTransactionExecutor.cs">
+      <Link>FakeMessageExecutors\ExecuteTransactionExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\GrantAccessRequestExecutor.cs">
+      <Link>FakeMessageExecutors\GrantAccessRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\IFakeMessageExecutor.cs">
+      <Link>FakeMessageExecutors\IFakeMessageExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\InitializeFromRequestExecutor.cs">
+      <Link>FakeMessageExecutors\InitializeFromRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\InsertOptionValueRequestExecutor.cs">
+      <Link>FakeMessageExecutors\InsertOptionValueRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\InsertStatusValueRequestExecutor.cs">
+      <Link>FakeMessageExecutors\InsertStatusValueRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\LoseOpportunityRequestExecutor.cs">
+      <Link>FakeMessageExecutors\LoseOpportunityRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\ModifyAccessRequestExecutor.cs">
+      <Link>FakeMessageExecutors\ModifyAccessRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\PickFromQueueRequestExecutor.cs">
+      <Link>FakeMessageExecutors\PickFromQueueRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\PublishXmlRequestExecutor.cs">
+      <Link>FakeMessageExecutors\PublishXmlRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\QualifyLeadRequestExecutor.cs">
+      <Link>FakeMessageExecutors\QualifyLeadRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RemoveFromQueueRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RemoveFromQueueRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RemoveMembersTeamRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RemoveMembersTeamRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RemoveUserFromRecordTeamRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RemoveUserFromRecordTeamRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RetrieveAttributeRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RetrieveAttributeRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RetrieveEntityRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RetrieveEntityRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RetrieveMultipleRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RetrieveOptionSetRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RetrieveOptionSetRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RetrievePrincipalAccessRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RetrievePrincipalAccessRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RetrieveRelationshipRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RetrieveRelationshipRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RetrieveRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RetrieveRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RetrieveSharedPrincipalsAndAccessRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RetrieveSharedPrincipalsAndAccessRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RetrieveVersionRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RetrieveVersionRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\ReviseQuoteRequestExecutor.cs">
+      <Link>FakeMessageExecutors\ReviseQuoteRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\RevokeAccessRequestExecutor.cs">
+      <Link>FakeMessageExecutors\RevokeAccessRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\SetStateRequestExecutor.cs">
+      <Link>FakeMessageExecutors\SetStateRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\UpdateRequestExecutor.cs">
+      <Link>FakeMessageExecutors\UpdateRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\WhoAmIRequestExecutor.cs">
+      <Link>FakeMessageExecutors\WhoAmIRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\FakeMessageExecutors\WinOpportunityRequestExecutor.cs">
+      <Link>FakeMessageExecutors\WinOpportunityRequestExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\IXrmFakedContext.cs">
+      <Link>IXrmFakedContext.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Metadata\DateTimeAttributeBehavior.cs">
+      <Link>Metadata\DateTimeAttributeBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Models\TypedConditionExpression.cs">
+      <Link>Models\TypedConditionExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\OrganizationFaults\OrganizationServiceFaultQueryBuilderNoAttribute.cs">
+      <Link>OrganizationFaults\OrganizationServiceFaultQueryBuilderNoAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Permissions\AccessRightsRepository.cs">
+      <Link>Permissions\AccessRightsRepository.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Permissions\IAccessRightsRepository.cs">
+      <Link>Permissions\IAccessRightsRepository.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\PullRequestException.cs">
+      <Link>PullRequestException.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Services\EntityInitializer\DefaultEntityInitializerService.cs">
+      <Link>Services\EntityInitializer\DefaultEntityInitializerService.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Services\EntityInitializer\InvoiceDetailInitializerService.cs">
+      <Link>Services\EntityInitializer\InvoiceDetailInitializerService.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Services\EntityInitializer\InvoiceInitializerService.cs">
+      <Link>Services\EntityInitializer\InvoiceInitializerService.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\Services\IEntityInitializerService.cs">
+      <Link>Services\IEntityInitializerService.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedContext.Aggregations.cs">
+      <Link>XrmFakedContext.Aggregations.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedContext.CodeActivities.cs">
+      <Link>XrmFakedContext.CodeActivities.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedContext.Crud.cs">
+      <Link>XrmFakedContext.Crud.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedContext.cs">
+      <Link>XrmFakedContext.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedContext.DateTime.cs">
+      <Link>XrmFakedContext.DateTime.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedContext.Metadata.cs">
+      <Link>XrmFakedContext.Metadata.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedContext.Pipeline.cs">
+      <Link>XrmFakedContext.Pipeline.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedContext.Plugins.cs">
+      <Link>XrmFakedContext.Plugins.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedContext.Queries.cs">
+      <Link>XrmFakedContext.Queries.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedPluginExecutionContext.cs">
+      <Link>XrmFakedPluginExecutionContext.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedRelationship.cs">
+      <Link>XrmFakedRelationship.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedTracingService.cs">
+      <Link>XrmFakedTracingService.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmFakedWorkflowContext.cs">
+      <Link>XrmFakedWorkflowContext.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmOrderByAttributeComparer.cs">
+      <Link>XrmOrderByAttributeComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Shared\XrmRealContext.cs">
+      <Link>XrmRealContext.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -102,7 +339,7 @@
     <None Include="fakexrmeasy.snk" />
     <None Include="packages.config" />
   </ItemGroup>
-  <Import Project="..\FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems" Label="Shared" />
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
