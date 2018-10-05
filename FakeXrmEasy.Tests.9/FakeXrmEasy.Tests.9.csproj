@@ -102,7 +102,6 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-  <Import Project="..\FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems" Label="Shared" />
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
       <ItemGroup>
@@ -112,6 +111,384 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\CodeActivitiesForTesting\AddActivity.cs">
+      <Link>CodeActivitiesForTesting\AddActivity.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\CodeActivitiesForTesting\AddActivityWithConstant.cs">
+      <Link>CodeActivitiesForTesting\AddActivityWithConstant.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\CodeActivitiesForTesting\CheckContextPropertyActivity.cs">
+      <Link>CodeActivitiesForTesting\CheckContextPropertyActivity.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\CodeActivitiesForTesting\CreateTaskActivity.cs">
+      <Link>CodeActivitiesForTesting\CreateTaskActivity.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\CrmModelClient.cs">
+      <Link>CrmModelClient.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Extensions\EntityExtensionsTests.cs">
+      <Link>Extensions\EntityExtensionsTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Extensions\EntityMetadataExtensionsTests.cs">
+      <Link>Extensions\EntityMetadataExtensionsTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Extensions\QueryExpressionExtensionsTests.cs">
+      <Link>Extensions\QueryExpressionExtensionsTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\AddListMembersListRequestTests\Tests.cs">
+      <Link>FakeContextTests\AddListMembersListRequestTests\Tests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\AddMemberListRequestTests\Tests.cs">
+      <Link>FakeContextTests\AddMemberListRequestTests\Tests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\AddMembersTeamRequestTests\Tests.cs">
+      <Link>FakeContextTests\AddMembersTeamRequestTests\Tests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\AddToQueueRequestTests\AddToQueueRequestTests.cs">
+      <Link>FakeContextTests\AddToQueueRequestTests\AddToQueueRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\AddUserToRecordTeamRequestTests\AddUserToRecordTeamRequestTests.cs">
+      <Link>FakeContextTests\AddUserToRecordTeamRequestTests\AddUserToRecordTeamRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\AssignRequestTests\AssignRequestTests.cs">
+      <Link>FakeContextTests\AssignRequestTests\AssignRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\AssociateRequestTests\AssociateRequestTests.cs">
+      <Link>FakeContextTests\AssociateRequestTests\AssociateRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\BasePluginTests\BasePluginTests.cs">
+      <Link>FakeContextTests\BasePluginTests\BasePluginTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\CloseIncidentRequestTests\CloseIncidentRequestTests.cs">
+      <Link>FakeContextTests\CloseIncidentRequestTests\CloseIncidentRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\CloseQuoteRequestTests\CloseQuoteRequestTests.cs">
+      <Link>FakeContextTests\CloseQuoteRequestTests\CloseQuoteRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\CustomRequestTests\NavigateToNextEntityRequestTests\NavigateToNextEntityRequestTests.cs">
+      <Link>FakeContextTests\CustomRequestTests\NavigateToNextEntityRequestTests\NavigateToNextEntityRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\DateTimeBehaviourTests\DateTimeBehaviourTests.cs">
+      <Link>FakeContextTests\DateTimeBehaviourTests\DateTimeBehaviourTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\DeleteRequestTests\DeleteRequestTests.cs">
+      <Link>FakeContextTests\DeleteRequestTests\DeleteRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\DisassociateRequestTests\DisassociateRequestTests.cs">
+      <Link>FakeContextTests\DisassociateRequestTests\DisassociateRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\ExecuteFetchRequestTests\ExecuteFetchRequestTests.cs">
+      <Link>FakeContextTests\ExecuteFetchRequestTests\ExecuteFetchRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\ExecuteMultipleRequestTests\ExecuteMultipleRequestTests.cs">
+      <Link>FakeContextTests\ExecuteMultipleRequestTests\ExecuteMultipleRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\ExecuteTransationTests\ExecuteTransactionTests.cs">
+      <Link>FakeContextTests\ExecuteTransactionTests\ExecuteTransactionTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeContextMockTests.cs">
+      <Link>FakeContextTests\FakeContextMockTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeContextTestCodeActivities.cs">
+      <Link>FakeContextTests\FakeContextTestCodeActivities.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeContextTestCreate.cs">
+      <Link>FakeContextTests\FakeContextTestCreate.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeContextTestCreateQuery.cs">
+      <Link>FakeContextTests\FakeContextTestCreateQuery.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeContextTestDelete.cs">
+      <Link>FakeContextTests\FakeContextTestDelete.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeContextTestExecute.cs">
+      <Link>FakeContextTests\FakeContextTestExecute.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeContextTestMetadata.cs">
+      <Link>FakeContextTests\FakeContextTestMetadata.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeContextTestPlugins.cs">
+      <Link>FakeContextTests\FakeContextTestPlugins.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeContextTestRetrieve.cs">
+      <Link>FakeContextTests\FakeContextTestRetrieve.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeContextTests.cs">
+      <Link>FakeContextTests\FakeContextTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeContextTestUpdate.cs">
+      <Link>FakeContextTests\FakeContextTestUpdate.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FakeTracingServiceTests.cs">
+      <Link>FakeContextTests\FakeTracingServiceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FetchXml\AggregateTests.cs">
+      <Link>FakeContextTests\FetchXml\AggregateTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FetchXml\ConditionOperatorTests.cs">
+      <Link>FakeContextTests\FetchXml\ConditionOperatorTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FetchXml\FakeContextTestFetchXmlTranslation.cs">
+      <Link>FakeContextTests\FetchXml\FakeContextTestFetchXmlTranslation.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FetchXml\OperatorTests\Strings\StringOperatorTests.cs">
+      <Link>FakeContextTests\FetchXml\OperatorTests\Strings\StringOperatorTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\FetchXml\TypeConversionTests.cs">
+      <Link>FakeContextTests\FetchXml\TypeConversionTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\InitializeFromRequestTests\InitializeFromRequestTests.cs">
+      <Link>FakeContextTests\InitializeFromRequestTests\InitializeFromRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\InsertOptionValueRequestTests\InsertOptionValueRequestTests.cs">
+      <Link>FakeContextTests\InsertOptionValueRequestTests\InsertOptionValueRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\InsertStatusValueRequestTests\InsertStatusValueRequestTests.cs">
+      <Link>FakeContextTests\InsertStatusValueRequestTests\InsertStatusValueRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs">
+      <Link>FakeContextTests\LinqTests\EqualityWithDifferentDataTypesTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs">
+      <Link>FakeContextTests\LinqTests\FakeContextTestLinqQueries.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\LinqTests\MetadataInferenceTests.cs">
+      <Link>FakeContextTests\LinqTests\MetadataInferenceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\LinqTests\MinClientContext.cs">
+      <Link>FakeContextTests\LinqTests\MinClientContext.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\LoseOpportunityTests\LoseOpportunityTests.cs">
+      <Link>FakeContextTests\LoseOpportunityTests\LoseOpportunityTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\ModifyAccessRightsTests\ModifyAccessRequestTests.cs">
+      <Link>FakeContextTests\ModifyAccessRightsTests\ModifyAccessRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\OptionSetValuesRequestTests\OptionSetValueRequestsTests.cs">
+      <Link>FakeContextTests\OptionSetValuesRequestTests\OptionSetValueRequestsTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\OrgServiceContextTests\OrgServiceContextTests.cs">
+      <Link>FakeContextTests\OrgServiceContextTests\OrgServiceContextTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\PermissionsTests\PermissionsTests.cs">
+      <Link>FakeContextTests\PermissionsTests\PermissionsTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\PickFromQueueRequestTests\PickFromQueueRequestTests.cs">
+      <Link>FakeContextTests\PickFromQueueRequestTests\PickFromQueueRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\PublishXml\PublishXmlRequestTests.cs">
+      <Link>FakeContextTests\PublishXml\PublishXmlRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\QualifyLeadTests\QualifyLeadTests.cs">
+      <Link>FakeContextTests\QualifyLeadTests\QualifyLeadTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\QueryByAttribute\QueryByAttributeTests.cs">
+      <Link>FakeContextTests\QueryByAttribute\QueryByAttributeTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\QueryLookupTests\QueryLookupTests.cs">
+      <Link>FakeContextTests\QueryLookupTests\QueryLookupTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\QueryTests\BusinessIdTests.cs">
+      <Link>FakeContextTests\QueryTests\BusinessIdTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\RemoveFromQueueRequestTests\RemoveFromQueueRequestTests.cs">
+      <Link>FakeContextTests\RemoveFromQueueRequestTests\RemoveFromQueueRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\RemoveMembersTeamRequestTests\Tests.cs">
+      <Link>FakeContextTests\RemoveMembersTeamRequestTests\Tests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\RemoveUserFromRecordTeamRequestTests\RemoveUserFromRecordTeamRequestTests.cs">
+      <Link>FakeContextTests\RemoveUserFromRecordTeamRequestTests\RemoveUserFromRecordTeamRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs">
+      <Link>FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\RetrieveEntityRequestTests\RetrieveEntityRequestTests.cs">
+      <Link>FakeContextTests\RetrieveEntityRequestTests\RetrieveEntityRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs">
+      <Link>FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\RetrieveMultiple\RetrieveMultipleTests.cs">
+      <Link>FakeContextTests\RetrieveMultiple\RetrieveMultipleTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\RetrieveOptionSetRequestTests\RetrieveOptionSetRequestTests.cs">
+      <Link>FakeContextTests\RetrieveOptionSetRequestTests\RetrieveOptionSetRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\RetrieveRequestTests\RetrieveRequestTests.cs">
+      <Link>FakeContextTests\RetrieveRequestTests\RetrieveRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\RetrieveVersionRequestTests\RetrieveVersionRequestTests.cs">
+      <Link>FakeContextTests\RetrieveVersionRequestTests\RetrieveVersionRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\ReviseQuoteRequestTests\ReviseQuoteRequestTests.cs">
+      <Link>FakeContextTests\ReviseQuoteRequestTests\ReviseQuoteRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs">
+      <Link>FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\TestGenericMessageExecutors.cs">
+      <Link>FakeContextTests\TestGenericMessageExecutors.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs">
+      <Link>FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\TranslateQueryExpressionTests\FakeContextTestFormattedValues.cs">
+      <Link>FakeContextTests\TranslateQueryExpressionTests\FakeContextTestFormattedValues.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs">
+      <Link>FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs">
+      <Link>FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\TranslateQueryExpressionTests\OperatorTests\DateTime\DateTimeOperatorsTests.cs">
+      <Link>FakeContextTests\TranslateQueryExpressionTests\OperatorTests\DateTime\DateTimeOperatorsTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\TranslateQueryExpressionTests\OperatorTests\Strings\StringOperatorsTests.cs">
+      <Link>FakeContextTests\TranslateQueryExpressionTests\OperatorTests\Strings\StringOperatorsTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\TranslateQueryExpressionTests\OrderByTests.cs">
+      <Link>FakeContextTests\TranslateQueryExpressionTests\OrderByTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\WhoAmIRequest\WhoAmITests.cs">
+      <Link>FakeContextTests\WhoAmIRequest\WhoAmITests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\WinOpportunityRequestTests\WinOpportunityTests.cs">
+      <Link>FakeContextTests\WinOpportunityRequestTests\WinOpportunityTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\FakeContextTests\XrmFakedRelationshipTests.cs">
+      <Link>FakeContextTests\XrmFakedRelationshipTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\GeneratedCode.cs">
+      <Link>GeneratedCode.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue116.cs">
+      <Link>Issues\Issue116.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue125.cs">
+      <Link>Issues\Issue125.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue156.cs">
+      <Link>Issues\Issue156.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue165.cs">
+      <Link>Issues\Issue165.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue178.cs">
+      <Link>Issues\Issue178.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue180.cs">
+      <Link>Issues\Issue180.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue191.cs">
+      <Link>Issues\Issue191.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue226.cs">
+      <Link>Issues\Issue226.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue253.cs">
+      <Link>Issues\Issue253.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue256.cs">
+      <Link>Issues\Issue256.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue278.cs">
+      <Link>Issues\Issue278.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue300.cs">
+      <Link>Issues\Issue300.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue308.cs">
+      <Link>Issues\Issue308.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue312.cs">
+      <Link>Issues\Issue312.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\Issue328.cs">
+      <Link>Issues\Issue328.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\ProxyEntities.cs">
+      <Link>Issues\ProxyEntities.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Issues\TestCRMHandlingOfNullsAndMissingFields.cs">
+      <Link>Issues\TestCRMHandlingOfNullsAndMissingFields.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Pipeline\PipelineTests.cs">
+      <Link>Pipeline\PipelineTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\AccountNumberPlugin.cs">
+      <Link>PluginsForTesting\AccountNumberPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\AccountSetTerritories.cs">
+      <Link>PluginsForTesting\AccountSetTerritories.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\BasePlugin.cs">
+      <Link>PluginsForTesting\BasePlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\ConfigurationPlugin.cs">
+      <Link>PluginsForTesting\ConfigurationPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\CreateAccountPlugin.cs">
+      <Link>PluginsForTesting\CreateAccountPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\CustomMockPlugin.cs">
+      <Link>PluginsForTesting\CustomMockPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\EntityImagesPlugin.cs">
+      <Link>PluginsForTesting\EntityImagesPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\ExceptionLoverPlugin.cs">
+      <Link>PluginsForTesting\ExceptionLoverPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\FollowupPlugin.cs">
+      <Link>PluginsForTesting\FollowupPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\InheritedPlugin.cs">
+      <Link>PluginsForTesting\InheritedPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\PostOperationUpdatePlugin.cs">
+      <Link>PluginsForTesting\PostOperationUpdatePlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\PreAccountCreate.cs">
+      <Link>PluginsForTesting\PreAccountCreate.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\RetrieveServicesPlugin.cs">
+      <Link>PluginsForTesting\RetrieveServicesPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\ServiceEndpointNotificationPlugin.cs">
+      <Link>PluginsForTesting\ServiceEndpointNotificationPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\TestContextOrgNamePlugin.cs">
+      <Link>PluginsForTesting\TestContextOrgNamePlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\TestContextPlugin.cs">
+      <Link>PluginsForTesting\TestContextPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\TestPropertiesPlugin.cs">
+      <Link>PluginsForTesting\TestPropertiesPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\TestSharedVariablesPropertyPlugin.cs">
+      <Link>PluginsForTesting\TestSharedVariablesPropertyPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\PluginsForTesting\ValidatePipelinePlugin.cs">
+      <Link>PluginsForTesting\ValidatePipelinePlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Services\EntityInitializer\InvoiceDetailInitializerServiceTests.cs">
+      <Link>Services\EntityInitializer\InvoiceDetailInitializerServiceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Services\EntityInitializer\InvoiceInitializerServiceTests.cs">
+      <Link>Services\EntityInitializer\InvoiceInitializerServiceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\TestDefaultEntityInitializer.cs">
+      <Link>TestDefaultEntityInitializer.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\Tracing\XrmFakeTracingExample.cs">
+      <Link>Tracing\XrmFakeTracingExample.cs</Link>
+    </Compile>
+    <Compile Include="..\FakeXrmEasy.Tests.Shared\XrmRealContextTests\XrmRealContextTests.cs">
+      <Link>XrmRealContextTests\XrmRealContextTests.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +501,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
