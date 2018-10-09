@@ -164,7 +164,7 @@ namespace FakeXrmEasy.Tests
             var plugCtx = fakedContext.GetDefaultPluginContext();
             plugCtx.InputParameters = inputParams;
 
-            fakedContext.ExecutePluginWith<TestPropertiesPlugin>(plugCtx, plugin);
+            fakedContext.ExecutePluginWith(plugCtx, plugin);
             Assert.Equal("Property Updated", plugin.Property);
         }
 
