@@ -760,6 +760,35 @@ namespace FakeXrmEasy
                 return operatorExpression;
 
         }
+
+        private static void ValidateSupportedTypedExpression(TypedConditionExpression typedExpression)
+        {
+            Expression validateOperatorTypeExpression = Expression.Empty();
+            ConditionOperator[] supportedOperators = (ConditionOperator[])Enum.GetValues(typeof(ConditionOperator));
+
+#if FAKE_XRM_EASY_9
+            if (typedExpression.AttributeType == typeof(OptionSetValueCollection))
+            {
+                supportedOperators = new[]
+                {
+                    ConditionOperator.ContainValues,
+                    ConditionOperator.DoesNotContainValues,
+                    ConditionOperator.Equal,
+                    ConditionOperator.NotEqual,
+                    ConditionOperator.NotNull,
+                    ConditionOperator.Null,
+                    ConditionOperator.In,
+                    ConditionOperator.NotIn,
+                };
+            }
+#endif
+
+            if (!supportedOperators.Contains(typedExpression.CondExpression.Operator))
+            {
+                OrganizationServiceFaultOperatorIsNotValidException.Throw();
+            }
+        }
+        
         protected static Expression GetAppropiateTypedValue(object value)
         {
             //Basic types conversions
@@ -1564,6 +1593,7 @@ namespace FakeXrmEasy
                     }
                 }
 
+                ValidateSupportedTypedExpression(typedExpression);
 
                 //Build a binary expression  
                 if (op == LogicalOperator.And)
