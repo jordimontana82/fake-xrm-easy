@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -745,6 +746,16 @@ namespace FakeXrmEasy
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
 
+#if FAKE_XRM_EASY_9
+                case ConditionOperator.ContainValues:
+                    operatorExpression = TranslateConditionExpressionContainValues(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
+                case ConditionOperator.DoesNotContainValues:
+                    operatorExpression = Expression.Not(TranslateConditionExpressionContainValues(c, getNonBasicValueExpr, containsAttributeExpression));
+                    break;
+#endif
+
                 default:
                     throw new PullRequestException(string.Format("Operator {0} not yet implemented for condition expression", c.CondExpression.Operator.ToString()));
 
@@ -967,6 +978,10 @@ namespace FakeXrmEasy
                     return GetAppropiateCastExpressionBasedOnStringAndType(input, value, attributeType);
                 if (attributeType.IsDateTime())
                     return GetAppropiateCastExpressionBasedOnDateTime(input, value);
+#if FAKE_XRM_EASY_9
+                if (attributeType.IsOptionSetValueCollection())
+                    return GetAppropiateCastExpressionBasedOnOptionSetValueCollection(input);
+#endif
 
                 return GetAppropiateCastExpressionDefault(input, value); //any other type
             }
@@ -1108,6 +1123,77 @@ namespace FakeXrmEasy
                                                     Expression.Convert(input, typeof(int)));
         }
 
+        protected static Expression GetAppropiateCastExpressionBasedOnOptionSetValueCollection(Expression input)
+        {
+            return Expression.Call(typeof(XrmFakedContext).GetMethod("ConvertToHashSetOfInt"), input, Expression.Constant(true));
+        }
+
+#if FAKE_XRM_EASY_9
+        public static HashSet<int> ConvertToHashSetOfInt(object input, bool isOptionSetValueCollectionAccepted)
+        {
+            var set = new HashSet<int>();
+
+            var faultReason = $"The formatter threw an exception while trying to deserialize the message: There was an error while trying to deserialize parameter" +
+                $" http://schemas.microsoft.com/xrm/2011/Contracts/Services:query. The InnerException message was 'Error in line 1 position 8295. Element " +
+                $"'http://schemas.microsoft.com/2003/10/Serialization/Arrays:anyType' contains data from a type that maps to the name " +
+                $"'http://schemas.microsoft.com/xrm/2011/Contracts:{input?.GetType()}'. The deserializer has no knowledge of any type that maps to this name. " +
+                $"Consider changing the implementation of the ResolveName method on your DataContractResolver to return a non-null value for name " +
+                $"'{input?.GetType()}' and namespace 'http://schemas.microsoft.com/xrm/2011/Contracts'.'.  Please see InnerException for more details.";
+
+            if (input is int)
+            {
+                set.Add((int)input);
+            }
+            else if (input is string)
+            {
+                set.Add(int.Parse(input as string));
+            }
+            else if (input is int[])
+            {
+                set.UnionWith(input as int[]);
+            }
+            else if (input is string[])
+            {
+                set.UnionWith((input as string[]).Select(s => int.Parse(s)));
+            }
+            else if (input is DataCollection<object>)
+            {
+                var collection = input as DataCollection<object>;
+
+                if (collection.All(o => o is int))
+                {
+                    set.UnionWith(collection.Cast<int>());
+                }
+                else if (collection.All(o => o is string))
+                {
+                    set.UnionWith(collection.Select(o => int.Parse(o as string)));
+                }
+                else if (collection.Count == 1 && collection[0] is int[])
+                {
+                    set.UnionWith(collection[0] as int[]);
+                }
+                else if (collection.Count == 1 && collection[0] is string[])
+                {
+                    set.UnionWith((collection[0] as string[]).Select(s => int.Parse(s)));
+                }
+                else
+                {
+                    throw new FaultException(new FaultReason(faultReason));
+                }
+            }
+            else if (isOptionSetValueCollectionAccepted && input is OptionSetValueCollection)
+            {
+                set.UnionWith((input as OptionSetValueCollection).Select(osv => osv.Value));
+            }
+            else
+            {
+                throw new FaultException(new FaultReason(faultReason));
+            }
+
+            return set;
+        }
+#endif
+
         protected static Expression TransformExpressionGetDateOnlyPart(Expression input)
         {
             return Expression.Call(input, typeof(DateTime).GetMethod("get_Date"));
@@ -1168,6 +1254,19 @@ namespace FakeXrmEasy
                 expOrValues = Expression.Equal(transformedExpression,
                                 GetAppropiateTypedValueAndType(unaryOperatorValue, c.AttributeType));
             }
+#if FAKE_XRM_EASY_9
+            else if (c.AttributeType == typeof(OptionSetValueCollection))
+            {
+                var conditionValue = GetSingleConditionValue(c);
+
+                var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(c.AttributeType, getAttributeValueExpr, conditionValue);
+                var rightHandSideExpression = Expression.Constant(ConvertToHashSetOfInt(conditionValue, isOptionSetValueCollectionAccepted: false));
+
+                expOrValues = Expression.Equal(
+                    Expression.Call(leftHandSideExpression, typeof(HashSet<int>).GetMethod("SetEquals"), rightHandSideExpression),
+                    Expression.Constant(true));
+            }
+#endif
             else
             {
                 foreach (object value in c.CondExpression.Values)
@@ -1189,29 +1288,74 @@ namespace FakeXrmEasy
                                 expOrValues));
         }
 
+        private static object GetSingleConditionValue(TypedConditionExpression c)
+        {
+            if (c.CondExpression.Values.Count != 1)
+            {
+                OrganizationServiceFaultInvalidArgument.Throw($"The {c.CondExpression.Operator} requires 1 value/s, not {c.CondExpression.Values.Count}.Parameter name: {c.CondExpression.AttributeName}");
+            }
+
+            var conditionValue = c.CondExpression.Values.Single();
+
+            if (!(conditionValue is string) && conditionValue is IEnumerable)
+            {
+                var conditionValueEnumerable = conditionValue as IEnumerable;
+                var count = 0;
+
+                foreach (var obj in conditionValueEnumerable)
+                {
+                    count++;
+                    conditionValue = obj;
+                }
+
+                if (count != 1)
+                {
+                    OrganizationServiceFaultInvalidArgument.Throw($"The {c.CondExpression.Operator} requires 1 value/s, not {count}.Parameter name: {c.CondExpression.AttributeName}");
+                }
+            }
+
+            return conditionValue;
+        }
+
         protected static Expression TranslateConditionExpressionIn(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             var c = tc.CondExpression;
 
             BinaryExpression expOrValues = Expression.Or(Expression.Constant(false), Expression.Constant(false));
-            foreach (object value in c.Values)
+
+#if FAKE_XRM_EASY_9
+            if (tc.AttributeType == typeof(OptionSetValueCollection))
             {
-                if (value is Array)
+                var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, null);
+                var rightHandSideExpression = Expression.Constant(ConvertToHashSetOfInt(c.Values, isOptionSetValueCollectionAccepted: false));
+
+                expOrValues = Expression.Equal(
+                    Expression.Call(leftHandSideExpression, typeof(HashSet<int>).GetMethod("SetEquals"), rightHandSideExpression),
+                    Expression.Constant(true));
+            }
+            else
+#endif
+            {
+                foreach (object value in c.Values)
                 {
-                    foreach (var a in ((Array)value))
+                    if (value is Array)
+                    {
+                        foreach (var a in ((Array)value))
+                        {
+                            expOrValues = Expression.Or(expOrValues, Expression.Equal(
+                                GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, a),
+                                GetAppropiateTypedValueAndType(a, tc.AttributeType)));
+                        }
+                    }
+                    else
                     {
                         expOrValues = Expression.Or(expOrValues, Expression.Equal(
-                            GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, a),
-                            GetAppropiateTypedValueAndType(a, tc.AttributeType)));
+                                    GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value),
+                                    GetAppropiateTypedValueAndType(value, tc.AttributeType)));
                     }
                 }
-                else
-                {
-                    expOrValues = Expression.Or(expOrValues, Expression.Equal(
-                                GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, value),
-                                GetAppropiateTypedValueAndType(value, tc.AttributeType)));
-                }
             }
+
             return Expression.AndAlso(
                             containsAttributeExpr,
                             Expression.AndAlso(Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
@@ -1796,5 +1940,21 @@ namespace FakeXrmEasy
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
+
+#if FAKE_XRM_EASY_9
+        protected static Expression TranslateConditionExpressionContainValues(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var leftHandSideExpression = GetAppropiateCastExpressionBasedOnType(tc.AttributeType, getAttributeValueExpr, null);
+            var rightHandSideExpression = Expression.Constant(ConvertToHashSetOfInt(tc.CondExpression.Values, isOptionSetValueCollectionAccepted: false));
+
+            return Expression.AndAlso(
+                       containsAttributeExpr,
+                       Expression.AndAlso(
+                           Expression.NotEqual(getAttributeValueExpr, Expression.Constant(null)),
+                           Expression.Equal(
+                               Expression.Call(leftHandSideExpression, typeof(HashSet<int>).GetMethod("Overlaps"), rightHandSideExpression),
+                               Expression.Constant(true))));
+        }
+#endif
     }
 }

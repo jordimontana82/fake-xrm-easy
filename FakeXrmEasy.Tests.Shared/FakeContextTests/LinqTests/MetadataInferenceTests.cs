@@ -3,6 +3,7 @@ using FakeItEasy;
 using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -150,7 +151,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
             var record1 = new Entity("contact")
             {
                 Id = Guid.NewGuid(),
-                ["new_multiselectoptionset"] = new OptionSetValueCollection(
+                ["new_injectedmultiselectoptionset"] = new OptionSetValueCollection(
                     new[]
                     {
                         new OptionSetValue(100001),
@@ -161,7 +162,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
             var record2 = new Entity("contact")
             {
                 Id = Guid.NewGuid(),
-                ["new_multiselectoptionset"] = new OptionSetValueCollection(
+                ["new_injectedmultiselectoptionset"] = new OptionSetValueCollection(
                     new[]
                     {
                         new OptionSetValue(100002),
@@ -178,7 +179,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
 
             var injectedAttribute = new MultiSelectPicklistAttributeMetadata()
             {
-                LogicalName = "new_multiselectoptionset"
+                LogicalName = "new_injectedmultiselectoptionset"
             };
 
             entityMetadata.SetAttribute(injectedAttribute);
@@ -190,14 +191,18 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
 
             var service = fakedContext.GetOrganizationService();
 
-            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            var contacts = service.RetrieveMultiple(new QueryExpression(Contact.EntityLogicalName)
             {
-                var contact = (from c in ctx.CreateQuery<Contact>()
-                               where c["new_multiselectoptionset"].Equals(new OptionSetValueCollection(new[] { new OptionSetValue(100002), new OptionSetValue(100003) }))
-                               select c).ToList();
+                Criteria = new FilterExpression()
+                {
+                    Conditions =
+                    {
+                        new ConditionExpression("new_injectedmultiselectoptionset" , ConditionOperator.In, new[] { 100002, 100003 })
+                    }
+                }
+            });
 
-                Assert.True(contact.Count == 1);
-            }
+            Assert.True(contacts.Entities.Count == 1);
         }
 #endif
 
