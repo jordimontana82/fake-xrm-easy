@@ -102,6 +102,46 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
 
 #if FAKE_XRM_EASY_9
         [Fact]
+        public static void When_using_proxy_types_assembly_the_optionset_metadata_is_inferred_from_injected_metadata_as_a_fallback()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contact1 = new Entity("contact") { Id = Guid.NewGuid() }; contact1["injectedAttribute"] = new OptionSetValue(10001);
+            var contact2 = new Entity("contact") { Id = Guid.NewGuid() }; contact2["injectedAttribute"] = new OptionSetValue(10002);
+
+            fakedContext.Initialize(new List<Entity>() { contact1, contact2 });
+
+            var contactMetadata = new EntityMetadata()
+            {
+                LogicalName = "contact"
+            };
+
+            var injectedAttribute = new PicklistAttributeMetadata()
+            {
+                LogicalName = "injectedAttribute"
+            };
+
+            contactMetadata.SetAttribute(injectedAttribute);
+            fakedContext.InitializeMetadata(contactMetadata);
+
+            var guid = Guid.NewGuid();
+
+            //Empty contecxt (no Initialize), but we should be able to query any typed entity without an entity not found exception
+
+            var service = fakedContext.GetOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var contact = (from c in ctx.CreateQuery<Contact>()
+                               where c["injectedAttribute"].Equals(new OptionSetValue(10002))
+                               select c).ToList();
+
+                Assert.True(contact.Count == 1);
+            }
+        }
+
+        [Fact]
         public static void When_using_proxy_types_assembly_multi_select_option_set_metadata_is_inferred_from_injected_metadata_as_a_fallback()
         {
             var fakedContext = new XrmFakedContext();
@@ -146,7 +186,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
 
             var guid = Guid.NewGuid();
 
-            //Empty contecxt (no Initialize), but we should be able to query any typed entity without an entity not found exception
+            //Empty context (no Initialize), but we should be able to query any typed entity without an entity not found exception
 
             var service = fakedContext.GetOrganizationService();
 
