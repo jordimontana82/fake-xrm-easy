@@ -388,33 +388,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
             Assert.Equal(1, result.Entities.Count);
             Assert.Equal(23, (result.Entities[0] as Account).IndustryCode.Value);
         }
-
-#if FAKE_XRM_EASY_9
-        [Fact]
-        public void When_querying_multiselect_option_sets_with_int_values_right_result_is_returned()
-        {
-            var ctx = new XrmFakedContext();
-            var service = ctx.GetOrganizationService();
-
-            ctx.Initialize(new List<Entity>()
-            {
-                new Account() { Id = Guid.NewGuid(), IndustryCode = new OptionSetValue(23) },
-                new Account() { Id = Guid.NewGuid(), IndustryCode = new OptionSetValue(69) }
-            });
-
-            QueryExpression query = new QueryExpression
-            {
-                EntityName = "account",
-                ColumnSet = new ColumnSet(new string[] { "accountid", "industrycode" }),
-            };
-            query.Criteria.AddCondition("industrycode", ConditionOperator.Equal, "23");
-            var result = service.RetrieveMultiple(query);
-
-            Assert.Equal(1, result.Entities.Count);
-            Assert.Equal(23, (result.Entities[0] as Account).IndustryCode.Value);
-        }
-#endif
-
+        
         //[Fact]
         //public void When_querying_enums_with_string_values_right_result_is_returned()
         //{

@@ -545,6 +545,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(2, query.Criteria.Conditions[0].Values[1]);
         }
 #endif
+
         [Fact]
         public void FetchXml_Operator_Null()
         {
