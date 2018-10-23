@@ -388,7 +388,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
             Assert.Equal(1, result.Entities.Count);
             Assert.Equal(23, (result.Entities[0] as Account).IndustryCode.Value);
         }
-        
+
         //[Fact]
         //public void When_querying_enums_with_string_values_right_result_is_returned()
         //{

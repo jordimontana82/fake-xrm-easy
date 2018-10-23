@@ -1370,8 +1370,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         public void FetchXml_Operator_Next_X_Weeks_Execution()
         {
             var ctx = new XrmFakedContext();
-            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
-
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
                               <entity name='contact'>
                                     <attribute name='anniversary' />
@@ -1382,9 +1380,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                             </fetch>";
 
             var date = DateTime.Now;
-            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7 * 2) }; //Should be returned
-            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7 * 4) }; //Shouldnt
-            ctx.Initialize(new[] { ct1, ct2 });
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7*2) }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7*4) }; //Shouldnt
+            ctx.Initialize(new[] { ct1, ct2});
             var service = ctx.GetFakedOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
