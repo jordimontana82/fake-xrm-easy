@@ -63,6 +63,21 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
         }
 
         [Fact]
+        public void Test_Conversion_OptionSetValueCollection_ToXml()
+        {
+            var fake = new XrmFakedContext();
+            fake.ProxyTypesAssembly = typeof(Crm.Contact).Assembly;
+            var executor = new ExecuteFetchRequestExecutor();
+            var formattedValues = new FormattedValueCollection();
+            var element = executor.AttributeValueToFetchResult(
+                new KeyValuePair<string, object>("new_multiselectattribute", new OptionSetValueCollection() { new OptionSetValue(1), new OptionSetValue(2) }),
+                formattedValues,
+                fake);
+            Assert.NotNull(element);
+            Assert.Equal(@"<new_multiselectattribute name=""[-1,1,2,-1]"">[-1,1,2,-1]</new_multiselectattribute>", element.ToString());
+        }
+
+        [Fact]
         public void When_executing_fetchxml_right_result_is_returned()
         {
             //This will test a query expression is generated and executed

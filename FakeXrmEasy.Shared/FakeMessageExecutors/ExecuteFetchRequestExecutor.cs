@@ -187,7 +187,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             else if (entAtt.Value is OptionSetValueCollection)
             {
                 var optionSetValueCollectionVal = entAtt.Value as OptionSetValueCollection;
-                var values = optionSetValueCollectionVal.Select(o => o.Value).OrderBy(v => v);
+                var values = String.Join(",", optionSetValueCollectionVal.Select(o => o.Value).OrderBy(v => v));
                 var serializedCollection = String.Join(",", "[-1", values, "-1]");
                 attributeValueElement = XElement.Parse(String.Format("<{0} name=\"{1}\">{1}</{0}>", entAtt.Key, serializedCollection));
             }
