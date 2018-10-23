@@ -68,6 +68,28 @@ namespace FakeXrmEasy.Tests
             Assert.Equal(context.Data["account"][guid]["name"], "After update");
         }
 
+#if FAKE_XRM_EASY_9
+        [Fact]
+        public void When_updating_an_optionsetvaluecollection_the_context_should_reflect_changes()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetFakedOrganizationService();
+
+            var e = new Entity("contact") { Id = Guid.Empty };
+            e["new_multiselectattribute"] = new OptionSetValueCollection() { new OptionSetValue(1) };
+            var guid = service.Create(e);
+
+            Assert.Equal(context.Data["contact"][guid]["new_multiselectattribute"], new OptionSetValueCollection() { new OptionSetValue(1) });
+
+            //now update the name
+            e = new Entity("contact") { Id = guid };
+            e["new_multiselectattribute"] = new OptionSetValueCollection() { new OptionSetValue(2), new OptionSetValue(3) };
+            service.Update(e);
+
+            Assert.Equal(context.Data["contact"][guid]["new_multiselectattribute"], new OptionSetValueCollection() { new OptionSetValue(2), new OptionSetValue(3) });
+        }
+#endif
+
         [Fact]
         public void When_update_is_invoked_with_non_existing_entity_an_exception_is_thrown()
         {
