@@ -239,6 +239,14 @@ namespace FakeXrmEasy.Extensions
                 return copy;
             }
 #endif
+#if FAKE_XRM_EASY_9
+            else if(attributeValue is OptionSetValueCollection)
+            {
+                var original = (attributeValue as OptionSetValueCollection);
+                var copy = new OptionSetValueCollection(original.ToArray());
+                return copy;
+            }
+#endif
             else if (type == typeof(int) || type == typeof(Int64))
                 return attributeValue; //Not a reference type
             else if (type == typeof(decimal))

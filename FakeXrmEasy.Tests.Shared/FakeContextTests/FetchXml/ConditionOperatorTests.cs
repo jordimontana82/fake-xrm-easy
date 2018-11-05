@@ -488,6 +488,64 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal("Iniesta", query.Criteria.Conditions[0].Values[1].ToString());
         }
 
+#if FAKE_XRM_EASY_9
+        [Fact]
+        public void FetchXml_Operator_In_MultiSelectOptionSet()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                        <filter type='and'>
+                                            <condition attribute='new_multiselectattribute' operator='in'>
+                                                <value>1</value>
+                                                <value>2</value>
+                                            </condition>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("new_multiselectattribute", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.In, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(1, query.Criteria.Conditions[0].Values[0]);
+            Assert.Equal(2, query.Criteria.Conditions[0].Values[1]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_NotIn_MultiSelectOptionSet()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                        <filter type='and'>
+                                            <condition attribute='new_multiselectattribute' operator='not-in'>
+                                                <value>1</value>
+                                                <value>2</value>
+                                            </condition>
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("new_multiselectattribute", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.NotIn, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(1, query.Criteria.Conditions[0].Values[0]);
+            Assert.Equal(2, query.Criteria.Conditions[0].Values[1]);
+        }
+#endif
+
         [Fact]
         public void FetchXml_Operator_Null()
         {
@@ -1335,6 +1393,120 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             //Assert.Equal(23, retrievedDateFirst.Value.Day);
             //Assert.Equal(22, retrievedDateSecond.Value.Day);
         }
+
+#if FAKE_XRM_EASY_9
+        [Fact]
+        public void FetchXml_Operator_ContainValues_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version=""1.0"" output-format=""xml-platform"" mapping=""logical"" distinct=""false"">
+                               <entity name=""contact"">
+                                 <attribute name=""firstname"" />
+                                 <filter type=""and"">
+                                   <condition attribute=""new_multiselectattribute"" operator=""contain-values"">
+                                     <value>1</value>
+                                     <value>2</value>
+                                   </condition>
+                                 </filter>
+                               </entity>
+                             </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("new_multiselectattribute", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.ContainValues, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(2, query.Criteria.Conditions[0].Values.Count);
+            Assert.Equal(1, query.Criteria.Conditions[0].Values[0]);
+            Assert.Equal(2, query.Criteria.Conditions[0].Values[1]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_ContainValues_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version=""1.0"" output-format=""xml-platform"" mapping=""logical"" distinct=""false"">
+                               <entity name=""contact"">
+                                 <attribute name=""firstname"" />
+                                 <filter type=""and"">
+                                   <condition attribute=""new_multiselectattribute"" operator=""contain-values"">
+                                     <value>1</value>
+                                     <value>2</value>
+                                   </condition>
+                                 </filter>
+                               </entity>
+                             </fetch>";
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), new_MultiSelectAttribute = new OptionSetValueCollection() { new OptionSetValue(1) } }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), new_MultiSelectAttribute = new OptionSetValueCollection() { new OptionSetValue(3) } }; //Shouldn't be returned
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            Assert.Equal(ct1.Id, collection.Entities[0].Id);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_DoesNotContainValues_Translation()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version=""1.0"" output-format=""xml-platform"" mapping=""logical"" distinct=""false"">
+                               <entity name=""contact"">
+                                 <attribute name=""firstname"" />
+                                 <filter type=""and"">
+                                   <condition attribute=""new_multiselectattribute"" operator=""not-contain-values"">
+                                     <value>1</value>
+                                     <value>2</value>
+                                   </condition>
+                                 </filter>
+                               </entity>
+                             </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(1, query.Criteria.Conditions.Count);
+            Assert.Equal("new_multiselectattribute", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.DoesNotContainValues, query.Criteria.Conditions[0].Operator);
+            Assert.Equal(2, query.Criteria.Conditions[0].Values.Count);
+            Assert.Equal(1, query.Criteria.Conditions[0].Values[0]);
+            Assert.Equal(2, query.Criteria.Conditions[0].Values[1]);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_DoesNotContainValues_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version=""1.0"" output-format=""xml-platform"" mapping=""logical"" distinct=""false"">
+                               <entity name=""contact"">
+                                 <attribute name=""firstname"" />
+                                 <filter type=""and"">
+                                   <condition attribute=""new_multiselectattribute"" operator=""not-contain-values"">
+                                     <value>1</value>
+                                     <value>2</value>
+                                   </condition>
+                                 </filter>
+                               </entity>
+                             </fetch>";
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), new_MultiSelectAttribute = new OptionSetValueCollection() { new OptionSetValue(1) } }; //Shouldn't be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), new_MultiSelectAttribute = new OptionSetValueCollection() { new OptionSetValue(3) } }; //Should be returned
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            Assert.Equal(ct2.Id, collection.Entities[0].Id);
+        }
+#endif
 
 #if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
 

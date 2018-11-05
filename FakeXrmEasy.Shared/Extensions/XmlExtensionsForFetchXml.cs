@@ -476,6 +476,14 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "next-x-weeks":
                     op = ConditionOperator.NextXWeeks;
                     break;
+#if FAKE_XRM_EASY_9
+                case "contain-values":
+                    op = ConditionOperator.ContainValues;
+                    break;
+                case "not-contain-values":
+                    op = ConditionOperator.DoesNotContainValues;
+                    break;
+#endif
                 default:
                     throw PullRequestException.FetchXmlOperatorNotImplemented(elem.GetAttribute("operator").Value);
             }
@@ -536,7 +544,11 @@ namespace FakeXrmEasy.Extensions.FetchXml
         {
             if (t == typeof(int)
                 || t == typeof(int?)
-                || t.IsOptionSet())
+                || t.IsOptionSet()
+#if FAKE_XRM_EASY_9
+                || t.IsOptionSetValueCollection()
+#endif
+            )
             {
                 int intValue = 0;
 

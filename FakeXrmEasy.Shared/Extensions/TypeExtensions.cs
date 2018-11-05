@@ -15,6 +15,14 @@ namespace FakeXrmEasy.Extensions
                    || nullableType != null && nullableType.IsEnum;
         }
 
+#if FAKE_XRM_EASY_9
+        public static bool IsOptionSetValueCollection(this Type t)
+        {
+            var nullableType = Nullable.GetUnderlyingType(t);
+            return t == typeof(OptionSetValueCollection);
+        }
+#endif
+
         public static bool IsDateTime(this Type t)
         {
             var nullableType = Nullable.GetUnderlyingType(t);

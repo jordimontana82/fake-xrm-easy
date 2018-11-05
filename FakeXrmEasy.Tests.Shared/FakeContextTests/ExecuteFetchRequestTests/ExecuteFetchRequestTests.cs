@@ -62,6 +62,23 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             Assert.Equal(@"<new_contact name=""Test"" formattedvalue=""1"">1</new_contact>", element.ToString());
         }
 
+#if FAKE_XRM_EASY_9
+        [Fact]
+        public void Test_Conversion_OptionSetValueCollection_ToXml()
+        {
+            var fake = new XrmFakedContext();
+            fake.ProxyTypesAssembly = typeof(Crm.Contact).Assembly;
+            var executor = new ExecuteFetchRequestExecutor();
+            var formattedValues = new FormattedValueCollection();
+            var element = executor.AttributeValueToFetchResult(
+                new KeyValuePair<string, object>("new_multiselectattribute", new OptionSetValueCollection() { new OptionSetValue(1), new OptionSetValue(2) }),
+                formattedValues,
+                fake);
+            Assert.NotNull(element);
+            Assert.Equal(@"<new_multiselectattribute name=""[-1,1,2,-1]"">[-1,1,2,-1]</new_multiselectattribute>", element.ToString());
+        }
+#endif
+
         [Fact]
         public void When_executing_fetchxml_right_result_is_returned()
         {
