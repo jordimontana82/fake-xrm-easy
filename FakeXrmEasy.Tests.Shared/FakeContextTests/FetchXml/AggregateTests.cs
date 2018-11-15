@@ -340,6 +340,117 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void FetchXml_Aggregate_Min_With_Nulls()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity e = new Entity("entity");
+            e.Id = Guid.NewGuid();
+            e["value"] = 1;
+            initialEntities.Add(e);
+
+            Entity e2 = new Entity("entity");
+            e2.Id = Guid.NewGuid();
+            e2["value"] = 2;
+            initialEntities.Add(e2);
+
+            Entity e3 = new Entity("entity");
+            e3.Id = Guid.NewGuid();
+            e3["value"] = null;
+            initialEntities.Add(e3);
+
+            context.Initialize(initialEntities);
+
+            FetchExpression query = new FetchExpression($@"
+                <fetch aggregate='true' >
+                  <entity name='entity' >
+                    <attribute name='value' alias='minvalue' aggregate='min' />
+                  </entity>
+                </fetch>
+                ");
+
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+            Assert.Equal(1, result.Entities.Single().GetAttributeValue<AliasedValue>("minvalue").Value);
+        }
+
+        [Fact]
+        public void FetchXml_Aggregate_Max_With_Nulls()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity e = new Entity("entity");
+            e.Id = Guid.NewGuid();
+            e["value"] = -0.5m;
+            initialEntities.Add(e);
+
+            Entity e2 = new Entity("entity");
+            e2.Id = Guid.NewGuid();
+            e2["value"] = -2m;
+            initialEntities.Add(e2);
+
+            Entity e3 = new Entity("entity");
+            e3.Id = Guid.NewGuid();
+            e3["value"] = null;
+            initialEntities.Add(e3);
+
+            context.Initialize(initialEntities);
+
+            FetchExpression query = new FetchExpression($@"
+                <fetch aggregate='true' >
+                  <entity name='entity' >
+                    <attribute name='value' alias='maxvalue' aggregate='max' />
+                  </entity>
+                </fetch>
+                ");
+
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+            Assert.Equal(-0.5m, result.Entities.Single().GetAttributeValue<AliasedValue>("maxvalue").Value);
+        }
+
+        [Fact]
+        public void FetchXml_Aggregate_Avg_With_Nulls()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity e = new Entity("entity");
+            e.Id = Guid.NewGuid();
+            e["value"] = -1m;
+            initialEntities.Add(e);
+
+            Entity e2 = new Entity("entity");
+            e2.Id = Guid.NewGuid();
+            e2["value"] = -2m;
+            initialEntities.Add(e2);
+
+            Entity e3 = new Entity("entity");
+            e3.Id = Guid.NewGuid();
+            e3["value"] = null;
+            initialEntities.Add(e3);
+
+            context.Initialize(initialEntities);
+
+            FetchExpression query = new FetchExpression($@"
+                <fetch aggregate='true' >
+                  <entity name='entity' >
+                    <attribute name='value' alias='avgvalue' aggregate='avg' />
+                  </entity>
+                </fetch>
+                ");
+
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+            Assert.Equal(-1.5m, result.Entities.Single().GetAttributeValue<AliasedValue>("avgvalue").Value);
+        }
+
+        [Fact]
         public void Query_Should_Return_QuoteProduct_Counts()
         {
             var context = new XrmFakedContext();
