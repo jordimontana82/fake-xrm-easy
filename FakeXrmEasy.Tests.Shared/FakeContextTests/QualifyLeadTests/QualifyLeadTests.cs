@@ -144,7 +144,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QualifyLeadTests
         public void Status_of_qualified_Lead_should_be_qualified()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var lead = new Lead()
             {
