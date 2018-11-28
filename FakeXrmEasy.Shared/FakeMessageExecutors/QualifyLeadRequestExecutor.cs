@@ -98,7 +98,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             // Actual Lead
             var lead = leads.First();
-            lead.Attributes["statuscode"] = req.Status.Value;
+            lead.Attributes["statuscode"] = new OptionSetValue(req.Status.Value);
             orgService.Update(lead);
 
             return response;
