@@ -1,4 +1,4 @@
-﻿Fake Xrm Easy: TDD for Dynamics CRM and Dynamics 365 made simple
+﻿Fake Xrm Easy: TDD for Dynamics CRM and Dynamics 365 (or now Common Data Service for Apps) made simple
 =================================================================================
 
 |Build|Line Coverage|Branch Coverage|
