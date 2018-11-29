@@ -17,6 +17,62 @@ namespace FakeXrmEasy
         protected const int EntityInactiveStateCode = 1;
 
         #region CRUD
+        public Guid RecordUniqueId(EntityReference record)
+        {
+            if (string.IsNullOrWhiteSpace(record.LogicalName))
+            {
+                throw new InvalidOperationException("The entity logical name must not be null or empty.");
+            }
+
+            // Don't fail with invalid operation exception, if no record of this entity exists, but entity is known
+            if (!Data.ContainsKey(record.LogicalName) && !EntityMetadata.ContainsKey(record.LogicalName))
+            {
+                if (ProxyTypesAssembly == null)
+                {
+                    throw new InvalidOperationException($"The entity logical name {record.LogicalName} is not valid.");
+                }
+
+                if (ProxyTypesAssembly.GetTypes().Any(type => FindReflectedType(record.LogicalName) != null))
+                {
+                    throw new InvalidOperationException($"The entity logical name {record.LogicalName} is not valid.");
+                }
+            }
+
+#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_9
+            if (record.Id == Guid.Empty && record.KeyAttributes.Any())
+            {
+                if (EntityMetadata.ContainsKey(record.LogicalName))
+                {
+                    var entityMetadata = EntityMetadata[record.LogicalName];
+                    foreach (var key in entityMetadata.Keys)
+                    {
+                        if (record.KeyAttributes.Keys.Count == key.KeyAttributes.Length && key.KeyAttributes.All(x => record.KeyAttributes.Keys.Contains(x)))
+                        {
+                            var matchedRecord = Data[record.LogicalName].Values.SingleOrDefault(x => record.KeyAttributes.All(k => x.Attributes.ContainsKey(k.Key) && x.Attributes[k.Key] != null && x.Attributes[k.Key].Equals(k.Value)));
+                            if (matchedRecord == null)
+                            {
+                                new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{record.LogicalName} with the specified Alternate Keys Does Not Exist");
+                            }
+                            return matchedRecord.Id;
+                        }
+                    }
+                    throw new InvalidOperationException($"The requested key attributes do not exist for the entity {record.LogicalName}");
+                }
+                else
+                {
+                    throw new InvalidOperationException($"The requested key attributes do not exist for the entity {record.LogicalName}");
+                }
+            }
+#endif
+
+            if (record.Id == Guid.Empty)
+            {
+                throw new InvalidOperationException("The id must not be empty.");
+            }
+
+            return record.Id;
+        }
+
         /// <summary>
         /// A fake retrieve method that will query the FakedContext to retrieve the specified
         /// entity and Guid, or null, if the entity was not found
@@ -60,14 +116,15 @@ namespace FakeXrmEasy
 
                     //Return the subset of columns requested only
                     var reflectedType = context.FindReflectedType(entityName);
-                    
+
                     //Entity logical name exists, so , check if the requested entity exists
                     if (context.Data.ContainsKey(entityName) && context.Data[entityName] != null
                         && context.Data[entityName].ContainsKey(id))
                     {
                         //Entity found => return only the subset of columns specified or all of them
                         var foundEntity = context.Data[entityName][id].Clone(reflectedType);
-                        if (columnSet.AllColumns) { 
+                        if (columnSet.AllColumns)
+                        {
                             foundEntity.ApplyDateBehaviour(context);
                             return foundEntity;
                         }
@@ -128,7 +185,7 @@ namespace FakeXrmEasy
                     var attribute = e[sAttributeName];
                     if (attribute is DateTime)
                     {
-                        cachedEntity[sAttributeName] = ConvertToUtc((DateTime) e[sAttributeName]);
+                        cachedEntity[sAttributeName] = ConvertToUtc((DateTime)e[sAttributeName]);
                     }
                     else
                     {
@@ -359,7 +416,7 @@ namespace FakeXrmEasy
 
             if (usePluginPipeline)
             {
-                ExecutePipelineStage("Create", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);               
+                ExecutePipelineStage("Create", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);
             }
 
             // Store
@@ -440,7 +497,7 @@ namespace FakeXrmEasy
                 }
             }
 
-            
+
         }
 
         protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
@@ -468,7 +525,7 @@ namespace FakeXrmEasy
                     if (attributeFound != null)
                         return true;
 
-                    if(attributeFound == null && EntityMetadata.ContainsKey(sEntityName))
+                    if (attributeFound == null && EntityMetadata.ContainsKey(sEntityName))
                     {
                         //Try with metadata
                         return AttributeExistsInInjectedMetadata(sEntityName, sAttributeName);
@@ -482,7 +539,7 @@ namespace FakeXrmEasy
                 return false;
             }
 
-            if(EntityMetadata.ContainsKey(sEntityName))
+            if (EntityMetadata.ContainsKey(sEntityName))
             {
                 //Try with metadata
                 return AttributeExistsInInjectedMetadata(sEntityName, sAttributeName);

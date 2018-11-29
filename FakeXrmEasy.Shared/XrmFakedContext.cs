@@ -280,6 +280,7 @@ namespace FakeXrmEasy
         /// Deprecated. Use GetOrganizationService instead
         /// </summary>
         /// <returns></returns>
+        [Obsolete("Use GetOrganizationService instead")]
         public IOrganizationService GetFakedOrganizationService()
         {
             return GetFakedOrganizationService(this);
