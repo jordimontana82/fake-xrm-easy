@@ -56,6 +56,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.CloseIncidentRequestTests
         public void When_a_request_with_invalid_incidentid_is_called_exception_is_raised()
         {
             var context = new XrmFakedContext();
+            context.Initialize(new Entity(Crm.Incident.EntityLogicalName) { Id = Guid.NewGuid() });
             var executor = new CloseIncidentRequestExecutor();
 
             Entity incidentResolution = new Entity

@@ -32,13 +32,13 @@ namespace FakeXrmEasy
                     throw new InvalidOperationException($"The entity logical name {record.LogicalName} is not valid.");
                 }
 
-                if (ProxyTypesAssembly.GetTypes().Any(type => FindReflectedType(record.LogicalName) != null))
+                if (!ProxyTypesAssembly.GetTypes().Any(type => FindReflectedType(record.LogicalName) != null))
                 {
                     throw new InvalidOperationException($"The entity logical name {record.LogicalName} is not valid.");
                 }
             }
 
-#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_9
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
             if (record.Id == Guid.Empty && record.KeyAttributes.Any())
             {
                 if (EntityMetadata.ContainsKey(record.LogicalName))
@@ -167,7 +167,12 @@ namespace FakeXrmEasy
 
         protected void UpdateEntity(Entity e)
         {
-            ValidateEntity(e);
+            if (e == null)
+            {
+                throw new InvalidOperationException("The entity must not be null");
+            }
+            e = e.Clone(e.GetType());
+            e.Id = RecordUniqueId(e.toEntityReference());
 
             // Update specific validations: The entity record must exist in the context
             if (Data.ContainsKey(e.LogicalName) &&

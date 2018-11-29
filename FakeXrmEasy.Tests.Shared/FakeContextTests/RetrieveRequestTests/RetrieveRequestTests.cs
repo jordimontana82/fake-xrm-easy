@@ -993,8 +993,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var exception = Assert.Throws<Exception>(() => fakedService.Execute(request));
             Assert.Equal("Relationship \"any\" does not exist in the metadata cache.", exception.Message);
         }
-
-#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_9
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
         [Fact]
         public static void Should_Retrieve_A_Correct_Entity_By_Alternate_Key()
         {
