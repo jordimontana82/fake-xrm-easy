@@ -1,13 +1,13 @@
 ﻿using FakeItEasy;
+using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xrm.Sdk.Query;
-using System.ServiceModel;
-using Microsoft.Xrm.Sdk.Messages;
-using FakeXrmEasy.Extensions;
 using System.Reflection;
+using System.ServiceModel;
 
 namespace FakeXrmEasy
 {
@@ -15,6 +15,8 @@ namespace FakeXrmEasy
     {
         protected const int EntityActiveStateCode = 0;
         protected const int EntityInactiveStateCode = 1;
+
+        public bool ValidateReferences { get; set; }
 
         #region CRUD
         /// <summary>
@@ -60,14 +62,15 @@ namespace FakeXrmEasy
 
                     //Return the subset of columns requested only
                     var reflectedType = context.FindReflectedType(entityName);
-                    
+
                     //Entity logical name exists, so , check if the requested entity exists
                     if (context.Data.ContainsKey(entityName) && context.Data[entityName] != null
                         && context.Data[entityName].ContainsKey(id))
                     {
                         //Entity found => return only the subset of columns specified or all of them
                         var foundEntity = context.Data[entityName][id].Clone(reflectedType);
-                        if (columnSet.AllColumns) { 
+                        if (columnSet.AllColumns)
+                        {
                             foundEntity.ApplyDateBehaviour(context);
                             return foundEntity;
                         }
@@ -128,7 +131,7 @@ namespace FakeXrmEasy
                     var attribute = e[sAttributeName];
                     if (attribute is DateTime)
                     {
-                        cachedEntity[sAttributeName] = ConvertToUtc((DateTime) e[sAttributeName]);
+                        cachedEntity[sAttributeName] = ConvertToUtc((DateTime)e[sAttributeName]);
                     }
                     else
                     {
@@ -254,6 +257,17 @@ namespace FakeXrmEasy
             if (CallerId == null)
             {
                 CallerId = new EntityReference("systemuser", Guid.NewGuid()); // Create a new instance by default
+                if (ValidateReferences)
+                {
+                    if (!Data.ContainsKey("systemuser"))
+                    {
+                        Data.Add("systemuser", new Dictionary<Guid, Entity>());
+                    }
+                    if (!Data["systemuser"].ContainsKey(CallerId.Id))
+                    {
+                        Data["systemuser"].Add(CallerId.Id, new Entity("systemuser") { Id = CallerId.Id });
+                    }
+                }
             }
 
             var isManyToManyRelationshipEntity = e.LogicalName != null && this.Relationships.ContainsKey(e.LogicalName);
@@ -359,7 +373,7 @@ namespace FakeXrmEasy
 
             if (usePluginPipeline)
             {
-                ExecutePipelineStage("Create", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);               
+                ExecutePipelineStage("Create", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);
             }
 
             // Store
@@ -389,6 +403,14 @@ namespace FakeXrmEasy
                 if (attribute is DateTime)
                 {
                     e[sAttributeName] = ConvertToUtc((DateTime)e[sAttributeName]);
+                }
+                if (attribute is EntityReference && ValidateReferences)
+                {
+                    var target = (EntityReference)e[sAttributeName];
+                    if (!Data.ContainsKey(target.LogicalName) || !Data[target.LogicalName].ContainsKey(target.Id))
+                    {
+                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{target.LogicalName} With Id = {target.Id:D} Does Not Exist");
+                    }
                 }
             }
 
@@ -440,7 +462,7 @@ namespace FakeXrmEasy
                 }
             }
 
-            
+
         }
 
         protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
@@ -468,7 +490,7 @@ namespace FakeXrmEasy
                     if (attributeFound != null)
                         return true;
 
-                    if(attributeFound == null && EntityMetadata.ContainsKey(sEntityName))
+                    if (attributeFound == null && EntityMetadata.ContainsKey(sEntityName))
                     {
                         //Try with metadata
                         return AttributeExistsInInjectedMetadata(sEntityName, sAttributeName);
@@ -482,7 +504,7 @@ namespace FakeXrmEasy
                 return false;
             }
 
-            if(EntityMetadata.ContainsKey(sEntityName))
+            if (EntityMetadata.ContainsKey(sEntityName))
             {
                 //Try with metadata
                 return AttributeExistsInInjectedMetadata(sEntityName, sAttributeName);
