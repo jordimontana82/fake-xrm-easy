@@ -133,8 +133,17 @@ namespace FakeXrmEasy
                     {
                         cachedEntity[sAttributeName] = ConvertToUtc((DateTime)e[sAttributeName]);
                     }
+
                     else
                     {
+                        if (attribute is EntityReference && ValidateReferences)
+                        {
+                            var target = (EntityReference)e[sAttributeName];
+                            if (!Data.ContainsKey(target.LogicalName) || !Data[target.LogicalName].ContainsKey(target.Id))
+                            {
+                                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{target.LogicalName} With Id = {target.Id:D} Does Not Exist");
+                            }
+                        }
                         cachedEntity[sAttributeName] = attribute;
                     }
                 }
