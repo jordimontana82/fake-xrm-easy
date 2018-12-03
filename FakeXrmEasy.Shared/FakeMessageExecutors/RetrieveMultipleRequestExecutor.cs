@@ -62,6 +62,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     qe.Criteria.AddCondition(new ConditionExpression(query.Attributes[i], ConditionOperator.Equal, query.Values[i]));
                 }
 
+                qe.PageInfo = query.PageInfo;
+
                 // QueryExpression now done... execute it!
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();

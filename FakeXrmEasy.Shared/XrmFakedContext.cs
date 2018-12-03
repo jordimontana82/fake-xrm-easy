@@ -400,7 +400,13 @@ namespace FakeXrmEasy
                     var response = executor.Execute(request, context) as RetrieveMultipleResponse;
 
                     QueryExpression qe = req as QueryExpression;
-                    if (qe?.PageInfo.ReturnTotalRecordCount == true)
+                    if (qe?.PageInfo?.ReturnTotalRecordCount == true)
+                    {
+                        response.EntityCollection.TotalRecordCount = response.EntityCollection.Entities.Count;
+                    }
+
+                    QueryByAttribute qa = req as QueryByAttribute;
+                    if (qa?.PageInfo?.ReturnTotalRecordCount == true)
                     {
                         response.EntityCollection.TotalRecordCount = response.EntityCollection.Entities.Count;
                     }
