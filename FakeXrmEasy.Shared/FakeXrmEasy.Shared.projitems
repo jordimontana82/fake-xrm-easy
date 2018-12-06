@@ -19,8 +19,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\XmlExtensionsForFetchXml.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddListMembersListRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RemoveMembersTeamRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddMembersTeamRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddMemberListRequestExecutor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddUserToRecordTeamRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RemoveUserFromRecordTeamRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddUserToRecordTeamRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\CloseIncidentRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\InsertStatusValueRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RemoveFromQueueRequestExecutor.cs" />
@@ -62,6 +65,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)IXrmFakedContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Metadata\DateTimeAttributeBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\TypedConditionExpression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultInvalidArgument.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultOperatorIsNotValidException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultQueryBuilderNoAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Permissions\AccessRightsRepository.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Permissions\IAccessRightsRepository.cs" />

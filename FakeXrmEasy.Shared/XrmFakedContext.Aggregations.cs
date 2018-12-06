@@ -266,20 +266,38 @@ namespace FakeXrmEasy
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
-                var lst = values.ToList();
-                // TODO: Check these cases in CRM proper
-                if (lst.Count == 0) return null;
-                if (lst.All(x => x == null)) return null;
-
+                var lst = values.Where(x=>x!=null);
+                if (!lst.Any()) return null;
+               
                 var firstValue = lst.Where(x => x != null).First();
                 var valType = firstValue.GetType();
 
-                if (valType == typeof(Money))
+                if (valType == typeof(decimal) || valType == typeof(decimal?))
                 {
-                    return new Money(values.Select(x => (x as Money)?.Value ?? 0m).Min());
+                    return lst.Min(x => (decimal)x);
                 }
 
-                return values.Select(x => x ?? 0).Min();
+                if (valType == typeof(Money))
+                {
+                    return new Money(lst.Min(x => (x as Money).Value));
+                }
+
+                if (valType == typeof(int) || valType == typeof(int?))
+                {
+                    return lst.Min(x => (int)x);
+                }
+
+                if (valType == typeof(float) || valType == typeof(float?))
+                {
+                    return lst.Min(x => (float)x);
+                }
+
+                if (valType == typeof(double) || valType == typeof(double?))
+                {
+                    return lst.Min(x => (double)x);
+                }
+
+                throw new Exception("Unhndled property type '" + valType.FullName + "' in 'min' aggregate");
             }
         }
 
@@ -287,20 +305,38 @@ namespace FakeXrmEasy
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
-                var lst = values.ToList();
-                // TODO: Check these cases in CRM proper
-                if (lst.Count == 0) return null;
-                if (lst.All(x => x == null)) return null;
-
-                var firstValue = lst.Where(x => x != null).First();
+                var lst = values.Where(x=>x!=null);
+                if (!lst.Any()) return null;
+              
+                var firstValue = lst.First();
                 var valType = firstValue.GetType();
+
+                if (valType == typeof(decimal) || valType == typeof(decimal?))
+                {
+                    return lst.Max(x => (decimal)x);
+                }
 
                 if (valType == typeof(Money))
                 {
-                    return new Money(values.Select(x => (x as Money)?.Value ?? 0m).Max());
+                    return new Money(lst.Max(x => (x as Money).Value));
                 }
 
-                return values.Select(x => x ?? 0).Max();
+                if (valType == typeof(int) || valType == typeof(int?))
+                {
+                    return lst.Max(x => (int)x);
+                }
+
+                if (valType == typeof(float) || valType == typeof(float?))
+                {
+                    return lst.Max(x => (float)x);
+                }
+
+                if (valType == typeof(double) || valType == typeof(double?))
+                {
+                    return lst.Max(x => (double)x);
+                }
+
+                throw new Exception("Unhndled property type '" + valType.FullName + "' in 'max' aggregate");
             }
         }
 
@@ -308,36 +344,35 @@ namespace FakeXrmEasy
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
-                var lst = values.ToList();
-                // TODO: Check these cases in CRM proper
-                if (lst.Count == 0) return null;
-                if (lst.All(x => x == null)) return null;
-
-                var firstValue = lst.Where(x => x != null).First();
+                var lst = values.Where(x=>x!=null);
+                if (!lst.Any()) return null;
+                
+                var firstValue = lst.First();
                 var valType = firstValue.GetType();
 
                 if (valType == typeof(decimal) || valType == typeof(decimal?))
                 {
-                    return lst.Average(x => x as decimal? ?? 0m);
+                    return lst.Average(x => (decimal)x );
                 }
+
                 if (valType == typeof(Money))
                 {
-                    return new Money(lst.Average(x => (x as Money)?.Value ?? 0m));
+                    return new Money(lst.Average(x => (x as Money).Value));
                 }
 
                 if (valType == typeof(int) || valType == typeof(int?))
                 {
-                    return lst.Average(x => x as int? ?? 0);
+                    return lst.Average(x => (int)x );
                 }
 
                 if (valType == typeof(float) || valType == typeof(float?))
                 {
-                    return lst.Average(x => x as float? ?? 0f);
+                    return lst.Average(x => (float)x);
                 }
 
                 if (valType == typeof(double) || valType == typeof(double?))
                 {
-                    return lst.Average(x => x as double? ?? 0d);
+                    return lst.Average(x => (double)x);
                 }
 
                 throw new Exception("Unhndled property type '" + valType.FullName + "' in 'avg' aggregate");

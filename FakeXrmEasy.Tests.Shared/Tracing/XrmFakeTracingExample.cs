@@ -46,7 +46,7 @@ namespace FakeXrmEasy.Tests.Tracing
             var log = fakeTracingService.DumpTrace();
 
             //Assert that the target contains a new attribute
-            Assert.Equal(log, "Some trace written" + System.Environment.NewLine);
+            Assert.Equal(log, "{ title: \"Complex message\", description: \"That could brake Formatter if not treated carefully\" }" + System.Environment.NewLine);
         }
 
         [Fact]

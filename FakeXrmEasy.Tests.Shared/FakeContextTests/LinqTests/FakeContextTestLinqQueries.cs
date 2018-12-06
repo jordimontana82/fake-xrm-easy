@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;  //TypedEntities generated code for testing
+using System.ServiceModel;
 using Xunit;
 
 namespace FakeXrmEasy.Tests
@@ -615,6 +616,57 @@ namespace FakeXrmEasy.Tests
                 Assert.True(matches.Count == 1);
             }
         }
+
+#if FAKE_XRM_EASY_9
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_an_optionsetvaluecollection_in_where_filter_exception_is_thrown()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contactId = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = contactId, new_MultiSelectAttribute = new OptionSetValueCollection(new[] { new OptionSetValue(1) }) },
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var query = from c in ctx.CreateQuery<Contact>()
+                            where c.new_MultiSelectAttribute.Contains(new OptionSetValue(1))
+                            select c;
+
+                Assert.Throws<FaultException<OrganizationServiceFault>>(() => query.ToList());
+            }
+        }
+
+        [Fact]
+        public void When_doing_a_crm_linq_query_with_an_optionsetvaluecollection_with_nulls_against_nulls_in_where_filter_record_is_returned()
+        {
+            var fakedContext = new XrmFakedContext();
+            fakedContext.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+
+            var contactId = Guid.NewGuid();
+
+            fakedContext.Initialize(new List<Entity>() {
+                new Contact() { Id = contactId, new_MultiSelectAttribute = new OptionSetValueCollection(new[] { new OptionSetValue(1) }) },
+                new Contact() { Id = Guid.NewGuid(), new_MultiSelectAttribute = null },
+            });
+
+            var service = fakedContext.GetFakedOrganizationService();
+
+            using (XrmServiceContext ctx = new XrmServiceContext(service))
+            {
+                var matches = (from c in ctx.CreateQuery<Contact>()
+                               where c.new_MultiSelectAttribute == null
+                               select c).ToList();
+
+                Assert.True(matches.Count == 1);
+            }
+        }
+#endif
 
         [Fact]
         public void When_doing_a_crm_linq_query_with_an_innerjoin_right_result_is_returned()

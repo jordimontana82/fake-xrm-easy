@@ -289,5 +289,38 @@ namespace FakeXrmEasy.Tests
 
             Assert.Equal(service, service2);
         }
+
+        [Fact]
+        public void When_enabling_proxy_types_exception_is_not_be_thrown() {
+
+            var assembly = typeof(Crm.Account).Assembly;
+
+            var context = new XrmFakedContext();
+            var ex = Record.Exception(() => context.EnableProxyTypes(assembly));
+            Assert.Null(ex);
+        }
+
+        [Fact]
+        public void When_enabling_proxy_types_twice_for_same_assembly_an_exception_is_thrown() {
+
+            var assembly = typeof(Crm.Account).Assembly;
+
+            var context = new XrmFakedContext();
+            context.EnableProxyTypes(assembly);
+            Assert.Throws<InvalidOperationException>(() => context.EnableProxyTypes(assembly));
+        }
+
+        [Fact]
+        public void When_initialising_the_context_after_enabling_proxy_types_exception_is_not_thrown()
+        {
+            var assembly = typeof(Crm.Account).Assembly;
+
+            var context = new XrmFakedContext();
+            context.EnableProxyTypes(assembly);
+            var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Lionel" };
+            var ex = Record.Exception(() => context.Initialize(new List<Entity>() { c }));
+            Assert.Null(ex);
+        }
+
     }
 }

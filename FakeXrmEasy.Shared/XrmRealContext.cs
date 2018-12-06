@@ -35,9 +35,9 @@ namespace FakeXrmEasy
             //Don't setup fakes in this case.
         }
 
-        public XrmRealContext(string connectionString)
+        public XrmRealContext(string connectionStringName)
         {
-            ConnectionStringName = connectionString;
+            ConnectionStringName = connectionStringName;
             //Don't setup fakes in this case.
         }
 
@@ -64,22 +64,24 @@ namespace FakeXrmEasy
         protected IOrganizationService GetOrgService()
         {
             var connection = ConfigurationManager.ConnectionStrings[ConnectionStringName];
-            if (connection == null)
-                throw new Exception(string.Format("A connectionstring parameter with name '{0}' must exist", ConnectionStringName));
 
-            if (string.IsNullOrWhiteSpace(connection.ConnectionString))
+            // In case of missing connection string in configuration,
+            // use ConnectionStringName as an explicit connection string
+            var connectionString = connection == null ? ConnectionStringName : connection.ConnectionString;
+
+            if (string.IsNullOrWhiteSpace(connectionString))
             {
-                throw new Exception("The connectionString property must not be blank");
+                throw new Exception("The ConnectionStringName property must be either a connection string or a connection string name");
             }
 
 #if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
 
             // Connect to the CRM web service using a connection string.
-            CrmServiceClient client = new Microsoft.Xrm.Tooling.Connector.CrmServiceClient(connection.ConnectionString);
+            CrmServiceClient client = new Microsoft.Xrm.Tooling.Connector.CrmServiceClient(connectionString);
             return client;
 
 #else
-            CrmConnection crmConnection = CrmConnection.Parse(connection.ConnectionString);
+            CrmConnection crmConnection = CrmConnection.Parse(connectionString);
             OrganizationService service = new OrganizationService(crmConnection);
             return service;
 #endif

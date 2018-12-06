@@ -50,7 +50,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
             else if (request.Query is QueryByAttribute)
             {
-                //We instantiate a QueryExpression to be executed as we have the implementation done already
+                // We instantiate a QueryExpression to be executed as we have the implementation done already
                 var query = request.Query as QueryByAttribute;
                 qe = new QueryExpression(query.EntityName);
                 entityName = qe.EntityName;
@@ -62,12 +62,14 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     qe.Criteria.AddCondition(new ConditionExpression(query.Attributes[i], ConditionOperator.Equal, query.Values[i]));
                 }
 
-                //QueryExpression now done... execute it!
-                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe as QueryExpression);
+                // QueryExpression now done... execute it!
+                var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();
             }
             else
+            {
                 throw PullRequestException.NotImplementedOrganizationRequest(request.Query.GetType());
+            }
 
             if (qe.Distinct)
             {
@@ -107,7 +109,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 numberToGet = list.Count - (pageSize * (pageNumber - 1));
             }
-            
+
             var recordsToReturn = startPosition + numberToGet > list.Count ? new List<Entity>() : list.GetRange(startPosition, numberToGet);
 
             recordsToReturn.ForEach(e => e.ApplyDateBehaviour(ctx));
@@ -122,13 +124,12 @@ namespace FakeXrmEasy.FakeMessageExecutors
             };
             response.EntityCollection.EntityName = entityName;
             response.EntityCollection.MoreRecords = (list.Count - pageSize * pageNumber) > 0;
+
             if (response.EntityCollection.MoreRecords)
             {
                 var first = response.EntityCollection.Entities.First();
                 var last = response.EntityCollection.Entities.Last();
-                response.EntityCollection.PagingCookie = String.Format(
-                    "<cookie page=\"{0}\"><{1}id last=\"{2}\" first=\"{3}\" /></cookie>",
-                    pageNumber, first.LogicalName, last.Id.ToString("B").ToUpper(), first.Id.ToString("B").ToUpper());
+                response.EntityCollection.PagingCookie = $"<cookie page=\"{pageNumber}\"><{first.LogicalName}id last=\"{last.Id.ToString("B").ToUpper()}\" first=\"{first.Id.ToString("B").ToUpper()}\" /></cookie>";
             }
 
             return response;
@@ -140,15 +141,15 @@ namespace FakeXrmEasy.FakeMessageExecutors
         /// <param name="e"></param>
         protected void PopulateFormattedValues(Entity e)
         {
-            //Iterate through attributes and retrieve formatted values based on type
+            // Iterate through attributes and retrieve formatted values based on type
             foreach (var attKey in e.Attributes.Keys)
             {
                 var value = e[attKey];
                 string formattedValue = "";
-                if (value != null)
+                if (!e.FormattedValues.ContainsKey(attKey) && (value != null))
                 {
-                    bool bShouldAdd = false;
-                    formattedValue = GetFormattedValueForValue(value, out bShouldAdd);
+                    bool bShouldAdd;
+                    formattedValue = this.GetFormattedValueForValue(value, out bShouldAdd);
                     if (bShouldAdd)
                     {
                         e.FormattedValues.Add(attKey, formattedValue);
@@ -160,7 +161,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
         protected string GetFormattedValueForValue(object value, out bool bShouldAddFormattedValue)
         {
             bShouldAddFormattedValue = false;
-            string sFormattedValue = "";
+            var sFormattedValue = string.Empty;
 
             if (value is Enum)
             {
@@ -170,7 +171,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
             else if (value is AliasedValue)
             {
-                return GetFormattedValueForValue((value as AliasedValue)?.Value, out bShouldAddFormattedValue);
+                return this.GetFormattedValueForValue((value as AliasedValue)?.Value, out bShouldAddFormattedValue);
             }
 
             return sFormattedValue;
@@ -181,18 +182,18 @@ namespace FakeXrmEasy.FakeMessageExecutors
             return typeof(RetrieveMultipleRequest);
         }
 
-        private List<Entity> GetDistinctEntities(List<Entity> input)
+        private static List<Entity> GetDistinctEntities(IEnumerable<Entity> input)
         {
-            List<Entity> output = new List<Entity>();
-            foreach (Entity currentEntity in input)
+            var output = new List<Entity>();
+
+            foreach (var entity in input)
             {
-                if (!output.Any(i => i.LogicalName == currentEntity.LogicalName
-                 && i.Id == currentEntity.Id
-                 && i.Attributes.SequenceEqual(currentEntity.Attributes)))
+                if (!output.Any(i => i.LogicalName == entity.LogicalName && i.Attributes.SequenceEqual(entity.Attributes)))
                 {
-                    output.Add(currentEntity);
+                    output.Add(entity);
                 }
             }
+
             return output;
         }
     }

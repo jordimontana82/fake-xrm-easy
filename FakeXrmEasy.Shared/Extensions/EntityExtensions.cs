@@ -81,6 +81,14 @@ namespace FakeXrmEasy.Extensions
                         projected[attKey] = e[attKey];
                     }
                 }
+
+                foreach (var attKey in e.FormattedValues.Keys)
+                {
+                    if (attKey.StartsWith(sAlias + "."))
+                    {
+                        projected.FormattedValues[attKey] = e.FormattedValues[attKey];
+                    }
+                }
             }
             else
             {
@@ -89,6 +97,9 @@ namespace FakeXrmEasy.Extensions
                     var linkedAttKey = sAlias + "." + attKey;
                     if (e.Attributes.ContainsKey(linkedAttKey))
                         projected[linkedAttKey] = e[linkedAttKey];
+
+                    if (e.FormattedValues.ContainsKey(linkedAttKey))
+                        projected.FormattedValues[linkedAttKey] = e.FormattedValues[linkedAttKey];
                 }
             }
 
@@ -127,6 +138,13 @@ namespace FakeXrmEasy.Extensions
                 else
                     projected = new Entity(e.LogicalName) { Id = e.Id };
 
+
+                //Remove primary attribute unless explicitly specified
+                if (projected.Attributes.ContainsKey($"{e.LogicalName}id"))
+                {
+                    projected.Attributes.Remove($"{e.LogicalName}id");
+                }
+
                 foreach (var attKey in qe.ColumnSet.Columns)
                 {
                     //Check if attribute really exists in metadata
@@ -138,8 +156,16 @@ namespace FakeXrmEasy.Extensions
                     if (e.Attributes.ContainsKey(attKey) && e.Attributes[attKey] != null)
                     {
                         projected[attKey] = CloneAttribute(e[attKey]);
+
+                        string formattedValue = "";
+
+                        if (e.FormattedValues.TryGetValue(attKey, out formattedValue))
+                        {
+                            projected.FormattedValues[attKey] = formattedValue;
+                        }
                     }
                 }
+
 
                 //Plus attributes from joins
                 foreach (var le in qe.LinkEntities)
@@ -210,6 +236,14 @@ namespace FakeXrmEasy.Extensions
                 var original = (attributeValue as byte[]);
                 var copy = new byte[original.Length];
                 original.CopyTo(copy, 0);
+                return copy;
+            }
+#endif
+#if FAKE_XRM_EASY_9
+            else if(attributeValue is OptionSetValueCollection)
+            {
+                var original = (attributeValue as OptionSetValueCollection);
+                var copy = new OptionSetValueCollection(original.ToArray());
                 return copy;
             }
 #endif
@@ -311,6 +345,11 @@ namespace FakeXrmEasy.Extensions
                 {
                     e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, otherEntity[attKey]);
                 }
+
+                foreach (var attKey in otherEntity.FormattedValues.Keys)
+                {
+                    e.FormattedValues[alias + "." + attKey] = otherEntity.FormattedValues[attKey];
+                }
             }
             else
             {
@@ -330,6 +369,11 @@ namespace FakeXrmEasy.Extensions
                     {
                         e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, null);
                     }
+
+                    if (otherEntity.FormattedValues.ContainsKey(attKey))
+                    {
+                        e.FormattedValues[alias + "." + attKey] = otherEntity.FormattedValues[attKey];
+                    }
                 }
             }
             return e;
@@ -346,6 +390,11 @@ namespace FakeXrmEasy.Extensions
                     foreach (var attKey in otherClonedEntity.Attributes.Keys)
                     {
                         e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, otherClonedEntity[attKey]);
+                    }
+
+                    foreach (var attKey in otherEntity.FormattedValues.Keys)
+                    {
+                        e.FormattedValues[alias + "." + attKey] = otherEntity.FormattedValues[attKey];
                     }
                 }
                 else
@@ -365,6 +414,11 @@ namespace FakeXrmEasy.Extensions
                         else
                         {
                             e[alias + "." + attKey] = new AliasedValue(otherEntity.LogicalName, attKey, null);
+                        }
+
+                        if (otherEntity.FormattedValues.ContainsKey(attKey))
+                        {
+                            e.FormattedValues[alias + "." + attKey] = otherEntity.FormattedValues[attKey];
                         }
                     }
                 }

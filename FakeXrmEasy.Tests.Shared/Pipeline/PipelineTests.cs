@@ -4,6 +4,7 @@ using System.Linq;
 using Crm;
 using FakeXrmEasy.Tests.PluginsForTesting;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
 using Xunit;
 
 namespace FakeXrmEasy.Tests
@@ -369,5 +370,27 @@ namespace FakeXrmEasy.Tests
             Assert.Contains($"Entity Logical Name: {Contact.EntityLogicalName}", trace);
             Assert.Contains($"Entity ID: {id}", trace);
         }
+
+        [Fact]
+        public void When_PluginStepRegisteredAsCreatePostOperation_Entity_Available()
+        {
+            var context = new XrmFakedContext {UsePipelineSimulation = true};
+
+            var target = new Account
+            {
+                Id = Guid.NewGuid(),
+                Name = "Original"
+            };
+
+            context.RegisterPluginStep<PostOperationUpdatePlugin>("Create");
+            IOrganizationService serivce = context.GetOrganizationService();
+
+            serivce.Create(target);
+
+            var updatedAccount = serivce.Retrieve(Account.EntityLogicalName, target.Id, new ColumnSet(true)).ToEntity<Account>();
+
+            Assert.Equal("Updated", updatedAccount.Name);
+        }
+
     }
 }
