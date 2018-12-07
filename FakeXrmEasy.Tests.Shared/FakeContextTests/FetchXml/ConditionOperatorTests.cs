@@ -1,7 +1,10 @@
 ﻿using Crm;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
