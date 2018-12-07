@@ -746,6 +746,13 @@ namespace FakeXrmEasy
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
 
+                case ConditionOperator.ThisYear:
+                case ConditionOperator.LastYear:
+                case ConditionOperator.NextYear:
+                case ConditionOperator.ThisMonth:
+                    operatorExpression = TranslateConditionExpressionBetweenDates(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
 #if FAKE_XRM_EASY_9
                 case ConditionOperator.ContainValues:
                     operatorExpression = TranslateConditionExpressionContainValues(c, getNonBasicValueExpr, containsAttributeExpression);
@@ -1382,7 +1389,7 @@ namespace FakeXrmEasy
 
         protected static Expression TranslateConditionExpressionGreaterThanOrEqual(XrmFakedContext context, TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
-            var c = tc.CondExpression;
+            //var c = tc.CondExpression;
 
             return Expression.Or(
                                 TranslateConditionExpressionEqual(context, tc, getAttributeValueExpr, containsAttributeExpr),
@@ -1455,7 +1462,7 @@ namespace FakeXrmEasy
 
         protected static Expression TranslateConditionExpressionLessThanOrEqual(XrmFakedContext context, TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
-            var c = tc.CondExpression;
+            //var c = tc.CondExpression;
 
             return Expression.Or(
                                 TranslateConditionExpressionEqual(context, tc, getAttributeValueExpr, containsAttributeExpr),
@@ -1546,6 +1553,49 @@ namespace FakeXrmEasy
 
             c.Values.Add(beforeDateTime);
             c.Values.Add(currentDateTime);
+
+            return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
+        }
+
+        protected static Expression TranslateConditionExpressionBetweenDates(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
+            DateTime? startDate = null;
+            DateTime? endDate = null;
+
+            var today = DateTime.Today;
+            var thisYear = today.Year;
+            var thisMonth = today.Month;
+
+
+            switch (c.Operator)
+            {
+                case ConditionOperator.ThisYear:
+                    // From first day of this year to last day of this year
+                    startDate = new DateTime(thisYear, 1, 1);
+                    endDate = new DateTime(thisYear, 12, 31);
+                    break;                
+                case ConditionOperator.LastYear:
+                    // From first day of last year to last day of last year
+                    startDate = new DateTime(thisYear - 1, 1, 1);
+                    endDate = new DateTime(thisYear - 1, 12, 31);
+                    break;
+                case ConditionOperator.NextYear:
+                    // From first day of next year to last day of next year
+                    startDate = new DateTime(thisYear + 1, 1, 1);
+                    endDate = new DateTime(thisYear + 1, 12, 31);
+                    break;
+                case ConditionOperator.ThisMonth:
+                    // From first day of this month to last day of this month
+                    startDate = new DateTime(thisYear, thisMonth, 1);
+                    // Add one month to the first of this month, and then remove one day
+                    endDate = new DateTime(thisYear, thisMonth, 1).AddMonths(1).AddDays(-1);
+                    break;
+            }
+
+            c.Values.Add(startDate);
+            c.Values.Add(endDate);
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
@@ -1936,7 +1986,8 @@ namespace FakeXrmEasy
 
             c.Values[0] = (currentDateTime);
             c.Values.Add(nextDateTime);
-            c.Values.Add(numberOfWeeks);
+            // Jordi don't think this is needed - tests work without it and not used in the TranslateConditionExpressionBetween method
+            // c.Values.Add(numberOfWeeks);
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }

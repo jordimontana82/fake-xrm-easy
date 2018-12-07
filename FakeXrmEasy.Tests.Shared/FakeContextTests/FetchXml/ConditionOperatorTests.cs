@@ -49,6 +49,12 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="olderthan-x-months" />
       <xs:enumeration value="last-seven-days" />
       <xs:enumeration value="next-x-weeks" />
+      <xs:enumeration value="last-year" />
+      <xs:enumeration value="this-year" />
+      <xs:enumeration value="next-year" />
+      <xs:enumeration value="last-month" />
+      <xs:enumeration value="this-month" />
+      <xs:enumeration value="next-month" />
 
     TODO:
 
@@ -57,12 +63,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="last-week" />
       <xs:enumeration value="this-week" />
       <xs:enumeration value="next-week" />
-      <xs:enumeration value="last-month" />
-      <xs:enumeration value="this-month" />
-      <xs:enumeration value="next-month" />
-      <xs:enumeration value="last-year" />
-      <xs:enumeration value="this-year" />
-      <xs:enumeration value="next-year" />
       <xs:enumeration value="last-x-hours" />
       <xs:enumeration value="next-x-hours" />
       <xs:enumeration value="last-x-days" />
@@ -1271,6 +1271,143 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             var retrievedDate = collection.Entities[0]["anniversary"] as DateTime?;
             Assert.Equal(retrievedDate, date);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_ThisYear_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='this-year' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var today = DateTime.Today;
+            var thisYear = today.Year;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = today }; //Today - Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, 1, 1) };        // First day of this year - should be returned
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, 12, 31) };      // Last day of this year - should be returned
+            var ct4 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(-1) };                  // One year ago - should not be returned
+            var ct5 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(1) };                   // One year in the future - should not be returned
+            var ct6 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear + 1, 1, 1) };      // First day of next year - should not be returned
+            var ct7 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear - 1, 12, 31) };    // Last day of last year - should not be returned
+            ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(3, collection.Entities.Count);
+
+            Assert.Equal(((DateTime)collection.Entities[0]["anniversary"]).Year, thisYear);
+            Assert.Equal(((DateTime)collection.Entities[1]["anniversary"]).Year, thisYear);
+            Assert.Equal(((DateTime)collection.Entities[2]["anniversary"]).Year, thisYear);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_ThisMonth_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='this-month' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var today = DateTime.Today;
+            var thisYear = today.Year;
+            var thisMonth = today.Month;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = today }; //Today - Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1) };                            // First day of this month - should be returned
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddMonths(1).AddDays(-1) };   // Last day of this month - should be returned
+            var ct4 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddMonths(1) };               // First day of next month - should not be returned
+            var ct5 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddDays(-1) };                // Last day of previous month - should not be returned
+            var ct6 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(1) };                                               // One year in the future - should not be returned
+            var ct7 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(1) };                                               // One year in the past - should not be returned
+            ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(3, collection.Entities.Count);
+
+            Assert.Equal(((DateTime)collection.Entities[0]["anniversary"]).Month, thisMonth);
+            Assert.Equal(((DateTime)collection.Entities[1]["anniversary"]).Month, thisMonth);
+            Assert.Equal(((DateTime)collection.Entities[2]["anniversary"]).Month, thisMonth);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_LastYear_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='last-year' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var today = DateTime.Today;
+            var thisYear = today.Year;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = today };                               //Today - Should not be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, 1, 1) };        // First day of this year - should not be returned
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, 12, 31) };      // Last day of this year - should not be returned
+            var ct4 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(-1) };                  // One year ago - should be returned
+            var ct5 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(1) };                   // One year in the future - should not be returned
+            var ct6 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear - 1, 1, 1) };    // First day of last year - should be returned
+            var ct7 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear - 1, 12, 31) };  // Last day of last year - should be returned
+            ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(3, collection.Entities.Count);
+
+            Assert.Equal(((DateTime)collection.Entities[0]["anniversary"]).Year, thisYear - 1);
+            Assert.Equal(((DateTime)collection.Entities[1]["anniversary"]).Year, thisYear - 1);
+            Assert.Equal(((DateTime)collection.Entities[2]["anniversary"]).Year, thisYear - 1);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_NextYear_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='next-year' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var today = DateTime.Today;
+            var thisYear = today.Year;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = today };                               //Today - Should not be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, 1, 1) };        // First day of this year - should not be returned
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, 12, 31) };      // Last day of this year - should not be returned
+            var ct4 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(1) };                   // One year from now - should be returned
+            var ct5 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(-1) };                  // One year in the past - should not be returned
+            var ct6 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear + 1, 1, 1) };    // First day of next year - should be returned
+            var ct7 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear + 1, 12, 31) };  // Last day of next year - should be returned
+            ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(3, collection.Entities.Count);
+
+            Assert.Equal(((DateTime)collection.Entities[0]["anniversary"]).Year, thisYear + 1);
+            Assert.Equal(((DateTime)collection.Entities[1]["anniversary"]).Year, thisYear + 1);
+            Assert.Equal(((DateTime)collection.Entities[2]["anniversary"]).Year, thisYear + 1);
         }
 
         [Fact]
