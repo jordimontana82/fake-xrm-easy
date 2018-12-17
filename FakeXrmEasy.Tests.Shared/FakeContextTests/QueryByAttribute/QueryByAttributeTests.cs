@@ -171,13 +171,13 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryByAttributeTests
             query.ColumnSet = new ColumnSet("firstname", "lastname");
             query.PageInfo = new PagingInfo()
             {
-                //TODO: Fix TotalRecordCount calculations
-                //PageNumber = 1,
-                //Count = 1,
+                PageNumber = 1,
+                Count = 1,
                 ReturnTotalRecordCount = true
             };
             var results = fakedService.RetrieveMultiple(query);
 
+            Assert.Equal(1, results.Entities.Count);
             Assert.Equal(2, results.TotalRecordCount);
         }
     }

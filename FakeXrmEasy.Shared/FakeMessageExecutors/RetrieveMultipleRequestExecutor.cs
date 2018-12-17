@@ -84,6 +84,13 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 list = list.Take(qe.TopCount.Value).ToList();
             }
 
+            // Handle TotalRecordCount here?
+            int totalRecordCount = -1;
+            if (qe?.PageInfo?.ReturnTotalRecordCount == true)
+            {
+                totalRecordCount = list.Count;
+            }
+
             // Handle paging
             var pageSize = ctx.MaxRetrieveCount;
             pageInfo = qe.PageInfo;
@@ -126,6 +133,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             };
             response.EntityCollection.EntityName = entityName;
             response.EntityCollection.MoreRecords = (list.Count - pageSize * pageNumber) > 0;
+            response.EntityCollection.TotalRecordCount = totalRecordCount;
 
             if (response.EntityCollection.MoreRecords)
             {
