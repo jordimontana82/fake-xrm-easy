@@ -1457,7 +1457,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date, CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
             var lastWeek = weekOfYear - 1;
 
-            DateTime getRandomDateOfWeek(int week)
+            Func<int, DateTime> getRandomDateOfWeek = (week) =>
             {
                 Random rnd = new Random();
                 DateTime d = new DateTime();
@@ -1470,7 +1470,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                     , CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek)
                     != week);
                 return d;
-            }
+            };
 
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(lastWeek) }; //Should be returned
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(weekOfYear) }; //Shouldnt
@@ -1510,7 +1510,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date, CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
             var lastWeek = weekOfYear - 1;
 
-            DateTime getRandomDateOfWeek(int week)
+            Func<int, DateTime> getRandomDateOfWeek = (week) =>
             {
                 Random rnd = new Random();
                 DateTime d = new DateTime();
@@ -1523,7 +1523,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                     , CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek)
                     != week);
                 return d;
-            }
+            };
 
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(weekOfYear) }; //Should be returned
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(lastWeek) }; //Shouldnt
@@ -1563,7 +1563,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date, CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
             var nextWeek = weekOfYear + 1;
 
-            DateTime getRandomDateOfWeek(int week)
+            Func<int, DateTime> getRandomDateOfWeek = (week) =>
             {
                 Random rnd = new Random();
                 DateTime d = new DateTime();
@@ -1576,7 +1576,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                     , CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek)
                     != week);
                 return d;
-            }
+            };
 
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(nextWeek) }; //Should be returned
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(weekOfYear) }; //Shouldnt
