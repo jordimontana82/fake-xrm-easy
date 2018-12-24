@@ -26,7 +26,8 @@ namespace FakeXrmEasy.Extensions.FetchXml
             ConditionOperator.LastXMonths,
             ConditionOperator.LastXWeeks,
             ConditionOperator.LastXYears,
-            ConditionOperator.NextXWeeks
+            ConditionOperator.NextXWeeks,
+            ConditionOperator.Next7Days
         };
 
         public static bool IsAttributeTrue(this XElement elem, string attributeName)
@@ -398,10 +399,8 @@ namespace FakeXrmEasy.Extensions.FetchXml
                         value = value.Replace("%", "");
                     }
                     break;
-
                 case "not-like":
                     op = ConditionOperator.NotLike;
-
                     if (value != null)
                     {
                         if (value.StartsWith("%") && !value.EndsWith("%"))
@@ -414,23 +413,18 @@ namespace FakeXrmEasy.Extensions.FetchXml
                         value = value.Replace("%", "");
                     }
                     break;
-
                 case "gt":
                     op = ConditionOperator.GreaterThan;
                     break;
-
                 case "ge":
                     op = ConditionOperator.GreaterEqual;
                     break;
-
                 case "lt":
                     op = ConditionOperator.LessThan;
                     break;
-
                 case "le":
                     op = ConditionOperator.LessEqual;
                     break;
-
                 case "on":
                     op = ConditionOperator.On;
                     break;
@@ -475,6 +469,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     break;
                 case "next-x-weeks":
                     op = ConditionOperator.NextXWeeks;
+                    break;
+                case "next-seven-days":
+                    op = ConditionOperator.Next7Days;
                     break;
 #if FAKE_XRM_EASY_9
                 case "contain-values":

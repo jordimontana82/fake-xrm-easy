@@ -40,9 +40,8 @@
       <HintPath>..\packages\Microsoft.CrmSdk.Extensions.6.0.4.1\lib\net40\AntiXSSLibrary.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FakeItEasy, Version=3.2.0.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
-      <HintPath>..\packages\FakeItEasy.3.2.0\lib\net40\FakeItEasy.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FakeItEasy, Version=4.0.0.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
+      <HintPath>..\packages\FakeItEasy.4.9.2\lib\net40\FakeItEasy.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Crm.Sdk.Proxy">
       <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.6.1.1\lib\net40\Microsoft.Crm.Sdk.Proxy.dll</HintPath>

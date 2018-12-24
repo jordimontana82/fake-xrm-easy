@@ -746,6 +746,10 @@ namespace FakeXrmEasy
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
 
+                case ConditionOperator.Next7Days:
+                    operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
 #if FAKE_XRM_EASY_9
                 case ConditionOperator.ContainValues:
                     operatorExpression = TranslateConditionExpressionContainValues(c, getNonBasicValueExpr, containsAttributeExpression);
@@ -1925,18 +1929,22 @@ namespace FakeXrmEasy
 
             var nextDateTime = default(DateTime);
             var currentDateTime = DateTime.UtcNow;
-            var numberOfWeeks = (int)c.Values[0];
+            var numberOfWeeks = c.Values.Any() ? (int)c.Values[0] : 1;
 
             switch (c.Operator)
             {
                 case ConditionOperator.NextXWeeks:
                     nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
+                    c.Values[0] = (currentDateTime);
+                    c.Values.Add(nextDateTime);
+                    c.Values.Add(numberOfWeeks);
+                    break;
+                case ConditionOperator.Next7Days:
+                    nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
+                    c.Values.Add(currentDateTime);
+                    c.Values.Add(nextDateTime);
                     break;
             }
-
-            c.Values[0] = (currentDateTime);
-            c.Values.Add(nextDateTime);
-            c.Values.Add(numberOfWeeks);
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }

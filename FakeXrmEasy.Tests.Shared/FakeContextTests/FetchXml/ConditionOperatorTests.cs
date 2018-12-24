@@ -49,11 +49,11 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="olderthan-x-months" />
       <xs:enumeration value="last-seven-days" />
       <xs:enumeration value="next-x-weeks" />
+      <xs:enumeration value="next-seven-days" />
 
     TODO:
 
       DATEs:      
-      <xs:enumeration value="next-seven-days" />
       <xs:enumeration value="last-week" />
       <xs:enumeration value="this-week" />
       <xs:enumeration value="next-week" />
@@ -1392,6 +1392,43 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             //var retrievedDateSecond = collection.Entities[1]["anniversary"] as DateTime?;
             //Assert.Equal(23, retrievedDateFirst.Value.Day);
             //Assert.Equal(22, retrievedDateSecond.Value.Day);
+        }
+        [Fact]
+        public void FetchXml_Operator_Next_Seven_Days_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                               <entity name='contact'>
+                                 <attribute name='fullname' />
+                                 <attribute name='telephone1' />
+                                 <attribute name='contactid' />
+                                 <order attribute='fullname' descending='false' />
+                                 <filter type='and'>
+                                   <condition attribute='anniversary' operator='next-seven-days' />
+                                 </filter>
+                               </entity>
+                             </fetch>";
+
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Single(query.Criteria.Conditions);
+            Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.Next7Days, query.Criteria.Conditions[0].Operator);
+
+            var date = DateTime.Now;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(3) }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7) }; //Shouldnt
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(8) }; //Shouldnt
+            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Single(collection.Entities);
+            var retrievedUser = collection.Entities[0].Id;
+            Assert.Equal(retrievedUser, ct1.Id);
         }
 
 #if FAKE_XRM_EASY_9
