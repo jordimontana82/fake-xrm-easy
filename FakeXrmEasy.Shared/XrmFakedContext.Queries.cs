@@ -749,11 +749,68 @@ namespace FakeXrmEasy
                     break;
 
                 case ConditionOperator.Next7Days:
-                    operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
+                    {
+                        DateTime now = DateTime.UtcNow;
+                        c.CondExpression.Values.Add(now);
+                        c.CondExpression.Values.Add(now.AddDays(7));
+                        operatorExpression = TranslateConditionExpressionBetween(c, getAttributeValueExpr, containsAttributeExpression);
+                    }
                     break;
+
                 case ConditionOperator.LastWeek:
-                    operatorExpression = TranslateConditionExpressionLast(c, getAttributeValueExpr, containsAttributeExpression);
+                    {
+                        DateTime now = DateTime.UtcNow;
+                        c.CondExpression.Values.Add(now.ToFirstDayOfDeltaWeek(-1));
+                        c.CondExpression.Values.Add(now.ToLastDayOfDeltaWeek(-1));
+                        operatorExpression = TranslateConditionExpressionBetween(c, getAttributeValueExpr, containsAttributeExpression);
+                    }
                     break;
+
+                case ConditionOperator.ThisWeek:
+                    {
+                        DateTime now = DateTime.UtcNow;
+                        c.CondExpression.Values.Add(now.ToFirstDayOfDeltaWeek());
+                        c.CondExpression.Values.Add(now.ToLastDayOfDeltaWeek());
+                        operatorExpression = TranslateConditionExpressionBetween(c, getAttributeValueExpr, containsAttributeExpression);
+                    }
+                    break;
+
+                case ConditionOperator.NextWeek:
+                    {
+                        DateTime now = DateTime.UtcNow;
+                        c.CondExpression.Values.Add(now.ToFirstDayOfDeltaWeek(1));
+                        c.CondExpression.Values.Add(now.ToLastDayOfDeltaWeek(1));
+                        operatorExpression = TranslateConditionExpressionBetween(c, getAttributeValueExpr, containsAttributeExpression);
+                    }
+                    break;
+
+                case ConditionOperator.LastMonth:
+                    {
+                        DateTime now = DateTime.UtcNow;
+                        c.CondExpression.Values.Add(now.ToFirstDayOfMonth(now.Month - 1));
+                        c.CondExpression.Values.Add(now.ToLastDayOfMonth(now.Month - 1));
+                        operatorExpression = TranslateConditionExpressionBetween(c, getAttributeValueExpr, containsAttributeExpression);
+                    }
+                    break;
+
+                case ConditionOperator.ThisMonth:
+                    {
+                        DateTime now = DateTime.UtcNow;
+                        c.CondExpression.Values.Add(now.ToFirstDayOfMonth(now.Month));
+                        c.CondExpression.Values.Add(now.ToLastDayOfMonth(now.Month));
+                        operatorExpression = TranslateConditionExpressionBetween(c, getAttributeValueExpr, containsAttributeExpression);
+                    }
+                    break;
+
+                case ConditionOperator.NextMonth:
+                    {
+                        DateTime now = DateTime.UtcNow;
+                        c.CondExpression.Values.Add(now.ToFirstDayOfMonth(now.Month + 1));
+                        c.CondExpression.Values.Add(now.ToLastDayOfMonth(now.Month + 1));
+                        operatorExpression = TranslateConditionExpressionBetween(c, getAttributeValueExpr, containsAttributeExpression);
+                    }
+                    break;
+
 #if FAKE_XRM_EASY_9
                 case ConditionOperator.ContainValues:
                     operatorExpression = TranslateConditionExpressionContainValues(c, getNonBasicValueExpr, containsAttributeExpression);
@@ -1543,42 +1600,17 @@ namespace FakeXrmEasy
             var c = tc.CondExpression;
 
             var beforeDateTime = default(DateTime);
-            var afterDateTime = DateTime.UtcNow;
-
-            DateTime getDateTimeFromWeek(int year, int week, DayOfWeek dayOfWeek)
-            {
-                DateTime startOfYear = new DateTime(year, 1, 1);
-                // The +7 and %7 stuff is to avoid negative numbers etc.
-                int daysToFirstCorrectDay = (((int)dayOfWeek - (int)startOfYear.DayOfWeek) + 7) % 7;
-                return startOfYear.AddDays(7 * (week - 1) + daysToFirstCorrectDay);
-            };
+            var currentDateTime = DateTime.UtcNow;
 
             switch (c.Operator)
             {
                 case ConditionOperator.Last7Days:
-                    beforeDateTime = afterDateTime.AddDays(-7);
-                    break;
-                case ConditionOperator.LastWeek:
-                    {
-                        var lastWeek = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
-                            afterDateTime
-                            , CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule
-                            , CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek) - 1;
-                        if (lastWeek < 1)
-                            lastWeek = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
-                                CultureInfo.CurrentCulture.Calendar.AddWeeks(afterDateTime, -1)
-                                , CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule
-                                , CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
-                        var currentDayOfWeek = afterDateTime.DayOfWeek;
-                        var firstDayOfWeek = CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
-                        beforeDateTime = getDateTimeFromWeek(afterDateTime.Year, lastWeek - 1, firstDayOfWeek);
-                        afterDateTime = getDateTimeFromWeek(afterDateTime.Year, lastWeek, firstDayOfWeek).AddDays(-1);
-                    }
+                    beforeDateTime = currentDateTime.AddDays(-7);
                     break;
             }
 
             c.Values.Add(beforeDateTime);
-            c.Values.Add(afterDateTime);
+            c.Values.Add(currentDateTime);
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }

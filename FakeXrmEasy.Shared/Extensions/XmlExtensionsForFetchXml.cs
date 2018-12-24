@@ -475,6 +475,21 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "last-week":
                     op = ConditionOperator.LastWeek;
                     break;
+                case "this-week":
+                    op = ConditionOperator.ThisWeek;
+                    break;
+                case "next-week":
+                    op = ConditionOperator.NextWeek;
+                    break;
+                case "last-month":
+                    op = ConditionOperator.LastMonth;
+                    break;
+                case "this-month":
+                    op = ConditionOperator.ThisMonth;
+                    break;
+                case "next-month":
+                    op = ConditionOperator.NextMonth;
+                    break;
 #if FAKE_XRM_EASY_9
                 case "contain-values":
                     op = ConditionOperator.ContainValues;
