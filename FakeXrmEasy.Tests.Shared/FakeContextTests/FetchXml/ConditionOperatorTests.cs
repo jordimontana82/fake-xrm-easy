@@ -3,6 +3,7 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using Xunit;
@@ -50,11 +51,11 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="last-seven-days" />
       <xs:enumeration value="next-x-weeks" />
       <xs:enumeration value="next-seven-days" />
+      <xs:enumeration value="last-week" />
 
     TODO:
 
       DATEs:      
-      <xs:enumeration value="last-week" />
       <xs:enumeration value="this-week" />
       <xs:enumeration value="next-week" />
       <xs:enumeration value="last-month" />
@@ -1409,7 +1410,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                                </entity>
                              </fetch>";
 
-
             var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
 
             Assert.True(query.Criteria != null);
@@ -1422,6 +1422,59 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7) }; //Shouldnt
             var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(8) }; //Shouldnt
             ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Single(collection.Entities);
+            var retrievedUser = collection.Entities[0].Id;
+            Assert.Equal(retrievedUser, ct1.Id);
+        }
+        [Fact]
+        public void FetchXml_Operator_Last_Week_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                               <entity name='contact'>
+                                 <attribute name='fullname' />
+                                 <attribute name='telephone1' />
+                                 <attribute name='contactid' />
+                                 <order attribute='fullname' descending='false' />
+                                 <filter type='and'>
+                                   <condition attribute='anniversary' operator='last-week' />
+                                 </filter>
+                               </entity>
+                             </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Single(query.Criteria.Conditions);
+            Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.LastWeek, query.Criteria.Conditions[0].Operator);
+
+            var date = DateTime.Now;
+            var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date, CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
+            var lastWeek = weekOfYear - 1;
+
+            DateTime getRandomDateOfWeek(int week)
+            {
+                Random rnd = new Random();
+                DateTime d = new DateTime();
+                do
+                {
+                    d = date.AddDays(rnd.Next(-10, 10));
+                }
+                while (CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(d
+                    , CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule
+                    , CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek)
+                    != week);
+                return d;
+            }
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(lastWeek) }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(weekOfYear) }; //Shouldnt
+            ctx.Initialize(new[] { ct1, ct2 });
             var service = ctx.GetFakedOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));

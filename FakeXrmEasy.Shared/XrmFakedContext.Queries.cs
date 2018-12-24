@@ -27,9 +27,11 @@ namespace FakeXrmEasy
                 ProxyTypesAssemblies.Select(a => FindReflectedType(logicalName, a))
                                     .Where(t => t != null);
 
-            if(types.Count() > 1) {
+            if (types.Count() > 1)
+            {
                 var errorMsg = $"Type { logicalName } is defined in multiple assemblies: ";
-                foreach(var type in types) {
+                foreach (var type in types)
+                {
                     errorMsg += type.Assembly
                                     .GetName()
                                     .Name + "; ";
@@ -330,11 +332,11 @@ namespace FakeXrmEasy
             }
 
             IQueryable<Entity> inner = null;
-            if(le.JoinOperator == JoinOperator.LeftOuter)
+            if (le.JoinOperator == JoinOperator.LeftOuter)
             {
                 //inner = context.CreateQuery<Entity>(le.LinkToEntityName);
 
-                
+
                 //filters are applied in the inner query and then ignored during filter evaluation
                 var outerQueryExpression = new QueryExpression()
                 {
@@ -345,14 +347,14 @@ namespace FakeXrmEasy
 
                 var outerQuery = TranslateQueryExpressionToLinq(context, outerQueryExpression);
                 inner = outerQuery;
-                
+
             }
             else
             {
                 //Filters are applied after joins
                 inner = context.CreateQuery<Entity>(le.LinkToEntityName);
             }
-            
+
             //if (!le.Columns.AllColumns && le.Columns.Columns.Count == 0)
             //{
             //    le.Columns.AllColumns = true;   //Add all columns in the joined entity, otherwise we can't filter by related attributes, then the Select will actually choose which ones we need
@@ -749,7 +751,9 @@ namespace FakeXrmEasy
                 case ConditionOperator.Next7Days:
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
-
+                case ConditionOperator.LastWeek:
+                    operatorExpression = TranslateConditionExpressionLast(c, getAttributeValueExpr, containsAttributeExpression);
+                    break;
 #if FAKE_XRM_EASY_9
                 case ConditionOperator.ContainValues:
                     operatorExpression = TranslateConditionExpressionContainValues(c, getNonBasicValueExpr, containsAttributeExpression);
@@ -803,7 +807,7 @@ namespace FakeXrmEasy
                 OrganizationServiceFaultOperatorIsNotValidException.Throw();
             }
         }
-        
+
         protected static Expression GetAppropiateTypedValue(object value)
         {
             //Basic types conversions
@@ -1539,17 +1543,42 @@ namespace FakeXrmEasy
             var c = tc.CondExpression;
 
             var beforeDateTime = default(DateTime);
-            var currentDateTime = DateTime.UtcNow;
+            var afterDateTime = DateTime.UtcNow;
+
+            DateTime getDateTimeFromWeek(int year, int week, DayOfWeek dayOfWeek)
+            {
+                DateTime startOfYear = new DateTime(year, 1, 1);
+                // The +7 and %7 stuff is to avoid negative numbers etc.
+                int daysToFirstCorrectDay = (((int)dayOfWeek - (int)startOfYear.DayOfWeek) + 7) % 7;
+                return startOfYear.AddDays(7 * (week - 1) + daysToFirstCorrectDay);
+            };
 
             switch (c.Operator)
             {
                 case ConditionOperator.Last7Days:
-                    beforeDateTime = currentDateTime.AddDays(-7);
+                    beforeDateTime = afterDateTime.AddDays(-7);
+                    break;
+                case ConditionOperator.LastWeek:
+                    {
+                        var lastWeek = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                            afterDateTime
+                            , CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule
+                            , CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek) - 1;
+                        if (lastWeek < 1)
+                            lastWeek = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                                CultureInfo.CurrentCulture.Calendar.AddWeeks(afterDateTime, -1)
+                                , CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule
+                                , CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
+                        var currentDayOfWeek = afterDateTime.DayOfWeek;
+                        var firstDayOfWeek = CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
+                        beforeDateTime = getDateTimeFromWeek(afterDateTime.Year, lastWeek - 1, firstDayOfWeek);
+                        afterDateTime = getDateTimeFromWeek(afterDateTime.Year, lastWeek, firstDayOfWeek).AddDays(-1);
+                    }
                     break;
             }
 
             c.Values.Add(beforeDateTime);
-            c.Values.Add(currentDateTime);
+            c.Values.Add(afterDateTime);
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
