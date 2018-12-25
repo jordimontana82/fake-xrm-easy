@@ -23,8 +23,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "Can not delete without target");
             }
 
-            var service = ctx.GetFakedOrganizationService();
-            service.Delete(target.LogicalName, target.Id);
+            var targetId = ctx.RecordUniqueId(target);
+
+            var service = ctx.GetOrganizationService();
+            service.Delete(target.LogicalName, targetId);
 
             return new DeleteResponse();
         }

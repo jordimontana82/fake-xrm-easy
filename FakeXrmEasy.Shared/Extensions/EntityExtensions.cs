@@ -225,13 +225,13 @@ namespace FakeXrmEasy.Extensions
                 var collection = attributeValue as EntityCollection;
                 return new EntityCollection(collection.Entities.Select(e => e.Clone(e.GetType())).ToList());
             }
-            else if(attributeValue is IEnumerable<Entity>)
+            else if (attributeValue is IEnumerable<Entity>)
             {
                 var enumerable = attributeValue as IEnumerable<Entity>;
                 return enumerable.Select(e => e.Clone(e.GetType())).ToArray();
             }
 #if !FAKE_XRM_EASY
-            else if(type == typeof(byte[]))
+            else if (type == typeof(byte[]))
             {
                 var original = (attributeValue as byte[]);
                 var copy = new byte[original.Length];
@@ -290,6 +290,12 @@ namespace FakeXrmEasy.Extensions
             {
                 cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
             }
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
+            foreach (var attKey in e.KeyAttributes.Keys)
+            {
+                cloned.KeyAttributes[attKey]= e.KeyAttributes[attKey] != null ? CloneAttribute(e.KeyAttributes[attKey]) : null;
+            }
+#endif
             return cloned;
         }
 
@@ -323,6 +329,13 @@ namespace FakeXrmEasy.Extensions
                     cloned[attKey] = CloneAttribute(e[attKey]);
                 }
             }
+
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
+            foreach (var attKey in e.KeyAttributes.Keys)
+            {
+                cloned.KeyAttributes[attKey] = e.KeyAttributes[attKey] != null ? CloneAttribute(e.KeyAttributes[attKey]) : null;
+            }
+#endif
             return cloned;
         }
 
@@ -492,6 +505,15 @@ namespace FakeXrmEasy.Extensions
             {
                 e[property] = value;
             }
+        }
+
+        public static EntityReference toEntityReference(this Entity e)
+        {
+            var result = e.ToEntityReference();
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
+            result.KeyAttributes = e.KeyAttributes;
+#endif
+            return result;
         }
     }
 }

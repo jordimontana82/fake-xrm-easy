@@ -1,11 +1,13 @@
 ﻿using Crm;
 using FakeItEasy;
+using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests
@@ -949,14 +951,15 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Throw_When_Related_Record_Query_Not_Set_For_Relationship()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
-
-            A.CallTo(() => fakedService.Retrieve(A<string>.Ignored, A<Guid>.Ignored, A<ColumnSet>.Ignored))
-                .Returns<Entity>(new Entity());
+            var fakedService = fakedContext.GetOrganizationService();
+            var account = new Entity(Account.EntityLogicalName);
+            account.Id = Guid.NewGuid();
+            fakedContext.Initialize(account);
 
             var request = new RetrieveRequest
             {
-                Target = new EntityReference(Account.EntityLogicalName, Guid.NewGuid()),
+                Target = account.ToEntityReference(),
+                ColumnSet = new ColumnSet(true),
                 RelatedEntitiesQuery = new RelationshipQueryCollection
                 {
                     { new Relationship("any"), null }
@@ -971,14 +974,16 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Throw_When_Relationship_Not_Set_In_Metadata()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
-            A.CallTo(() => fakedService.Retrieve(A<string>.Ignored, A<Guid>.Ignored, A<ColumnSet>.Ignored))
-                .Returns<Entity>(new Entity());
+            var account = new Entity(Account.EntityLogicalName);
+            account.Id = Guid.NewGuid();
+            fakedContext.Initialize(account);
 
             var request = new RetrieveRequest
             {
-                Target = new EntityReference(Account.EntityLogicalName, Guid.NewGuid()),
+                Target = account.ToEntityReference(),
+                ColumnSet = new ColumnSet(true),
                 RelatedEntitiesQuery = new RelationshipQueryCollection
                 {
                     { new Relationship("any"), new QueryExpression() }
@@ -988,5 +993,56 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var exception = Assert.Throws<Exception>(() => fakedService.Execute(request));
             Assert.Equal("Relationship \"any\" does not exist in the metadata cache.", exception.Message);
         }
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
+        [Fact]
+        public static void Should_Retrieve_A_Correct_Entity_By_Alternate_Key()
+        {
+            var fakedContext = new XrmFakedContext();
+            var accountMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityMetadata();
+            accountMetadata.LogicalName = Account.EntityLogicalName;
+            var alternateKeyMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata();
+            alternateKeyMetadata.KeyAttributes = new string[] { "alternateKey" };
+            accountMetadata.SetFieldValue("_keys", new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata[]
+                 {
+                 alternateKeyMetadata
+                 });
+            fakedContext.InitializeMetadata(accountMetadata);
+            var account = new Entity(Account.EntityLogicalName);
+            account.Id = Guid.NewGuid();
+            account.Attributes.Add("alternateKey", "key");
+            fakedContext.Initialize(account);
+            var fakedService = fakedContext.GetOrganizationService();
+
+            var request = new RetrieveRequest
+            {
+                Target = new EntityReference(Account.EntityLogicalName, "alternateKey", "key"),
+                ColumnSet = new ColumnSet(allColumns: true)
+            };
+
+            var retrievedAccount = (RetrieveResponse)fakedService.Execute(request);
+            Assert.Equal(account.Id, retrievedAccount.Entity.Id);
+        }
+
+
+        [Fact]
+        public static void Should_Throw_When_Alternate_Key_Not_In_Metadata()
+        {
+            var fakedContext = new XrmFakedContext();
+            var account = new Entity(Account.EntityLogicalName);
+            account.Id = Guid.NewGuid();
+            account.Attributes.Add("alternateKey", "key");
+            fakedContext.Initialize(account);
+            var fakedService = fakedContext.GetOrganizationService();
+
+            var request = new RetrieveRequest
+            {
+                Target = new EntityReference(Account.EntityLogicalName, "alternateKey", "key"),
+                ColumnSet = new ColumnSet(allColumns: true)
+            };
+
+            var exception = Assert.Throws<InvalidOperationException>(() => fakedService.Execute(request));
+            Assert.Equal($"The requested key attributes do not exist for the entity {Account.EntityLogicalName}", exception.Message);
+        }
+#endif 
     }
 }
