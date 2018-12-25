@@ -172,7 +172,7 @@ namespace FakeXrmEasy
                 throw new InvalidOperationException("The entity must not be null");
             }
             e = e.Clone(e.GetType());
-            e.Id = GetRecordUniqueId(e.toEntityReference());
+            e.Id = GetRecordUniqueId(e.ToEntityReferenceWithKeyAttributes());
 
             // Update specific validations: The entity record must exist in the context
             if (Data.ContainsKey(e.LogicalName) &&

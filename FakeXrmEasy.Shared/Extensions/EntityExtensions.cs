@@ -507,7 +507,7 @@ namespace FakeXrmEasy.Extensions
             }
         }
 
-        public static EntityReference toEntityReference(this Entity e)
+        public static EntityReference ToEntityReferenceWithKeyAttributes(this Entity e)
         {
             var result = e.ToEntityReference();
 #if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
