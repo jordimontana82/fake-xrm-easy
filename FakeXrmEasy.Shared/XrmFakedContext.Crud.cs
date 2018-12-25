@@ -26,64 +26,56 @@ namespace FakeXrmEasy
         /// <returns></returns>
         protected static void FakeRetrieve(XrmFakedContext context, IOrganizationService fakedService)
         {
-            A.CallTo(() => fakedService.Retrieve(A<string>._, A<Guid>._, A<ColumnSet>._))
-                .ReturnsLazily((string entityName, Guid id, ColumnSet columnSet) =>
+            Entity entity = null;
+            Func<String, Guid, ColumnSet, Entity> retrive = (String entityName, Guid id, ColumnSet columnSet) =>
+            {
+                if (String.IsNullOrWhiteSpace(entityName))
+                    throw new InvalidOperationException("The entity logical name must not be null or empty.");
+
+                if (id == Guid.Empty)
+                    throw new InvalidOperationException("The id must not be empty.");
+
+                if (columnSet == null)
+                    throw new InvalidOperationException("The columnset parameter must not be null.");
+
+                // Don't fail with invalid operation exception, if no record of this entity exists, but entity is known
+                if (!context.Data.ContainsKey(entityName))
                 {
-                    if (string.IsNullOrWhiteSpace(entityName))
-                    {
-                        throw new InvalidOperationException("The entity logical name must not be null or empty.");
-                    }
+                    if (context.ProxyTypesAssembly == null)
+                        throw new InvalidOperationException($"The entity logical name {entityName} is not valid.");
 
-                    if (id == Guid.Empty)
-                    {
-                        throw new InvalidOperationException("The id must not be empty.");
-                    }
+                    if (!context.ProxyTypesAssembly.GetTypes().Any(type => context.FindReflectedType(entityName) != null))
+                        throw new InvalidOperationException($"The entity logical name {entityName} is not valid.");
+                }
 
-                    if (columnSet == null)
-                    {
-                        throw new InvalidOperationException("The columnset parameter must not be null.");
-                    }
+                //Return the subset of columns requested only
+                var reflectedType = context.FindReflectedType(entityName);
 
-                    // Don't fail with invalid operation exception, if no record of this entity exists, but entity is known
-                    if (!context.Data.ContainsKey(entityName))
+                //Entity logical name exists, so , check if the requested entity exists
+                if (context.Data.ContainsKey(entityName) && context.Data[entityName] != null
+                    && context.Data[entityName].ContainsKey(id))
+                {
+                    //Entity found => return only the subset of columns specified or all of them
+                    var foundEntity = context.Data[entityName][id].Clone(reflectedType);
+                    if (columnSet.AllColumns)
                     {
-                        if (context.ProxyTypesAssembly == null)
-                        {
-                            throw new InvalidOperationException($"The entity logical name {entityName} is not valid.");
-                        }
-
-                        if (!context.ProxyTypesAssembly.GetTypes().Any(type => context.FindReflectedType(entityName) != null))
-                        {
-                            throw new InvalidOperationException($"The entity logical name {entityName} is not valid.");
-                        }
-                    }
-
-                    //Return the subset of columns requested only
-                    var reflectedType = context.FindReflectedType(entityName);
-                    
-                    //Entity logical name exists, so , check if the requested entity exists
-                    if (context.Data.ContainsKey(entityName) && context.Data[entityName] != null
-                        && context.Data[entityName].ContainsKey(id))
-                    {
-                        //Entity found => return only the subset of columns specified or all of them
-                        var foundEntity = context.Data[entityName][id].Clone(reflectedType);
-                        if (columnSet.AllColumns) { 
-                            foundEntity.ApplyDateBehaviour(context);
-                            return foundEntity;
-                        }
-                        else
-                        {
-                            var projected = foundEntity.ProjectAttributes(columnSet, context);
-                            projected.ApplyDateBehaviour(context);
-                            return projected;
-                        }
+                        foundEntity.ApplyDateBehaviour(context);
+                        return foundEntity;
                     }
                     else
                     {
-                        // Entity not found in the context => FaultException
-                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{entityName} With Id = {id:D} Does Not Exist");
+                        var projected = foundEntity.ProjectAttributes(columnSet, context);
+                        projected.ApplyDateBehaviour(context);
+                        return projected;
                     }
-                });
+                }
+                else
+                    // Entity not found in the context => FaultException
+                    throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{entityName} With Id = {id:D} Does Not Exist");
+            };
+            A.CallTo(() => fakedService.Retrieve(A<string>._, A<Guid>._, A<ColumnSet>._))
+                .Invokes((string entityName, Guid id, ColumnSet columnSet) => entity = retrive(entityName, id, columnSet))
+                .ReturnsLazily((string entityName, Guid id, ColumnSet columnSet) => entity);
         }
         /// <summary>
         /// Fakes the Create message
@@ -92,11 +84,12 @@ namespace FakeXrmEasy
         /// <param name="fakedService"></param>
         protected static void FakeCreate(XrmFakedContext context, IOrganizationService fakedService)
         {
+            Guid id = Guid.Empty;
+            Func<Entity, Guid> create = (Entity e) => context.CreateEntity(e);
+
             A.CallTo(() => fakedService.Create(A<Entity>._))
-                .ReturnsLazily((Entity e) =>
-                {
-                    return context.CreateEntity(e);
-                });
+                .Invokes((Entity e) => id = create(e))
+                .ReturnsLazily((Entity e) => id);
         }
 
         protected static void FakeUpdate(XrmFakedContext context, IOrganizationService fakedService)
@@ -128,7 +121,7 @@ namespace FakeXrmEasy
                     var attribute = e[sAttributeName];
                     if (attribute is DateTime)
                     {
-                        cachedEntity[sAttributeName] = ConvertToUtc((DateTime) e[sAttributeName]);
+                        cachedEntity[sAttributeName] = ConvertToUtc((DateTime)e[sAttributeName]);
                     }
                     else
                     {
@@ -359,7 +352,7 @@ namespace FakeXrmEasy
 
             if (usePluginPipeline)
             {
-                ExecutePipelineStage("Create", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);               
+                ExecutePipelineStage("Create", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);
             }
 
             // Store
@@ -440,7 +433,7 @@ namespace FakeXrmEasy
                 }
             }
 
-            
+
         }
 
         protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
@@ -468,7 +461,7 @@ namespace FakeXrmEasy
                     if (attributeFound != null)
                         return true;
 
-                    if(attributeFound == null && EntityMetadata.ContainsKey(sEntityName))
+                    if (attributeFound == null && EntityMetadata.ContainsKey(sEntityName))
                     {
                         //Try with metadata
                         return AttributeExistsInInjectedMetadata(sEntityName, sAttributeName);
@@ -482,7 +475,7 @@ namespace FakeXrmEasy
                 return false;
             }
 
-            if(EntityMetadata.ContainsKey(sEntityName))
+            if (EntityMetadata.ContainsKey(sEntityName))
             {
                 //Try with metadata
                 return AttributeExistsInInjectedMetadata(sEntityName, sAttributeName);
