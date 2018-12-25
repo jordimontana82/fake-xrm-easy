@@ -507,6 +507,11 @@ namespace FakeXrmEasy.Extensions
             }
         }
 
+        /// <summary>
+        /// ToEntityReference implementation which converts an entity into an entity reference with key attribute info as well
+        /// </summary>
+        /// <param name="e">Entity to convert to an Entity Reference</param>
+        /// <returns></returns>
         public static EntityReference ToEntityReferenceWithKeyAttributes(this Entity e)
         {
             var result = e.ToEntityReference();
