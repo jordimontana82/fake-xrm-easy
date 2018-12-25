@@ -1,13 +1,13 @@
 ﻿using FakeItEasy;
+using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xrm.Sdk.Query;
-using System.ServiceModel;
-using Microsoft.Xrm.Sdk.Messages;
-using FakeXrmEasy.Extensions;
 using System.Reflection;
+using System.ServiceModel;
 
 namespace FakeXrmEasy
 {
@@ -15,6 +15,8 @@ namespace FakeXrmEasy
     {
         protected const int EntityActiveStateCode = 0;
         protected const int EntityInactiveStateCode = 1;
+
+        public bool ValidateReferences { get; set; }
 
         #region CRUD
         public Guid GetRecordUniqueId(EntityReference record)
@@ -192,8 +194,17 @@ namespace FakeXrmEasy
                     {
                         cachedEntity[sAttributeName] = ConvertToUtc((DateTime)e[sAttributeName]);
                     }
+
                     else
                     {
+                        if (attribute is EntityReference && ValidateReferences)
+                        {
+                            var target = (EntityReference)e[sAttributeName];
+                            if (!Data.ContainsKey(target.LogicalName) || !Data[target.LogicalName].ContainsKey(target.Id))
+                            {
+                                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{target.LogicalName} With Id = {target.Id:D} Does Not Exist");
+                            }
+                        }
                         cachedEntity[sAttributeName] = attribute;
                     }
                 }
@@ -316,6 +327,17 @@ namespace FakeXrmEasy
             if (CallerId == null)
             {
                 CallerId = new EntityReference("systemuser", Guid.NewGuid()); // Create a new instance by default
+                if (ValidateReferences)
+                {
+                    if (!Data.ContainsKey("systemuser"))
+                    {
+                        Data.Add("systemuser", new Dictionary<Guid, Entity>());
+                    }
+                    if (!Data["systemuser"].ContainsKey(CallerId.Id))
+                    {
+                        Data["systemuser"].Add(CallerId.Id, new Entity("systemuser") { Id = CallerId.Id });
+                    }
+                }
             }
 
             var isManyToManyRelationshipEntity = e.LogicalName != null && this.Relationships.ContainsKey(e.LogicalName);
@@ -451,6 +473,14 @@ namespace FakeXrmEasy
                 if (attribute is DateTime)
                 {
                     e[sAttributeName] = ConvertToUtc((DateTime)e[sAttributeName]);
+                }
+                if (attribute is EntityReference && ValidateReferences)
+                {
+                    var target = (EntityReference)e[sAttributeName];
+                    if (!Data.ContainsKey(target.LogicalName) || !Data[target.LogicalName].ContainsKey(target.Id))
+                    {
+                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{target.LogicalName} With Id = {target.Id:D} Does Not Exist");
+                    }
                 }
             }
 
