@@ -17,7 +17,7 @@ namespace FakeXrmEasy
         protected const int EntityInactiveStateCode = 1;
 
         #region CRUD
-        public Guid RecordUniqueId(EntityReference record)
+        public Guid GetRecordUniqueId(EntityReference record)
         {
             if (string.IsNullOrWhiteSpace(record.LogicalName))
             {
@@ -172,7 +172,7 @@ namespace FakeXrmEasy
                 throw new InvalidOperationException("The entity must not be null");
             }
             e = e.Clone(e.GetType());
-            e.Id = RecordUniqueId(e.toEntityReference());
+            e.Id = GetRecordUniqueId(e.toEntityReference());
 
             // Update specific validations: The entity record must exist in the context
             if (Data.ContainsKey(e.LogicalName) &&
