@@ -1617,15 +1617,15 @@ namespace FakeXrmEasy
                     break;
                 case ConditionOperator.ThisWeek:
                     fromDate = today.ToFirstDayOfDeltaWeek();
-                    toDate = today.ToLastDayOfDeltaWeek();
+                    toDate = today.ToLastDayOfDeltaWeek().AddDays(1);
                     break;
                 case ConditionOperator.LastWeek:
                     fromDate = today.ToFirstDayOfDeltaWeek(-1);
-                    toDate = today.ToLastDayOfDeltaWeek(-1);
+                    toDate = today.ToLastDayOfDeltaWeek(-1).AddDays(1);
                     break;
                 case ConditionOperator.NextWeek:
                     fromDate = today.ToFirstDayOfDeltaWeek(1);
-                    toDate = today.ToLastDayOfDeltaWeek(1);
+                    toDate = today.ToLastDayOfDeltaWeek(1).AddDays(1);
                     break;
             }
 
