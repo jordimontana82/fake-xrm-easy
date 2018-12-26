@@ -36,6 +36,18 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             var service = ctx.GetOrganizationService();
 
+            // generate JobId
+            var jobId = Guid.NewGuid();
+
+            // create related asyncOperation
+            Entity asyncOpertation = new Entity("asyncoperation")
+            {
+                Id = jobId
+            };
+
+            service.Create(asyncOpertation);
+
+            // delete all records from all queries
             foreach (QueryExpression queryExpression in bulkDeleteRequest.QuerySet)
             {
                 EntityCollection recordsToDelete = service.RetrieveMultiple(queryExpression);
@@ -44,13 +56,15 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     service.Delete(record.LogicalName, record.Id);
                 }
             }
-            
-            return new BulkDeleteResponse()
-            {
-                ResponseName = "BulkDeleteResponse"
-            };
-        }
 
+            // set ayncoperation to completed
+            asyncOpertation["statecode"] = new OptionSetValue(3);
+            service.Update(asyncOpertation);
+
+            // return result
+            return new BulkDeleteResponse { ResponseName = "BulkDeleteResponse", ["JobId"] = jobId};
+        }
+         
         public Type GetResponsibleRequestType()
         {
             return typeof(BulkDeleteRequest);

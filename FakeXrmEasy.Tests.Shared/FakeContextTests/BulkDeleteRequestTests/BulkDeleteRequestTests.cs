@@ -140,7 +140,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.BulkDeleteRequestTests
             var request = new BulkDeleteRequest
             {
                 JobName = $"Delete Contacts of Account '{parentAccountId}'",
-                QuerySet = new QueryExpression[]
+                QuerySet = new[]
                 {
                     query
                 },
@@ -150,7 +150,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.BulkDeleteRequestTests
                 RecurrencePattern = string.Empty
             };
 
-            service.Execute(request);
+            var response = (BulkDeleteResponse)service.Execute(request);
 
             // validate
             var deletedContacts = (from c in context.CreateQuery<Contact>()
@@ -159,9 +159,19 @@ namespace FakeXrmEasy.Tests.FakeContextTests.BulkDeleteRequestTests
             var allContacts = (from c in context.CreateQuery<Contact>()
                                select c);
 
+            var asyncOperation = (from a in context.CreateQuery<AsyncOperation>()
+                                  where a.AsyncOperationId == response.JobId
+                                  select a);
+
+            Assert.NotNull(response);
+            Assert.IsType<BulkDeleteResponse>(response);
+            Assert.NotNull(response.JobId);
+            Assert.NotEqual(Guid.Empty, response.JobId);
             Assert.Equal(0, deletedContacts.Count());
             Assert.Equal(1, allContacts.Count());
             Assert.Equal(keepName, allContacts.First().FirstName);
+            Assert.Equal(1, asyncOperation.Count());
+            Assert.Equal(AsyncOperationState.Completed, asyncOperation.First().StateCode);
         }
     }
 }
