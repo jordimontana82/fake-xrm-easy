@@ -15,11 +15,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\DateTimeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityMetadataExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityReferenceExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\QueryExpressionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\XmlExtensionsForFetchXml.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddListMembersListRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\BulkDeleteRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RemoveMembersTeamRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddMembersTeamRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddMemberListRequestExecutor.cs" />
