@@ -1,13 +1,13 @@
 ﻿using FakeItEasy;
+using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xrm.Sdk.Query;
-using System.ServiceModel;
-using Microsoft.Xrm.Sdk.Messages;
-using FakeXrmEasy.Extensions;
 using System.Reflection;
+using System.ServiceModel;
 
 namespace FakeXrmEasy
 {
@@ -15,6 +15,8 @@ namespace FakeXrmEasy
     {
         protected const int EntityActiveStateCode = 0;
         protected const int EntityInactiveStateCode = 1;
+
+        public bool ValidateReferences { get; set; }
 
         #region CRUD
         public Guid GetRecordUniqueId(EntityReference record)
@@ -39,7 +41,7 @@ namespace FakeXrmEasy
             }
 
 #if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
-            if (record.Id == Guid.Empty && record.KeyAttributes.Any())
+            if (record.Id == Guid.Empty && record.HasKeyAttributes())
             {
                 if (EntityMetadata.ContainsKey(record.LogicalName))
                 {
@@ -63,8 +65,8 @@ namespace FakeXrmEasy
                     throw new InvalidOperationException($"The requested key attributes do not exist for the entity {record.LogicalName}");
                 }
             }
-#endif
 
+#endif
             if (record.Id == Guid.Empty)
             {
                 throw new InvalidOperationException("The id must not be empty.");
@@ -192,8 +194,14 @@ namespace FakeXrmEasy
                     {
                         cachedEntity[sAttributeName] = ConvertToUtc((DateTime)e[sAttributeName]);
                     }
+
                     else
                     {
+                        if (attribute is EntityReference && ValidateReferences)
+                        {
+                            var target = (EntityReference)e[sAttributeName];
+                            attribute = ResolveEntityReference(target);
+                        }
                         cachedEntity[sAttributeName] = attribute;
                     }
                 }
@@ -217,6 +225,32 @@ namespace FakeXrmEasy
             }
         }
 
+        protected EntityReference ResolveEntityReference(EntityReference er)
+        {
+            if (!Data.ContainsKey(er.LogicalName) || !Data[er.LogicalName].ContainsKey(er.Id))
+            {
+                if (er.Id == Guid.Empty && er.HasKeyAttributes())
+                {
+                    return ResolveEntityReferenceByAlternateKeys(er);
+                }
+                else
+                {
+                    throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{er.LogicalName} With Id = {er.Id:D} Does Not Exist");
+                }
+            }
+            return er;
+        }
+
+        protected EntityReference ResolveEntityReferenceByAlternateKeys(EntityReference er)
+        {
+            var resolvedId = GetRecordUniqueId(er);
+            
+            return new EntityReference()
+            {
+                LogicalName = er.LogicalName,
+                Id = resolvedId
+            };
+        }
         /// <summary>
         /// Fakes the delete method. Very similar to the Retrieve one
         /// </summary>
@@ -316,6 +350,18 @@ namespace FakeXrmEasy
             if (CallerId == null)
             {
                 CallerId = new EntityReference("systemuser", Guid.NewGuid()); // Create a new instance by default
+                if (ValidateReferences)
+                {
+                    if (!Data.ContainsKey("systemuser"))
+                    {
+                        Data.Add("systemuser", new Dictionary<Guid, Entity>());
+                    }
+                    if (!Data["systemuser"].ContainsKey(CallerId.Id))
+                    {
+                        Data["systemuser"].Add(CallerId.Id, new Entity("systemuser") { Id = CallerId.Id });
+                    }
+                }
+                
             }
 
             var isManyToManyRelationshipEntity = e.LogicalName != null && this.Relationships.ContainsKey(e.LogicalName);
@@ -451,6 +497,11 @@ namespace FakeXrmEasy
                 if (attribute is DateTime)
                 {
                     e[sAttributeName] = ConvertToUtc((DateTime)e[sAttributeName]);
+                }
+                if (attribute is EntityReference && ValidateReferences)
+                {
+                    var target = (EntityReference)e[sAttributeName];
+                    e[sAttributeName] = ResolveEntityReference(target);
                 }
             }
 
