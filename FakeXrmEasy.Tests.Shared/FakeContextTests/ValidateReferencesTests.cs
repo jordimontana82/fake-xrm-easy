@@ -1,7 +1,13 @@
-﻿using Microsoft.Xrm.Sdk;
+﻿using Crm;
+using FakeItEasy;
+using FakeXrmEasy.Extensions;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.ServiceModel;
 using System.Text;
 using Xunit;
@@ -75,6 +81,8 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             Assert.Equal(otherEntity.Id, otherEntityInContext.Id);
         }
 
+        
+
         [Fact]
         public void An_entity_which_references_another_non_existent_entity_can_be_updated_when_validate_is_false()
         {
@@ -137,6 +145,111 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             Assert.Equal(otherEntity.Id, updated.GetAttributeValue<EntityReference>("otherEntity").Id);
             Assert.Equal(otherEntity.Id, otherEntityInContext.Id);
+        }
+
+        [Fact]
+        public void An_entity_which_references_another_existent_entity_by_alternate_key_can_be_created_when_validate_is_true()
+        {
+            var context = new XrmFakedContext();
+            context.ValidateReferences = true;
+            IOrganizationService service = context.GetOrganizationService();
+
+            var accountMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityMetadata();
+            accountMetadata.LogicalName = Account.EntityLogicalName;
+            var alternateKeyMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata();
+            alternateKeyMetadata.KeyAttributes = new string[] { "alternateKey" };
+            accountMetadata.SetFieldValue("_keys", new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata[]
+                 {
+                 alternateKeyMetadata
+                 });
+            context.InitializeMetadata(accountMetadata);
+            var account = new Entity(Account.EntityLogicalName);
+            account.Id = Guid.NewGuid();
+            account.Attributes.Add("alternateKey", "keyValue");
+            context.Initialize(new List<Entity>() { account });
+
+            Entity otherEntity = new Entity("otherEntity");
+            otherEntity.Id = Guid.NewGuid();
+            otherEntity["new_accountId"] = new EntityReference("account", "alternateKey","keyValue") ;
+            Guid created = service.Create(otherEntity);
+
+            Entity otherEntityInContext = service.Retrieve("otherEntity", otherEntity.Id, new ColumnSet(true));
+
+            Assert.NotEqual(Guid.Empty, created);
+            Assert.Equal(((EntityReference)otherEntityInContext["new_accountId"]).Id, account.Id);
+        }
+
+        [Fact]
+        public void An_entity_which_references_another_existent_entity_by_alternate_key_can_be_initialised_when_validate_is_true()
+        {
+            var context = new XrmFakedContext();
+            context.ValidateReferences = true;
+            IOrganizationService service = context.GetOrganizationService();
+
+            var accountMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityMetadata();
+            accountMetadata.LogicalName = Account.EntityLogicalName;
+            var alternateKeyMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata();
+            alternateKeyMetadata.KeyAttributes = new string[] { "alternateKey" };
+            accountMetadata.SetFieldValue("_keys", new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata[]
+                 {
+                 alternateKeyMetadata
+                 });
+            context.InitializeMetadata(accountMetadata);
+            var account = new Entity(Account.EntityLogicalName);
+            account.Id = Guid.NewGuid();
+            account.Attributes.Add("alternateKey", "keyValue");
+
+            Entity otherEntity = new Entity("otherEntity");
+            otherEntity.Id = Guid.NewGuid();
+            otherEntity["new_accountId"] = new EntityReference("account", "alternateKey", "keyValue");
+
+            context.Initialize(new List<Entity>() { account, otherEntity });
+
+            Entity otherEntityInContext = service.Retrieve("otherEntity", otherEntity.Id, new ColumnSet(true));
+
+            Assert.Equal(((EntityReference)otherEntityInContext["new_accountId"]).Id, account.Id);
+        }
+
+        [Fact]
+        public void An_entity_which_references_another_existent_entity_by_alternate_key_can_be_updated_when_validate_is_true()
+        {
+            var context = new XrmFakedContext();
+            context.ValidateReferences = true;
+            IOrganizationService service = context.GetOrganizationService();
+
+            var accountMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityMetadata();
+            accountMetadata.LogicalName = Account.EntityLogicalName;
+            var alternateKeyMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata();
+            alternateKeyMetadata.KeyAttributes = new string[] { "alternateKey" };
+            accountMetadata.SetFieldValue("_keys", new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata[]
+                 {
+                 alternateKeyMetadata
+                 });
+            context.InitializeMetadata(accountMetadata);
+            var account = new Entity(Account.EntityLogicalName);
+            account.Id = Guid.NewGuid();
+            account.Attributes.Add("alternateKey", "keyValue");
+
+            var account2 = new Entity(Account.EntityLogicalName);
+            account2.Id = Guid.NewGuid();
+            account2.Attributes.Add("alternateKey", "keyValue2");
+
+            Entity otherEntity = new Entity("otherEntity");
+            otherEntity.Id = Guid.NewGuid();
+            otherEntity["new_accountId"] = new EntityReference("account", "alternateKey", "keyValue");
+
+            context.Initialize(new List<Entity>() { account, account2, otherEntity });
+
+            var entityToUpdate = new Entity("otherEntity")
+            {
+                Id = otherEntity.Id,
+                ["new_accountId"] = new EntityReference("account", "alternateKey", "keyValue2")
+            };
+            service.Update(entityToUpdate);
+
+            Entity otherEntityInContext = service.Retrieve("otherEntity", otherEntity.Id, new ColumnSet(true));
+
+            Assert.Equal(((EntityReference)otherEntityInContext["new_accountId"]).Id, account2.Id);
         }
     }
 }

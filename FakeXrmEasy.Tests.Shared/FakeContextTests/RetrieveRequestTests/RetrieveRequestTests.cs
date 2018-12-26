@@ -36,7 +36,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
 
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             fakedContext.Initialize(new[] { account1, account2, account3 });
 

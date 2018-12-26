@@ -41,7 +41,7 @@ namespace FakeXrmEasy
             }
 
 #if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
-            if (record.Id == Guid.Empty && record.KeyAttributes.Any())
+            if (record.Id == Guid.Empty && record.HasKeyAttributes())
             {
                 if (EntityMetadata.ContainsKey(record.LogicalName))
                 {
@@ -65,8 +65,8 @@ namespace FakeXrmEasy
                     throw new InvalidOperationException($"The requested key attributes do not exist for the entity {record.LogicalName}");
                 }
             }
-#endif
 
+#endif
             if (record.Id == Guid.Empty)
             {
                 throw new InvalidOperationException("The id must not be empty.");
@@ -200,10 +200,7 @@ namespace FakeXrmEasy
                         if (attribute is EntityReference && ValidateReferences)
                         {
                             var target = (EntityReference)e[sAttributeName];
-                            if (!Data.ContainsKey(target.LogicalName) || !Data[target.LogicalName].ContainsKey(target.Id))
-                            {
-                                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{target.LogicalName} With Id = {target.Id:D} Does Not Exist");
-                            }
+                            attribute = ResolveEntityReference(target);
                         }
                         cachedEntity[sAttributeName] = attribute;
                     }
@@ -228,6 +225,32 @@ namespace FakeXrmEasy
             }
         }
 
+        protected EntityReference ResolveEntityReference(EntityReference er)
+        {
+            if (!Data.ContainsKey(er.LogicalName) || !Data[er.LogicalName].ContainsKey(er.Id))
+            {
+                if (er.Id == Guid.Empty && er.HasKeyAttributes())
+                {
+                    return ResolveEntityReferenceByAlternateKeys(er);
+                }
+                else
+                {
+                    throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{er.LogicalName} With Id = {er.Id:D} Does Not Exist");
+                }
+            }
+            return er;
+        }
+
+        protected EntityReference ResolveEntityReferenceByAlternateKeys(EntityReference er)
+        {
+            var resolvedId = GetRecordUniqueId(er);
+            
+            return new EntityReference()
+            {
+                LogicalName = er.LogicalName,
+                Id = resolvedId
+            };
+        }
         /// <summary>
         /// Fakes the delete method. Very similar to the Retrieve one
         /// </summary>
@@ -338,6 +361,7 @@ namespace FakeXrmEasy
                         Data["systemuser"].Add(CallerId.Id, new Entity("systemuser") { Id = CallerId.Id });
                     }
                 }
+                
             }
 
             var isManyToManyRelationshipEntity = e.LogicalName != null && this.Relationships.ContainsKey(e.LogicalName);
@@ -477,10 +501,7 @@ namespace FakeXrmEasy
                 if (attribute is EntityReference && ValidateReferences)
                 {
                     var target = (EntityReference)e[sAttributeName];
-                    if (!Data.ContainsKey(target.LogicalName) || !Data[target.LogicalName].ContainsKey(target.Id))
-                    {
-                        throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{target.LogicalName} With Id = {target.Id:D} Does Not Exist");
-                    }
+                    e[sAttributeName] = ResolveEntityReference(target);
                 }
             }
 
