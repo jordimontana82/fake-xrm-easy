@@ -3,6 +3,7 @@ using FakeItEasy;
 using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
+using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
@@ -369,6 +370,33 @@ namespace FakeXrmEasy.Tests
             service.Update(accountToUpdate);
             var updatedAccount = context.CreateQuery<Account>().FirstOrDefault();
             Assert.Equal(1, (int)updatedAccount.StateCode.Value);
+        }
+
+        [Fact]
+        public void Should_Return_Updated_EntityReference_Name()
+        {
+            var userMetadata = new EntityMetadata() { LogicalName = "systemuser" };
+            userMetadata.SetSealedPropertyValue("PrimaryNameAttribute", "fullname");
+
+            var user = new Entity() { LogicalName = "systemuser", Id = Guid.NewGuid() };
+            user["fullname"] = "Fake XrmEasy";
+
+            var context = new XrmFakedContext();
+            context.InitializeMetadata(userMetadata);
+            context.Initialize(user);
+            context.CallerId = user.ToEntityReference();
+
+            var account = new Entity() { LogicalName = "account" };
+
+            var service = context.GetOrganizationService();
+            var accountId = service.Create(account);
+
+            user["fullname"] = "Good Job";
+            service.Update(user);
+
+            account = service.Retrieve("account", accountId, new ColumnSet(true));
+
+            Assert.Equal("Good Job", account.GetAttributeValue<EntityReference>("ownerid").Name);
         }
     }
 }

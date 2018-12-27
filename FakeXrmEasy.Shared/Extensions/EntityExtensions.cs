@@ -155,7 +155,7 @@ namespace FakeXrmEasy.Extensions
 
                     if (e.Attributes.ContainsKey(attKey) && e.Attributes[attKey] != null)
                     {
-                        projected[attKey] = CloneAttribute(e[attKey]);
+                        projected[attKey] = CloneAttribute(e[attKey], context);
 
                         string formattedValue = "";
 
@@ -181,7 +181,7 @@ namespace FakeXrmEasy.Extensions
             }
         }
 
-        public static object CloneAttribute(object attributeValue)
+        public static object CloneAttribute(object attributeValue, XrmFakedContext context = null)
         {
             if (attributeValue == null)
                 return null;
@@ -197,7 +197,16 @@ namespace FakeXrmEasy.Extensions
             {
                 var original = (attributeValue as EntityReference);
                 var clone = new EntityReference(original.LogicalName, original.Id);
-                clone.Name = CloneAttribute(original.Name) as string;
+
+                if (context != null && !string.IsNullOrEmpty(original.LogicalName) && context.EntityMetadata.ContainsKey(original.LogicalName) && !string.IsNullOrEmpty(context.EntityMetadata[original.LogicalName].PrimaryNameAttribute) &&
+                    context.Data.ContainsKey(original.LogicalName) && context.Data[original.LogicalName].ContainsKey(original.Id))
+                {
+                    clone.Name = context.Data[original.LogicalName][original.Id].GetAttributeValue<string>(context.EntityMetadata[original.LogicalName].PrimaryNameAttribute);
+                }
+                else
+                {
+                    clone.Name = CloneAttribute(original.Name) as string;
+                }
 
 #if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
                 if (original.KeyAttributes != null)
@@ -206,7 +215,7 @@ namespace FakeXrmEasy.Extensions
                     clone.KeyAttributes.AddRange(original.KeyAttributes.Select(kvp => new KeyValuePair<string, object>(CloneAttribute(kvp.Key) as string, kvp.Value)).ToArray());
                 }
 #endif
-                    return clone;
+                return clone;
             }
             else if (type == typeof(BooleanManagedProperty))
             {
@@ -279,7 +288,7 @@ namespace FakeXrmEasy.Extensions
             throw new Exception(string.Format("Attribute type not supported when trying to clone attribute '{0}'", type.ToString()));
         }
 
-        public static Entity Clone(this Entity e)
+        public static Entity Clone(this Entity e, XrmFakedContext context = null)
         {
             var cloned = new Entity(e.LogicalName);
             cloned.Id = e.Id;
@@ -296,7 +305,7 @@ namespace FakeXrmEasy.Extensions
 
             foreach (var attKey in e.Attributes.Keys)
             {
-                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
+                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey], context) : null;
             }
 #if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
             foreach (var attKey in e.KeyAttributes.Keys)
@@ -312,10 +321,10 @@ namespace FakeXrmEasy.Extensions
             return (T)e.Clone(typeof(T));
         }
 
-        public static Entity Clone(this Entity e, Type t)
+        public static Entity Clone(this Entity e, Type t, XrmFakedContext context = null)
         {
             if (t == null)
-                return e.Clone();
+                return e.Clone(context);
 
             var cloned = Activator.CreateInstance(t) as Entity;
             cloned.Id = e.Id;
@@ -334,7 +343,7 @@ namespace FakeXrmEasy.Extensions
             {
                 if (e[attKey] != null)
                 {
-                    cloned[attKey] = CloneAttribute(e[attKey]);
+                    cloned[attKey] = CloneAttribute(e[attKey], context);
                 }
             }
 
@@ -529,6 +538,6 @@ namespace FakeXrmEasy.Extensions
             return result;
         }
 
-        
+
     }
 }

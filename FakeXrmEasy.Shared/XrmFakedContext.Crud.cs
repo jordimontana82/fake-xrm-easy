@@ -124,7 +124,7 @@ namespace FakeXrmEasy
                         && context.Data[entityName].ContainsKey(id))
                     {
                         //Entity found => return only the subset of columns specified or all of them
-                        var foundEntity = context.Data[entityName][id].Clone(reflectedType);
+                        var foundEntity = context.Data[entityName][id].Clone(reflectedType, context);
                         if (columnSet.AllColumns)
                         {
                             foundEntity.ApplyDateBehaviour(context);
@@ -244,7 +244,7 @@ namespace FakeXrmEasy
         protected EntityReference ResolveEntityReferenceByAlternateKeys(EntityReference er)
         {
             var resolvedId = GetRecordUniqueId(er);
-            
+
             return new EntityReference()
             {
                 LogicalName = er.LogicalName,
@@ -361,7 +361,7 @@ namespace FakeXrmEasy
                         Data["systemuser"].Add(CallerId.Id, new Entity("systemuser") { Id = CallerId.Id });
                     }
                 }
-                
+
             }
 
             var isManyToManyRelationshipEntity = e.LogicalName != null && this.Relationships.ContainsKey(e.LogicalName);
