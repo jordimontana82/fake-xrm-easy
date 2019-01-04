@@ -62,6 +62,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     qe.Criteria.AddCondition(new ConditionExpression(query.Attributes[i], ConditionOperator.Equal, query.Values[i]));
                 }
 
+                qe.PageInfo = query.PageInfo;
+
                 // QueryExpression now done... execute it!
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();
@@ -80,6 +82,13 @@ namespace FakeXrmEasy.FakeMessageExecutors
             if (qe.TopCount != null && qe.TopCount.Value < list.Count)
             {
                 list = list.Take(qe.TopCount.Value).ToList();
+            }
+
+            // Handle TotalRecordCount here?
+            int totalRecordCount = -1;
+            if (qe?.PageInfo?.ReturnTotalRecordCount == true)
+            {
+                totalRecordCount = list.Count;
             }
 
             // Handle paging
@@ -124,6 +133,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             };
             response.EntityCollection.EntityName = entityName;
             response.EntityCollection.MoreRecords = (list.Count - pageSize * pageNumber) > 0;
+            response.EntityCollection.TotalRecordCount = totalRecordCount;
 
             if (response.EntityCollection.MoreRecords)
             {

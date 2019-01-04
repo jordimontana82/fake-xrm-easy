@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
 {
@@ -17,7 +16,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         public void TestPaging()
         {
             XrmFakedContext context = new XrmFakedContext();
-            IOrganizationService service =  context.GetOrganizationService();
+            IOrganizationService service = context.GetOrganizationService();
             List<Entity> initialEntities = new List<Entity>();
             int excessNumberOfRecords = 50;
 
@@ -61,7 +60,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         public void TestTop()
         {
             XrmFakedContext context = new XrmFakedContext();
-            IOrganizationService service =  context.GetOrganizationService();
+            IOrganizationService service = context.GetOrganizationService();
             List<Entity> initialEntities = new List<Entity>();
 
             for (int i = 0; i < 10; i++)
@@ -86,7 +85,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         public void TestEmptyResultSet()
         {
             XrmFakedContext context = new XrmFakedContext();
-            IOrganizationService service =  context.GetOrganizationService();
+            IOrganizationService service = context.GetOrganizationService();
             List<Entity> initialEntities = new List<Entity>();
 
             Entity e = new Entity("entity");
@@ -110,7 +109,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         public void TestMultiplePagesWithLinkedEntity()
         {
             XrmFakedContext context = new XrmFakedContext();
-            IOrganizationService service =  context.GetOrganizationService();
+            IOrganizationService service = context.GetOrganizationService();
             List<Entity> initialEntities = new List<Entity>();
             int excessNumberOfRecords = 50;
 
@@ -155,7 +154,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         public void TestLinkCriteriaAreNotChanged()
         {
             XrmFakedContext context = new XrmFakedContext();
-            IOrganizationService service =  context.GetOrganizationService();
+            IOrganizationService service = context.GetOrganizationService();
             List<Entity> initialEntities = new List<Entity>();
 
             Entity second = new Entity("second");
@@ -186,7 +185,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         public void TestAskingForEmptyPage()
         {
             XrmFakedContext context = new XrmFakedContext();
-            IOrganizationService service =  context.GetOrganizationService();
+            IOrganizationService service = context.GetOrganizationService();
             List<Entity> initialEntities = new List<Entity>();
 
             Entity first = new Entity("entity");
@@ -207,7 +206,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         public void TestThatDistinctWorks()
         {
             XrmFakedContext context = new XrmFakedContext();
-            IOrganizationService service =  context.GetOrganizationService();
+            IOrganizationService service = context.GetOrganizationService();
             List<Entity> initialEntities = new List<Entity>();
 
             Entity first = new Entity("entity");
@@ -249,7 +248,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         public void TestThatDistinctWorksWithLinkEntityFields()
         {
             XrmFakedContext context = new XrmFakedContext();
-            IOrganizationService service =  context.GetOrganizationService();
+            IOrganizationService service = context.GetOrganizationService();
             List<Entity> initialEntities = new List<Entity>();
 
             Entity first = new Entity("entity");
@@ -320,6 +319,45 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
             Assert.Equal(2, result.Entities.Count);
             Assert.Equal(2, result.TotalRecordCount);
             Assert.False(result.MoreRecords);
+        }
+
+        /// <summary>
+        /// Tests that if PageInfo's ReturnTotalRecordCount works correctly with paging 
+        /// </summary>
+        [Fact]
+        public void TestThatPageInfoTotalRecordCountWorksWithPaging()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            for (int i = 0; i < 100; i++)
+            {
+                Entity e = new Entity("entity");
+                e.Id = Guid.NewGuid();
+                initialEntities.Add(e);
+            }
+
+            context.Initialize(initialEntities);
+
+            QueryExpression query = new QueryExpression("entity");
+            query.PageInfo.ReturnTotalRecordCount = true;
+            query.PageInfo.PageNumber = 1;
+            query.PageInfo.Count = 10;
+
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(10, result.Entities.Count);
+            Assert.Equal(100, result.TotalRecordCount);
+            Assert.True(result.MoreRecords);
+
+            query.PageInfo.PageNumber++;
+            query.PageInfo.Count = 20;
+            query.PageInfo.PagingCookie = result.PagingCookie;
+
+            result = service.RetrieveMultiple(query);
+            Assert.Equal(20, result.Entities.Count);
+            Assert.Equal(100, result.TotalRecordCount);
+            Assert.True(result.MoreRecords);
         }
     }
 }
