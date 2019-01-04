@@ -30,7 +30,7 @@ namespace FakeXrmEasy
         public bool IsExecutingOffline { get; set; }
 
         [DataMember(Order = 7)]
-        public bool IsInTransaction => Stage == 20 || Stage == 40;
+        public bool IsInTransaction { get; set; }
 
         [DataMember(Order = 8)]
         public bool IsOfflinePlayback { get; set; }
