@@ -13,6 +13,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
             return request.GetType().Equals(GetResponsibleRequestType());
         }
 
+     
+
         public OrganizationResponse Execute(OrganizationRequest req, XrmFakedContext context)
         {
             var request = req as RetrieveRequest;
@@ -23,7 +25,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
 
             var service = context.GetOrganizationService();
-            var resultEntity = service.Retrieve(request.Target.LogicalName, request.Target.Id, request.ColumnSet);
+            var targetId = context.GetRecordUniqueId(request.Target);
+            var resultEntity = service.Retrieve(request.Target.LogicalName, targetId, request.ColumnSet);
             resultEntity.ApplyDateBehaviour(context);
 
             if (request.RelatedEntitiesQuery != null && request.RelatedEntitiesQuery.Count > 0)
@@ -75,9 +78,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                             retrieveRelatedEntitiesQuery.Criteria
                                 .AddFilter(LogicalOperator.And)
                                 .AddCondition(linkEntity.LinkFromAttributeName, ConditionOperator.Equal, resultEntity.Id);
-                        } else {
+                        }
+                        else
+                        {
                             var link = retrieveRelatedEntitiesQuery.AddLink(fakeRelationship.Entity1LogicalName, fakeRelationship.Entity2Attribute, fakeRelationship.Entity1Attribute);
-                            link.LinkCriteria.AddCondition(resultEntity.LogicalName+"id", ConditionOperator.Equal, resultEntity.Id);
+                            link.LinkCriteria.AddCondition(resultEntity.LogicalName + "id", ConditionOperator.Equal, resultEntity.Id);
                         }
                     }
                     else

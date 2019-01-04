@@ -1,6 +1,8 @@
 ﻿using Crm;
+using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
+using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
@@ -135,5 +137,40 @@ namespace FakeXrmEasy.Tests
                 Assert.Null(retrievedAccount);
             }
         }
+
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
+        [Fact]
+        public void When_delete_is_invoked_with_an_existing_entity_by_alternate_key_that_entity_is_delete_from_the_context()
+        {
+            var context = new XrmFakedContext();
+
+            var accountMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityMetadata();
+            accountMetadata.LogicalName = Account.EntityLogicalName;
+            var alternateKeyMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata();
+            alternateKeyMetadata.KeyAttributes = new string[] { "AccountNumber" };
+            accountMetadata.SetFieldValue("_keys", new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata[]
+                 {
+                 alternateKeyMetadata
+                 });
+            context.InitializeMetadata(accountMetadata);
+
+            //Initialize the context with a single entity
+            var account = new Entity("account");
+            account.Id = Guid.NewGuid();
+            account.Attributes.Add("AccountNumber", 9000);
+
+            context.Initialize(account);
+
+            var service = context.GetOrganizationService();
+            var delete = new DeleteRequest
+            {
+                Target = new EntityReference("account", "AccountNumber", 9000)
+            };
+            service.Execute(delete);
+
+            Assert.True(context.Data["account"].Count == 0);
+        }
+#endif
+
     }
 }

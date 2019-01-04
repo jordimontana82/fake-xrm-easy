@@ -15,7 +15,6 @@ using FakeXrmEasy.OrganizationFaults;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Query;
-using Microsoft.Xrm.Sdk.Workflow;
 
 namespace FakeXrmEasy
 {
@@ -746,6 +745,15 @@ namespace FakeXrmEasy
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
 
+                case ConditionOperator.ThisYear:
+                case ConditionOperator.LastYear:
+                case ConditionOperator.NextYear:
+                case ConditionOperator.ThisMonth:
+                case ConditionOperator.LastMonth:
+                case ConditionOperator.NextMonth:
+                    operatorExpression = TranslateConditionExpressionBetweenDates(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
 #if FAKE_XRM_EASY_9
                 case ConditionOperator.ContainValues:
                     operatorExpression = TranslateConditionExpressionContainValues(c, getNonBasicValueExpr, containsAttributeExpression);
@@ -1382,7 +1390,7 @@ namespace FakeXrmEasy
 
         protected static Expression TranslateConditionExpressionGreaterThanOrEqual(XrmFakedContext context, TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
-            var c = tc.CondExpression;
+            //var c = tc.CondExpression;
 
             return Expression.Or(
                                 TranslateConditionExpressionEqual(context, tc, getAttributeValueExpr, containsAttributeExpr),
@@ -1455,7 +1463,7 @@ namespace FakeXrmEasy
 
         protected static Expression TranslateConditionExpressionLessThanOrEqual(XrmFakedContext context, TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
-            var c = tc.CondExpression;
+            //var c = tc.CondExpression;
 
             return Expression.Or(
                                 TranslateConditionExpressionEqual(context, tc, getAttributeValueExpr, containsAttributeExpr),
@@ -1546,6 +1554,58 @@ namespace FakeXrmEasy
 
             c.Values.Add(beforeDateTime);
             c.Values.Add(currentDateTime);
+
+            return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
+        }
+
+        /// <summary>
+        /// Takes a condition expression which needs translating into a 'between two dates' expression and works out the relevant dates
+        /// </summary>        
+        protected static Expression TranslateConditionExpressionBetweenDates(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
+            DateTime? fromDate = null;
+            DateTime? toDate = null;
+
+            var today = DateTime.Today;
+            var thisYear = today.Year;
+            var thisMonth = today.Month;
+
+
+            switch (c.Operator)
+            {
+                case ConditionOperator.ThisYear: // From first day of this year to last day of this year
+                    fromDate = new DateTime(thisYear, 1, 1);
+                    toDate = new DateTime(thisYear, 12, 31);
+                    break;                
+                case ConditionOperator.LastYear: // From first day of last year to last day of last year
+                    fromDate = new DateTime(thisYear - 1, 1, 1);
+                    toDate = new DateTime(thisYear - 1, 12, 31);
+                    break;
+                case ConditionOperator.NextYear: // From first day of next year to last day of next year
+                    fromDate = new DateTime(thisYear + 1, 1, 1);
+                    toDate = new DateTime(thisYear + 1, 12, 31);
+                    break;
+                case ConditionOperator.ThisMonth: // From first day of this month to last day of this month                    
+                    fromDate = new DateTime(thisYear, thisMonth, 1);
+                    // Last day of this month: Add one month to the first of this month, and then remove one day
+                    toDate = new DateTime(thisYear, thisMonth, 1).AddMonths(1).AddDays(-1);
+                    break;
+                case ConditionOperator.LastMonth: // From first day of last month to last day of last month                    
+                    fromDate = new DateTime(thisYear, thisMonth, 1).AddMonths(-1);
+                    // Last day of last month: One day before the first of this month
+                    toDate = new DateTime(thisYear, thisMonth, 1).AddDays(-1);
+                    break;
+                case ConditionOperator.NextMonth: // From first day of next month to last day of next month
+                    fromDate = new DateTime(thisYear, thisMonth, 1).AddMonths(1);
+                    // LAst day of Next Month: Add two months to the first of this month, and then go back one day
+                    toDate = new DateTime(thisYear, thisMonth, 1).AddMonths(2).AddDays(-1);
+                    break;
+            }
+
+            c.Values.Add(fromDate);
+            c.Values.Add(toDate);
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
@@ -1935,8 +1995,8 @@ namespace FakeXrmEasy
             }
 
             c.Values[0] = (currentDateTime);
-            c.Values.Add(nextDateTime);
-            c.Values.Add(numberOfWeeks);
+            c.Values.Add(nextDateTime);            
+            // c.Values.Add(numberOfWeeks);
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }

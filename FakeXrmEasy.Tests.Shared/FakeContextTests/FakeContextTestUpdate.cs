@@ -1,5 +1,6 @@
 ﻿using Crm;
 using FakeItEasy;
+using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Query;
@@ -18,7 +19,7 @@ namespace FakeXrmEasy.Tests
         public void When_a_null_entity_is_updated_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var ex = Assert.Throws<InvalidOperationException>(() => service.Update(null));
             Assert.Equal(ex.Message, "The entity must not be null");
@@ -28,24 +29,25 @@ namespace FakeXrmEasy.Tests
         public void When_an_entity_is_updated_with_an_empty_guid_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
+            context.Initialize(new Entity("account") { Id = Guid.NewGuid() });
 
             var e = new Entity("account") { Id = Guid.Empty };
 
             var ex = Assert.Throws<InvalidOperationException>(() => service.Update(e));
-            Assert.Equal(ex.Message, "The Id property must not be empty");
+            Assert.Equal("The id must not be empty.", ex.Message);
         }
 
         [Fact]
         public void When_an_entity_is_updated_with_an_empty_logical_name_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var e = new Entity("") { Id = Guid.NewGuid() };
 
             var ex = Assert.Throws<InvalidOperationException>(() => service.Update(e));
-            Assert.Equal(ex.Message, "The LogicalName property must not be empty");
+            Assert.Equal("The entity logical name must not be null or empty.", ex.Message);
         }
 
         [Fact]
@@ -67,6 +69,39 @@ namespace FakeXrmEasy.Tests
 
             Assert.Equal(context.Data["account"][guid]["name"], "After update");
         }
+
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
+        [Fact]
+        public void When_updating_an_entity_by_alternate_key_the_context_should_reflect_changes()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            var accountMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityMetadata();
+            accountMetadata.LogicalName = Account.EntityLogicalName;
+            var alternateKeyMetadata = new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata();
+            alternateKeyMetadata.KeyAttributes = new string[] { "AccountNumber" };
+            accountMetadata.SetFieldValue("_keys", new Microsoft.Xrm.Sdk.Metadata.EntityKeyMetadata[]
+                 {
+                 alternateKeyMetadata
+                 });
+            context.InitializeMetadata(accountMetadata);
+
+            var e = new Entity("account");
+            e["AccountNumber"] = 9000;
+            e["name"] = "Before update";
+            var guid = service.Create(e);
+
+            Assert.Equal(context.Data["account"][guid]["name"], "Before update");
+
+            //now update the name
+            e = new Entity("account", "AccountNumber", 9000);
+            e["name"] = "After update";
+            service.Update(e);
+
+            Assert.Equal(context.Data["account"][guid]["name"], "After update");
+        }
+#endif
 
 #if FAKE_XRM_EASY_9
         [Fact]
@@ -151,7 +186,7 @@ namespace FakeXrmEasy.Tests
                 existingAccount, otherExistingAccount
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             //Create a new entity class to update the first account
             var accountToUpdate = new Account() { Id = existingAccount.Id };
@@ -178,7 +213,8 @@ namespace FakeXrmEasy.Tests
                 existingAccount
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
+
 
             using (var ctx = new OrganizationServiceContext(service))
             {
@@ -323,7 +359,8 @@ namespace FakeXrmEasy.Tests
                 }
             });
 
-            var accountToUpdate = new Account() {
+            var accountToUpdate = new Account()
+            {
                 Id = entityId,
                 Name = "FC Barcelona",
                 ["statecode"] = new OptionSetValue(1)
@@ -331,7 +368,7 @@ namespace FakeXrmEasy.Tests
 
             service.Update(accountToUpdate);
             var updatedAccount = context.CreateQuery<Account>().FirstOrDefault();
-            Assert.Equal(1, (int) updatedAccount.StateCode.Value);
+            Assert.Equal(1, (int)updatedAccount.StateCode.Value);
         }
     }
 }
