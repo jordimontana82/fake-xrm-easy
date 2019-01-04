@@ -30,7 +30,14 @@ namespace FakeXrmEasy
         public bool IsExecutingOffline { get; set; }
 
         [DataMember(Order = 7)]
-        public bool IsInTransaction { get; set; }
+        public bool IsInTransaction
+        {
+            get
+            {
+                return Stage == (int)ProcessingStepStage.Preoperation || Stage == (int)ProcessingStepStage.Postoperation && Mode == (int)ProcessingStepMode.Synchronous;
+            }
+            set {  /* This property is writable only to correctly support serialization/deserialization */ }
+        }
 
         [DataMember(Order = 8)]
         public bool IsOfflinePlayback { get; set; }
