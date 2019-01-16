@@ -481,6 +481,7 @@ namespace FakeXrmEasy
 
             query.PageInfo.Count = xlDoc.ToCount() ?? 0;
             query.PageInfo.PageNumber = xlDoc.ToPageNumber() ?? 1;
+            query.PageInfo.ReturnTotalRecordCount = xlDoc.ToReturnTotalRecordCount();
 
             var linkedEntities = xlDoc.ToLinkEntities(context);
             foreach (var le in linkedEntities)
