@@ -32,7 +32,8 @@ namespace FakeXrmEasy.Tests
         public void When_retrieve_is_invoked_with_an_empty_guid_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            context.Initialize(new Entity() { LogicalName = "account", Id = Guid.NewGuid() });
+            var service = context.GetOrganizationService();
 
             var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("account", Guid.Empty, new ColumnSet()));
             Assert.Equal(ex.Message, "The id must not be empty.");
@@ -42,10 +43,12 @@ namespace FakeXrmEasy.Tests
         public void When_retrieve_is_invoked_with_a_null_columnset_exception_is_thrown()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var account = new Entity() { LogicalName = "account", Id = Guid.NewGuid() };
+            context.Initialize(account);
+            var service = context.GetOrganizationService();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("account", Guid.NewGuid(), null));
-            Assert.Equal(ex.Message, "The columnset parameter must not be null.");
+            var ex = Assert.Throws<FaultException>(() => service.Retrieve("account", account.Id, null));
+            Assert.Equal("Something unexpected happened.", ex.Message);
         }
 
         [Fact]
@@ -53,10 +56,10 @@ namespace FakeXrmEasy.Tests
         {
             var context = new XrmFakedContext();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("account", Guid.NewGuid(), null));
-            Assert.Equal(ex.Message, "The columnset parameter must not be null.");
+            var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("account", Guid.NewGuid(), new ColumnSet(true)));
+            Assert.Equal("The entity logical name account is not valid.", ex.Message);
         }
 
         [Fact]
