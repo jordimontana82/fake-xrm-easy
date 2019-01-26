@@ -449,7 +449,7 @@ namespace FakeXrmEasy
                 int result = 0;
                 foreach (IComparable x in obj)
                 {
-                    result |= x == null ? 0 : x.GetHashCode();
+                    result ^= x == null ? 0 : x.GetHashCode();
                 }
                 return result;
             }
@@ -489,7 +489,7 @@ namespace FakeXrmEasy
 
             public override int GetHashCode()
             {
-                return (entityReference.LogicalName == null ? 0 : entityReference.LogicalName.GetHashCode()) | entityReference.Id.GetHashCode();
+                return (entityReference.LogicalName == null ? 0 : entityReference.LogicalName.GetHashCode()) ^ entityReference.Id.GetHashCode();
             }
         }
 
