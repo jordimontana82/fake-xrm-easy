@@ -206,7 +206,7 @@ namespace FakeXrmEasy.Extensions
                     clone.KeyAttributes.AddRange(original.KeyAttributes.Select(kvp => new KeyValuePair<string, object>(CloneAttribute(kvp.Key) as string, kvp.Value)).ToArray());
                 }
 #endif
-                    return clone;
+                return clone;
             }
             else if (type == typeof(BooleanManagedProperty))
             {
@@ -332,10 +332,7 @@ namespace FakeXrmEasy.Extensions
 
             foreach (var attKey in e.Attributes.Keys)
             {
-                if (e[attKey] != null)
-                {
-                    cloned[attKey] = CloneAttribute(e[attKey]);
-                }
+                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
             }
 
 #if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
@@ -529,6 +526,6 @@ namespace FakeXrmEasy.Extensions
             return result;
         }
 
-        
+
     }
 }
