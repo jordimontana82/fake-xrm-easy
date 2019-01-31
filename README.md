@@ -64,3 +64,4 @@ FetchXml implementation:
 ## Tests disappeared?
 
 Try deleting anything under the VS test explorer cache: `%Temp%\VisualStudioTestExplorerExtensions`
+
