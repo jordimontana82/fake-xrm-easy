@@ -94,7 +94,7 @@ namespace FakeXrmEasy
 
             return context;
         }
-        
+
         /// <summary>
         /// Executes a plugin passing a custom context. This is useful whenever we need to mock more complex plugin contexts (ex: passing MessageName, plugin Depth, InitiatingUserId etc...)
         /// </summary>
@@ -369,12 +369,21 @@ namespace FakeXrmEasy
                    {
                        return GetFakedServiceEndpointNotificationService();
                    }
-
+#if FAKE_XRM_EASY_9
+                   if (t == typeof(IEntityDataSourceRetrieverService))
+                   {
+                       return GetFakedEntityDataSourceRetrieverService();
+                   }
+#endif
                    throw new PullRequestException("The specified service type is not supported");
                });
 
             return fakedServiceProvider;
         }
+
+#if FAKE_XRM_EASY_9
+        public Entity EntityDataSourceRetriever { get; set; }
+#endif
 
         public XrmFakedTracingService GetFakeTracingService()
         {
