@@ -54,7 +54,7 @@ namespace FakeXrmEasy.Tests
         public void When_updating_an_entity_the_context_should_reflect_changes()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var e = new Entity("account") { Id = Guid.Empty };
             e["name"] = "Before update";
@@ -139,7 +139,7 @@ namespace FakeXrmEasy.Tests
 
             context.Initialize(data);
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
             var update = new Entity("account") { Id = nonExistingGuid };
             var ex = Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Update(update));
 
@@ -158,7 +158,7 @@ namespace FakeXrmEasy.Tests
                 existingAccount
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             //Create a new entity class to update the name
             var accountToUpdate = new Account() { Id = existingAccount.Id };
@@ -238,7 +238,7 @@ namespace FakeXrmEasy.Tests
 
             var existingAccount = new Account() { Id = Guid.NewGuid(), Name = "Super Great Customer", AccountNumber = "69" };
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             using (var ctx = new OrganizationServiceContext(service))
             {
