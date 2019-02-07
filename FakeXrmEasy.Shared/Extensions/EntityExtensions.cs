@@ -111,11 +111,9 @@ namespace FakeXrmEasy.Extensions
 
         public static Entity ProjectAttributes(this Entity e, QueryExpression qe, XrmFakedContext context)
         {
-            if (qe.ColumnSet == null) return e;
-
-            if (qe.ColumnSet.AllColumns)
+            if (qe.ColumnSet == null || qe.ColumnSet.AllColumns)
             {
-                return e; //return all the original attributes
+                return RemoveNullAttributes(e); //return all the original attributes
             }
             else
             {
@@ -170,15 +168,28 @@ namespace FakeXrmEasy.Extensions
                 //Plus attributes from joins
                 foreach (var le in qe.LinkEntities)
                 {
-                    ProjectAttributes(e, projected, le, context);
+                    ProjectAttributes(RemoveNullAttributes(e), projected, le, context);
                 }
                 //foreach (var attKey in e.Attributes.Keys)
                 //{
                 //    if(e[attKey] is AliasedValue && !projected.Attributes.ContainsKey(attKey))
                 //        projected[attKey] = e[attKey];
                 //}
-                return projected;
+                return RemoveNullAttributes(projected);
             }
+        }
+
+        public static Entity RemoveNullAttributes(Entity entity)
+        {
+            IList<string> nullAttributes = entity.Attributes
+                .Where(attribute => attribute.Value == null ||
+                                  (attribute.Value is AliasedValue && (attribute.Value as AliasedValue).Value == null))
+                .Select(attribute => attribute.Key).ToList();
+            foreach (var nullAttribute in nullAttributes)
+            {
+                entity.Attributes.Remove(nullAttribute);
+            }
+            return entity;
         }
 
         public static object CloneAttribute(object attributeValue)
@@ -206,7 +217,7 @@ namespace FakeXrmEasy.Extensions
                     clone.KeyAttributes.AddRange(original.KeyAttributes.Select(kvp => new KeyValuePair<string, object>(CloneAttribute(kvp.Key) as string, kvp.Value)).ToArray());
                 }
 #endif
-                    return clone;
+                return clone;
             }
             else if (type == typeof(BooleanManagedProperty))
             {
@@ -332,10 +343,7 @@ namespace FakeXrmEasy.Extensions
 
             foreach (var attKey in e.Attributes.Keys)
             {
-                if (e[attKey] != null)
-                {
-                    cloned[attKey] = CloneAttribute(e[attKey]);
-                }
+                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
             }
 
 #if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
@@ -529,6 +537,6 @@ namespace FakeXrmEasy.Extensions
             return result;
         }
 
-        
+
     }
 }

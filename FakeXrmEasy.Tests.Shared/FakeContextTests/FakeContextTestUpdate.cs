@@ -51,6 +51,33 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_an_entity_is_updated_with_a_null_attribute_the_attribute_is_removed()
+        {
+            var context = new XrmFakedContext();
+            var entity = new Account { Id = Guid.NewGuid() };
+            entity.DoNotEMail = true;
+            context.Initialize(entity);
+
+            var update = new Account() { Id = entity.Id };
+            update.DoNotEMail = null;
+
+            var service = context.GetOrganizationService();
+            service.Update(update);
+
+            var updatedEntityAllAttributes = service.Retrieve(Account.EntityLogicalName, update.Id, new ColumnSet(true));
+            var updatedEntityAllAttributesEarlyBound = updatedEntityAllAttributes.ToEntity<Account>();
+
+            var updatedEntitySingleAttribute = service.Retrieve(Account.EntityLogicalName, update.Id, new ColumnSet(new string[] { "donotemail" }));
+            var updatedEntitySingleAttributeEarlyBound = updatedEntityAllAttributes.ToEntity<Account>();
+
+            Assert.Null(updatedEntityAllAttributesEarlyBound.DoNotEMail);
+            Assert.False(updatedEntityAllAttributes.Attributes.ContainsKey("donotemail"));
+
+            Assert.Null(updatedEntitySingleAttributeEarlyBound.DoNotEMail);
+            Assert.False(updatedEntitySingleAttribute.Attributes.ContainsKey("donotemail"));
+        }
+
+        [Fact]
         public void When_updating_an_entity_the_context_should_reflect_changes()
         {
             var context = new XrmFakedContext();
