@@ -51,6 +51,25 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_an_entity_is_updated_with_a_null_attribute_the_attribute_is_removed()
+        {
+            var context = new XrmFakedContext();
+            var entity = new Entity("entity") { Id = Guid.NewGuid() };
+            entity["attribute"] = 1;
+            context.Initialize(entity);
+
+            var update = new Entity("entity") { Id = entity.Id };
+            update["attribute"] = null;
+
+            var service = context.GetOrganizationService();
+            service.Update(update);
+
+            update = service.Retrieve("entity", update.Id, new ColumnSet(true));
+
+            Assert.False( update.Attributes.ContainsKey("attribute"));
+        }
+
+        [Fact]
         public void When_updating_an_entity_the_context_should_reflect_changes()
         {
             var context = new XrmFakedContext();
