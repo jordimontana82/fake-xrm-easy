@@ -461,7 +461,7 @@ namespace FakeXrmEasy.Extensions
         /// <param name="e"></param>
         /// <param name="sAttributeName"></param>
         /// <returns></returns>
-        public static Guid KeySelector(this Entity e, string sAttributeName, XrmFakedContext context)
+        public static object KeySelector(this Entity e, string sAttributeName, XrmFakedContext context)
         {
             if (sAttributeName.Contains("."))
             {
@@ -497,10 +497,12 @@ namespace FakeXrmEasy.Extensions
 
             if (keyValue is EntityReference)
                 return (keyValue as EntityReference).Id;
-            if (keyValue is Guid)
-                return ((Guid)keyValue);
+            if (keyValue is OptionSetValue)
+                return (keyValue as OptionSetValue).Value;
+            if (keyValue is Money)
+                return (keyValue as Money).Value;
 
-            return Guid.Empty;
+            return keyValue;
         }
 
         /// <summary>
