@@ -52,7 +52,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             {
                 LogicalName = "account"
             };
-            Assert.Throws<Exception>(() => 
+            Assert.Throws<Exception>(() =>
                 ctx.InitializeMetadata(new List<EntityMetadata>() {
                     entityMetadata,
                     entityMetadata
@@ -101,6 +101,21 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var metadata1 = ctx.CreateMetadataQuery().FirstOrDefault();
             var metadata2 = ctx.CreateMetadataQuery().FirstOrDefault();
             Assert.True(metadata1 != metadata2);
+        }
+
+        [Fact]
+        public void Should_initialize_metadata_from_early_bound_assembly()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.InitializeMetadata(typeof(Crm.Account).Assembly);
+
+            var accountMetadata = ctx.CreateMetadataQuery().Where(x => x.LogicalName == "account").FirstOrDefault();
+
+            Assert.NotNull(accountMetadata);
+            Assert.Equal("accountid", accountMetadata.PrimaryIdAttribute);
+
+            var accountid = accountMetadata.Attributes.FirstOrDefault(x => x.LogicalName == "accountid");
+            Assert.NotNull(accountid);
         }
     }
 }
