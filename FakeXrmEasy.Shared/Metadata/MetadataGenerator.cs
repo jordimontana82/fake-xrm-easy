@@ -32,37 +32,53 @@ namespace FakeXrmEasy.Metadata
                 List<OneToManyRelationshipMetadata> oneToManyRelationshipMetadatas = new List<OneToManyRelationshipMetadata>();
                 List<OneToManyRelationshipMetadata> manyToOneRelationshipMetadatas = new List<OneToManyRelationshipMetadata>();
 
+                var idProperty = earlyBoundEntity.GetProperty("Id");
+                AttributeLogicalNameAttribute attributeLogicalNameAttribute;
+                if (idProperty != null && (attributeLogicalNameAttribute = GetCustomAttribute<AttributeLogicalNameAttribute>(idProperty)) != null)
+                {
+                    metadata.SetFieldValue("_primaryIdAttribute", attributeLogicalNameAttribute.LogicalName);
+                }
+
                 var properties = earlyBoundEntity.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                                    .Where(x => Attribute.IsDefined(x, typeof(AttributeLogicalNameAttribute))
+                                    .Where(x => x.Name != "Id" && Attribute.IsDefined(x, typeof(AttributeLogicalNameAttribute))
                                              || Attribute.IsDefined(x, typeof(RelationshipSchemaNameAttribute)));
 
                 foreach (var property in properties)
                 {
-                    RelationshipSchemaNameAttribute relationshipSchemaNameAttribute = (RelationshipSchemaNameAttribute)Attribute.GetCustomAttribute(property, typeof(RelationshipSchemaNameAttribute));
-                    AttributeLogicalNameAttribute attributeLogicalNameAttribute = (AttributeLogicalNameAttribute)Attribute.GetCustomAttribute(property, typeof(AttributeLogicalNameAttribute));
+                    RelationshipSchemaNameAttribute relationshipSchemaNameAttribute = GetCustomAttribute<RelationshipSchemaNameAttribute>(property);
+                    attributeLogicalNameAttribute = GetCustomAttribute<AttributeLogicalNameAttribute>(property);
 
                     if (relationshipSchemaNameAttribute == null)
                     {
-                        if (property.Name == "Id")
+#if !FAKE_XRM_EASY
+                        if (property.PropertyType == typeof(byte[]))
                         {
-                            metadata.SetFieldValue("_primaryIdAttribute", attributeLogicalNameAttribute.LogicalName);
+                            metadata.SetFieldValue("_primaryImageAttribute", attributeLogicalNameAttribute.LogicalName);
+                        }
+#endif
+                        AttributeMetadata attributeMetadata;
+                        if (attributeLogicalNameAttribute.LogicalName == "statecode")
+                        {
+                            attributeMetadata = new StateAttributeMetadata();
+                        }
+                        else if (attributeLogicalNameAttribute.LogicalName == "statuscode")
+                        {
+                            attributeMetadata = new StatusAttributeMetadata();
+                        }
+                        else if (attributeLogicalNameAttribute.LogicalName == metadata.PrimaryIdAttribute)
+                        {
+                            attributeMetadata = new AttributeMetadata();
+                            attributeMetadata.SetSealedPropertyValue("AttributeType", AttributeTypeCode.Uniqueidentifier);
                         }
                         else
                         {
-#if !FAKE_XRM_EASY
-                            if (property.PropertyType.Name == "Byte[]")
-                            {
-                                metadata.SetFieldValue("_primaryImageAttribute", attributeLogicalNameAttribute.LogicalName);
-                            }
-#endif
-
-                            AttributeMetadata attributeMetadata = CreateAttributeMetadata(property.PropertyType);
-                            if (attributeMetadata == null) continue;
-                            attributeMetadata.SetFieldValue("_entityLogicalName", entityLogicalNameAttribute.LogicalName);
-                            attributeMetadata.SetFieldValue("_logicalName", attributeLogicalNameAttribute.LogicalName);
-
-                            attributeMetadatas.Add(attributeMetadata);
+                            attributeMetadata = CreateAttributeMetadata(property.PropertyType);
                         }
+
+                        attributeMetadata.SetFieldValue("_entityLogicalName", entityLogicalNameAttribute.LogicalName);
+                        attributeMetadata.SetFieldValue("_logicalName", attributeLogicalNameAttribute.LogicalName);
+
+                        attributeMetadatas.Add(attributeMetadata);
                     }
                     else
                     {
@@ -115,70 +131,109 @@ namespace FakeXrmEasy.Metadata
 
         private static AttributeMetadata CreateAttributeMetadata(Type propertyType)
         {
-            switch (propertyType.Name)
+            if (typeof(string) == propertyType)
             {
-                case "String":
-                    return new StringAttributeMetadata();
-                case "EntityReference":
-                    return new LookupAttributeMetadata();
-                case "CrmEntityReference":
-                    return new LookupAttributeMetadata();
-                case "OptionSetValue":
-                    return new PicklistAttributeMetadata();
-                case "Money":
-                    return new MoneyAttributeMetadata();
-                case "Nullable`1":
-                    switch (propertyType.GetGenericArguments()[0].Name)
+                return new StringAttributeMetadata();
+            }
+            else if (typeof(EntityReference).IsAssignableFrom(propertyType))
+            {
+                return new LookupAttributeMetadata();
+            }
+#if FAKE_XRM_EASY || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365
+            else if (typeof(Microsoft.Xrm.Client.CrmEntityReference).IsAssignableFrom(propertyType))
+            {
+                return new LookupAttributeMetadata();
+            }
+#endif
+            else if (typeof(OptionSetValue).IsAssignableFrom(propertyType))
+            {
+                return new PicklistAttributeMetadata();
+            }
+            else if (typeof(Money).IsAssignableFrom(propertyType))
+            {
+                return new MoneyAttributeMetadata();
+            }
+            else if (propertyType.IsGenericType)
+            {
+                Type genericType = propertyType.GetGenericArguments().FirstOrDefault();
+                if (propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    if (typeof(int) == genericType)
                     {
-                        case "Int32":
-                            return new IntegerAttributeMetadata();
-                        case "Double":
-                            return new DoubleAttributeMetadata();
-                        case "Boolean":
-                            return new BooleanAttributeMetadata();
-                        case "Decimal":
-                            return new DecimalAttributeMetadata();
-                        case "DateTime":
-                            return new DateTimeAttributeMetadata();
-                        case "Guid":
-                            return new LookupAttributeMetadata();
-                        case "Int64":
-                            return new BigIntAttributeMetadata();
-                        case "statecode":
-                            return new StateAttributeMetadata();
-                        default:
-                            if (propertyType.GetGenericArguments()[0].BaseType == typeof(Enum))
-                            {
-                                return new StateAttributeMetadata();
-                            }
-                            else
-                            {
-                                throw new Exception($"Type {propertyType.Name}{propertyType.GetGenericArguments()[0].Name} has not been mapped to an AttributeMetadata.");
-                            }
-
+                        return new IntegerAttributeMetadata();
                     }
-                case "IEnumerable`1":
+                    else if (typeof(double) == genericType)
+                    {
+                        return new DoubleAttributeMetadata();
+                    }
+                    else if (typeof(bool) == genericType)
+                    {
+                        return new BooleanAttributeMetadata();
+                    }
+                    else if (typeof(decimal) == genericType)
+                    {
+                        return new DecimalAttributeMetadata();
+                    }
+                    else if (typeof(DateTime) == genericType)
+                    {
+                        return new DateTimeAttributeMetadata();
+                    }
+                    else if (typeof(Guid) == genericType)
+                    {
+                        return new LookupAttributeMetadata();
+                    }
+                    else if (typeof(long) == genericType)
+                    {
+                        return new BigIntAttributeMetadata();
+                    }
+                    else if (typeof(Enum).IsAssignableFrom(genericType))
+                    {
+                        return new StateAttributeMetadata();
+                    }
+                    else
+                    {
+                        throw new Exception($"Type {propertyType.Name}{genericType.Name} has not been mapped to an AttributeMetadata.");
+                    }
+                }
+                else if (propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                {
                     var partyList = new LookupAttributeMetadata();
                     partyList.SetSealedPropertyValue("AttributeType", AttributeTypeCode.PartyList);
                     return partyList;
-                case "BooleanManagedProperty":
-                    var booleanManaged = new BooleanAttributeMetadata();
-                    booleanManaged.SetSealedPropertyValue("AttributeType", AttributeTypeCode.ManagedProperty);
-                    return booleanManaged;
+                }
+                else
+                {
+                    throw new Exception($"Type {propertyType.Name}{genericType.Name} has not been mapped to an AttributeMetadata.");
+                }
+            }
+            else if (typeof(BooleanManagedProperty) == propertyType)
+            {
+                var booleanManaged = new BooleanAttributeMetadata();
+                booleanManaged.SetSealedPropertyValue("AttributeType", AttributeTypeCode.ManagedProperty);
+                return booleanManaged;
+            }
 #if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013
-                case "Guid":
-                    return new UniqueIdentifierAttributeMetadata();
+            else if (typeof(Guid) == propertyType)
+            {
+                return new UniqueIdentifierAttributeMetadata();
+            }
 #endif
 #if !FAKE_XRM_EASY
-                case "Byte[]":
-                    return new ImageAttributeMetadata();
+            else if (typeof(byte[]) == propertyType)
+            {
+
+                return new ImageAttributeMetadata();
+            }
 #endif
 #if FAKE_XRM_EASY_9
-                case "OptionSetValueCollection":
-                    return new MultiSelectPicklistAttributeMetadata();
+            else if (typeof(OptionSetValueCollection).IsAssignableFrom(propertyType))
+            {
+                return new MultiSelectPicklistAttributeMetadata();
+            }
 #endif
-                default:
-                    throw new Exception($"Type {propertyType.Name} has not been mapped to an AttributeMetadata.");
+            else
+            {
+                throw new Exception($"Type {propertyType.Name} has not been mapped to an AttributeMetadata.");
             }
         }
 

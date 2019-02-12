@@ -112,10 +112,13 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var accountMetadata = ctx.CreateMetadataQuery().Where(x => x.LogicalName == "account").FirstOrDefault();
 
             Assert.NotNull(accountMetadata);
-            Assert.Equal("accountid", accountMetadata.PrimaryIdAttribute);
 
             var accountid = accountMetadata.Attributes.FirstOrDefault(x => x.LogicalName == "accountid");
+
+
+            Assert.Equal("accountid", accountMetadata.PrimaryIdAttribute);
             Assert.NotNull(accountid);
+            Assert.Equal(AttributeTypeCode.Uniqueidentifier, accountid.AttributeType);
         }
     }
 }
