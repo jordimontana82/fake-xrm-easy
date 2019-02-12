@@ -486,21 +486,25 @@ namespace FakeXrmEasy.Extensions
             }
 
             object keyValue = null;
-            if (e[sAttributeName] is AliasedValue)
+            AliasedValue aliasedValue;
+            if ((aliasedValue = e[sAttributeName] as AliasedValue) != null)
             {
-                keyValue = (e[sAttributeName] as AliasedValue).Value;
+                keyValue = aliasedValue.Value;
             }
             else
             {
                 keyValue = e[sAttributeName];
             }
 
-            if (keyValue is EntityReference)
-                return (keyValue as EntityReference).Id;
-            if (keyValue is OptionSetValue)
-                return (keyValue as OptionSetValue).Value;
-            if (keyValue is Money)
-                return (keyValue as Money).Value;
+            EntityReference entityReference;
+            if ((entityReference = keyValue as EntityReference) != null)
+                return entityReference.Id;
+            OptionSetValue optionSetValue;
+            if ((optionSetValue = keyValue as OptionSetValue) != null)
+                return optionSetValue.Value;
+            Money money;
+            if ((money = keyValue as Money) != null)
+                return money.Value;
 
             return keyValue;
         }
