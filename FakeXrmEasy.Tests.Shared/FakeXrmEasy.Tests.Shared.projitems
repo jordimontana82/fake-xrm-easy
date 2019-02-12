@@ -83,6 +83,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveRequestTests\RetrieveRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveVersionRequestTests\RetrieveVersionRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ReviseQuoteRequestTests\ReviseQuoteRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\SendEmailRequestTests\SendEmailRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\SetStateRequestTests\SetStateRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TestGenericMessageExecutors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\ConditionExpressionTests.cs" />
