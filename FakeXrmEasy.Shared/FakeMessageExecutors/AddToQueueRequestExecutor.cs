@@ -52,7 +52,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             {
                 LogicalName = "queueitem",
                 // QueueItemProperties are used for initializing new queueitems
-                Attributes = queueItemProperties.Attributes
+                Attributes = queueItemProperties?.Attributes
             };
 
             createQueueItem["queueid"] = new EntityReference("queue", destinationQueueId);
