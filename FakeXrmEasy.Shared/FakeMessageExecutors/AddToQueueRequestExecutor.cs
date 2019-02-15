@@ -1,6 +1,8 @@
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
 using System;
+using System.Linq;
 using System.ServiceModel;
 
 namespace FakeXrmEasy.FakeMessageExecutors
@@ -18,6 +20,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             var target = addToQueueRequest.Target;
             var destinationQueueId = addToQueueRequest.DestinationQueueId;
+            var queueItemProperties = addToQueueRequest.QueueItemProperties;
 
             if (target == null)
             {
@@ -31,15 +34,29 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             var service = ctx.GetOrganizationService();
 
-            var createQueueItem = new Entity
+            // CRM updates existing queue item if one already exists for a given objectid
+            var existingQueueItem = service.RetrieveMultiple(new QueryExpression
+            {
+                EntityName = "queueitem",
+                ColumnSet = new ColumnSet(true),
+                Criteria = new FilterExpression
+                {
+                    Conditions =
+                        {
+                            new ConditionExpression("objectid", ConditionOperator.Equal, target.Id)
+                        }
+                }
+            }).Entities.FirstOrDefault();
+
+            var createQueueItem = existingQueueItem ?? new Entity
             {
                 LogicalName = "queueitem",
-                Attributes = new AttributeCollection
-                {
-                    { "queueid", new EntityReference("queue", destinationQueueId) },
-                    { "objectid", target }
-                }
+                // QueueItemProperties are used for initializing new queueitems
+                Attributes = queueItemProperties.Attributes
             };
+
+            createQueueItem["queueid"] = new EntityReference("queue", destinationQueueId);
+            createQueueItem["objectid"] = target;
 
             var guid = service.Create(createQueueItem);
 
