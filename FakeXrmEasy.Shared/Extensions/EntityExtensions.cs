@@ -138,14 +138,6 @@ namespace FakeXrmEasy.Extensions
                     projected = new Entity(e.LogicalName) { Id = e.Id };
 
 
-                /*
-                //Remove primary attribute unless explicitly specified
-                if (projected.Attributes.ContainsKey($"{e.LogicalName}id"))
-                {
-                    projected.Attributes.Remove($"{e.LogicalName}id");
-                }
-                */
-
                 foreach (var attKey in qe.ColumnSet.Columns)
                 {
                     //Check if attribute really exists in metadata
