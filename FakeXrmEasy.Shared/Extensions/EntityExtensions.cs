@@ -101,6 +101,7 @@ namespace FakeXrmEasy.Extensions
                     if (e.FormattedValues.ContainsKey(linkedAttKey))
                         projected.FormattedValues[linkedAttKey] = e.FormattedValues[linkedAttKey];
                 }
+
             }
 
             foreach (var nestedLinkedEntity in le.LinkEntities)
@@ -137,11 +138,13 @@ namespace FakeXrmEasy.Extensions
                     projected = new Entity(e.LogicalName) { Id = e.Id };
 
 
+                /*
                 //Remove primary attribute unless explicitly specified
                 if (projected.Attributes.ContainsKey($"{e.LogicalName}id"))
                 {
                     projected.Attributes.Remove($"{e.LogicalName}id");
                 }
+                */
 
                 foreach (var attKey in qe.ColumnSet.Columns)
                 {
@@ -170,11 +173,6 @@ namespace FakeXrmEasy.Extensions
                 {
                     ProjectAttributes(RemoveNullAttributes(e), projected, le, context);
                 }
-                //foreach (var attKey in e.Attributes.Keys)
-                //{
-                //    if(e[attKey] is AliasedValue && !projected.Attributes.ContainsKey(attKey))
-                //        projected[attKey] = e[attKey];
-                //}
                 return RemoveNullAttributes(projected);
             }
         }
