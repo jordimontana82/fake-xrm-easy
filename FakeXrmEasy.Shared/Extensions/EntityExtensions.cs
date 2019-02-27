@@ -486,14 +486,16 @@ namespace FakeXrmEasy.Extensions
                 keyValue = e[sAttributeName];
             }
 
-            EntityReference entityReference;
-            if ((entityReference = keyValue as EntityReference) != null)
+            EntityReference entityReference = keyValue as EntityReference;
+            if (entityReference != null)
                 return entityReference.Id;
-            OptionSetValue optionSetValue;
-            if ((optionSetValue = keyValue as OptionSetValue) != null)
+
+            OptionSetValue optionSetValue = keyValue as OptionSetValue;
+            if (optionSetValue != null)
                 return optionSetValue.Value;
-            Money money;
-            if ((money = keyValue as Money) != null)
+
+            Money money = keyValue as Money;
+            if (money != null)
                 return money.Value;
 
             return keyValue;
