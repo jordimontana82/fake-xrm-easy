@@ -440,13 +440,13 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Not_Fail_On_Conditions_In_Link_Entities()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var testEntity1 = new Entity("entity1")
             {
                 Attributes = new AttributeCollection
                 {
-                    {"entity1attr", "test1"}
+                    {"entity1attr", "test2"}
                 }
             };
             var testEntity2 = new Entity("entity2")
@@ -506,6 +506,22 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var result = fakedService.RetrieveMultiple(query);
             Assert.NotEmpty(result.Entities);
             Assert.Equal(1, result.Entities.Count);
+        }
+
+        [Fact]
+        public void Entities_Can_Be_Linked_On_String_Attribute()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            var entity = new Entity("entity") { Id = Guid.NewGuid(), ["name"] = "test" };
+            context.Initialize(entity);
+            var query = new QueryExpression("entity");
+            query.ColumnSet = new ColumnSet(true);
+            query.AddLink("entity", "name", "name");
+
+            var queryResult = service.RetrieveMultiple(query);
+
+            Assert.Equal(1, queryResult.Entities.Count);
         }
 
         [Fact]
