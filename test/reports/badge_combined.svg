@@ -77,8 +77,8 @@
 
         <text x="53" y="15" fill="#010101" fill-opacity=".3">Coverage</text>
         <text x="53" y="14" fill="#fff">Coverage</text>
-        <text class="linecoverage" x="132.5" y="15" fill="#010101" fill-opacity=".3">89.8%</text><text class="linecoverage" x="132.5" y="14">89.8%</text>
-        <text class="branchcoverage" x="132.5" y="15" fill="#010101" fill-opacity=".3">73.8%</text><text class="branchcoverage" x="132.5" y="14">73.8%</text>
+        <text class="linecoverage" x="132.5" y="15" fill="#010101" fill-opacity=".3">89.5%</text><text class="linecoverage" x="132.5" y="14">89.5%</text>
+        <text class="branchcoverage" x="132.5" y="15" fill="#010101" fill-opacity=".3">74.3%</text><text class="branchcoverage" x="132.5" y="14">74.3%</text>
     </g>
 
     <g>
