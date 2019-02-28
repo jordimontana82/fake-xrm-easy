@@ -475,6 +475,37 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void FetchXml_Aggregate_Sum_With_Linked_Entity()
+        {
+            var context = new XrmFakedContext();
+            var contact = new Contact() { Id = Guid.NewGuid() };
+            var sale1 = new SalesOrder() { Id = Guid.NewGuid() };
+            sale1.CustomerId = contact.ToEntityReference();
+            sale1.TotalAmount = new Money(10m);
+            sale1.DateFulfilled = new DateTime(2019, 1, 1);
+            context.Initialize(new Entity[] { contact, sale1 });
+
+            EntityCollection result = context.GetOrganizationService().RetrieveMultiple(new FetchExpression(@"
+<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true' aggregate='true'>
+  <entity name='contact'>
+	<attribute name='contactid' groupby='true' alias='agg_contactid' />	
+    <link-entity name='salesorder' from='customerid' to='contactid' alias='sales12m' link-type='inner'>
+		<attribute name='totalamount' aggregate='sum' alias='TotalAmount' />
+        <filter type='and'>
+	      <condition attribute='datefulfilled' operator='on-or-before' value='2019-02-01' />
+	    </filter>
+	</link-entity>
+  </entity>
+</fetch>"));
+
+
+            Assert.Equal(1, result.Entities.Count);
+            var value = result.Entities.First().GetAttributeValue<AliasedValue>("sales12m.TotalAmount");
+            Assert.NotNull(value);
+            Assert.Equal(10m, ((Money)value.Value).Value);
+        }
+
+        [Fact]
         public void Query_Should_Return_QuoteProduct_Counts()
         {
             var context = new XrmFakedContext();
