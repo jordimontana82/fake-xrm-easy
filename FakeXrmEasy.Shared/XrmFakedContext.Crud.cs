@@ -124,7 +124,7 @@ namespace FakeXrmEasy
                         && context.Data[entityName].ContainsKey(id))
                     {
                         //Entity found => return only the subset of columns specified or all of them
-                        var foundEntity = context.Data[entityName][id].Clone(reflectedType);
+                        var foundEntity = context.Data[entityName][id].Clone(reflectedType, context);
                         if (columnSet.AllColumns)
                         {
                             foundEntity.ApplyDateBehaviour(context);

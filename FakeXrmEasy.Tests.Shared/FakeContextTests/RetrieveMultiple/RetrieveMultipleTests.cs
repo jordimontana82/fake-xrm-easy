@@ -1,4 +1,6 @@
-﻿using Microsoft.Xrm.Sdk;
+﻿using FakeXrmEasy.Extensions;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
@@ -358,6 +360,34 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
             Assert.Equal(20, result.Entities.Count);
             Assert.Equal(100, result.TotalRecordCount);
             Assert.True(result.MoreRecords);
+        }
+
+        [Fact]
+        public void Should_Populate_EntityReference_Name_When_Metadata_Is_Provided()
+        {
+            var userMetadata = new EntityMetadata() { LogicalName = "systemuser" };
+            userMetadata.SetSealedPropertyValue("PrimaryNameAttribute", "fullname");
+
+            var user = new Entity() { LogicalName = "systemuser", Id = Guid.NewGuid() };
+            user["fullname"] = "Fake XrmEasy";
+
+            var context = new XrmFakedContext();
+            context.InitializeMetadata(userMetadata);
+            context.Initialize(user);
+            context.CallerId = user.ToEntityReference();
+
+            var account = new Entity() { LogicalName = "account" };
+
+            var service = context.GetOrganizationService();
+
+            var accountId = service.Create(account);
+
+            QueryExpression query = new QueryExpression("account");
+            query.ColumnSet = new ColumnSet(true);
+
+            var accounts = service.RetrieveMultiple(query);
+
+            Assert.Equal("Fake XrmEasy", accounts.Entities[0].GetAttributeValue<EntityReference>("ownerid").Name);
         }
     }
 }
