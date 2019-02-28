@@ -16,7 +16,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Find_Faked_N_To_N_Records()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var userId = new Guid("11111111-7982-4276-A8FE-7CE05FABEAB4");
             var businessId = Guid.NewGuid();
@@ -94,7 +94,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Only_Find_Correct_Faked_N_To_N_Records()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var userId = new Guid("11111111-7982-4276-A8FE-7CE05FABEAB4");
             var businessId = Guid.NewGuid();
@@ -196,7 +196,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Not_Find_Faked_N_To_N_Records_If_Disassociated_Again()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var userId = new Guid("11111111-7982-4276-A8FE-7CE05FABEAB4");
             var businessId = Guid.NewGuid();
@@ -285,7 +285,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Find_Faked_N_To_N_Records_Using_Associate_Method()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var userId = new Guid("11111111-7982-4276-A8FE-7CE05FABEAB4");
             var businessId = Guid.NewGuid();
@@ -359,7 +359,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Not_Find_Faked_N_To_N_Records_If_Disassociated_Again_Using_Disassociate_Method()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var userId = new Guid("11111111-7982-4276-A8FE-7CE05FABEAB4");
             var businessId = Guid.NewGuid();
@@ -586,7 +586,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
             ctx.Initialize(new List<Entity>()
             {
                 new Contact()
@@ -615,7 +615,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
             ctx.Initialize(new List<Entity>()
             {
                 new Contact() {Id = Guid.NewGuid(), FirstName = "Ronald", LastName = "Mcdonald"},
@@ -650,7 +650,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
             ctx.Initialize(new List<Entity>() {
                 account1, account2, account3, contact1, contact2, contact3, contact4, contact5, contact6
             });
@@ -695,7 +695,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public void Should_Not_Apply_Left_Outer_Join_Filters_When_The_Right_hand_side_of_the_expression_wasnt_found()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             // Date for filtering, we only want "expired" records, i.e. those that weren't set as regarding in any emails for this period and logically even exist this long
             var days = 5;
@@ -767,7 +767,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public void Should_Apply_Left_Outer_Join_Filters_When_The_Right_hand_side_of_the_expression_was_found()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             // Date for filtering, we only want "expired" records, i.e. those that weren't set as regarding in any emails for this period and logically even exist this long
             var days = 5;
