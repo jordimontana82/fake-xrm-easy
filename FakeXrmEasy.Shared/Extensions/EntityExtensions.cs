@@ -342,7 +342,7 @@ namespace FakeXrmEasy.Extensions
 
             foreach (var attKey in e.Attributes.Keys)
             {
-                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
+                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey], context) : null;
             }
 
 #if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
