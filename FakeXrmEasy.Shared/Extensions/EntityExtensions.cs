@@ -451,7 +451,7 @@ namespace FakeXrmEasy.Extensions
         /// <param name="e"></param>
         /// <param name="sAttributeName"></param>
         /// <returns></returns>
-        public static Guid KeySelector(this Entity e, string sAttributeName, XrmFakedContext context)
+        public static object KeySelector(this Entity e, string sAttributeName, XrmFakedContext context)
         {
             if (sAttributeName.Contains("."))
             {
@@ -476,21 +476,29 @@ namespace FakeXrmEasy.Extensions
             }
 
             object keyValue = null;
-            if (e[sAttributeName] is AliasedValue)
+            AliasedValue aliasedValue;
+            if ((aliasedValue = e[sAttributeName] as AliasedValue) != null)
             {
-                keyValue = (e[sAttributeName] as AliasedValue).Value;
+                keyValue = aliasedValue.Value;
             }
             else
             {
                 keyValue = e[sAttributeName];
             }
 
-            if (keyValue is EntityReference)
-                return (keyValue as EntityReference).Id;
-            if (keyValue is Guid)
-                return ((Guid)keyValue);
+            EntityReference entityReference = keyValue as EntityReference;
+            if (entityReference != null)
+                return entityReference.Id;
 
-            return Guid.Empty;
+            OptionSetValue optionSetValue = keyValue as OptionSetValue;
+            if (optionSetValue != null)
+                return optionSetValue.Value;
+
+            Money money = keyValue as Money;
+            if (money != null)
+                return money.Value;
+
+            return keyValue;
         }
 
         /// <summary>
