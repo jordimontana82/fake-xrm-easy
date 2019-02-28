@@ -49,6 +49,30 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void FetchXml_Aggregate_Group_EntityReference_Count()
+        {
+            var fetchXml = @"<fetch no-lock='true' aggregate='true'> <entity name='account'> <attribute name='parentaccountid' alias='pa' groupby='true' /> <attribute name='accountid' alias='Qt' aggregate='countcolumn' /> <order alias='Qt' descending='true' /> </entity> </fetch>";
+
+            EntityReference parentId = new EntityReference("account", Guid.NewGuid());
+
+            var ctx = new XrmFakedContext();
+            ctx.Initialize(new[] {
+                new Account() { Id = Guid.NewGuid(), ParentAccountId=parentId },
+                new Account() { Id = Guid.NewGuid(), ParentAccountId=parentId },
+                new Account() { Id = Guid.NewGuid(), ParentAccountId=new EntityReference("account",Guid.NewGuid()) },
+                new Account() { Id = Guid.NewGuid()}
+            });
+
+            var collection = ctx.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(3, collection.Entities.Count);
+
+            var biggestGroup = collection.Entities.Where(x => x.Attributes.ContainsKey("pa")).SingleOrDefault(x => parentId.Id.Equals((x.GetAttributeValue<AliasedValue>("pa")?.Value as EntityReference)?.Id));
+            Assert.Equal(2, biggestGroup.GetAttributeValue<AliasedValue>("Qt").Value);
+        }
+
+
+        [Fact]
         public void FetchXml_Aggregate_CountDistinct()
         {
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' aggregate='true'>

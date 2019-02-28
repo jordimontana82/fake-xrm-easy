@@ -213,7 +213,8 @@ namespace FakeXrmEasy
                 {
                     if (g.Key[rule] != null)
                     {
-                        ent[groups[rule].OutputAlias] = new AliasedValue(null, groups[rule].Attribute, g.Key[rule]);
+                        object value = g.Key[rule];
+                        ent[groups[rule].OutputAlias] = new AliasedValue(null, groups[rule].Attribute, value is ComparableEntityReference ? (value as ComparableEntityReference).entityReference : value);
                     }
                 }
 
@@ -266,9 +267,9 @@ namespace FakeXrmEasy
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
-                var lst = values.Where(x=>x!=null);
+                var lst = values.Where(x => x != null);
                 if (!lst.Any()) return null;
-               
+
                 var firstValue = lst.Where(x => x != null).First();
                 var valType = firstValue.GetType();
 
@@ -305,9 +306,9 @@ namespace FakeXrmEasy
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
-                var lst = values.Where(x=>x!=null);
+                var lst = values.Where(x => x != null);
                 if (!lst.Any()) return null;
-              
+
                 var firstValue = lst.First();
                 var valType = firstValue.GetType();
 
@@ -344,15 +345,15 @@ namespace FakeXrmEasy
         {
             public override object AggregateValues(IEnumerable<object> values)
             {
-                var lst = values.Where(x=>x!=null);
+                var lst = values.Where(x => x != null);
                 if (!lst.Any()) return null;
-                
+
                 var firstValue = lst.First();
                 var valType = firstValue.GetType();
 
                 if (valType == typeof(decimal) || valType == typeof(decimal?))
                 {
-                    return lst.Average(x => (decimal)x );
+                    return lst.Average(x => (decimal)x);
                 }
 
                 if (valType == typeof(Money))
@@ -362,7 +363,7 @@ namespace FakeXrmEasy
 
                 if (valType == typeof(int) || valType == typeof(int?))
                 {
-                    return lst.Average(x => (int)x );
+                    return lst.Average(x => (int)x);
                 }
 
                 if (valType == typeof(float) || valType == typeof(float?))
@@ -445,7 +446,50 @@ namespace FakeXrmEasy
 
             public int GetHashCode(IComparable[] obj)
             {
-                return string.Join(",", obj as IEnumerable<IComparable>).GetHashCode();
+                int result = 0;
+                foreach (IComparable x in obj)
+                {
+                    result ^= x == null ? 0 : x.GetHashCode();
+                }
+                return result;
+            }
+        }
+
+        private class ComparableEntityReference : IComparable
+        {
+            public EntityReference entityReference { get; private set; }
+
+            public ComparableEntityReference(EntityReference entityReference)
+            {
+                this.entityReference = entityReference;
+            }
+
+            int IComparable.CompareTo(object obj)
+            {
+                return Equals(obj) ? 0 : 1;
+            }
+
+            public override bool Equals(object obj)
+            {
+                EntityReference other;
+                if (obj is EntityReference)
+                {
+                    other = obj as EntityReference;
+                }
+                else if (obj is ComparableEntityReference)
+                {
+                    other = (obj as ComparableEntityReference).entityReference;
+                }
+                else
+                {
+                    return false;
+                }
+                return entityReference.Id == other.Id && entityReference.LogicalName == other.LogicalName;
+            }
+
+            public override int GetHashCode()
+            {
+                return (entityReference.LogicalName == null ? 0 : entityReference.LogicalName.GetHashCode()) ^ entityReference.Id.GetHashCode();
             }
         }
 
@@ -453,7 +497,14 @@ namespace FakeXrmEasy
         {
             public override IComparable FindGroupValue(object attributeValue)
             {
-                return attributeValue as IComparable;
+                if (attributeValue is EntityReference)
+                {
+                    return new ComparableEntityReference(attributeValue as EntityReference) as IComparable;
+                }
+                else
+                {
+                    return attributeValue as IComparable;
+                }
             }
         }
 
