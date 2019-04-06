@@ -315,7 +315,7 @@ namespace FakeXrmEasy
         {
             if (!string.IsNullOrEmpty(le.EntityAlias))
             {
-                if (!Regex.IsMatch(le.EntityAlias, "^[A-Za-z_]\\w*$", RegexOptions.ECMAScript))
+                if (!Regex.IsMatch(le.EntityAlias, "^[A-Za-z_](\\w|\\.)*$", RegexOptions.ECMAScript))
                 {
                     throw new FaultException(new FaultReason($"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _."));
                 }
