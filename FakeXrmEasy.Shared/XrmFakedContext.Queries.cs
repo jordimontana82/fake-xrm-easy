@@ -575,7 +575,14 @@ namespace FakeXrmEasy
 
             if (!string.IsNullOrWhiteSpace(c.CondExpression.EntityName) && !c.CondExpression.EntityName.Equals(qe.EntityName))
             {
-                attributeName = c.CondExpression.EntityName + "." + c.CondExpression.AttributeName;
+                if (context.Data.ContainsKey(c.CondExpression.EntityName))
+                {
+                    attributeName = c.CondExpression.EntityName + "1." + c.CondExpression.AttributeName;
+                }
+                else
+                {
+                    attributeName = c.CondExpression.EntityName + "." + c.CondExpression.AttributeName;
+                }             
             }
             else
                 attributeName = c.CondExpression.AttributeName;

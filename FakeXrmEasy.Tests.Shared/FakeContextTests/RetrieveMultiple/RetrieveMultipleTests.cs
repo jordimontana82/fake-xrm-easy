@@ -389,5 +389,61 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
 
             Assert.Equal("Fake XrmEasy", accounts.Entities[0].GetAttributeValue<EntityReference>("ownerid").Name);
         }
+
+#if !FAKE_XRM_EASY
+        [Fact]
+        public void Can_Filter_Using_Entity_Name_Without_Alias()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            Entity e = new Entity("contact")
+            {
+                Id = Guid.NewGuid(),
+                ["retrieve"] = true
+            };
+
+            Entity e2 = new Entity("account")
+            {
+                Id = Guid.NewGuid(),
+                ["contactid"] = e.ToEntityReference()
+            };
+
+            context.Initialize(new Entity[] { e, e2 });
+
+            QueryExpression query = new QueryExpression("account");
+            query.Criteria.AddCondition("contact", "retrieve", ConditionOperator.Equal, true);
+            query.AddLink("contact", "contactid", "contactid");
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+        }
+
+        [Fact]
+        public void Can_Filter_Using_Entity_Name_With_Alias()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            Entity e = new Entity("contact")
+            {
+                Id = Guid.NewGuid(),
+                ["retrieve"] = true
+            };
+
+            Entity e2 = new Entity("account")
+            {
+                Id = Guid.NewGuid(),
+                ["contactid"] = e.ToEntityReference()
+            };
+
+            context.Initialize(new Entity[] { e, e2 });
+
+            QueryExpression query = new QueryExpression("account");
+            query.Criteria.AddCondition("mycontact", "retrieve", ConditionOperator.Equal, true);
+            query.AddLink("contact", "contactid", "contactid").EntityAlias="mycontact";
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+        }
+#endif
     }
 }
