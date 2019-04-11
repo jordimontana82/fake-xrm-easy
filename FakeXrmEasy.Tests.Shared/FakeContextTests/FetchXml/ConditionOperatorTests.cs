@@ -3,6 +3,7 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using Xunit;
@@ -1777,6 +1778,78 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
 
             Assert.Equal(0, collection.Entities.Count);
+        }
+
+        [Fact]
+        public void FetchXml_EntityName_Attribute_Alias_Execution()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            Entity e = new Entity("contact")
+            {
+                Id = Guid.NewGuid(),
+                ["retrieve"] = "Yes"
+            };
+
+            Entity e2 = new Entity("account")
+            {
+                Id = Guid.NewGuid(),
+                ["contactid"] = e.ToEntityReference()
+            };
+
+            context.Initialize(new Entity[] { e, e2 });
+
+            var fetchXml = @"<fetch top='50' >
+                              <entity name='account' >
+                                <filter>
+                                  <condition entityname='mycontact' attribute='retrieve' operator='eq' value='Yes' />
+                                </filter>
+                                <link-entity name='contact' from='contactid' to='contactid' link-type='inner' alias='mycontact' >
+                                  <attribute name='retrieve' />
+                                </link-entity>
+                              </entity>
+                            </fetch>";
+
+            var result = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.True(result.Entities.Any());
+        }
+
+        [Fact]
+        public void FetchXml_EntityName_Attribute_No_Alias_Execution()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            Entity e = new Entity("contact")
+            {
+                Id = Guid.NewGuid(),
+                ["retrieve"] = "Yes"
+            };
+
+            Entity e2 = new Entity("account")
+            {
+                Id = Guid.NewGuid(),
+                ["contactid"] = e.ToEntityReference()
+            };
+
+            context.Initialize(new Entity[] { e, e2 });
+
+            var fetchXml = @"<fetch top='50' >
+                              <entity name='account' >
+                                <filter>
+                                  <condition entityname='contact' attribute='retrieve' operator='eq' value='Yes' />
+                                </filter>
+                                <link-entity name='contact' from='contactid' to='contactid' link-type='inner'>
+                                  <attribute name='retrieve' />
+                                </link-entity>
+                              </entity>
+                            </fetch>";
+
+            var result = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.True(result.Entities.Any());
         }
 #endif
 
