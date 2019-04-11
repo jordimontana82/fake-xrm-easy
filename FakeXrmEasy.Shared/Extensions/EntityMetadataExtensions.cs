@@ -43,5 +43,10 @@ namespace FakeXrmEasy.Extensions
         {
             attributeMetadata.GetType().GetProperty(sPropertyName).SetValue(attributeMetadata, value, null);
         }
+
+        public static void SetSealedPropertyValue(this ManyToManyRelationshipMetadata manyToManyRelationshipMetadata, string sPropertyName, object value)
+        {
+            manyToManyRelationshipMetadata.GetType().GetProperty(sPropertyName).SetValue(manyToManyRelationshipMetadata, value, null);
+        }
     }
 }

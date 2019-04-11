@@ -26,6 +26,15 @@ namespace FakeXrmEasy.Tests.Extensions
         }
 
         [Fact]
+        public void SetSealedPropertyValue_should_update_manytomanyrelationship_metadata()
+        {
+            var fakeRelationship = new ManyToManyRelationshipMetadata();
+
+            fakeRelationship.SetSealedPropertyValue("Entity2LogicalName", "role");
+            Assert.Equal("role", fakeRelationship.Entity2LogicalName);
+        }
+
+        [Fact]
         public void SetAttributeCollection_should_update_attributes()
         {
             var entityMetadata = new EntityMetadata();
