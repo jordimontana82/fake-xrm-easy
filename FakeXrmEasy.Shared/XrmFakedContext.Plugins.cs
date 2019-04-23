@@ -7,6 +7,10 @@ namespace FakeXrmEasy
 {
     public partial class XrmFakedContext : IXrmContext
     {
+        /// <summary>
+        /// Returns a plugin context with default properties one can override
+        /// </summary>
+        /// <returns></returns>
         public XrmFakedPluginExecutionContext GetDefaultPluginContext()
         {
             var userId = CallerId?.Id ?? Guid.NewGuid();
@@ -24,7 +28,8 @@ namespace FakeXrmEasy
                 OutputParameters = new ParameterCollection(),
                 SharedVariables = new ParameterCollection(),
                 PreEntityImages = new EntityImageCollection(),
-                PostEntityImages = new EntityImageCollection()
+                PostEntityImages = new EntityImageCollection(),
+                IsolationMode = 1
             };
         }
 
@@ -62,6 +67,9 @@ namespace FakeXrmEasy
             A.CallTo(() => context.BusinessUnitId).ReturnsLazily(() => ctx.BusinessUnitId);
             A.CallTo(() => context.CorrelationId).ReturnsLazily(() => ctx.CorrelationId);
             A.CallTo(() => context.OperationCreatedOn).ReturnsLazily(() => ctx.OperationCreatedOn);
+            A.CallTo(() => context.IsolationMode).ReturnsLazily(() => ctx.IsolationMode);
+            A.CallTo(() => context.IsInTransaction).ReturnsLazily(() => ctx.IsInTransaction);
+
 
             // Create message will pass an Entity as the target but this is not always true
             // For instance, a Delete request will receive an EntityReference
@@ -81,6 +89,7 @@ namespace FakeXrmEasy
                 }
             }
         }
+
         protected IExecutionContext GetFakedExecutionContext(XrmFakedPluginExecutionContext ctx)
         {
             var context = A.Fake<IExecutionContext>();
@@ -89,9 +98,31 @@ namespace FakeXrmEasy
 
             return context;
         }
-
-        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx, T instance)
+        
+        /// <summary>
+        /// Executes a plugin passing a custom context. This is useful whenever we need to mock more complex plugin contexts (ex: passing MessageName, plugin Depth, InitiatingUserId etc...)
+        /// </summary>
+        /// <typeparam name="T">Must be a plugin</typeparam>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx = null)
             where T : IPlugin, new()
+        {
+            if (ctx == null)
+            {
+                ctx = GetDefaultPluginContext();
+            }
+
+            return this.ExecutePluginWith(ctx, new T());
+        }
+
+        /// <summary>
+        /// Executes a plugin passing a custom context. This is useful whenever we need to mock more complex plugin contexts (ex: passing MessageName, plugin Depth, InitiatingUserId etc...)
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="instance"></param>
+        /// <returns></returns>
+        public IPlugin ExecutePluginWith(XrmFakedPluginExecutionContext ctx, IPlugin instance)
         {
             var fakedServiceProvider = GetFakedServiceProvider(ctx);
 
@@ -105,27 +136,6 @@ namespace FakeXrmEasy
 
             fakedPlugin.Execute(fakedServiceProvider); //Execute the plugin
             return fakedPlugin;
-        }
-
-        public IPlugin ExecutePluginWith<T>(XrmFakedPluginExecutionContext ctx = null)
-            where T : IPlugin, new()
-        {
-            if (ctx == null)
-            {
-                ctx = GetDefaultPluginContext();
-            }
-
-            return this.ExecutePluginWith(ctx, new T());
-        }
-
-        public IPlugin ExecutePluginWithTarget<T>(XrmFakedPluginExecutionContext ctx, Entity target, string messageName = "Create", int stage = 40)
-            where T : IPlugin, new()
-        {
-            ctx.InputParameters.Add("Target", target);
-            ctx.MessageName = messageName;
-            ctx.Stage = stage;
-
-            return this.ExecutePluginWith<T>(ctx);
         }
 
         public IPlugin ExecutePluginWith<T>(ParameterCollection inputParameters, ParameterCollection outputParameters, EntityImageCollection preEntityImages, EntityImageCollection postEntityImages)
@@ -152,7 +162,7 @@ namespace FakeXrmEasy
         }
 
         public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, string unsecureConfiguration, string secureConfiguration)
-            where T : class, IPlugin 
+            where T : class, IPlugin
         {
             var pluginType = typeof(T);
             var constructors = pluginType.GetConstructors().ToList();
@@ -164,11 +174,11 @@ namespace FakeXrmEasy
 
             var pluginInstance = (T)Activator.CreateInstance(typeof(T), unsecureConfiguration, secureConfiguration);
 
-            return this.ExecutePluginWithConfigurations(plugCtx, pluginInstance, unsecureConfiguration, secureConfiguration);
-          
+            return this.ExecutePluginWith(plugCtx, pluginInstance);
         }
 
-        public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, T instance, string unsecureConfiguration, string secureConfiguration)
+        [Obsolete("Use ExecutePluginWith(XrmFakedPluginExecutionContext ctx, IPlugin instance).")]
+        public IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, T instance, string unsecureConfiguration="", string secureConfiguration="")
             where T : class, IPlugin
         {
             var fakedServiceProvider = GetFakedServiceProvider(plugCtx);
@@ -194,6 +204,16 @@ namespace FakeXrmEasy
             return fakedPlugin;
         }
 
+        public IPlugin ExecutePluginWithTarget<T>(XrmFakedPluginExecutionContext ctx, Entity target, string messageName = "Create", int stage = 40)
+          where T : IPlugin, new()
+        {
+            ctx.InputParameters.Add("Target", target);
+            ctx.MessageName = messageName;
+            ctx.Stage = stage;
+
+            return this.ExecutePluginWith<T>(ctx);
+        }
+
         /// <summary>
         /// Executes the plugin of type T against the faked context for an entity target
         /// and returns the faked plugin
@@ -204,15 +224,30 @@ namespace FakeXrmEasy
         /// <param name="stage">Sets the stage.</param>
         /// <returns></returns>
         public IPlugin ExecutePluginWithTarget<T>(Entity target, string messageName = "Create", int stage = 40)
-            where T: IPlugin, new()
+            where T : IPlugin, new()
+        {
+            return this.ExecutePluginWithTarget(new T(), target, messageName, stage);
+        }
+
+        /// <summary>
+        /// Executes the plugin of type T against the faked context for an entity target
+        /// and returns the faked plugin
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="target">The entity to execute the plug-in for.</param>
+        /// <param name="messageName">Sets the message name.</param>
+        /// <param name="stage">Sets the stage.</param>
+        /// <returns></returns>
+        public IPlugin ExecutePluginWithTarget(IPlugin instance, Entity target, string messageName = "Create", int stage = 40)
         {
             var ctx = GetDefaultPluginContext();
+
             // Add the target entity to the InputParameters
             ctx.InputParameters.Add("Target", target);
             ctx.MessageName = messageName;
             ctx.Stage = stage;
 
-            return this.ExecutePluginWith<T>(ctx);
+            return this.ExecutePluginWith(ctx, instance);
         }
 
         /// <summary>
@@ -227,15 +262,35 @@ namespace FakeXrmEasy
         public IPlugin ExecutePluginWithTargetReference<T>(EntityReference target, string messageName = "Delete", int stage = 40)
             where T : IPlugin, new()
         {
+            return this.ExecutePluginWithTargetReference(new T(), target, messageName, stage);
+        }
+
+        /// <summary>
+        /// Executes the plugin of type T against the faked context for an entity reference target
+        /// and returns the faked plugin
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="target">The entity reference to execute the plug-in for.</param>
+        /// <param name="messageName">Sets the message name.</param>
+        /// <param name="stage">Sets the stage.</param>
+        /// <returns></returns>
+        public IPlugin ExecutePluginWithTargetReference(IPlugin instance, EntityReference target, string messageName = "Delete", int stage = 40)
+        {
             var ctx = GetDefaultPluginContext();
             // Add the target entity to the InputParameters
             ctx.InputParameters.Add("Target", target);
             ctx.MessageName = messageName;
             ctx.Stage = stage;
 
-            return this.ExecutePluginWith<T>(ctx);
+            return this.ExecutePluginWith(ctx, instance);
         }
 
+        /// <summary>
+        /// Returns a faked plugin with a target and the specified pre entity images
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        [Obsolete]
         public IPlugin ExecutePluginWithTargetAndPreEntityImages<T>(object target, EntityImageCollection preEntityImages, string messageName = "Create", int stage = 40)
             where T : IPlugin, new()
         {
@@ -249,6 +304,12 @@ namespace FakeXrmEasy
             return this.ExecutePluginWith<T>(ctx);
         }
 
+        /// <summary>
+        /// Returns a faked plugin with a target and the specified post entity images
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        [Obsolete]
         public IPlugin ExecutePluginWithTargetAndPostEntityImages<T>(object target, EntityImageCollection postEntityImages, string messageName = "Create", int stage = 40)
             where T : IPlugin, new()
         {
@@ -262,6 +323,7 @@ namespace FakeXrmEasy
             return this.ExecutePluginWith<T>(ctx);
         }
 
+        [Obsolete]
         public IPlugin ExecutePluginWithTargetAndInputParameters<T>(Entity target, ParameterCollection inputParameters, string messageName = "Create", int stage = 40)
             where T : IPlugin, new()
         {

@@ -14,11 +14,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepStage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityMetadataExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityReferenceExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\QueryExpressionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\XmlExtensionsForFetchXml.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddListMembersListRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RetrieveExchangeRateRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\BulkDeleteRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\RemoveMembersTeamRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddMembersTeamRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\AddMemberListRequestExecutor.cs" />
@@ -64,7 +67,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\WinOpportunityRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IXrmFakedContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Metadata\DateTimeAttributeBehavior.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Metadata\MetadataGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\TypedConditionExpression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultInvalidArgument.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultOperatorIsNotValidException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultQueryBuilderNoAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Permissions\AccessRightsRepository.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Permissions\IAccessRightsRepository.cs" />

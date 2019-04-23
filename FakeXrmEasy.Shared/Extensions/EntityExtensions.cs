@@ -101,6 +101,7 @@ namespace FakeXrmEasy.Extensions
                     if (e.FormattedValues.ContainsKey(linkedAttKey))
                         projected.FormattedValues[linkedAttKey] = e.FormattedValues[linkedAttKey];
                 }
+
             }
 
             foreach (var nestedLinkedEntity in le.LinkEntities)
@@ -111,11 +112,9 @@ namespace FakeXrmEasy.Extensions
 
         public static Entity ProjectAttributes(this Entity e, QueryExpression qe, XrmFakedContext context)
         {
-            if (qe.ColumnSet == null) return e;
-
-            if (qe.ColumnSet.AllColumns)
+            if (qe.ColumnSet == null || qe.ColumnSet.AllColumns)
             {
-                return e; //return all the original attributes
+                return RemoveNullAttributes(e); //return all the original attributes
             }
             else
             {
@@ -139,12 +138,6 @@ namespace FakeXrmEasy.Extensions
                     projected = new Entity(e.LogicalName) { Id = e.Id };
 
 
-                //Remove primary attribute unless explicitly specified
-                if (projected.Attributes.ContainsKey($"{e.LogicalName}id"))
-                {
-                    projected.Attributes.Remove($"{e.LogicalName}id");
-                }
-
                 foreach (var attKey in qe.ColumnSet.Columns)
                 {
                     //Check if attribute really exists in metadata
@@ -155,7 +148,7 @@ namespace FakeXrmEasy.Extensions
 
                     if (e.Attributes.ContainsKey(attKey) && e.Attributes[attKey] != null)
                     {
-                        projected[attKey] = CloneAttribute(e[attKey]);
+                        projected[attKey] = CloneAttribute(e[attKey], context);
 
                         string formattedValue = "";
 
@@ -170,18 +163,26 @@ namespace FakeXrmEasy.Extensions
                 //Plus attributes from joins
                 foreach (var le in qe.LinkEntities)
                 {
-                    ProjectAttributes(e, projected, le, context);
+                    ProjectAttributes(RemoveNullAttributes(e), projected, le, context);
                 }
-                //foreach (var attKey in e.Attributes.Keys)
-                //{
-                //    if(e[attKey] is AliasedValue && !projected.Attributes.ContainsKey(attKey))
-                //        projected[attKey] = e[attKey];
-                //}
-                return projected;
+                return RemoveNullAttributes(projected);
             }
         }
 
-        public static object CloneAttribute(object attributeValue)
+        public static Entity RemoveNullAttributes(Entity entity)
+        {
+            IList<string> nullAttributes = entity.Attributes
+                .Where(attribute => attribute.Value == null ||
+                                  (attribute.Value is AliasedValue && (attribute.Value as AliasedValue).Value == null))
+                .Select(attribute => attribute.Key).ToList();
+            foreach (var nullAttribute in nullAttributes)
+            {
+                entity.Attributes.Remove(nullAttribute);
+            }
+            return entity;
+        }
+
+        public static object CloneAttribute(object attributeValue, XrmFakedContext context = null)
         {
             if (attributeValue == null)
                 return null;
@@ -197,7 +198,24 @@ namespace FakeXrmEasy.Extensions
             {
                 var original = (attributeValue as EntityReference);
                 var clone = new EntityReference(original.LogicalName, original.Id);
-                clone.Name = CloneAttribute(original.Name) as string;
+
+                if (context != null && !string.IsNullOrEmpty(original.LogicalName) && context.EntityMetadata.ContainsKey(original.LogicalName) && !string.IsNullOrEmpty(context.EntityMetadata[original.LogicalName].PrimaryNameAttribute) &&
+                    context.Data.ContainsKey(original.LogicalName) && context.Data[original.LogicalName].ContainsKey(original.Id))
+                {
+                    clone.Name = context.Data[original.LogicalName][original.Id].GetAttributeValue<string>(context.EntityMetadata[original.LogicalName].PrimaryNameAttribute);
+                }
+                else
+                {
+                    clone.Name = CloneAttribute(original.Name) as string;
+                }
+
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
+                if (original.KeyAttributes != null)
+                {
+                    clone.KeyAttributes = new KeyAttributeCollection();
+                    clone.KeyAttributes.AddRange(original.KeyAttributes.Select(kvp => new KeyValuePair<string, object>(CloneAttribute(kvp.Key) as string, kvp.Value)).ToArray());
+                }
+#endif
                 return clone;
             }
             else if (type == typeof(BooleanManagedProperty))
@@ -225,17 +243,25 @@ namespace FakeXrmEasy.Extensions
                 var collection = attributeValue as EntityCollection;
                 return new EntityCollection(collection.Entities.Select(e => e.Clone(e.GetType())).ToList());
             }
-            else if(attributeValue is IEnumerable<Entity>)
+            else if (attributeValue is IEnumerable<Entity>)
             {
                 var enumerable = attributeValue as IEnumerable<Entity>;
                 return enumerable.Select(e => e.Clone(e.GetType())).ToArray();
             }
 #if !FAKE_XRM_EASY
-            else if(type == typeof(byte[]))
+            else if (type == typeof(byte[]))
             {
                 var original = (attributeValue as byte[]);
                 var copy = new byte[original.Length];
                 original.CopyTo(copy, 0);
+                return copy;
+            }
+#endif
+#if FAKE_XRM_EASY_9
+            else if (attributeValue is OptionSetValueCollection)
+            {
+                var original = (attributeValue as OptionSetValueCollection);
+                var copy = new OptionSetValueCollection(original.ToArray());
                 return copy;
             }
 #endif
@@ -263,7 +289,7 @@ namespace FakeXrmEasy.Extensions
             throw new Exception(string.Format("Attribute type not supported when trying to clone attribute '{0}'", type.ToString()));
         }
 
-        public static Entity Clone(this Entity e)
+        public static Entity Clone(this Entity e, XrmFakedContext context = null)
         {
             var cloned = new Entity(e.LogicalName);
             cloned.Id = e.Id;
@@ -280,8 +306,14 @@ namespace FakeXrmEasy.Extensions
 
             foreach (var attKey in e.Attributes.Keys)
             {
-                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey]) : null;
+                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey], context) : null;
             }
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
+            foreach (var attKey in e.KeyAttributes.Keys)
+            {
+                cloned.KeyAttributes[attKey] = e.KeyAttributes[attKey] != null ? CloneAttribute(e.KeyAttributes[attKey]) : null;
+            }
+#endif
             return cloned;
         }
 
@@ -290,10 +322,10 @@ namespace FakeXrmEasy.Extensions
             return (T)e.Clone(typeof(T));
         }
 
-        public static Entity Clone(this Entity e, Type t)
+        public static Entity Clone(this Entity e, Type t, XrmFakedContext context = null)
         {
             if (t == null)
-                return e.Clone();
+                return e.Clone(context);
 
             var cloned = Activator.CreateInstance(t) as Entity;
             cloned.Id = e.Id;
@@ -310,11 +342,15 @@ namespace FakeXrmEasy.Extensions
 
             foreach (var attKey in e.Attributes.Keys)
             {
-                if (e[attKey] != null)
-                {
-                    cloned[attKey] = CloneAttribute(e[attKey]);
-                }
+                cloned[attKey] = e[attKey] != null ? CloneAttribute(e[attKey], context) : null;
             }
+
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
+            foreach (var attKey in e.KeyAttributes.Keys)
+            {
+                cloned.KeyAttributes[attKey] = e.KeyAttributes[attKey] != null ? CloneAttribute(e.KeyAttributes[attKey]) : null;
+            }
+#endif
             return cloned;
         }
 
@@ -424,7 +460,7 @@ namespace FakeXrmEasy.Extensions
         /// <param name="e"></param>
         /// <param name="sAttributeName"></param>
         /// <returns></returns>
-        public static Guid KeySelector(this Entity e, string sAttributeName, XrmFakedContext context)
+        public static object KeySelector(this Entity e, string sAttributeName, XrmFakedContext context)
         {
             if (sAttributeName.Contains("."))
             {
@@ -449,21 +485,29 @@ namespace FakeXrmEasy.Extensions
             }
 
             object keyValue = null;
-            if (e[sAttributeName] is AliasedValue)
+            AliasedValue aliasedValue;
+            if ((aliasedValue = e[sAttributeName] as AliasedValue) != null)
             {
-                keyValue = (e[sAttributeName] as AliasedValue).Value;
+                keyValue = aliasedValue.Value;
             }
             else
             {
                 keyValue = e[sAttributeName];
             }
 
-            if (keyValue is EntityReference)
-                return (keyValue as EntityReference).Id;
-            if (keyValue is Guid)
-                return ((Guid)keyValue);
+            EntityReference entityReference = keyValue as EntityReference;
+            if (entityReference != null)
+                return entityReference.Id;
 
-            return Guid.Empty;
+            OptionSetValue optionSetValue = keyValue as OptionSetValue;
+            if (optionSetValue != null)
+                return optionSetValue.Value;
+
+            Money money = keyValue as Money;
+            if (money != null)
+                return money.Value;
+
+            return keyValue;
         }
 
         /// <summary>
@@ -485,5 +529,21 @@ namespace FakeXrmEasy.Extensions
                 e[property] = value;
             }
         }
+
+        /// <summary>
+        /// ToEntityReference implementation which converts an entity into an entity reference with key attribute info as well
+        /// </summary>
+        /// <param name="e">Entity to convert to an Entity Reference</param>
+        /// <returns></returns>
+        public static EntityReference ToEntityReferenceWithKeyAttributes(this Entity e)
+        {
+            var result = e.ToEntityReference();
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
+            result.KeyAttributes = e.KeyAttributes;
+#endif
+            return result;
+        }
+
+
     }
 }

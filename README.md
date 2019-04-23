@@ -1,4 +1,4 @@
-﻿Fake Xrm Easy: TDD for Dynamics CRM and Dynamics 365 made simple
+﻿Fake Xrm Easy: TDD for Dynamics CRM and Dynamics 365 (or now Common Data Service for Apps) made simple
 =================================================================================
 
 |Build|Line Coverage|Branch Coverage|
@@ -46,7 +46,7 @@ Please consider the below guidelines for contributing to the project:
 
 * <u>Provide a unit test</u> to reproduce any issues detected where possible. 
 * Attach all generated early bound typed entities required (if you're using early bound).
-* Finally, if you are able to even fix the issue yourself, which would be <i>awesome</i>, please do [fork](https://github.com/jordimontana82/fake-xrm-easy/fork) the project and submit a [pull request](https://github.com/jordimontana82/fake-xrm-easy/pulls). We'll thank you forever and ever. 
+* Finally, if you are even able to fix the issue yourself, which would be <i>awesome</i>, please do [fork](https://github.com/jordimontana82/fake-xrm-easy/fork) the project and submit a [pull request](https://github.com/jordimontana82/fake-xrm-easy/pulls). We'll thank you forever and ever. 
 
 ## Roadmap
 
@@ -64,3 +64,4 @@ FetchXml implementation:
 ## Tests disappeared?
 
 Try deleting anything under the VS test explorer cache: `%Temp%\VisualStudioTestExplorerExtensions`
+

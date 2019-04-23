@@ -16,7 +16,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Find_Faked_N_To_N_Records()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var userId = new Guid("11111111-7982-4276-A8FE-7CE05FABEAB4");
             var businessId = Guid.NewGuid();
@@ -94,7 +94,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Only_Find_Correct_Faked_N_To_N_Records()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var userId = new Guid("11111111-7982-4276-A8FE-7CE05FABEAB4");
             var businessId = Guid.NewGuid();
@@ -196,7 +196,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Not_Find_Faked_N_To_N_Records_If_Disassociated_Again()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var userId = new Guid("11111111-7982-4276-A8FE-7CE05FABEAB4");
             var businessId = Guid.NewGuid();
@@ -285,7 +285,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Find_Faked_N_To_N_Records_Using_Associate_Method()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var userId = new Guid("11111111-7982-4276-A8FE-7CE05FABEAB4");
             var businessId = Guid.NewGuid();
@@ -359,7 +359,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Not_Find_Faked_N_To_N_Records_If_Disassociated_Again_Using_Disassociate_Method()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var userId = new Guid("11111111-7982-4276-A8FE-7CE05FABEAB4");
             var businessId = Guid.NewGuid();
@@ -440,13 +440,13 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Not_Fail_On_Conditions_In_Link_Entities()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var testEntity1 = new Entity("entity1")
             {
                 Attributes = new AttributeCollection
                 {
-                    {"entity1attr", "test1"}
+                    {"entity1attr", "test2"}
                 }
             };
             var testEntity2 = new Entity("entity2")
@@ -506,6 +506,22 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var result = fakedService.RetrieveMultiple(query);
             Assert.NotEmpty(result.Entities);
             Assert.Equal(1, result.Entities.Count);
+        }
+
+        [Fact]
+        public void Entities_Can_Be_Linked_On_String_Attribute()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            var entity = new Entity("entity") { Id = Guid.NewGuid(), ["name"] = "test" };
+            context.Initialize(entity);
+            var query = new QueryExpression("entity");
+            query.ColumnSet = new ColumnSet(true);
+            query.AddLink("entity", "name", "name");
+
+            var queryResult = service.RetrieveMultiple(query);
+
+            Assert.Equal(1, queryResult.Entities.Count);
         }
 
         [Fact]
@@ -570,7 +586,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
             ctx.Initialize(new List<Entity>()
             {
                 new Contact()
@@ -599,7 +615,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
             ctx.Initialize(new List<Entity>()
             {
                 new Contact() {Id = Guid.NewGuid(), FirstName = "Ronald", LastName = "Mcdonald"},
@@ -634,7 +650,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             var ctx = new XrmFakedContext();
             ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
             ctx.Initialize(new List<Entity>() {
                 account1, account2, account3, contact1, contact2, contact3, contact4, contact5, contact6
             });
@@ -679,7 +695,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public void Should_Not_Apply_Left_Outer_Join_Filters_When_The_Right_hand_side_of_the_expression_wasnt_found()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             // Date for filtering, we only want "expired" records, i.e. those that weren't set as regarding in any emails for this period and logically even exist this long
             var days = 5;
@@ -751,7 +767,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public void Should_Apply_Left_Outer_Join_Filters_When_The_Right_hand_side_of_the_expression_was_found()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             // Date for filtering, we only want "expired" records, i.e. those that weren't set as regarding in any emails for this period and logically even exist this long
             var days = 5;
@@ -866,7 +882,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             var result = service.RetrieveMultiple(query);
             var resultingEntity = result.Entities[0];
-            Assert.Equal(1, resultingEntity.Attributes.Count);
+            Assert.Equal(2, resultingEntity.Attributes.Count);
             Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
         }
 
@@ -921,7 +937,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             var result = service.RetrieveMultiple(query);
             var resultingEntity = result.Entities[0];
-            Assert.Equal(2, resultingEntity.Attributes.Count);
+            Assert.Equal(3, resultingEntity.Attributes.Count);
             Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
             Assert.Equal("BusinessUnit1", ((AliasedValue)resultingEntity["businessunit1.name"]).Value);
         }
@@ -979,7 +995,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             var result = service.RetrieveMultiple(query);
             var resultingEntity = result.Entities[0];
-            Assert.Equal(2, resultingEntity.Attributes.Count);
+            Assert.Equal(3, resultingEntity.Attributes.Count);
             Assert.Equal("User2", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
             Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser2.fullname"]).Value);
         }
@@ -1053,10 +1069,79 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             var result = service.RetrieveMultiple(query);
             var resultingEntity = result.Entities[0];
-            Assert.Equal(3, resultingEntity.Attributes.Count);
+            Assert.Equal(4, resultingEntity.Attributes.Count);
             Assert.Equal("User3", ((AliasedValue)resultingEntity["systemuser1.fullname"]).Value);
             Assert.Equal("User2", ((AliasedValue)resultingEntity["systemuserwithalias.fullname"]).Value);
             Assert.Equal("User1", ((AliasedValue)resultingEntity["systemuser2.fullname"]).Value);
+        }
+
+        [Fact]
+        public void TestRetriveMultipleWithLinkEntityWithAlternateNullField()
+        {
+            // ARRANGE
+
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity parentEntity = new Entity("parent");
+            parentEntity["parentname"] = "parent name";
+            parentEntity.Id = Guid.NewGuid();
+            initialEntities.Add(parentEntity);
+
+            // create the first child which has the "myvalue" field set to "value"
+            Entity childEntity1 = new Entity("child");
+            childEntity1["parent"] = parentEntity.ToEntityReference();
+            childEntity1["name"] = "entity1";
+            childEntity1["myvalue"] = "value";
+            childEntity1.Id = Guid.NewGuid();
+            initialEntities.Add(childEntity1);
+
+            // create the second child which has the "myvalue" field set to null
+            Entity childEntity2 = new Entity("child");
+            childEntity2["parent"] = parentEntity.ToEntityReference();
+            childEntity2["name"] = "entity2";
+            childEntity2["myvalue"] = null;
+            childEntity2.Id = Guid.NewGuid();
+            initialEntities.Add(childEntity2);
+
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            context.Initialize(initialEntities);
+
+            // the query selects the "parent" entity, and joins to the "child" entities
+            QueryExpression query = new QueryExpression("parent");
+            query.ColumnSet = new ColumnSet("parentname");
+
+            LinkEntity link = new LinkEntity("parent", "child", "parentid", "parent", JoinOperator.Inner);
+            link.EntityAlias = "c";
+            link.Columns = new ColumnSet("name", "myvalue");
+
+            query.LinkEntities.Add(link);
+
+            // ACT
+
+            DataCollection<Entity> results = service.RetrieveMultiple(query).Entities;
+
+            // ASSERT
+
+            // fields for the first entity work as expected...
+            string entity1Name = results[0].GetAttributeValue<AliasedValue>("c.name").Value as string;
+            string entity1Value = results[0].GetAttributeValue<AliasedValue>("c.myvalue").Value as string;
+
+            Assert.Equal("entity1", entity1Name);
+            Assert.Equal("value", entity1Value);
+
+            // fields for the second entity do not.  
+            // The child "name" field is correct, but the "myvalue" field is returning the value of the previous
+            // entity when it should be returning null
+            string entity2Name = results[1].GetAttributeValue<AliasedValue>("c.name").Value as string;
+            string entity2Value = results[1].GetAttributeValue<AliasedValue>("c.myvalue")?.Value as string;
+
+            // this works fine:
+            Assert.Equal("entity2", entity2Name);
+
+            // this fails (entity2Value is "value")
+            Assert.Equal(null, entity2Value);
         }
     }
 }

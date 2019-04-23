@@ -19,6 +19,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\QueryExpressionExtensionsTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AddListMembersListRequestTests\Tests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AddMemberListRequestTests\Tests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\BulkDeleteRequestTests\BulkDeleteRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QueryTranslationTests\ProjectionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RemoveUserFromRecordTeamRequestTests\RemoveUserFromRecordTeamRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AddUserToRecordTeamRequestTests\AddUserToRecordTeamRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AddMembersTeamRequestTests\Tests.cs" />
@@ -89,8 +91,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FakeContextTestTranslateQueryExpression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\FilterExpressionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OperatorTests\DateTime\DateTimeOperatorsTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OperatorTests\MultiSelectOptionSet\MultiSelectOptionSetTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OperatorTests\Strings\StringOperatorsTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OrderByTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ValidateReferencesTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WhoAmIRequest\WhoAmITests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WinOpportunityRequestTests\WinOpportunityTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\XrmFakedRelationshipTests.cs" />
@@ -132,6 +136,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestPropertiesPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestSharedVariablesPropertyPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\TestContextPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GeneratedCodeMultiselectOptionSet.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\EntityInitializer\InvoiceDetailInitializerServiceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\EntityInitializer\InvoiceInitializerServiceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestDefaultEntityInitializer.cs" />

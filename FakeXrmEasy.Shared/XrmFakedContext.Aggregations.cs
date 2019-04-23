@@ -33,9 +33,13 @@ namespace FakeXrmEasy
             foreach (var attr in xmlDoc.Descendants(ns + "attribute"))
             {
                 //TODO: Find entity alias. Handle aliasedvalue in the query result.
+                var namespacedAlias = attr.Ancestors(ns + "link-entity").Select(x => x.GetAttribute("alias")?.Value != null ? x.GetAttribute("alias").Value : x.GetAttribute("name").Value).ToList();
+                namespacedAlias.Add(attr.GetAttribute("alias")?.Value);
+                var alias = string.Join(".", namespacedAlias);
+                namespacedAlias.RemoveAt(namespacedAlias.Count - 1);
+                namespacedAlias.Add(attr.GetAttribute("name")?.Value);
+                var logicalName = string.Join(".", namespacedAlias);
 
-                var alias = attr.GetAttribute("alias")?.Value;
-                var logicalName = attr.GetAttribute("name")?.Value;
                 if (string.IsNullOrEmpty("alias"))
                 {
                     throw new Exception("Missing alias for attribute in aggregate fetch xml");
@@ -213,7 +217,8 @@ namespace FakeXrmEasy
                 {
                     if (g.Key[rule] != null)
                     {
-                        ent[groups[rule].OutputAlias] = new AliasedValue(null, groups[rule].Attribute, g.Key[rule]);
+                        object value = g.Key[rule];
+                        ent[groups[rule].OutputAlias] = new AliasedValue(null, groups[rule].Attribute, value is ComparableEntityReference ? (value as ComparableEntityReference).entityReference : value);
                     }
                 }
 
@@ -235,126 +240,176 @@ namespace FakeXrmEasy
                 ));
             }
 
-            public abstract object AggregateValues(IEnumerable<object> values);
+            protected abstract object AggregateValues(IEnumerable<object> values);
+        }
+
+        private abstract class AliasedAggregate : FetchAggregate
+        {
+            protected override object AggregateValues(IEnumerable<object> values)
+            {
+                var lst = values.Where(x => x != null);
+                bool alisedValue = lst.FirstOrDefault() is AliasedValue;
+                if (alisedValue)
+                {
+                    lst = lst.Select(x => (x as AliasedValue)?.Value);
+                }
+
+                return AggregateAliasedValues(lst);
+            }
+
+            protected abstract object AggregateAliasedValues(IEnumerable<object> values);
         }
 
         private class CountAggregate : FetchAggregate
         {
-            public override object AggregateValues(IEnumerable<object> values)
+            protected override object AggregateValues(IEnumerable<object> values)
             {
                 return values.Count();
             }
         }
 
-        private class CountColumnAggregate : FetchAggregate
+        private class CountColumnAggregate : AliasedAggregate
         {
-            public override object AggregateValues(IEnumerable<object> values)
+            protected override object AggregateAliasedValues(IEnumerable<object> values)
             {
                 return values.Where(x => x != null).Count();
             }
         }
 
-        private class CountDistinctAggregate : FetchAggregate
+        private class CountDistinctAggregate : AliasedAggregate
         {
-            public override object AggregateValues(IEnumerable<object> values)
+            protected override object AggregateAliasedValues(IEnumerable<object> values)
             {
                 return values.Where(x => x != null).Distinct().Count();
             }
         }
 
-        private class MinAggregate : FetchAggregate
+        private class MinAggregate : AliasedAggregate
         {
-            public override object AggregateValues(IEnumerable<object> values)
+            protected override object AggregateAliasedValues(IEnumerable<object> values)
             {
-                var lst = values.ToList();
-                // TODO: Check these cases in CRM proper
-                if (lst.Count == 0) return null;
-                if (lst.All(x => x == null)) return null;
-
-                var firstValue = lst.Where(x => x != null).First();
-                var valType = firstValue.GetType();
-
-                if (valType == typeof(Money))
-                {
-                    return new Money(values.Select(x => (x as Money)?.Value ?? 0m).Min());
-                }
-
-                return values.Select(x => x ?? 0).Min();
-            }
-        }
-
-        private class MaxAggregate : FetchAggregate
-        {
-            public override object AggregateValues(IEnumerable<object> values)
-            {
-                var lst = values.ToList();
-                // TODO: Check these cases in CRM proper
-                if (lst.Count == 0) return null;
-                if (lst.All(x => x == null)) return null;
-
-                var firstValue = lst.Where(x => x != null).First();
-                var valType = firstValue.GetType();
-
-                if (valType == typeof(Money))
-                {
-                    return new Money(values.Select(x => (x as Money)?.Value ?? 0m).Max());
-                }
-
-                return values.Select(x => x ?? 0).Max();
-            }
-        }
-
-        private class AvgAggregate : FetchAggregate
-        {
-            public override object AggregateValues(IEnumerable<object> values)
-            {
-                var lst = values.ToList();
-                // TODO: Check these cases in CRM proper
-                if (lst.Count == 0) return null;
-                if (lst.All(x => x == null)) return null;
+                var lst = values.Where(x => x != null);
+                if (!lst.Any()) return null;
 
                 var firstValue = lst.Where(x => x != null).First();
                 var valType = firstValue.GetType();
 
                 if (valType == typeof(decimal) || valType == typeof(decimal?))
                 {
-                    return lst.Average(x => x as decimal? ?? 0m);
+                    return lst.Min(x => (decimal)x);
                 }
+
                 if (valType == typeof(Money))
                 {
-                    return new Money(lst.Average(x => (x as Money)?.Value ?? 0m));
+                    return new Money(lst.Min(x => (x as Money).Value));
                 }
 
                 if (valType == typeof(int) || valType == typeof(int?))
                 {
-                    return lst.Average(x => x as int? ?? 0);
+                    return lst.Min(x => (int)x);
                 }
 
                 if (valType == typeof(float) || valType == typeof(float?))
                 {
-                    return lst.Average(x => x as float? ?? 0f);
+                    return lst.Min(x => (float)x);
                 }
 
                 if (valType == typeof(double) || valType == typeof(double?))
                 {
-                    return lst.Average(x => x as double? ?? 0d);
+                    return lst.Min(x => (double)x);
+                }
+
+                throw new Exception("Unhndled property type '" + valType.FullName + "' in 'min' aggregate");
+            }
+        }
+
+        private class MaxAggregate : AliasedAggregate
+        {
+            protected override object AggregateAliasedValues(IEnumerable<object> values)
+            {
+                var lst = values.Where(x => x != null);
+                if (!lst.Any()) return null;
+
+                var firstValue = lst.First();
+                var valType = firstValue.GetType();
+
+                if (valType == typeof(decimal) || valType == typeof(decimal?))
+                {
+                    return lst.Max(x => (decimal)x);
+                }
+
+                if (valType == typeof(Money))
+                {
+                    return new Money(lst.Max(x => (x as Money).Value));
+                }
+
+                if (valType == typeof(int) || valType == typeof(int?))
+                {
+                    return lst.Max(x => (int)x);
+                }
+
+                if (valType == typeof(float) || valType == typeof(float?))
+                {
+                    return lst.Max(x => (float)x);
+                }
+
+                if (valType == typeof(double) || valType == typeof(double?))
+                {
+                    return lst.Max(x => (double)x);
+                }
+
+                throw new Exception("Unhndled property type '" + valType.FullName + "' in 'max' aggregate");
+            }
+        }
+
+        private class AvgAggregate : AliasedAggregate
+        {
+            protected override object AggregateAliasedValues(IEnumerable<object> values)
+            {
+                var lst = values.Where(x => x != null);
+                if (!lst.Any()) return null;
+
+                var firstValue = lst.First();
+                var valType = firstValue.GetType();
+
+                if (valType == typeof(decimal) || valType == typeof(decimal?))
+                {
+                    return lst.Average(x => (decimal)x);
+                }
+
+                if (valType == typeof(Money))
+                {
+                    return new Money(lst.Average(x => (x as Money).Value));
+                }
+
+                if (valType == typeof(int) || valType == typeof(int?))
+                {
+                    return lst.Average(x => (int)x);
+                }
+
+                if (valType == typeof(float) || valType == typeof(float?))
+                {
+                    return lst.Average(x => (float)x);
+                }
+
+                if (valType == typeof(double) || valType == typeof(double?))
+                {
+                    return lst.Average(x => (double)x);
                 }
 
                 throw new Exception("Unhndled property type '" + valType.FullName + "' in 'avg' aggregate");
             }
         }
 
-        private class SumAggregate : FetchAggregate
+        private class SumAggregate : AliasedAggregate
         {
-            public override object AggregateValues(IEnumerable<object> values)
+            protected override object AggregateAliasedValues(IEnumerable<object> values)
             {
-                var lst = values.ToList();
+                var lst = values.ToList().Where(x => x != null);
                 // TODO: Check these cases in CRM proper
-                if (lst.Count == 0) return null;
-                if (lst.All(x => x == null)) return null;
+                if (!lst.Any()) return null;
 
-                var firstValue = lst.Where(x => x != null).First();
-                var valType = firstValue.GetType();
+                var valType = lst.First().GetType();
 
                 if (valType == typeof(decimal) || valType == typeof(decimal?))
                 {
@@ -410,7 +465,50 @@ namespace FakeXrmEasy
 
             public int GetHashCode(IComparable[] obj)
             {
-                return string.Join(",", obj as IEnumerable<IComparable>).GetHashCode();
+                int result = 0;
+                foreach (IComparable x in obj)
+                {
+                    result ^= x == null ? 0 : x.GetHashCode();
+                }
+                return result;
+            }
+        }
+
+        private class ComparableEntityReference : IComparable
+        {
+            public EntityReference entityReference { get; private set; }
+
+            public ComparableEntityReference(EntityReference entityReference)
+            {
+                this.entityReference = entityReference;
+            }
+
+            int IComparable.CompareTo(object obj)
+            {
+                return Equals(obj) ? 0 : 1;
+            }
+
+            public override bool Equals(object obj)
+            {
+                EntityReference other;
+                if (obj is EntityReference)
+                {
+                    other = obj as EntityReference;
+                }
+                else if (obj is ComparableEntityReference)
+                {
+                    other = (obj as ComparableEntityReference).entityReference;
+                }
+                else
+                {
+                    return false;
+                }
+                return entityReference.Id == other.Id && entityReference.LogicalName == other.LogicalName;
+            }
+
+            public override int GetHashCode()
+            {
+                return (entityReference.LogicalName == null ? 0 : entityReference.LogicalName.GetHashCode()) ^ entityReference.Id.GetHashCode();
             }
         }
 
@@ -418,7 +516,14 @@ namespace FakeXrmEasy
         {
             public override IComparable FindGroupValue(object attributeValue)
             {
-                return attributeValue as IComparable;
+                if (attributeValue is EntityReference)
+                {
+                    return new ComparableEntityReference(attributeValue as EntityReference) as IComparable;
+                }
+                else
+                {
+                    return attributeValue as IComparable;
+                }
             }
         }
 

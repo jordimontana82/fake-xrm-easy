@@ -139,5 +139,35 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QualifyLeadTests
 
             Assert.NotNull(opportunity.CustomerId);
         }
+
+        [Fact]
+        public void Status_of_qualified_Lead_should_be_qualified()
+        {
+            var context = new XrmFakedContext();
+            var service = context.GetOrganizationService();
+
+            var lead = new Lead()
+            {
+                Id = Guid.NewGuid()
+            };
+            context.Initialize(new List<Entity>() { lead });
+
+            var request = new QualifyLeadRequest()
+            {
+                CreateAccount = false,
+                CreateContact = false,
+                CreateOpportunity = false,
+                LeadId = lead.ToEntityReference(),
+                Status = new OptionSetValue((int)LeadState.Qualified)
+            };
+
+            service.Execute(request);
+
+            var qualifiedLead = (from l in context.CreateQuery<Lead>()
+                               where l.Id == lead.Id
+                               select l).Single();
+
+            Assert.Equal((int)LeadState.Qualified, qualifiedLead.StatusCode.Value);
+        }
     }
 }
