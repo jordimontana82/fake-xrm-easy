@@ -71,8 +71,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     {
                         Attributes = new AttributeCollection
                         {
-                            { fromAttribute, associateRequest.Target.Id },
-                            { toAttribute, relatedEntityReference.Id }
+                            { fromAttribute + (toEntityName == fromEntityName ? "one" : ""), associateRequest.Target.Id },
+                            { toAttribute + (toEntityName == fromEntityName ? "two" : ""), relatedEntityReference.Id }
                         }
                     };
 
