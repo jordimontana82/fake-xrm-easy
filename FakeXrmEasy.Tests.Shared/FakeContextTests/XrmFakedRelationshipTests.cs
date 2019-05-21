@@ -34,9 +34,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         }
 
         [Fact]
-        public void TestSelfReferentialRelationships()
+        public void Self_referential_relationships_can_be_created()
         {
-            var context = new FakeXrmEasy.XrmFakedContext();
+            var context = new XrmFakedContext();
 
 
             var exampleMetadata = new EntityMetadata()
@@ -99,9 +99,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         }
 
         [Fact]
-        public void TestReferentialRelationships()
+        public void Relationships_between_two_different_entities_can_be_created()
         {
-            var context = new FakeXrmEasy.XrmFakedContext();
+            var context = new XrmFakedContext();
 
 
             var exampleMetadata = new EntityMetadata()
@@ -147,9 +147,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             {
                 IntersectEntity = "test_entity_other",
                 Entity1LogicalName = exampleMetadata.LogicalName,
-                Entity1Attribute = idAttribute.LogicalName + "one",
+                Entity1Attribute = idAttribute.LogicalName,
                 Entity2LogicalName = otherMetadata.LogicalName,
-                Entity2Attribute = otherIdAttribute.LogicalName + "two",
+                Entity2Attribute = otherIdAttribute.LogicalName,
                 RelationshipType = XrmFakedRelationship.enmFakeRelationshipType.ManyToMany
             });
 
@@ -166,7 +166,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
 
             context.Initialize(new[] { record1, record2 });
-            
+
             var service = context.GetOrganizationService();
 
             var relationship = new Relationship("test_entity_other");
