@@ -556,7 +556,6 @@ namespace FakeXrmEasy
                 }
             }
 
-
         }
 
         protected internal bool AttributeExistsInMetadata(string sEntityName, string sAttributeName)
