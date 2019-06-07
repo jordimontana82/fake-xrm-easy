@@ -83,7 +83,7 @@ namespace FakeXrmEasy
             if (EntityMetadata.ContainsKey(sLogicalName))
                 return EntityMetadata[sLogicalName].Copy();
 
-            return default;
+            return null;
         }
 
         public void SetEntityMetadata(EntityMetadata em)
