@@ -237,7 +237,9 @@ namespace FakeXrmEasy.Tests
                 Target = order
             };
 
-            var exception = Assert.Throws<Exception>(() => service.Execute(request));
+            var exception = Record.Exception(() => service.Execute(request));
+
+            Assert.IsType<Exception>(exception);
             Assert.Equal(exception.Message, "Relationship order_details does not exist in the metadata cache");
         }
 
@@ -322,7 +324,7 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
-        public void Shouldnt_modify_objects_passed_to_the_service()
+        public void Shouldnt_modify_objects_passed_to_the_service() // *PLEASE_READ* This test is correct?
         {
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));

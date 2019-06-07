@@ -754,7 +754,19 @@ namespace FakeXrmEasy
                 case ConditionOperator.ThisMonth:
                 case ConditionOperator.LastMonth:
                 case ConditionOperator.NextMonth:
+                case ConditionOperator.LastWeek:
+                case ConditionOperator.ThisWeek:
+                case ConditionOperator.NextWeek:
                     operatorExpression = TranslateConditionExpressionBetweenDates(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
+                case ConditionOperator.Next7Days:
+                    {
+                        DateTime today = DateTime.Today;
+                        c.CondExpression.Values.Add(today);
+                        c.CondExpression.Values.Add(today.AddDays(7));
+                        operatorExpression = TranslateConditionExpressionBetween(c, getAttributeValueExpr, containsAttributeExpression);
+                    }
                     break;
 
 #if FAKE_XRM_EASY_9
@@ -1575,7 +1587,6 @@ namespace FakeXrmEasy
             var thisYear = today.Year;
             var thisMonth = today.Month;
 
-
             switch (c.Operator)
             {
                 case ConditionOperator.ThisYear: // From first day of this year to last day of this year
@@ -1604,6 +1615,18 @@ namespace FakeXrmEasy
                     fromDate = new DateTime(thisYear, thisMonth, 1).AddMonths(1);
                     // LAst day of Next Month: Add two months to the first of this month, and then go back one day
                     toDate = new DateTime(thisYear, thisMonth, 1).AddMonths(2).AddDays(-1);
+                    break;
+                case ConditionOperator.ThisWeek:
+                    fromDate = today.ToFirstDayOfDeltaWeek();
+                    toDate = today.ToLastDayOfDeltaWeek().AddDays(1);
+                    break;
+                case ConditionOperator.LastWeek:
+                    fromDate = today.ToFirstDayOfDeltaWeek(-1);
+                    toDate = today.ToLastDayOfDeltaWeek(-1).AddDays(1);
+                    break;
+                case ConditionOperator.NextWeek:
+                    fromDate = today.ToFirstDayOfDeltaWeek(1);
+                    toDate = today.ToLastDayOfDeltaWeek(1).AddDays(1);
                     break;
             }
 
@@ -1988,18 +2011,22 @@ namespace FakeXrmEasy
 
             var nextDateTime = default(DateTime);
             var currentDateTime = DateTime.UtcNow;
-            var numberOfWeeks = (int)c.Values[0];
+            var numberOfWeeks = c.Values.Any() ? (int)c.Values[0] : 1;
 
             switch (c.Operator)
             {
                 case ConditionOperator.NextXWeeks:
                     nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
+                    c.Values[0] = (currentDateTime);
+                    c.Values.Add(nextDateTime);
+                    c.Values.Add(numberOfWeeks);
+                    break;
+                case ConditionOperator.Next7Days:
+                    nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
+                    c.Values.Add(currentDateTime);
+                    c.Values.Add(nextDateTime);
                     break;
             }
-
-            c.Values[0] = (currentDateTime);
-            c.Values.Add(nextDateTime);
-            // c.Values.Add(numberOfWeeks);
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
