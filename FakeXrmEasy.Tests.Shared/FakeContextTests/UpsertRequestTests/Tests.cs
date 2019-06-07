@@ -1,5 +1,6 @@
 ﻿using Crm;
 using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -17,7 +18,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.UpsertRequestTests
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
             var service = context.GetOrganizationService();
-            
+
             var contact = new Contact()
             {
                 Id = Guid.NewGuid(),
@@ -54,6 +55,85 @@ namespace FakeXrmEasy.Tests.FakeContextTests.UpsertRequestTests
                 FirstName = "FakeXrm",
                 LastName = "Easy"
             };
+
+            var request = new UpsertRequest()
+            {
+                Target = contact
+            };
+
+            var response = (UpsertResponse)service.Execute(request);
+
+            Assert.Equal(false, response.RecordCreated);
+        }
+
+        [Fact]
+        public void Upsert_Creates_Record_When_It_Does_Not_Exist_Using_Alternate_Key()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+            context.InitializeMetadata(Assembly.GetExecutingAssembly());
+            var service = context.GetOrganizationService();
+
+            var key = new EntityKeyMetadata[]
+            {
+                new EntityKeyMetadata()
+                {
+                    KeyAttributes = new string[]{"firstname","lastname"}
+                }
+            };
+            typeof(EntityMetadata).GetProperty("Keys").SetValue(context.GetEntityMetadataByName("contact"), key, null);
+
+            var contact = new Contact()
+            {
+                FirstName = "FakeXrm",
+                LastName = "Easy"
+            };
+            contact.KeyAttributes.Add("firstname", contact.FirstName);
+            contact.KeyAttributes.Add("lastname", contact.LastName);
+
+            var request = new UpsertRequest()
+            {
+                Target = contact
+            };
+
+            var response = (UpsertResponse)service.Execute(request);
+
+            Assert.Equal(true, response.RecordCreated);
+        }
+
+        [Fact]
+        public void Upsert_Updates_Record_When_It_Exists_Using_Alternate_Key()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+            context.InitializeMetadata(Assembly.GetExecutingAssembly());
+            var service = context.GetOrganizationService();
+
+            var key = new EntityKeyMetadata[]
+                             {
+                                 new EntityKeyMetadata()
+                                 {
+                                    KeyAttributes = new string[]{"firstname","lastname"}
+                                 }
+                             };
+            typeof(EntityMetadata).GetProperty("Keys").SetValue(context.GetEntityMetadataByName("contact"), key, null);
+
+            var contact = new Contact()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "FakeXrm",
+                LastName = "Easy"
+            };
+            context.Initialize(new[] { contact });
+
+            contact = new Contact()
+            {
+                FirstName = "FakeXrm2",
+                LastName = "Easy2"
+            };
+
+            contact.KeyAttributes.Add("firstname", "FakeXrm");
+            contact.KeyAttributes.Add("lastname", "Easy");
 
             var request = new UpsertRequest()
             {
