@@ -21,8 +21,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             var service = ctx.GetOrganizationService();
 
-            if (ctx.Data.ContainsKey(upsertRequest.Target.LogicalName) &&
-                ctx.Data[upsertRequest.Target.LogicalName].ContainsKey(upsertRequest.Target.Id))
+            var entityLogicalName = upsertRequest.Target.LogicalName;
+            var entityId = ctx.GetRecordUniqueId(upsertRequest.Target.ToEntityReferenceWithKeyAttributes());
+
+            if (ctx.Data.ContainsKey(entityLogicalName) &&
+                ctx.Data[entityLogicalName].ContainsKey(entityId))
             {
                 recordCreated = false;
                 service.Update(upsertRequest.Target);
@@ -30,12 +33,12 @@ namespace FakeXrmEasy.FakeMessageExecutors
             else
             {
                 recordCreated = true;
-                service.Create(upsertRequest.Target);
+                entityId = service.Create(upsertRequest.Target);
             }
-            
+
             var result = new UpsertResponse();
             result.Results.Add("RecordCreated", recordCreated);
-            result.Results.Add("Target", upsertRequest.Target.ToEntityReference());
+            result.Results.Add("Target", new EntityReference(entityLogicalName, entityId));
             return result;
         }
 

@@ -1,10 +1,9 @@
 ﻿using Crm;
+using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.UpsertRequestTests
@@ -74,22 +73,21 @@ namespace FakeXrmEasy.Tests.FakeContextTests.UpsertRequestTests
             context.InitializeMetadata(Assembly.GetExecutingAssembly());
             var service = context.GetOrganizationService();
 
-            var key = new EntityKeyMetadata[]
+            var metadata = context.GetEntityMetadataByName("contact");
+            metadata.SetFieldValue("_keys", new EntityKeyMetadata[]
             {
                 new EntityKeyMetadata()
                 {
-                    KeyAttributes = new string[]{"firstname","lastname"}
+                    KeyAttributes = new string[]{"firstname"}
                 }
-            };
-            typeof(EntityMetadata).GetProperty("Keys").SetValue(context.GetEntityMetadataByName("contact"), key, null);
-
+            });
+            context.SetEntityMetadata(metadata);
             var contact = new Contact()
             {
                 FirstName = "FakeXrm",
                 LastName = "Easy"
             };
             contact.KeyAttributes.Add("firstname", contact.FirstName);
-            contact.KeyAttributes.Add("lastname", contact.LastName);
 
             var request = new UpsertRequest()
             {
@@ -109,14 +107,16 @@ namespace FakeXrmEasy.Tests.FakeContextTests.UpsertRequestTests
             context.InitializeMetadata(Assembly.GetExecutingAssembly());
             var service = context.GetOrganizationService();
 
-            var key = new EntityKeyMetadata[]
-                             {
-                                 new EntityKeyMetadata()
-                                 {
-                                    KeyAttributes = new string[]{"firstname","lastname"}
-                                 }
-                             };
-            typeof(EntityMetadata).GetProperty("Keys").SetValue(context.GetEntityMetadataByName("contact"), key, null);
+
+            var metadata = context.GetEntityMetadataByName("contact");
+            metadata.SetFieldValue("_keys", new EntityKeyMetadata[]
+            {
+                new EntityKeyMetadata()
+                {
+                    KeyAttributes = new string[]{"firstname"}
+                }
+            });
+            context.SetEntityMetadata(metadata);
 
             var contact = new Contact()
             {
@@ -133,7 +133,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.UpsertRequestTests
             };
 
             contact.KeyAttributes.Add("firstname", "FakeXrm");
-            contact.KeyAttributes.Add("lastname", "Easy");
 
             var request = new UpsertRequest()
             {
