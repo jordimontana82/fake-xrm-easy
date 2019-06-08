@@ -50,20 +50,44 @@ namespace FakeXrmEasy
                     {
                         if (record.KeyAttributes.Keys.Count == key.KeyAttributes.Length && key.KeyAttributes.All(x => record.KeyAttributes.Keys.Contains(x)))
                         {
-                            var matchedRecord = Data[record.LogicalName].Values.SingleOrDefault(x => record.KeyAttributes.All(k => x.Attributes.ContainsKey(k.Key) && x.Attributes[k.Key] != null && x.Attributes[k.Key].Equals(k.Value)));
-                            if (matchedRecord == null)
+                            if (Data.ContainsKey(record.LogicalName))
+                            {
+                                var matchedRecord = Data[record.LogicalName].Values.SingleOrDefault(x => record.KeyAttributes.All(k => x.Attributes.ContainsKey(k.Key) && x.Attributes[k.Key] != null && x.Attributes[k.Key].Equals(k.Value)));
+                                if (matchedRecord != null)
+                                {
+                                    return matchedRecord.Id;
+                                }
+                            }
+                        }
+                    }              
+                }
+            }
+#endif
+
+            return record.Id;
+        }
+
+        public void ValidateRecordUniqueId(EntityReference record)
+        {
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
+            if (record.Id == Guid.Empty && record.HasKeyAttributes())
+            {
+                if (EntityMetadata.ContainsKey(record.LogicalName))
+                {
+                    var entityMetadata = EntityMetadata[record.LogicalName];
+                    foreach (var key in entityMetadata.Keys)
+                    {
+                        if (record.KeyAttributes.Keys.Count == key.KeyAttributes.Length && key.KeyAttributes.All(x => record.KeyAttributes.Keys.Contains(x)))
+                        {
+                            if (!Data.ContainsKey(record.LogicalName) || Data[record.LogicalName].Values.SingleOrDefault(x => record.KeyAttributes.All(k => x.Attributes.ContainsKey(k.Key) && x.Attributes[k.Key] != null && x.Attributes[k.Key].Equals(k.Value))) == null)
                             {
                                 new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{record.LogicalName} with the specified Alternate Keys Does Not Exist");
                             }
-                            return matchedRecord.Id;
+                            return;
                         }
                     }
-                    throw new InvalidOperationException($"The requested key attributes do not exist for the entity {record.LogicalName}");
                 }
-                else
-                {
-                    throw new InvalidOperationException($"The requested key attributes do not exist for the entity {record.LogicalName}");
-                }
+                throw new InvalidOperationException($"The requested key attributes do not exist for the entity {record.LogicalName}");
             }
 
 #endif
@@ -71,8 +95,6 @@ namespace FakeXrmEasy
             {
                 throw new InvalidOperationException("The id must not be empty.");
             }
-
-            return record.Id;
         }
 
         /// <summary>
@@ -174,7 +196,9 @@ namespace FakeXrmEasy
                 throw new InvalidOperationException("The entity must not be null");
             }
             e = e.Clone(e.GetType());
-            e.Id = GetRecordUniqueId(e.ToEntityReferenceWithKeyAttributes());
+            var reference = e.ToEntityReferenceWithKeyAttributes();
+            ValidateRecordUniqueId(reference);
+            e.Id = GetRecordUniqueId(reference);
 
             // Update specific validations: The entity record must exist in the context
             if (Data.ContainsKey(e.LogicalName) &&
@@ -246,6 +270,7 @@ namespace FakeXrmEasy
 
         protected EntityReference ResolveEntityReferenceByAlternateKeys(EntityReference er)
         {
+            ValidateRecordUniqueId(er);
             var resolvedId = GetRecordUniqueId(er);
 
             return new EntityReference()
