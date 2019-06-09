@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepImageType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepStage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DateTimeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityMetadataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityReferenceExtensions.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\WinOpportunityRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IXrmFakedContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Metadata\DateTimeAttributeBehavior.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Metadata\MetadataGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\TypedConditionExpression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultInvalidArgument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultOperatorIsNotValidException.cs" />

@@ -28,7 +28,8 @@ namespace FakeXrmEasy
                 OutputParameters = new ParameterCollection(),
                 SharedVariables = new ParameterCollection(),
                 PreEntityImages = new EntityImageCollection(),
-                PostEntityImages = new EntityImageCollection()
+                PostEntityImages = new EntityImageCollection(),
+                IsolationMode = 1
             };
         }
 
@@ -66,6 +67,9 @@ namespace FakeXrmEasy
             A.CallTo(() => context.BusinessUnitId).ReturnsLazily(() => ctx.BusinessUnitId);
             A.CallTo(() => context.CorrelationId).ReturnsLazily(() => ctx.CorrelationId);
             A.CallTo(() => context.OperationCreatedOn).ReturnsLazily(() => ctx.OperationCreatedOn);
+            A.CallTo(() => context.IsolationMode).ReturnsLazily(() => ctx.IsolationMode);
+            A.CallTo(() => context.IsInTransaction).ReturnsLazily(() => ctx.IsInTransaction);
+
 
             // Create message will pass an Entity as the target but this is not always true
             // For instance, a Delete request will receive an EntityReference

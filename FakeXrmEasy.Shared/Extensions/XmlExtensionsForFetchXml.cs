@@ -420,10 +420,8 @@ namespace FakeXrmEasy.Extensions.FetchXml
                         value = value.Replace("%", "");
                     }
                     break;
-
                 case "not-like":
                     op = ConditionOperator.NotLike;
-
                     if (value != null)
                     {
                         if (value.StartsWith("%") && !value.EndsWith("%"))
@@ -436,23 +434,18 @@ namespace FakeXrmEasy.Extensions.FetchXml
                         value = value.Replace("%", "");
                     }
                     break;
-
                 case "gt":
                     op = ConditionOperator.GreaterThan;
                     break;
-
                 case "ge":
                     op = ConditionOperator.GreaterEqual;
                     break;
-
                 case "lt":
                     op = ConditionOperator.LessThan;
                     break;
-
                 case "le":
                     op = ConditionOperator.LessEqual;
                     break;
-
                 case "on":
                     op = ConditionOperator.On;
                     break;
@@ -498,6 +491,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "next-x-weeks":
                     op = ConditionOperator.NextXWeeks;
                     break;
+                case "next-seven-days":
+                    op = ConditionOperator.Next7Days;
+                    break;
                 case "this-year":
                     op = ConditionOperator.ThisYear;
                     break;
@@ -515,6 +511,15 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     break;
                 case "next-month":
                     op = ConditionOperator.NextMonth;
+                    break;
+                case "last-week":
+                    op = ConditionOperator.LastWeek;
+                    break;
+                case "this-week":
+                    op = ConditionOperator.ThisWeek;
+                    break;
+                case "next-week":
+                    op = ConditionOperator.NextWeek;
                     break;
                 case "in-fiscal-year":
                     op = ConditionOperator.InFiscalYear;

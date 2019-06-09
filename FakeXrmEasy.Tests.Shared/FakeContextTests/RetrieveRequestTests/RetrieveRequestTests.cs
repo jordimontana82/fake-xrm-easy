@@ -3,6 +3,7 @@ using FakeItEasy;
 using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,31 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 {
     public class RetrieveRequestTests
     {
+        [Fact]
+        public static void Should_Populate_EntityReference_Name_When_Metadata_Is_Provided()
+        {
+            var userMetadata = new EntityMetadata() { LogicalName = "systemuser" };
+            userMetadata.SetSealedPropertyValue("PrimaryNameAttribute", "fullname");
+
+            var user = new Entity() { LogicalName = "systemuser", Id=Guid.NewGuid() };
+            user["fullname"] = "Fake XrmEasy";
+
+            var context = new XrmFakedContext();
+            context.InitializeMetadata(userMetadata);
+            context.Initialize(user);
+            context.CallerId = user.ToEntityReference();
+
+            var account = new Entity() { LogicalName = "account" };
+
+            var service = context.GetOrganizationService();
+
+            var accountId = service.Create(account);
+
+            account = service.Retrieve("account", accountId, new ColumnSet(true));
+
+            Assert.Equal("Fake XrmEasy", account.GetAttributeValue<EntityReference>("ownerid").Name);
+        }
+
         [Fact]
         public static void Should_Retrieve_A_Correct_Entity()
         {
@@ -936,7 +962,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public static void Should_Throw_When_Target_Not_Set()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var request = new RetrieveRequest
             {

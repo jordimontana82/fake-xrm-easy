@@ -62,6 +62,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     qe.Criteria.AddCondition(new ConditionExpression(query.Attributes[i], ConditionOperator.Equal, query.Values[i]));
                 }
 
+                foreach (var order in query.Orders)
+                {
+                    qe.AddOrder(order.AttributeName, order.OrderType);
+                }
+
                 qe.PageInfo = query.PageInfo;
 
                 // QueryExpression now done... execute it!

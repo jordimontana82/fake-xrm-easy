@@ -9,6 +9,9 @@
 
 <b>Drive your development</b> by unit testing any plugin, code activity, or 3rd party app using the `OrganizationService` easier and faster than ever before.
 
+<b>Note: To keep up to date with client-side unit testing version of this framework, please [have a look at this repo](http://github.com/jordimontana82/fake-xrm-easy-js) and samples in this other [sample code repo](http://github.com/jordimontana82/fake-xrm-easy-js-samples) </b>
+
+
 |Version|NuGet|
 |-----------|-----|
 |Dynamics v9|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.9?v=1.41.0)](https://www.nuget.org/packages/fakexrmeasy.9)|

@@ -26,9 +26,11 @@ namespace FakeXrmEasy
                 ProxyTypesAssemblies.Select(a => FindReflectedType(logicalName, a))
                                     .Where(t => t != null);
 
-            if(types.Count() > 1) {
+            if (types.Count() > 1)
+            {
                 var errorMsg = $"Type { logicalName } is defined in multiple assemblies: ";
-                foreach(var type in types) {
+                foreach (var type in types)
+                {
                     errorMsg += type.Assembly
                                     .GetName()
                                     .Name + "; ";
@@ -329,11 +331,11 @@ namespace FakeXrmEasy
             }
 
             IQueryable<Entity> inner = null;
-            if(le.JoinOperator == JoinOperator.LeftOuter)
+            if (le.JoinOperator == JoinOperator.LeftOuter)
             {
                 //inner = context.CreateQuery<Entity>(le.LinkToEntityName);
 
-                
+
                 //filters are applied in the inner query and then ignored during filter evaluation
                 var outerQueryExpression = new QueryExpression()
                 {
@@ -344,14 +346,14 @@ namespace FakeXrmEasy
 
                 var outerQuery = TranslateQueryExpressionToLinq(context, outerQueryExpression);
                 inner = outerQuery;
-                
+
             }
             else
             {
                 //Filters are applied after joins
                 inner = context.CreateQuery<Entity>(le.LinkToEntityName);
             }
-            
+
             //if (!le.Columns.AllColumns && le.Columns.Columns.Count == 0)
             //{
             //    le.Columns.AllColumns = true;   //Add all columns in the joined entity, otherwise we can't filter by related attributes, then the Select will actually choose which ones we need
@@ -373,7 +375,7 @@ namespace FakeXrmEasy
                     query = query.Join(inner,
                                     outerKey => outerKey.KeySelector(linkFromAlias, context),
                                     innerKey => innerKey.KeySelector(le.LinkToAttributeName, context),
-                                    (outerEl, innerEl) => outerEl.Clone(outerEl.GetType()).JoinAttributes(innerEl, new ColumnSet(true), leAlias, context));
+                                    (outerEl, innerEl) => outerEl.Clone(outerEl.GetType(), context).JoinAttributes(innerEl, new ColumnSet(true), leAlias, context));
 
                     break;
                 case JoinOperator.LeftOuter:
@@ -550,7 +552,7 @@ namespace FakeXrmEasy
             }
 
             //Project the attributes in the root column set  (must be applied after the where and order clauses, not before!!)
-            query = query.Select(x => x.Clone(x.GetType()).ProjectAttributes(qe, context));
+            query = query.Select(x => x.Clone(x.GetType(), context).ProjectAttributes(qe, context));
 
             return query;
         }
@@ -752,8 +754,20 @@ namespace FakeXrmEasy
                 case ConditionOperator.ThisMonth:
                 case ConditionOperator.LastMonth:
                 case ConditionOperator.NextMonth:
+                case ConditionOperator.LastWeek:
+                case ConditionOperator.ThisWeek:
+                case ConditionOperator.NextWeek:
                 case ConditionOperator.InFiscalYear:
                     operatorExpression = TranslateConditionExpressionBetweenDates(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
+                case ConditionOperator.Next7Days:
+                    {
+                        DateTime today = DateTime.Today;
+                        c.CondExpression.Values.Add(today);
+                        c.CondExpression.Values.Add(today.AddDays(7));
+                        operatorExpression = TranslateConditionExpressionBetween(c, getAttributeValueExpr, containsAttributeExpression);
+                    }
                     break;
 
 #if FAKE_XRM_EASY_9
@@ -809,7 +823,7 @@ namespace FakeXrmEasy
                 OrganizationServiceFaultOperatorIsNotValidException.Throw();
             }
         }
-        
+
         protected static Expression GetAppropiateTypedValue(object value)
         {
             //Basic types conversions
@@ -1574,19 +1588,13 @@ namespace FakeXrmEasy
             var thisYear = today.Year;
             var thisMonth = today.Month;
 
-            var conditionValue = 0;
-            if (c.Values.Any())
-            {
-                conditionValue = (int) c.Values[0];
-                c.Values.Clear();
-            }
 
             switch (c.Operator)
             {
                 case ConditionOperator.ThisYear: // From first day of this year to last day of this year
                     fromDate = new DateTime(thisYear, 1, 1);
                     toDate = new DateTime(thisYear, 12, 31);
-                    break;                
+                    break;
                 case ConditionOperator.LastYear: // From first day of last year to last day of last year
                     fromDate = new DateTime(thisYear - 1, 1, 1);
                     toDate = new DateTime(thisYear - 1, 12, 31);
@@ -1609,10 +1617,6 @@ namespace FakeXrmEasy
                     fromDate = new DateTime(thisYear, thisMonth, 1).AddMonths(1);
                     // LAst day of Next Month: Add two months to the first of this month, and then go back one day
                     toDate = new DateTime(thisYear, thisMonth, 1).AddMonths(2).AddDays(-1);
-                    break;
-                case ConditionOperator.InFiscalYear: // From 1 apr of Year in condition to 31 march of (Year + 1) in condition
-                    fromDate = new DateTime(conditionValue, 4, 1);
-                    toDate = new DateTime(conditionValue + 1, 3, 31);
                     break;
             }
 
@@ -1997,18 +2001,22 @@ namespace FakeXrmEasy
 
             var nextDateTime = default(DateTime);
             var currentDateTime = DateTime.UtcNow;
-            var numberOfWeeks = (int)c.Values[0];
+            var numberOfWeeks = c.Values.Any() ? (int)c.Values[0] : 1;
 
             switch (c.Operator)
             {
                 case ConditionOperator.NextXWeeks:
                     nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
+                    c.Values[0] = (currentDateTime);
+                    c.Values.Add(nextDateTime);
+                    c.Values.Add(numberOfWeeks);
+                    break;
+                case ConditionOperator.Next7Days:
+                    nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
+                    c.Values.Add(currentDateTime);
+                    c.Values.Add(nextDateTime);
                     break;
             }
-
-            c.Values[0] = (currentDateTime);
-            c.Values.Add(nextDateTime);            
-            // c.Values.Add(numberOfWeeks);
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
