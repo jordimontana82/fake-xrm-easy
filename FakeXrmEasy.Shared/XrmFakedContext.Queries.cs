@@ -752,6 +752,7 @@ namespace FakeXrmEasy
                 case ConditionOperator.ThisMonth:
                 case ConditionOperator.LastMonth:
                 case ConditionOperator.NextMonth:
+                case ConditionOperator.InFiscalYear:
                     operatorExpression = TranslateConditionExpressionBetweenDates(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
 
@@ -1569,10 +1570,16 @@ namespace FakeXrmEasy
             DateTime? fromDate = null;
             DateTime? toDate = null;
 
-            var today = DateTime.Today;
+            var today = DateTime.Today; 
             var thisYear = today.Year;
             var thisMonth = today.Month;
 
+            var conditionValue = 0;
+            if (c.Values.Any())
+            {
+                conditionValue = (int) c.Values[0];
+                c.Values.Clear();
+            }
 
             switch (c.Operator)
             {
@@ -1602,6 +1609,10 @@ namespace FakeXrmEasy
                     fromDate = new DateTime(thisYear, thisMonth, 1).AddMonths(1);
                     // LAst day of Next Month: Add two months to the first of this month, and then go back one day
                     toDate = new DateTime(thisYear, thisMonth, 1).AddMonths(2).AddDays(-1);
+                    break;
+                case ConditionOperator.InFiscalYear: // From 1 apr of Year in condition to 31 march of (Year + 1) in condition
+                    fromDate = new DateTime(conditionValue, 4, 1);
+                    toDate = new DateTime(conditionValue + 1, 3, 31);
                     break;
             }
 

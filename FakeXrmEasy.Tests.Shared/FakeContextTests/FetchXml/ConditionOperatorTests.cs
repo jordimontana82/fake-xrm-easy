@@ -1299,6 +1299,36 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void FetchXml_Operator_InFiscalYear_Execution()
+        {
+            var today = DateTime.Today;
+            var thisYear = today.Year;
+
+            var ctx = new XrmFakedContext();
+            var fetchXml = $@"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='in-fiscal-year' value='{thisYear}' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+            
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, 1, 1) };        // First day of this year - should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, 12, 31) };      // Last day of this year - should be returned
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear + 1, 1, 1) };      // First day of next year - should not be returned
+            ctx.Initialize(new[] { ct1, ct2, ct3});
+            var service = ctx.GetFakedOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(2, collection.Entities.Count);
+
+            Assert.Equal(((DateTime)collection.Entities[0]["anniversary"]).Year, thisYear);
+            Assert.Equal(((DateTime)collection.Entities[1]["anniversary"]).Year, thisYear+1);
+        }
+
+        [Fact]
         public void FetchXml_Operator_ThisMonth_Execution()
         {
             var ctx = new XrmFakedContext();
