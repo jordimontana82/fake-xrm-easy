@@ -19,7 +19,7 @@ namespace FakeXrmEasy
         public bool ValidateReferences { get; set; }
 
         #region CRUD
-        public Guid GetRecordUniqueId(EntityReference record)
+        public Guid GetRecordUniqueId(EntityReference record, bool validate = true)
         {
             if (string.IsNullOrWhiteSpace(record.LogicalName))
             {
@@ -58,44 +58,25 @@ namespace FakeXrmEasy
                                     return matchedRecord.Id;
                                 }
                             }
-                        }
-                    }              
-                }
-            }
-#endif
-
-            return record.Id;
-        }
-
-        public void ValidateRecordUniqueId(EntityReference record)
-        {
-#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
-            if (record.Id == Guid.Empty && record.HasKeyAttributes())
-            {
-                if (EntityMetadata.ContainsKey(record.LogicalName))
-                {
-                    var entityMetadata = EntityMetadata[record.LogicalName];
-                    foreach (var key in entityMetadata.Keys)
-                    {
-                        if (record.KeyAttributes.Keys.Count == key.KeyAttributes.Length && key.KeyAttributes.All(x => record.KeyAttributes.Keys.Contains(x)))
-                        {
-                            if (!Data.ContainsKey(record.LogicalName) || Data[record.LogicalName].Values.SingleOrDefault(x => record.KeyAttributes.All(k => x.Attributes.ContainsKey(k.Key) && x.Attributes[k.Key] != null && x.Attributes[k.Key].Equals(k.Value))) == null)
+                            if (validate)
                             {
                                 new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{record.LogicalName} with the specified Alternate Keys Does Not Exist");
                             }
-                            return;
                         }
                     }
                 }
-                throw new InvalidOperationException($"The requested key attributes do not exist for the entity {record.LogicalName}");
+                if (validate)
+                {
+                    throw new InvalidOperationException($"The requested key attributes do not exist for the entity {record.LogicalName}");
+                }
             }
-
 #endif
-            if (record.Id == Guid.Empty)
+            if (validate && record.Id == Guid.Empty)
             {
                 throw new InvalidOperationException("The id must not be empty.");
             }
-        }
+            return record.Id;
+        }   
 
         /// <summary>
         /// A fake retrieve method that will query the FakedContext to retrieve the specified
@@ -197,7 +178,6 @@ namespace FakeXrmEasy
             }
             e = e.Clone(e.GetType());
             var reference = e.ToEntityReferenceWithKeyAttributes();
-            ValidateRecordUniqueId(reference);
             e.Id = GetRecordUniqueId(reference);
 
             // Update specific validations: The entity record must exist in the context
@@ -270,7 +250,6 @@ namespace FakeXrmEasy
 
         protected EntityReference ResolveEntityReferenceByAlternateKeys(EntityReference er)
         {
-            ValidateRecordUniqueId(er);
             var resolvedId = GetRecordUniqueId(er);
 
             return new EntityReference()

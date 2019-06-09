@@ -22,7 +22,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             var service = ctx.GetOrganizationService();
 
             var entityLogicalName = upsertRequest.Target.LogicalName;
-            var entityId = ctx.GetRecordUniqueId(upsertRequest.Target.ToEntityReferenceWithKeyAttributes());
+            var entityId = ctx.GetRecordUniqueId(upsertRequest.Target.ToEntityReferenceWithKeyAttributes(), validate: false);
 
             if (ctx.Data.ContainsKey(entityLogicalName) &&
                 ctx.Data[entityLogicalName].ContainsKey(entityId))
