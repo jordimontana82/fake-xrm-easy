@@ -1618,6 +1618,18 @@ namespace FakeXrmEasy
                     // LAst day of Next Month: Add two months to the first of this month, and then go back one day
                     toDate = new DateTime(thisYear, thisMonth, 1).AddMonths(2).AddDays(-1);
                     break;
+                case ConditionOperator.ThisWeek:
+                    fromDate = today.ToFirstDayOfDeltaWeek();
+                    toDate = today.ToLastDayOfDeltaWeek().AddDays(1);
+                    break;
+                case ConditionOperator.LastWeek:
+                    fromDate = today.ToFirstDayOfDeltaWeek(-1);
+                    toDate = today.ToLastDayOfDeltaWeek(-1).AddDays(1);
+                    break;
+                case ConditionOperator.NextWeek:
+                    fromDate = today.ToFirstDayOfDeltaWeek(1);
+                    toDate = today.ToLastDayOfDeltaWeek(1).AddDays(1);
+                    break;
             }
 
             c.Values.Add(fromDate);
