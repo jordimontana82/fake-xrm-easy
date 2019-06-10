@@ -5,6 +5,7 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
@@ -388,6 +389,27 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
             var accounts = service.RetrieveMultiple(query);
 
             Assert.Equal("Fake XrmEasy", accounts.Entities[0].GetAttributeValue<EntityReference>("ownerid").Name);
+        }
+
+        [Fact]
+        public void TheCorrectResultIsReturnedWhenUsingConditionOperatorInWithGuid()
+        {
+            var context = new XrmFakedContext();
+            context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
+            var contact = new Crm.Contact()
+            {
+                Id = Guid.NewGuid()
+            };
+            context.Initialize(contact);
+
+            var Ids = new string[] { Guid.NewGuid().ToString(), contact.Id.ToString() };
+
+            var query = new QueryExpression("contact");
+            query.Criteria.AddCondition("contactid", ConditionOperator.In, Ids);
+
+            var result = context.GetOrganizationService().RetrieveMultiple(query).Entities;
+            Assert.True(result.Any());
+            Assert.Equal(contact.Id, result[0].Id);
         }
     }
 }
