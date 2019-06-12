@@ -55,8 +55,8 @@ namespace FakeXrmEasy.Tests
 
             var service = context.GetOrganizationService();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("account", Guid.NewGuid(), null));
-            Assert.Equal(ex.Message, "The columnset parameter must not be null.");
+            var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("account", Guid.NewGuid(), new ColumnSet(true)));
+            Assert.Equal("The entity logical name account is not valid.", ex.Message);
         }
 
         [Fact]
