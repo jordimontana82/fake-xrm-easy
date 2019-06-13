@@ -67,10 +67,12 @@ namespace FakeXrmEasy
             }
 
 #endif
+            /*
             if (record.Id == Guid.Empty)
             {
                 throw new InvalidOperationException("The id must not be empty.");
             }
+            */
 
             return record.Id;
         }
@@ -87,7 +89,6 @@ namespace FakeXrmEasy
             A.CallTo(() => fakedService.Retrieve(A<string>._, A<Guid>._, A<ColumnSet>._))
                 .ReturnsLazily((string entityName, Guid id, ColumnSet columnSet) =>
                 {
-                    if (columnSet == null) throw new FaultException("Something unexpected happened.");
                     RetrieveRequest retrieveRequest = new RetrieveRequest()
                     {
                         Target = new EntityReference() { LogicalName = entityName, Id = id },

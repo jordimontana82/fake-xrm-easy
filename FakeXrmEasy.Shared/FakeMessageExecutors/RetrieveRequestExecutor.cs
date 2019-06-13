@@ -29,7 +29,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             var columnSet = request.ColumnSet;
             if (columnSet == null)
             {
-                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "The columnset parameter must not be null.");
+                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "Required field 'ColumnSet' is missing");
             }
 
             var id = context.GetRecordUniqueId(request.Target);
@@ -42,7 +42,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 var reflectedType = context.FindReflectedType(entityName);
 
                 //Entity found => return only the subset of columns specified or all of them
-                var resultEntity = context.Data[entityName][id].Clone(reflectedType);
+                var resultEntity = context.Data[entityName][id].Clone(reflectedType, context);
                 if (!columnSet.AllColumns)
                 {
                     resultEntity = resultEntity.ProjectAttributes(columnSet, context);
