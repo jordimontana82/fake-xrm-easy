@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepImageType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepStage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DateTimeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityMetadataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\EntityReferenceExtensions.cs" />

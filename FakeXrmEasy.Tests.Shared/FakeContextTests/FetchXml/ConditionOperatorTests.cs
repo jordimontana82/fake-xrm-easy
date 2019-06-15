@@ -4,6 +4,7 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using Xunit;
@@ -50,6 +51,10 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="olderthan-x-months" />
       <xs:enumeration value="last-seven-days" />
       <xs:enumeration value="next-x-weeks" />
+      <xs:enumeration value="next-seven-days" />
+      <xs:enumeration value="last-week" />
+      <xs:enumeration value="this-week" />
+      <xs:enumeration value="next-week" />
       <xs:enumeration value="last-year" />
       <xs:enumeration value="this-year" />
       <xs:enumeration value="next-year" />
@@ -60,10 +65,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
     TODO:
 
       DATEs:      
-      <xs:enumeration value="next-seven-days" />
-      <xs:enumeration value="last-week" />
-      <xs:enumeration value="this-week" />
-      <xs:enumeration value="next-week" />
       <xs:enumeration value="last-x-hours" />
       <xs:enumeration value="next-x-hours" />
       <xs:enumeration value="last-x-days" />
@@ -1582,7 +1583,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7*2) }; //Should be returned
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7*4) }; //Shouldnt
             ctx.Initialize(new[] { ct1, ct2});
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1592,7 +1593,203 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             //Assert.Equal(23, retrievedDateFirst.Value.Day);
             //Assert.Equal(22, retrievedDateSecond.Value.Day);
         }
+        [Fact]
+        public void FetchXml_Operator_Next_Seven_Days_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                               <entity name='contact'>
+                                 <attribute name='fullname' />
+                                 <attribute name='telephone1' />
+                                 <attribute name='contactid' />
+                                 <order attribute='fullname' descending='false' />
+                                 <filter type='and'>
+                                   <condition attribute='anniversary' operator='next-seven-days' />
+                                 </filter>
+                               </entity>
+                             </fetch>";
 
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Single(query.Criteria.Conditions);
+            Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.Next7Days, query.Criteria.Conditions[0].Operator);
+
+            var date = DateTime.Now;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(3) }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7) }; //Shouldnt
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(8) }; //Shouldnt
+            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Single(collection.Entities);
+            var retrievedUser = collection.Entities[0].Id;
+            Assert.Equal(retrievedUser, ct1.Id);
+        }
+        [Fact]
+        public void FetchXml_Operator_Last_Week_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                               <entity name='contact'>
+                                 <attribute name='fullname' />
+                                 <attribute name='telephone1' />
+                                 <attribute name='contactid' />
+                                 <order attribute='fullname' descending='false' />
+                                 <filter type='and'>
+                                   <condition attribute='anniversary' operator='last-week' />
+                                 </filter>
+                               </entity>
+                             </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Single(query.Criteria.Conditions);
+            Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.LastWeek, query.Criteria.Conditions[0].Operator);
+
+            var date = DateTime.Now;
+            var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date, CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
+            var lastWeek = weekOfYear - 1;
+
+            Func<int, DateTime> getRandomDateOfWeek = (week) =>
+            {
+                Random rnd = new Random();
+                DateTime d = new DateTime();
+                do
+                {
+                    d = date.AddDays(rnd.Next(-10, 10));
+                }
+                while (CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(d
+                    , CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule
+                    , CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek)
+                    != week);
+                return d;
+            };
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(lastWeek) }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(weekOfYear) }; //Shouldnt
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Single(collection.Entities);
+            var retrievedUser = collection.Entities[0].Id;
+            Assert.Equal(retrievedUser, ct1.Id);
+        }
+        [Fact]
+        public void FetchXml_Operator_This_Week_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                               <entity name='contact'>
+                                 <attribute name='fullname' />
+                                 <attribute name='telephone1' />
+                                 <attribute name='contactid' />
+                                 <order attribute='fullname' descending='false' />
+                                 <filter type='and'>
+                                   <condition attribute='anniversary' operator='this-week' />
+                                 </filter>
+                               </entity>
+                             </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Single(query.Criteria.Conditions);
+            Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.ThisWeek, query.Criteria.Conditions[0].Operator);
+
+            var date = DateTime.Now;
+            var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date, CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
+            var lastWeek = weekOfYear - 1;
+
+            Func<int, DateTime> getRandomDateOfWeek = (week) =>
+            {
+                Random rnd = new Random();
+                DateTime d = new DateTime();
+                do
+                {
+                    d = date.AddDays(rnd.Next(-10, 10));
+                }
+                while (CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(d
+                    , CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule
+                    , CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek)
+                    != week);
+                return d;
+            };
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(weekOfYear) }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(lastWeek) }; //Shouldnt
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Single(collection.Entities);
+            var retrievedUser = collection.Entities[0].Id;
+            Assert.Equal(retrievedUser, ct1.Id);
+        }
+        [Fact]
+        public void FetchXml_Operator_Next_Week_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                               <entity name='contact'>
+                                 <attribute name='fullname' />
+                                 <attribute name='telephone1' />
+                                 <attribute name='contactid' />
+                                 <order attribute='fullname' descending='false' />
+                                 <filter type='and'>
+                                   <condition attribute='anniversary' operator='next-week' />
+                                 </filter>
+                               </entity>
+                             </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Single(query.Criteria.Conditions);
+            Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.NextWeek, query.Criteria.Conditions[0].Operator);
+
+            var date = DateTime.Now;
+            var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date, CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
+            var nextWeek = weekOfYear + 1;
+
+            Func<int, DateTime> getRandomDateOfWeek = (week) =>
+            {
+                Random rnd = new Random();
+                DateTime d = new DateTime();
+                do
+                {
+                    d = date.AddDays(rnd.Next(-10, 10));
+                }
+                while (CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(d
+                    , CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule
+                    , CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek)
+                    != week);
+                return d;
+            };
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(nextWeek) }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = getRandomDateOfWeek(weekOfYear) }; //Shouldnt
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Single(collection.Entities);
+            var retrievedUser = collection.Entities[0].Id;
+            Assert.Equal(retrievedUser, ct1.Id);
+        }
+
+        
 #if FAKE_XRM_EASY_9
         [Fact]
         public void FetchXml_Operator_ContainValues_Translation()

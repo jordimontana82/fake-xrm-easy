@@ -45,17 +45,21 @@ namespace FakeXrmEasy
         /// proxy types please use <see cref="EnableProxyTypes(Assembly)"/>
         /// instead.
         /// </summary>
-        public Assembly ProxyTypesAssembly {
-          get {
-            // TODO What we should do when ProxyTypesAssemblies contains multiple assemblies? One shouldn't throw exceptions from properties.
-            return ProxyTypesAssemblies.FirstOrDefault();
-          }
-          set {
-            ProxyTypesAssemblies = new List<Assembly>();
-            if(value != null) {
-              ProxyTypesAssemblies.Add(value);
+        public Assembly ProxyTypesAssembly
+        {
+            get
+            {
+                // TODO What we should do when ProxyTypesAssemblies contains multiple assemblies? One shouldn't throw exceptions from properties.
+                return ProxyTypesAssemblies.FirstOrDefault();
             }
-          }
+            set
+            {
+                ProxyTypesAssemblies = new List<Assembly>();
+                if (value != null)
+                {
+                    ProxyTypesAssemblies.Add(value);
+                }
+            }
         }
 
         /// <summary>
@@ -162,16 +166,19 @@ namespace FakeXrmEasy
         /// See issue #334 on GitHub. This has quite similar idea as is on SDK method
         /// https://docs.microsoft.com/en-us/dotnet/api/microsoft.xrm.sdk.client.organizationserviceproxy.enableproxytypes.
         /// </remarks>
-        public void EnableProxyTypes(Assembly assembly) {
-          if(assembly == null) {
-            throw new ArgumentNullException(nameof(assembly));
-          }
+        public void EnableProxyTypes(Assembly assembly)
+        {
+            if (assembly == null)
+            {
+                throw new ArgumentNullException(nameof(assembly));
+            }
 
-          if(ProxyTypesAssemblies.Contains(assembly)) {
-            throw new InvalidOperationException($"Proxy types assembly { assembly.GetName().Name } is already enabled.");
-          }
+            if (ProxyTypesAssemblies.Contains(assembly))
+            {
+                throw new InvalidOperationException($"Proxy types assembly { assembly.GetName().Name } is already enabled.");
+            }
 
-          ProxyTypesAssemblies.Add(assembly);
+            ProxyTypesAssemblies.Add(assembly);
         }
 
         public void AddExecutionMock<T>(ServiceRequestExecution mock) where T : OrganizationRequest
@@ -321,29 +328,26 @@ namespace FakeXrmEasy
         /// <param name="fakedService"></param>
         public static void FakeExecute(XrmFakedContext context, IOrganizationService fakedService)
         {
+            OrganizationResponse response = null;
+            Func<OrganizationRequest, OrganizationResponse> execute = (req) =>
+            {
+                if (context.ExecutionMocks.ContainsKey(req.GetType()))
+                    return context.ExecutionMocks[req.GetType()].Invoke(req);
+
+                if (context.FakeMessageExecutors.ContainsKey(req.GetType())
+                    && context.FakeMessageExecutors[req.GetType()].CanExecute(req))
+                    return context.FakeMessageExecutors[req.GetType()].Execute(req, context);
+
+                if (req.GetType() == typeof(OrganizationRequest)
+                    && context.GenericFakeMessageExecutors.ContainsKey(req.RequestName))
+                    return context.GenericFakeMessageExecutors[req.RequestName].Execute(req, context);
+
+                throw PullRequestException.NotImplementedOrganizationRequest(req.GetType());
+            };
+
             A.CallTo(() => fakedService.Execute(A<OrganizationRequest>._))
-                .ReturnsLazily((OrganizationRequest req) =>
-                {
-                    if (context.ExecutionMocks.ContainsKey(req.GetType()))
-                    {
-                        return context.ExecutionMocks[req.GetType()].Invoke(req);
-                    }
-
-                    if (context.FakeMessageExecutors.ContainsKey(req.GetType()))
-                    {
-                        if (context.FakeMessageExecutors[req.GetType()].CanExecute(req))
-                        {
-                            return context.FakeMessageExecutors[req.GetType()].Execute(req, context);
-                        }
-                    }
-
-                    if (req.GetType() == typeof(OrganizationRequest) && context.GenericFakeMessageExecutors.ContainsKey(req.RequestName))
-                    {
-                        return context.GenericFakeMessageExecutors[req.RequestName].Execute(req, context);
-                    }
-
-                    throw PullRequestException.NotImplementedOrganizationRequest(req.GetType());
-                });
+                .Invokes((OrganizationRequest req) => response = execute(req))
+                .ReturnsLazily((OrganizationRequest req) => response);
         }
 
         public static void FakeAssociate(XrmFakedContext context, IOrganizationService fakedService)
@@ -388,26 +392,27 @@ namespace FakeXrmEasy
 
         public static void FakeRetrieveMultiple(XrmFakedContext context, IOrganizationService fakedService)
         {
+            EntityCollection entities = null;
+            Func<QueryBase, EntityCollection> retriveMultiple = (QueryBase req) =>
+            {
+                var request = new RetrieveMultipleRequest { Query = req };
+
+                var executor = new RetrieveMultipleRequestExecutor();
+                var response = executor.Execute(request, context) as RetrieveMultipleResponse;
+
+                return response.EntityCollection;
+            };
+
             //refactored from RetrieveMultipleExecutor
             A.CallTo(() => fakedService.RetrieveMultiple(A<QueryBase>._))
-                .ReturnsLazily((QueryBase req) =>
-                {
-                    var request = new RetrieveMultipleRequest()
-                    {
-                        Query = req
-                    };
-
-                    var executor = new RetrieveMultipleRequestExecutor();
-                    var response = executor.Execute(request, context) as RetrieveMultipleResponse;
-
-                    return response.EntityCollection;
-                });
+                .Invokes((QueryBase req) => entities = retriveMultiple(req))
+                .ReturnsLazily((QueryBase req) => entities);
         }
 
         public IServiceEndpointNotificationService GetFakedServiceEndpointNotificationService()
         {
             return _serviceEndpointNotificationService ??
-                   ( _serviceEndpointNotificationService = A.Fake<IServiceEndpointNotificationService>());
+                   (_serviceEndpointNotificationService = A.Fake<IServiceEndpointNotificationService>());
         }
     }
 }

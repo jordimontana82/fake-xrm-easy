@@ -100,7 +100,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="fakexrmeasy.snk" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="..\FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
