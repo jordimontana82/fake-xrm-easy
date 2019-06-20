@@ -88,14 +88,16 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             var relationship = new Relationship("test_entity_entity");
 
-            service.Associate(
+            var ex = Record.Exception(() => service.Associate(
                 exampleMetadata.LogicalName,
                 record1.Id,
                 relationship,
                 new EntityReferenceCollection(
                     new[] { record2.ToEntityReference() }
                     )
-                );
+                ));
+
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -171,15 +173,16 @@ namespace FakeXrmEasy.Tests.FakeContextTests
 
             var relationship = new Relationship("test_entity_other");
 
-            service.Associate(
-                exampleMetadata.LogicalName,
-                record1.Id,
-                relationship,
-                new EntityReferenceCollection(
-                    new[] { record2.ToEntityReference() }
-                    )
-                );
+            var ex = Record.Exception(() => service.Associate(
+                   exampleMetadata.LogicalName,
+                   record1.Id,
+                   relationship,
+                   new EntityReferenceCollection(
+                       new[] { record2.ToEntityReference() }
+                       )
+                   ));
 
+            Assert.Null(ex);
         }
     }
 }
