@@ -26,7 +26,11 @@ namespace FakeXrmEasy.Extensions.FetchXml
             ConditionOperator.LastXMonths,
             ConditionOperator.LastXWeeks,
             ConditionOperator.LastXYears,
-            ConditionOperator.NextXWeeks
+            ConditionOperator.NextXHours,
+            ConditionOperator.NextXDays,
+            ConditionOperator.NextXWeeks,
+            ConditionOperator.NextXMonths,
+            ConditionOperator.NextXYears
         };
 
         public static bool IsAttributeTrue(this XElement elem, string attributeName)
@@ -501,6 +505,33 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     break;
                 case "next-year":
                     op = ConditionOperator.NextYear;
+                    break;
+                case "last-x-hours":
+                    op = ConditionOperator.LastXHours;
+                    break;
+                case "last-x-days":
+                    op = ConditionOperator.LastXDays;
+                    break;
+                case "last-x-weeks":
+                    op = ConditionOperator.LastXWeeks;
+                    break;
+                case "last-x-months":
+                    op = ConditionOperator.LastXMonths;
+                    break;
+                case "last-x-years":
+                    op = ConditionOperator.LastXYears;
+                    break;
+                case "next-x-hours":
+                    op = ConditionOperator.NextXHours;
+                    break;
+                case "next-x-days":
+                    op = ConditionOperator.NextXDays;
+                    break;
+                case "next-x-months":
+                    op = ConditionOperator.NextXMonths;
+                    break;
+                case "next-x-years":
+                    op = ConditionOperator.NextXYears;
                     break;
                 case "this-month":
                     op = ConditionOperator.ThisMonth;
