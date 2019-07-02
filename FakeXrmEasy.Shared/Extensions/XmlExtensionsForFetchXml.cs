@@ -551,6 +551,23 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "next-week":
                     op = ConditionOperator.NextWeek;
                     break;
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013
+                case "olderthan-x-minutes":
+                    op = ConditionOperator.OlderThanXMinutes;
+                    break;
+                case "olderthan-x-hours":
+                    op = ConditionOperator.OlderThanXHours;
+                    break;
+                case "olderthan-x-days":
+                    op = ConditionOperator.OlderThanXDays;
+                    break;
+                case "olderthan-x-weeks":
+                    op = ConditionOperator.OlderThanXWeeks;
+                    break;
+                case "olderthan-x-years":
+                    op = ConditionOperator.OlderThanXYears;
+                    break;
+#endif
 #if FAKE_XRM_EASY_9
                 case "contain-values":
                     op = ConditionOperator.ContainValues;

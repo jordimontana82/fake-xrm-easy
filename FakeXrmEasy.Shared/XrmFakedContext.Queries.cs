@@ -730,24 +730,17 @@ namespace FakeXrmEasy
                     }
                     operatorExpression = Expression.Not(TranslateConditionExpressionBetween(c, getNonBasicValueExpr, containsAttributeExpression));
                     break;
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013
+                case ConditionOperator.OlderThanXMinutes:
+                case ConditionOperator.OlderThanXHours:
+                case ConditionOperator.OlderThanXDays:
+                case ConditionOperator.OlderThanXWeeks:
+                case ConditionOperator.OlderThanXYears:                  
+#endif
                 case ConditionOperator.OlderThanXMonths:
-                    var monthsToAdd = 0;
-                    var parsedMonths = int.TryParse(c.CondExpression.Values[0].ToString(), out monthsToAdd);
-
-                    if (parsedMonths == false)
-                    {
-                        throw new Exception("Older than X months requires an integer value in the ConditionExpression.");
-                    }
-
-                    if (monthsToAdd <= 0)
-                    {
-                        throw new Exception("Older than X months requires a value greater than 0.");
-                    }
-
-                    var olderThanDate = DateTime.Now.AddMonths(-monthsToAdd);
-
-                    operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression, olderThanDate);
+                    operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
+
                 case ConditionOperator.NextXHours:               
                 case ConditionOperator.NextXDays:                  
                 case ConditionOperator.Next7Days:
@@ -1648,6 +1641,53 @@ namespace FakeXrmEasy
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
+
+
+        protected static Expression TranslateConditionExpressionOlderThan(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
+            var valueToAdd = 0;
+
+            if (!int.TryParse(c.Values[0].ToString(), out valueToAdd))
+            {
+                throw new Exception(c.Operator + " requires an integer value in the ConditionExpression.");
+            }
+
+            if (valueToAdd <= 0)
+            {
+                throw new Exception(c.Operator + " requires a value greater than 0.");
+            }
+
+            DateTime toDate = default(DateTime);
+
+            switch (c.Operator)
+            {
+                case ConditionOperator.OlderThanXMonths:
+                    toDate = DateTime.UtcNow.AddMonths(-valueToAdd);
+                    break;
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013
+                case ConditionOperator.OlderThanXMinutes:      
+                    toDate = DateTime.UtcNow.AddMinutes(-valueToAdd);
+                    break;
+                case ConditionOperator.OlderThanXHours: 
+                    toDate = DateTime.UtcNow.AddHours(-valueToAdd);
+                    break;
+                case ConditionOperator.OlderThanXDays: 
+                    toDate = DateTime.UtcNow.AddDays(-valueToAdd);
+                    break;
+                case ConditionOperator.OlderThanXWeeks:              
+                    toDate = DateTime.UtcNow.AddDays(-7 * valueToAdd);
+                    break;              
+                case ConditionOperator.OlderThanXYears: 
+                    toDate = DateTime.UtcNow.AddYears(-valueToAdd);
+                    break;
+#endif
+            }
+                        
+            return TranslateConditionExpressionOlderThan(tc, getAttributeValueExpr, containsAttributeExpr, toDate);
+        }
+     
 
         protected static Expression TranslateConditionExpressionBetween(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
