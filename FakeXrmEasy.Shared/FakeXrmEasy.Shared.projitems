@@ -9,6 +9,7 @@
     <Import_RootNamespace>FakeXrmEasy</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\ErrorCodes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepImageType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\ProcessingStepStage.cs" />
@@ -70,9 +71,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Metadata\DateTimeAttributeBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Metadata\MetadataGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\TypedConditionExpression.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultInvalidArgument.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultOperatorIsNotValidException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)OrganizationFaults\OrganizationServiceFaultQueryBuilderNoAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeOrganizationServiceFault.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Permissions\AccessRightsRepository.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Permissions\IAccessRightsRepository.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PullRequestException.cs" />

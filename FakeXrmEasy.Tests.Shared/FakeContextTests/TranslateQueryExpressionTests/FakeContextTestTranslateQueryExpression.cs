@@ -1,5 +1,4 @@
 ﻿using Crm;
-using FakeXrmEasy.OrganizationFaults;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
@@ -256,7 +255,7 @@ namespace FakeXrmEasy.Tests
             qe.ColumnSet = new ColumnSet(new string[] { "this attribute doesnt exists!" });
 
             var exception = Assert.Throws<FaultException<OrganizationServiceFault>>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
-            Assert.Equal(exception.Detail.ErrorCode, OrganizationServiceFaultQueryBuilderNoAttributeException.ErrorCode);
+            Assert.Equal(exception.Detail.ErrorCode, (int)ErrorCodes.QueryBuilderNoAttribute);
         }
 
         [Fact]
@@ -292,7 +291,7 @@ namespace FakeXrmEasy.Tests
             qe.ColumnSet = new ColumnSet(new string[] { "this attribute doesnt exists!" });
 
             var exception = Assert.Throws<FaultException<OrganizationServiceFault>>(() => XrmFakedContext.TranslateQueryExpressionToLinq(context, qe).ToList());
-            Assert.Equal(exception.Detail.ErrorCode, OrganizationServiceFaultQueryBuilderNoAttributeException.ErrorCode);
+            Assert.Equal(exception.Detail.ErrorCode, (int)ErrorCodes.QueryBuilderNoAttribute);
         }
 
         [Fact]
