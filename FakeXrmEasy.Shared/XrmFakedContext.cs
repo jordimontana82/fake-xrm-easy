@@ -40,7 +40,7 @@ namespace FakeXrmEasy
         /// <summary>
         /// Specify which assembly is used to search for early-bound proxy
         /// types when used within simulated CRM context.
-        /// 
+        ///
         /// If you want to specify multiple different assemblies for early-bound
         /// proxy types please use <see cref="EnableProxyTypes(Assembly)"/>
         /// instead.
@@ -414,5 +414,14 @@ namespace FakeXrmEasy
             return _serviceEndpointNotificationService ??
                    (_serviceEndpointNotificationService = A.Fake<IServiceEndpointNotificationService>());
         }
+#if FAKE_XRM_EASY_9
+        public IEntityDataSourceRetrieverService GetFakedEntityDataSourceRetrieverService()
+        {
+            var service = A.Fake<IEntityDataSourceRetrieverService>();
+            A.CallTo(() => service.RetrieveEntityDataSource())
+                .ReturnsLazily(() => EntityDataSourceRetriever);
+            return service;
+        }
+#endif
     }
 }
