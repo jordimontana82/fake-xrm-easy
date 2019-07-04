@@ -3,13 +3,14 @@ using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using System;
+using System.Linq;
 using System.Reflection;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.UpsertRequestTests
 {
 #if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013 && !FAKE_XRM_EASY_2015
-    public class Tests
+    public class UpsertRequestTests
     {
         [Fact]
         public void Upsert_Creates_Record_When_It_Does_Not_Exist()
@@ -32,7 +33,10 @@ namespace FakeXrmEasy.Tests.FakeContextTests.UpsertRequestTests
 
             var response = (UpsertResponse)service.Execute(request);
 
+            var contactCreated = context.CreateQuery<Contact>().FirstOrDefault();
+
             Assert.Equal(true, response.RecordCreated);
+            Assert.NotNull(contactCreated);
         }
 
         [Fact]
@@ -44,14 +48,15 @@ namespace FakeXrmEasy.Tests.FakeContextTests.UpsertRequestTests
 
             var contact = new Contact()
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                FirstName = "FakeXrm"
             };
             context.Initialize(new[] { contact });
 
             contact = new Contact()
             {
                 Id = contact.Id,
-                FirstName = "FakeXrm",
+                FirstName = "FakeXrm2",
                 LastName = "Easy"
             };
 
@@ -60,9 +65,12 @@ namespace FakeXrmEasy.Tests.FakeContextTests.UpsertRequestTests
                 Target = contact
             };
 
+
             var response = (UpsertResponse)service.Execute(request);
+            var contactUpdated = context.CreateQuery<Contact>().FirstOrDefault();
 
             Assert.Equal(false, response.RecordCreated);
+            Assert.Equal("FakeXrm2", contactUpdated.FirstName);
         }
 
         [Fact]
