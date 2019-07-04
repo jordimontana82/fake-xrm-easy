@@ -477,6 +477,8 @@ namespace FakeXrmEasy
                 }
             }
 
+            query.Distinct = xlDoc.IsDistincFetchXml();
+
             query.Criteria = xlDoc.ToCriteria(context);
 
             query.TopCount = xlDoc.ToTopCount();
