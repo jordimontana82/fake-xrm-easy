@@ -17,7 +17,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             var req = request as FetchXmlToQueryExpressionRequest;
             var service = ctx.GetOrganizationService();
             FetchXmlToQueryExpressionResponse response = new FetchXmlToQueryExpressionResponse();
-            response["Query"] = new QueryExpression() { EntityName = "test" };
+            response["Query"] = XrmFakedContext.TranslateFetchXmlDocumentToQueryExpression(ctx, XrmFakedContext.ParseFetchXml(req.FetchXml)); ;
             return response;
         }
 
