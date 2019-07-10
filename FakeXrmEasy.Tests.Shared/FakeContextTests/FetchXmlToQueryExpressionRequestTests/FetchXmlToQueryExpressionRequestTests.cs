@@ -35,6 +35,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXmlToQueryExpressionRequestTes
 
             var response = service.Execute(request) as FetchXmlToQueryExpressionResponse;
             Assert.NotNull(response.Query);
+            Assert.Equal("activitypointer", response.Query.EntityName);
         }
     }
 }
