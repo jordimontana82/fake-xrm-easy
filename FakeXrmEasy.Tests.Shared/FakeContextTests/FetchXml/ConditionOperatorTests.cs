@@ -1319,7 +1319,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, 12, 31) };      // Last day of this year - should be returned
             var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear + 1, 1, 1) };      // First day of next year - should not be returned
             ctx.Initialize(new[] { ct1, ct2, ct3});
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
