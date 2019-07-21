@@ -1584,7 +1584,7 @@ namespace FakeXrmEasy
             DateTime? fromDate = null;
             DateTime? toDate = null;
 
-            var today = DateTime.Today; 
+            var today = DateTime.Today;
             var thisYear = today.Year;
             var thisMonth = today.Month;
 
@@ -1629,6 +1629,12 @@ namespace FakeXrmEasy
                 case ConditionOperator.NextWeek:
                     fromDate = today.ToFirstDayOfDeltaWeek(1);
                     toDate = today.ToLastDayOfDeltaWeek(1).AddDays(1);
+                    break;
+                case ConditionOperator.InFiscalYear:
+                    var fiscalYear = (int)c.Values[0];
+                    c.Values.Clear();
+                    fromDate = new DateTime(fiscalYear, 4, 1);
+                    toDate = new DateTime(fiscalYear + 1, 3, 31);
                     break;
             }
 
