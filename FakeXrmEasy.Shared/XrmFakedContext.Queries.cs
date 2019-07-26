@@ -1864,6 +1864,7 @@ namespace FakeXrmEasy
 
             foreach (var c in conditions)
             {
+                var cEntityName = sEntityName;
                 //Create a new typed expression 
                 var typedExpression = new TypedConditionExpression(c);
                 typedExpression.IsOuter = bIsOuter;
@@ -1876,34 +1877,34 @@ namespace FakeXrmEasy
 
 #if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
                     if (c.EntityName != null)
-                        sEntityName = qe.GetEntityNameFromAlias(c.EntityName);
+                        cEntityName = qe.GetEntityNameFromAlias(c.EntityName);
                     else
                     {
                         if (c.AttributeName.IndexOf(".") >= 0)
                         {
                             var alias = c.AttributeName.Split('.')[0];
-                            sEntityName = qe.GetEntityNameFromAlias(alias);
+                            cEntityName = qe.GetEntityNameFromAlias(alias);
                             sAttributeName = c.AttributeName.Split('.')[1];
                         }
-                        else
-                        {
-                            sEntityName = qe.EntityName; //Attributes from the root entity
-                        }
+                        //else
+                        //{
+                        //    sEntityName = qe.EntityName; //Attributes from the root entity
+                        //}
                     }
 
 #else
                     //CRM 2011
                     if (c.AttributeName.IndexOf(".") >= 0) {
                         var alias = c.AttributeName.Split('.')[0];
-                        sEntityName = qe.GetEntityNameFromAlias(alias);
+                        cEntityName = qe.GetEntityNameFromAlias(alias);
                         sAttributeName = c.AttributeName.Split('.')[1];
                     }
 #endif
 
-                    var earlyBoundType = context.FindReflectedType(sEntityName);
+                    var earlyBoundType = context.FindReflectedType(cEntityName);
                     if (earlyBoundType != null)
                     {
-                        typedExpression.AttributeType = context.FindReflectedAttributeType(earlyBoundType, sEntityName, sAttributeName);
+                        typedExpression.AttributeType = context.FindReflectedAttributeType(earlyBoundType, cEntityName, sAttributeName);
 
                         // Special case when filtering on the name of a Lookup
                         if (typedExpression.AttributeType == typeof(EntityReference) && sAttributeName.EndsWith("name"))
