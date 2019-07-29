@@ -1886,10 +1886,6 @@ namespace FakeXrmEasy
                             cEntityName = qe.GetEntityNameFromAlias(alias);
                             sAttributeName = c.AttributeName.Split('.')[1];
                         }
-                        //else
-                        //{
-                        //    sEntityName = qe.EntityName; //Attributes from the root entity
-                        //}
                     }
 
 #else
