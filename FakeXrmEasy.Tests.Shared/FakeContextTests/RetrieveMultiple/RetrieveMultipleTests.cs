@@ -539,5 +539,31 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
             Assert.Equal(1, result.Entities.Count);
         }
 #endif
+
+        [Fact]
+        public void Should_Allow_Using_Aliases_with_Dot()
+        {
+            var contact = new Entity("contact") { Id = Guid.NewGuid() };
+            contact["firstname"] = "Jordi";
+
+            var account = new Entity("account") { Id = Guid.NewGuid() };
+            account["primarycontactid"] = contact.ToEntityReference();
+            account["name"] = "Dynamics Value";
+
+            var context = new XrmFakedContext();
+            context.Initialize(new Entity[] { contact, account });
+            var service = context.GetOrganizationService();
+
+            QueryExpression query = new QueryExpression("account");
+            query.ColumnSet = new ColumnSet("name");
+            var link = query.AddLink("contact", "contactid", "primarycontactid");
+            link.EntityAlias = "primary.contact";
+            link.Columns = new ColumnSet("firstname");
+
+            var accounts = service.RetrieveMultiple(query);
+
+            Assert.True(accounts.Entities.First().Contains("primary.contact.firstname"));
+            Assert.Equal("Jordi", accounts.Entities.First().GetAttributeValue<AliasedValue>("primary.contact.firstname").Value);
+        }
     }
 }
