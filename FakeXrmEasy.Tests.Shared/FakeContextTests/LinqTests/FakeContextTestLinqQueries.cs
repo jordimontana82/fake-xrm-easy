@@ -1135,7 +1135,7 @@ namespace FakeXrmEasy.Tests
                                where a.Name == "Barcelona"
                                select c.Address1_Name).ToList();
 
-                Assert.True(matches.Count == 2);
+                Assert.Equal(2, matches.Count);
             }
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
