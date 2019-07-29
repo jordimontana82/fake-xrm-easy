@@ -35,6 +35,15 @@ namespace FakeXrmEasy.Tests.Extensions
         }
 
         [Fact]
+        public void SetSealedPropertyValue_should_update_onetomanyrelationship_metadata()
+        {
+            var fakeRelationship = new OneToManyRelationshipMetadata();
+
+            fakeRelationship.SetSealedPropertyValue("ReferencingEntity", "account");
+            Assert.Equal("account", fakeRelationship.ReferencingEntity);
+        }
+
+        [Fact]
         public void SetAttributeCollection_should_update_attributes()
         {
             var entityMetadata = new EntityMetadata();
