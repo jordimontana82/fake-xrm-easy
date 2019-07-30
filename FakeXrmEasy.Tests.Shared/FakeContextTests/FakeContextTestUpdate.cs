@@ -35,8 +35,8 @@ namespace FakeXrmEasy.Tests
 
             var e = new Entity("account") { Id = Guid.Empty };
 
-            var ex = Assert.Throws<InvalidOperationException>(() => service.Update(e));
-            Assert.Equal("The id must not be empty.", ex.Message);
+            var ex = Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Update(e));
+            Assert.Equal("account with Id 00000000-0000-0000-0000-000000000000 Does Not Exist", ex.Message);
         }
 
         [Fact]
@@ -411,6 +411,7 @@ namespace FakeXrmEasy.Tests
             var context = new XrmFakedContext();
             context.InitializeMetadata(userMetadata);
             context.Initialize(user);
+
             context.CallerId = user.ToEntityReference();
 
             var account = new Entity() { LogicalName = "account" };

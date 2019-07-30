@@ -34,8 +34,10 @@ namespace FakeXrmEasy.Tests
             var context = new XrmFakedContext();
             var service = context.GetOrganizationService();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("account", Guid.Empty, new ColumnSet()));
-            Assert.Equal(ex.Message, "The id must not be empty.");
+            context.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Account));
+
+            var ex = Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Retrieve("account", Guid.Empty, new ColumnSet(true)));
+            Assert.Equal(ex.Message, "account With Id = 00000000-0000-0000-0000-000000000000 Does Not Exist");
         }
 
         [Fact]
@@ -44,8 +46,8 @@ namespace FakeXrmEasy.Tests
             var context = new XrmFakedContext();
             var service = context.GetOrganizationService();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("account", Guid.NewGuid(), null));
-            Assert.Equal(ex.Message, "The columnset parameter must not be null.");
+            var ex = Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Retrieve("account", Guid.NewGuid(), null));
+            Assert.Equal(ex.Message, "Required field 'ColumnSet' is missing");
         }
 
         [Fact]
@@ -55,8 +57,8 @@ namespace FakeXrmEasy.Tests
 
             var service = context.GetOrganizationService();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("account", Guid.NewGuid(), null));
-            Assert.Equal(ex.Message, "The columnset parameter must not be null.");
+            var ex = Assert.Throws<InvalidOperationException>(() => service.Retrieve("account", Guid.NewGuid(), new ColumnSet(true)));
+            Assert.Equal("The entity logical name account is not valid.", ex.Message);
         }
 
         [Fact]
