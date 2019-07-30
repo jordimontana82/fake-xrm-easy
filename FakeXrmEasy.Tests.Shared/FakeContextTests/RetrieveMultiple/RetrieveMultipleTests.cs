@@ -363,6 +363,100 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         }
 
         [Fact]
+        public void TestNestedFiltersWithLateBoundEntities()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            Entity account = new Entity("account") { Id = Guid.NewGuid() };
+            account["name"] = "test";
+
+            Entity contact = new Entity("contact") { Id = Guid.NewGuid() };
+            contact["accountid"] = account.ToEntityReference();
+            contact["birthdate"] = null;
+            contact["territorycode"] = null;
+
+            context.Initialize(new List<Entity>
+            {
+                account,
+                contact
+            });
+
+            var query = new QueryExpression("account");
+            query.ColumnSet = new ColumnSet("name");
+            query.Criteria.AddCondition(new ConditionExpression("name", ConditionOperator.Like, "test"));
+
+            var linkEntity = query.AddLink("contact", "accountid", "accountid", JoinOperator.Inner);
+            linkEntity.LinkCriteria.AddFilter(new FilterExpression(LogicalOperator.Or)
+            {
+                Filters = {
+                    new FilterExpression(LogicalOperator.And) {
+                        Conditions = {
+                            new ConditionExpression("birthdate",ConditionOperator.Null),
+                            new ConditionExpression("territorycode",ConditionOperator.Null)
+                        }
+                    },
+                    new FilterExpression(LogicalOperator.And) {
+                        Conditions = {
+                            new ConditionExpression("birthdate",ConditionOperator.NotNull),
+                            new ConditionExpression("territorycode",ConditionOperator.NotNull)
+                        }
+                    }
+                }
+            });
+
+            var results = service.RetrieveMultiple(query).Entities;
+            Assert.Single(results);
+        }
+
+        [Fact]
+        public void TestNestedFiltersWithEarlyBoundEntities()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            Crm.Account account = new Crm.Account() { Id = Guid.NewGuid() };
+            account.Name = "test";
+
+            Crm.Contact contact = new Crm.Contact() { Id = Guid.NewGuid() };
+            contact["accountid"] = account.ToEntityReference();
+            contact.BirthDate = null;
+            contact.TerritoryCode = null;
+
+            context.Initialize(new List<Entity>
+            {
+                account,
+                contact
+            });
+
+            var query = new QueryExpression("account");
+            query.ColumnSet = new ColumnSet("name");
+            query.Criteria.AddCondition(new ConditionExpression("name", ConditionOperator.Like, "test"));
+
+            var linkEntity = query.AddLink("contact", "accountid", "accountid", JoinOperator.Inner);
+            linkEntity.LinkCriteria.AddFilter(new FilterExpression(LogicalOperator.Or)
+            {
+                Filters = {
+                    new FilterExpression(LogicalOperator.And) {
+                        Conditions = {
+                            new ConditionExpression("birthdate",ConditionOperator.Null),
+                            new ConditionExpression("territorycode",ConditionOperator.Null)
+                        }
+                    },
+                    new FilterExpression(LogicalOperator.And) {
+                        Conditions = {
+                            new ConditionExpression("birthdate",ConditionOperator.NotNull),
+                            new ConditionExpression("territorycode",ConditionOperator.NotNull)
+                        }
+                    }
+                }
+            });
+
+            var results = service.RetrieveMultiple(query).Entities.Cast<Crm.Account>().ToList();
+            Assert.Single(results);
+        }
+
+        [Fact]
         public void Should_Populate_EntityReference_Name_When_Metadata_Is_Provided()
         {
             var userMetadata = new EntityMetadata() { LogicalName = "systemuser" };
@@ -388,6 +482,89 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
             var accounts = service.RetrieveMultiple(query);
 
             Assert.Equal("Fake XrmEasy", accounts.Entities[0].GetAttributeValue<EntityReference>("ownerid").Name);
+        }
+
+
+#if !FAKE_XRM_EASY
+        [Fact]
+        public void Can_Filter_Using_Entity_Name_Without_Alias()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            Entity e = new Entity("contact")
+            {
+                Id = Guid.NewGuid(),
+                ["retrieve"] = true
+            };
+
+            Entity e2 = new Entity("account")
+            {
+                Id = Guid.NewGuid(),
+                ["contactid"] = e.ToEntityReference()
+            };
+
+            context.Initialize(new Entity[] { e, e2 });
+
+            QueryExpression query = new QueryExpression("account");
+            query.Criteria.AddCondition("contact", "retrieve", ConditionOperator.Equal, true);
+            query.AddLink("contact", "contactid", "contactid");
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+        }
+
+        [Fact]
+        public void Can_Filter_Using_Entity_Name_With_Alias()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            Entity e = new Entity("contact")
+            {
+                Id = Guid.NewGuid(),
+                ["retrieve"] = true
+            };
+
+            Entity e2 = new Entity("account")
+            {
+                Id = Guid.NewGuid(),
+                ["contactid"] = e.ToEntityReference()
+            };
+
+            context.Initialize(new Entity[] { e, e2 });
+
+            QueryExpression query = new QueryExpression("account");
+            query.Criteria.AddCondition("mycontact", "retrieve", ConditionOperator.Equal, true);
+            query.AddLink("contact", "contactid", "contactid").EntityAlias="mycontact";
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+        }
+#endif
+
+        [Fact]
+        public void Should_Allow_Using_Aliases_with_Dot()
+        {
+            var contact = new Entity("contact") { Id = Guid.NewGuid() };
+            contact["firstname"] = "Jordi";
+
+            var account = new Entity("account") { Id = Guid.NewGuid() };
+            account["primarycontactid"] = contact.ToEntityReference();
+            account["name"] = "Dynamics Value";
+
+            var context = new XrmFakedContext();
+            context.Initialize(new Entity[] { contact, account });
+            var service = context.GetOrganizationService();
+
+            QueryExpression query = new QueryExpression("account");
+            query.ColumnSet = new ColumnSet("name");
+            var link = query.AddLink("contact", "contactid", "primarycontactid");
+            link.EntityAlias = "primary.contact";
+            link.Columns = new ColumnSet("firstname");
+
+            var accounts = service.RetrieveMultiple(query);
+
+            Assert.True(accounts.Entities.First().Contains("primary.contact.firstname"));
+            Assert.Equal("Jordi", accounts.Entities.First().GetAttributeValue<AliasedValue>("primary.contact.firstname").Value);
         }
     }
 }

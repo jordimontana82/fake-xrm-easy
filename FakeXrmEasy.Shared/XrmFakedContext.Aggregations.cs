@@ -318,6 +318,11 @@ namespace FakeXrmEasy
                 {
                     return lst.Min(x => (double)x);
                 }
+                
+                if (valType == typeof(DateTime) || valType == typeof(DateTime?))
+                {
+                    return lst.Min(x => (DateTime)x);
+                }
 
                 throw new Exception("Unhndled property type '" + valType.FullName + "' in 'min' aggregate");
             }
@@ -356,6 +361,11 @@ namespace FakeXrmEasy
                 if (valType == typeof(double) || valType == typeof(double?))
                 {
                     return lst.Max(x => (double)x);
+                }
+                  
+                if (valType == typeof(DateTime) || valType == typeof(DateTime?))
+                {
+                    return lst.Max(x => (DateTime)x);
                 }
 
                 throw new Exception("Unhndled property type '" + valType.FullName + "' in 'max' aggregate");
@@ -434,7 +444,7 @@ namespace FakeXrmEasy
                 {
                     return lst.Sum(x => x as double? ?? 0d);
                 }
-
+              
                 throw new Exception("Unhndled property type '" + valType.FullName + "' in 'sum' aggregate");
             }
         }
