@@ -8,6 +8,8 @@ namespace FakeXrmEasy
     {
         public TimeZoneInfo SystemTimeZone { get; set; }
 
+        public FiscalYearSettings FiscalYearSettings { get; set; }
+
         public Dictionary<string, Dictionary<string, DateTimeAttributeBehavior>> DateBehaviour { get; set; }
 
         private static Dictionary<string, Dictionary<string, DateTimeAttributeBehavior>> DefaultDateBehaviour()
