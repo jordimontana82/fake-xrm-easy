@@ -27,12 +27,19 @@ namespace FakeXrmEasy.FakeMessageExecutors
                           .SingleOrDefault();
 
             if(user != null) {
-              var orgId = user.GetAttributeValue<Guid?>("organizationid");
-              results.Add("OrganizationId", orgId ?? Guid.Empty);
-
               var buRef = user.GetAttributeValue<EntityReference>("businessunitid");
               var buId = buRef != null ? buRef.Id : Guid.Empty;
               results.Add("BusinessUnitId", buId);
+
+              var orgId = user.GetAttributeValue<Guid?>("organizationid") ?? Guid.Empty;
+              if(orgId == Guid.Empty) {
+                var bu = ctx.CreateQuery("businessunit")
+                            .Where(b => b.Id == buId)
+                            .SingleOrDefault();
+                var orgRef = bu.GetAttributeValue<EntityReference>("organizationid");
+                orgId = orgRef?.Id ?? Guid.Empty;
+              }
+              results.Add("OrganizationId", orgId);
             }
 
             var response = new WhoAmIResponse
