@@ -29,6 +29,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
             if(user != null) {
               var orgId = user.GetAttributeValue<Guid?>("organizationid");
               results.Add("OrganizationId", orgId ?? Guid.Empty);
+
+              var buRef = user.GetAttributeValue<EntityReference>("businessunitid");
+              var buId = buRef != null ? buRef.Id : Guid.Empty;
+              results.Add("BusinessUnitId", buId);
             }
 
             var response = new WhoAmIResponse
