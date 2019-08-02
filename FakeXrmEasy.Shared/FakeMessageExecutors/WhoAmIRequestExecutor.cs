@@ -1,6 +1,7 @@
 ﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using System;
+using System.Linq;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -15,10 +16,24 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             var req = request as WhoAmIRequest;
 
+            var callerId = ctx.CallerId.Id;
+
+            var results = new ParameterCollection {
+              { "UserId", callerId }
+            };
+
+            var user = ctx.CreateQuery("systemuser")
+                          .Where(u => u.Id == callerId)
+                          .SingleOrDefault();
+
+            if(user != null) {
+              var orgId = user.GetAttributeValue<Guid?>("organizationid");
+              results.Add("OrganizationId", orgId ?? Guid.Empty);
+            }
+
             var response = new WhoAmIResponse
             {
-                Results = new ParameterCollection
-                                { { "UserId", ctx.CallerId.Id } }
+                Results = results
             };
             return response;
         }
