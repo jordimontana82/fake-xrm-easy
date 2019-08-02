@@ -57,7 +57,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.WhoAmIRequestTests
 
           var user = new Entity("systemuser") {
               Id = Guid.NewGuid(),
-              ["businessunitid"] = (Guid?)businessUnit.Id
+              ["businessunitid"] = businessUnit.ToEntityReference()
             };
 
             var dbContent = new List<Entity> {
@@ -88,7 +88,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.WhoAmIRequestTests
 
             var user = new Entity("systemuser") {
               Id = Guid.NewGuid(),
-              ["businessunitid"] = (Guid?)businessUnit.Id,
+              ["businessunitid"] = businessUnit.ToEntityReference(),
               ["organizationid"] = (Guid?)organization_.Id
             };
 
@@ -117,12 +117,13 @@ namespace FakeXrmEasy.Tests.FakeContextTests.WhoAmIRequestTests
         public void BuAndOrgAreReturnedWhenUserBelongsToBuAndBuHasOrg() {
 
             var businessUnit = new Entity("businessunit") {
-              Id = Guid.NewGuid()
+              Id = Guid.NewGuid(),
+              ["organizationid"] = organization_.ToEntityReference()
             };
 
             var user = new Entity("systemuser") {
               Id = Guid.NewGuid(),
-              ["businessunitid"] = (Guid?)businessUnit.Id
+              ["businessunitid"] = businessUnit.ToEntityReference(),
             };
 
             var dbContent = new List<Entity> {
