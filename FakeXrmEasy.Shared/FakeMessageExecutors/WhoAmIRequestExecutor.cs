@@ -27,18 +27,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
                           .SingleOrDefault();
 
             if(user != null) {
-              var buRef = user.GetAttributeValue<EntityReference>("businessunitid");
-              var buId = buRef != null ? buRef.Id : Guid.Empty;
+              var buId = GetBusinessUnitId(user);
               results.Add("BusinessUnitId", buId);
 
-              var orgId = user.GetAttributeValue<Guid?>("organizationid") ?? Guid.Empty;
-              if(orgId == Guid.Empty) {
-                var bu = ctx.CreateQuery("businessunit")
-                            .Where(b => b.Id == buId)
-                            .SingleOrDefault();
-                var orgRef = bu.GetAttributeValue<EntityReference>("organizationid");
-                orgId = orgRef?.Id ?? Guid.Empty;
-              }
+              var orgId = GetOrganizationId(ctx, user, buId);
               results.Add("OrganizationId", orgId);
             }
 
@@ -53,5 +45,25 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             return typeof(WhoAmIRequest);
         }
+
+        private static Guid GetBusinessUnitId(Entity user) {
+          var buRef = user.GetAttributeValue<EntityReference>("businessunitid");
+          var buId = buRef != null ? buRef.Id : Guid.Empty;
+          return buId;
+        }
+
+        private static Guid GetOrganizationId(XrmFakedContext ctx, Entity user, Guid buId) {
+          var orgId = user.GetAttributeValue<Guid?>("organizationid") ?? Guid.Empty;
+          if(orgId == Guid.Empty) {
+            var bu = ctx.CreateQuery("businessunit")
+                        .Where(b => b.Id == buId)
+                        .SingleOrDefault();
+            var orgRef = bu.GetAttributeValue<EntityReference>("organizationid");
+            orgId = orgRef?.Id ?? Guid.Empty;
+          }
+
+          return orgId;
+        }
+
     }
 }
