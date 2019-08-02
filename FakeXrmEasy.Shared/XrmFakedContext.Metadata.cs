@@ -80,9 +80,10 @@ namespace FakeXrmEasy
 
         public EntityMetadata GetEntityMetadataByName(string sLogicalName)
         {
-            return CreateMetadataQuery()
-                .Where(em => em.LogicalName.Equals(sLogicalName))
-                .FirstOrDefault();
+            if (EntityMetadata.ContainsKey(sLogicalName))
+                return EntityMetadata[sLogicalName].Copy();
+
+            return null;
         }
 
         public void SetEntityMetadata(EntityMetadata em)

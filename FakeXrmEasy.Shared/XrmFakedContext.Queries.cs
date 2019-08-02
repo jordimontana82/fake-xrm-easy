@@ -315,7 +315,7 @@ namespace FakeXrmEasy
         {
             if (!string.IsNullOrEmpty(le.EntityAlias))
             {
-                if (!Regex.IsMatch(le.EntityAlias, "^[A-Za-z_]\\w*$", RegexOptions.ECMAScript))
+                if (!Regex.IsMatch(le.EntityAlias, "^[A-Za-z_](\\w|\\.)*$", RegexOptions.ECMAScript))
                 {
                     throw new FaultException(new FaultReason($"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _."));
                 }
@@ -507,6 +507,10 @@ namespace FakeXrmEasy
 
             var linkedEntities = new Dictionary<string, int>();
 
+#if  !FAKE_XRM_EASY
+            ValidateAliases(qe, context);
+#endif
+
             // Add as many Joins as linked entities
             foreach (var le in qe.LinkEntities)
             {
@@ -557,6 +561,98 @@ namespace FakeXrmEasy
             return query;
         }
 
+#if !FAKE_XRM_EASY
+        protected static void ValidateAliases(QueryExpression qe, XrmFakedContext context)
+        {
+            if (qe.Criteria != null)
+                ValidateAliases(qe, context, qe.Criteria);
+            if (qe.LinkEntities != null)
+                foreach (var link in qe.LinkEntities)
+                {
+                    ValidateAliases(qe, context, link);
+                }
+        }
+
+        protected static void ValidateAliases(QueryExpression qe, XrmFakedContext context, LinkEntity link)
+        {
+            if (link.LinkCriteria != null)
+                ValidateAliases(qe, context, link.LinkCriteria);
+            if (link.LinkEntities != null)
+                foreach (var innerLink in link.LinkEntities)
+                {
+                    ValidateAliases(qe, context, innerLink);
+                }
+        }
+
+        protected static void ValidateAliases(QueryExpression qe, XrmFakedContext context, FilterExpression filter)
+        {
+            if (filter.Filters != null)
+                foreach (var innerFilter in filter.Filters)
+                {
+                    ValidateAliases(qe, context, innerFilter);
+                }
+
+            if (filter.Conditions != null)
+                foreach (var condition in filter.Conditions)
+                {
+                    if (!string.IsNullOrEmpty(condition.EntityName))
+                    {
+                        ValidateAliases(qe, context, condition);
+                    }
+                }
+        }
+
+        protected static void ValidateAliases(QueryExpression qe, XrmFakedContext context, ConditionExpression condition)
+        {
+            var matches = qe.LinkEntities != null ? MatchByAlias(qe, context, condition, qe.LinkEntities) : 0;
+            if (matches > 1)
+            {
+                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"Table {condition.EntityName} is not unique amongst all top-level table and join aliases");
+            }
+            else if (matches == 0)
+            {
+                if (qe.LinkEntities != null) matches = MatchByEntity(qe, context, condition, qe.LinkEntities);
+                if (matches > 1)
+                {
+                    throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"There's more than one LinkEntity expressions with name={condition.EntityName}");
+                }
+                else if (matches == 0)
+                {
+                    if (condition.EntityName == qe.EntityName) return;
+                    throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"LinkEntity with name or alias {condition.EntityName} is not found");
+                }
+                condition.EntityName += "1";
+            }
+        }
+
+        protected static int MatchByEntity(QueryExpression qe, XrmFakedContext context, ConditionExpression condition, DataCollection<LinkEntity> linkEntities)
+        {
+            var matches = 0;
+            foreach (var link in linkEntities)
+            {
+                if (string.IsNullOrEmpty(link.EntityAlias) && condition.EntityName == link.LinkToEntityName)
+                {
+                    matches += 1;
+                }
+                if (link.LinkEntities != null) matches += MatchByEntity(qe, context, condition, link.LinkEntities);
+            }
+            return matches;
+        }
+
+        protected static int MatchByAlias(QueryExpression qe, XrmFakedContext context, ConditionExpression condition, DataCollection<LinkEntity> linkEntities)
+        {
+            var matches = 0;
+            foreach (var link in linkEntities)
+            {
+                if (link.EntityAlias == condition.EntityName)
+                {
+                    matches += 1;
+                }
+                if (link.LinkEntities != null) matches += MatchByAlias(qe, context, condition, link.LinkEntities);
+            }
+            return matches;
+        }
+#endif
 
         protected static Expression TranslateConditionExpression(QueryExpression qe, XrmFakedContext context, TypedConditionExpression c, ParameterExpression entity)
         {
@@ -754,7 +850,19 @@ namespace FakeXrmEasy
                 case ConditionOperator.ThisMonth:
                 case ConditionOperator.LastMonth:
                 case ConditionOperator.NextMonth:
+                case ConditionOperator.LastWeek:
+                case ConditionOperator.ThisWeek:
+                case ConditionOperator.NextWeek:
                     operatorExpression = TranslateConditionExpressionBetweenDates(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
+                case ConditionOperator.Next7Days:
+                    {
+                        DateTime today = DateTime.Today;
+                        c.CondExpression.Values.Add(today);
+                        c.CondExpression.Values.Add(today.AddDays(7));
+                        operatorExpression = TranslateConditionExpressionBetween(c, getAttributeValueExpr, containsAttributeExpression);
+                    }
                     break;
 
 #if FAKE_XRM_EASY_9
@@ -1575,7 +1683,6 @@ namespace FakeXrmEasy
             var thisYear = today.Year;
             var thisMonth = today.Month;
 
-
             switch (c.Operator)
             {
                 case ConditionOperator.ThisYear: // From first day of this year to last day of this year
@@ -1604,6 +1711,18 @@ namespace FakeXrmEasy
                     fromDate = new DateTime(thisYear, thisMonth, 1).AddMonths(1);
                     // LAst day of Next Month: Add two months to the first of this month, and then go back one day
                     toDate = new DateTime(thisYear, thisMonth, 1).AddMonths(2).AddDays(-1);
+                    break;
+                case ConditionOperator.ThisWeek:
+                    fromDate = today.ToFirstDayOfDeltaWeek();
+                    toDate = today.ToLastDayOfDeltaWeek().AddDays(1);
+                    break;
+                case ConditionOperator.LastWeek:
+                    fromDate = today.ToFirstDayOfDeltaWeek(-1);
+                    toDate = today.ToLastDayOfDeltaWeek(-1).AddDays(1);
+                    break;
+                case ConditionOperator.NextWeek:
+                    fromDate = today.ToFirstDayOfDeltaWeek(1);
+                    toDate = today.ToLastDayOfDeltaWeek(1).AddDays(1);
                     break;
             }
 
@@ -1745,6 +1864,7 @@ namespace FakeXrmEasy
 
             foreach (var c in conditions)
             {
+                var cEntityName = sEntityName;
                 //Create a new typed expression 
                 var typedExpression = new TypedConditionExpression(c);
                 typedExpression.IsOuter = bIsOuter;
@@ -1757,18 +1877,14 @@ namespace FakeXrmEasy
 
 #if FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015 || FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
                     if (c.EntityName != null)
-                        sEntityName = qe.GetEntityNameFromAlias(c.EntityName);
+                        cEntityName = qe.GetEntityNameFromAlias(c.EntityName);
                     else
                     {
                         if (c.AttributeName.IndexOf(".") >= 0)
                         {
                             var alias = c.AttributeName.Split('.')[0];
-                            sEntityName = qe.GetEntityNameFromAlias(alias);
+                            cEntityName = qe.GetEntityNameFromAlias(alias);
                             sAttributeName = c.AttributeName.Split('.')[1];
-                        }
-                        else
-                        {
-                            sEntityName = qe.EntityName; //Attributes from the root entity
                         }
                     }
 
@@ -1776,15 +1892,15 @@ namespace FakeXrmEasy
                     //CRM 2011
                     if (c.AttributeName.IndexOf(".") >= 0) {
                         var alias = c.AttributeName.Split('.')[0];
-                        sEntityName = qe.GetEntityNameFromAlias(alias);
+                        cEntityName = qe.GetEntityNameFromAlias(alias);
                         sAttributeName = c.AttributeName.Split('.')[1];
                     }
 #endif
 
-                    var earlyBoundType = context.FindReflectedType(sEntityName);
+                    var earlyBoundType = context.FindReflectedType(cEntityName);
                     if (earlyBoundType != null)
                     {
-                        typedExpression.AttributeType = context.FindReflectedAttributeType(earlyBoundType, sEntityName, sAttributeName);
+                        typedExpression.AttributeType = context.FindReflectedAttributeType(earlyBoundType, cEntityName, sAttributeName);
 
                         // Special case when filtering on the name of a Lookup
                         if (typedExpression.AttributeType == typeof(EntityReference) && sAttributeName.EndsWith("name"))
@@ -1988,18 +2104,22 @@ namespace FakeXrmEasy
 
             var nextDateTime = default(DateTime);
             var currentDateTime = DateTime.UtcNow;
-            var numberOfWeeks = (int)c.Values[0];
+            var numberOfWeeks = c.Values.Any() ? (int)c.Values[0] : 1;
 
             switch (c.Operator)
             {
                 case ConditionOperator.NextXWeeks:
                     nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
+                    c.Values[0] = (currentDateTime);
+                    c.Values.Add(nextDateTime);
+                    c.Values.Add(numberOfWeeks);
+                    break;
+                case ConditionOperator.Next7Days:
+                    nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
+                    c.Values.Add(currentDateTime);
+                    c.Values.Add(nextDateTime);
                     break;
             }
-
-            c.Values[0] = (currentDateTime);
-            c.Values.Add(nextDateTime);
-            // c.Values.Add(numberOfWeeks);
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }

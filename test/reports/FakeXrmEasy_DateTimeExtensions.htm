@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html data-ng-app="coverageApp">
+<head>
+<meta charset="utf-8" />
+<title>FakeXrmEasy.Extensions.DateTimeExtensions - Coverage Report</title>
+<link rel="stylesheet" type="text/css" href="report.css" />
+</head><body data-ng-controller="DetailViewCtrl"><div class="container">
+<h1>Summary</h1>
+<table class="overview">
+<colgroup>
+<col class="column135" />
+<col />
+</colgroup>
+<tbody>
+<tr><th>Class:</th><td>FakeXrmEasy.Extensions.DateTimeExtensions</td></tr>
+<tr><th>Assembly:</th><td>FakeXrmEasy</td></tr>
+<tr><th>File(s):</th><td><a href="#DGitfakexrmeasyFakeXrmEasySharedExtensionsDateTimeExtensionscs">D:\Git\fake-xrm-easy\FakeXrmEasy.Shared\Extensions\DateTimeExtensions.cs</a></td></tr>
+<tr><th>Covered lines:</th><td>9</td></tr>
+<tr><th>Uncovered lines:</th><td>10</td></tr>
+<tr><th>Coverable lines:</th><td>19</td></tr>
+<tr><th>Total lines:</th><td>43</td></tr>
+<tr><th>Line coverage:</th><td>47.3%</td></tr>
+<tr><th>Branch coverage:</th><td>0%</td></tr>
+</tbody>
+</table>
+<h1>Metrics</h1>
+<table class="overview">
+<thead><tr><th>Method</th><th>Cyclomatic Complexity</th><th>Sequence Coverage</th><th>Branch Coverage</th></tr></thead>
+<tbody>
+<tr><td title="System.DateTime FakeXrmEasy.Extensions.DateTimeExtensions::ToDayOfWeek(System.DateTime,System.Int32,System.DayOfWeek)">ToDayOfWeek(...)</td><td>1</td><td>100</td><td>100</td></tr>
+<tr><td title="System.DateTime FakeXrmEasy.Extensions.DateTimeExtensions::ToDayOfDeltaWeek(System.DateTime,System.Int32,System.DayOfWeek)">ToDayOfDeltaWeek(...)</td><td>1</td><td>100</td><td>100</td></tr>
+<tr><td title="System.DateTime FakeXrmEasy.Extensions.DateTimeExtensions::ToLastDayOfDeltaWeek(System.DateTime,System.Int32)">ToLastDayOfDeltaWeek(...)</td><td>1</td><td>100</td><td>100</td></tr>
+<tr><td title="System.DateTime FakeXrmEasy.Extensions.DateTimeExtensions::ToFirstDayOfDeltaWeek(System.DateTime,System.Int32)">ToFirstDayOfDeltaWeek(...)</td><td>1</td><td>100</td><td>100</td></tr>
+<tr><td title="System.DateTime FakeXrmEasy.Extensions.DateTimeExtensions::ToFirstDayOfMonth(System.DateTime,System.Int32)">ToFirstDayOfMonth(...)</td><td>1</td><td>0</td><td>0</td></tr>
+<tr><td title="System.DateTime FakeXrmEasy.Extensions.DateTimeExtensions::ToFirstDayOfMonth(System.DateTime)">ToFirstDayOfMonth(...)</td><td>1</td><td>0</td><td>0</td></tr>
+<tr><td title="System.DateTime FakeXrmEasy.Extensions.DateTimeExtensions::ToLastDayOfMonth(System.DateTime,System.Int32)">ToLastDayOfMonth(...)</td><td>3</td><td>0</td><td>0</td></tr>
+<tr><td title="System.DateTime FakeXrmEasy.Extensions.DateTimeExtensions::ToLastDayOfMonth(System.DateTime)">ToLastDayOfMonth(...)</td><td>1</td><td>0</td><td>0</td></tr>
+</tbody>
+</table>
+<h1>File(s)</h1>
+<h2 id="DGitfakexrmeasyFakeXrmEasySharedExtensionsDateTimeExtensionscs">D:\Git\fake-xrm-easy\FakeXrmEasy.Shared\Extensions\DateTimeExtensions.cs</h2>
+<table class="lineAnalysis">
+<thead><tr><th></th><th>#</th><th>Line</th><th></th><th>Line coverage</th></tr></thead>
+<tbody>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>1</code></td><td></td><td class="lightgray"><code>using&nbsp;System;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>2</code></td><td></td><td class="lightgray"><code>using&nbsp;System.Globalization;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>3</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>4</code></td><td></td><td class="lightgray"><code>namespace&nbsp;FakeXrmEasy.Extensions</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>5</code></td><td></td><td class="lightgray"><code>{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>6</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;class&nbsp;DateTimeExtensions</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>7</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>8</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;DateTime&nbsp;ToDayOfWeek(this&nbsp;DateTime&nbsp;dateTime,&nbsp;Int32&nbsp;week,&nbsp;DayOfWeek&nbsp;dayOfWeek)</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>9</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>10</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DateTime&nbsp;startOfYear&nbsp;=&nbsp;dateTime.AddDays(1&nbsp;-&nbsp;dateTime.DayOfYear);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>11</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;startOfYear.AddDays(7&nbsp;*&nbsp;(week&nbsp;-&nbsp;2)&nbsp;+&nbsp;((dayOfWeek&nbsp;-&nbsp;startOfYear.DayOfWeek&nbsp;+&nbsp;7)&nbsp;%&nbsp;7));</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>12</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>13</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>14</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;DateTime&nbsp;ToDayOfDeltaWeek(this&nbsp;DateTime&nbsp;dateTime,&nbsp;Int32&nbsp;deltaWeek,&nbsp;DayOfWeek&nbsp;dayOfWeek)</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>15</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;dateTime.ToDayOfWeek(CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(dateTime</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>16</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '36', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">36</td><td class="rightmargin right"><code>17</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek)&nbsp;+&nbsp;deltaWeek,&nbsp;dayOfWeek);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>18</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>19</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;DateTime&nbsp;ToLastDayOfDeltaWeek(this&nbsp;DateTime&nbsp;dateTime,&nbsp;Int32&nbsp;deltaWeek&nbsp;=&nbsp;0)</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '18', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">18</td><td class="rightmargin right"><code>20</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;dateTime.ToDayOfDeltaWeek(deltaWeek,&nbsp;CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek).AddDays(6)</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>21</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>22</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;DateTime&nbsp;ToFirstDayOfDeltaWeek(this&nbsp;DateTime&nbsp;dateTime,&nbsp;Int32&nbsp;deltaWeek&nbsp;=&nbsp;0)</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '18', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">18</td><td class="rightmargin right"><code>23</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;dateTime.ToDayOfDeltaWeek(deltaWeek,&nbsp;CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>24</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>25</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;DateTime&nbsp;ToFirstDayOfMonth(this&nbsp;DateTime&nbsp;dateTime,&nbsp;Int32&nbsp;month)</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>26</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;dateTime.AddDays(1&nbsp;-&nbsp;dateTime.Day).AddMonths(month&nbsp;-&nbsp;dateTime.Month);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>27</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>28</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;DateTime&nbsp;ToFirstDayOfMonth(this&nbsp;DateTime&nbsp;dateTime)</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>29</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;dateTime.ToFirstDayOfMonth(dateTime.Month);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>30</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>31</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;DateTime&nbsp;ToLastDayOfMonth(this&nbsp;DateTime&nbsp;dateTime,&nbsp;Int32&nbsp;month)</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>32</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr title="0 of 2 branches are covered" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>33</code></td><td class="branch0">&nbsp;</td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int32&nbsp;addYears&nbsp;=&nbsp;month&nbsp;&gt;&nbsp;12&nbsp;?&nbsp;month&nbsp;%&nbsp;12&nbsp;:&nbsp;0;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>34</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;month&nbsp;=&nbsp;month&nbsp;-&nbsp;12&nbsp;*&nbsp;addYears;</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>35</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;dateTime</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>36</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.AddDays(CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(dateTime.Year&nbsp;+&nbsp;addYears,&nbsp;month)&nbsp;-&nbsp;dateTime.</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>37</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.AddMonths(month&nbsp;-&nbsp;dateTime.Month).AddYears(addYears);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>38</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>39</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>40</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;DateTime&nbsp;ToLastDayOfMonth(this&nbsp;DateTime&nbsp;dateTime)</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><code>41</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;dateTime.ToLastDayOfMonth(dateTime.Month);</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>42</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><code>43</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
+</tbody>
+</table>
+<div class="footer">Generated by: ReportGenerator 2.4.5.0<br />29/07/2019 - 23:30:55<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<script type="text/javascript" src="combined.js"></script>
+</body></html>
