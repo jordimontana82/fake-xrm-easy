@@ -22,6 +22,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             var utcOffset = date.ToString("zz");
             var localizedAMPMDesignator = date.ToString("tt"); //Spanish and other cultures don't have the AM/PM designator
             Assert.NotNull(element);
+            // TODO See https://github.com/jordimontana82/fake-xrm-easy/issues/439
             Assert.Equal($"<new_startdate date=\"2011-07-12\" time=\"01:12 {localizedAMPMDesignator}\">2011-07-12T13:12:43{utcOffset}:00</new_startdate>", element.ToString());
         }
 
@@ -34,6 +35,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
             var utcOffset = date.ToString("zz");
             var localizedAMPMDesignator = date.ToString("tt"); //Spanish and other cultures don't have the AM/PM designator
             Assert.NotNull(element);
+            // TODO See https://github.com/jordimontana82/fake-xrm-easy/issues/439
             Assert.Equal($"<alias.new_startdate date=\"2011-07-12\" time=\"01:12 {localizedAMPMDesignator}\">2011-07-12T13:12:43{utcOffset}:00</alias.new_startdate>", element.ToString());
         }
 
