@@ -12,14 +12,14 @@
 <b>Note: To keep up to date with client-side unit testing version of this framework, please [have a look at this repo](http://github.com/jordimontana82/fake-xrm-easy-js) and samples in this other [sample code repo](http://github.com/jordimontana82/fake-xrm-easy-js-samples) </b>
 
 
-|Version|NuGet|
-|-----------|-----|
-|Dynamics v9|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.9?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.9)|
-|Dynamics 365|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.365?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.365)|
-|Dynamics CRM 2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.2016)|
-|Dynamics CRM 2015|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2015?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.2015)|
-|Dynamics CRM 2013|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2013?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.2013)|
-|Dynamics CRM 2011|[![Nuget](https://buildstats.info/nuget/fakexrmeasy?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy)|
+|Version|Package Name|NuGet|
+|-----------|------|-----|
+|Dynamics v9 (>= 9.x)|FakeXrmEasy.9|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.9?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.9)|
+|Dynamics 365 (8.2.x)|FakeXrmEasy.365|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.365?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.365)|
+|Dynamics CRM 2016 ( >= 8.0 && <= 8.1)|FakeXrmEasy.2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.2016)|
+|Dynamics CRM 2015 (7.x)|FakeXrmEasy.2015|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2015?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.2015)|
+|Dynamics CRM 2013 (6.x)|FakeXrmEasy.2013|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2013?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.2013)|
+|Dynamics CRM 2011 (5.x)|FakeXrmEasy|[![Nuget](https://buildstats.info/nuget/fakexrmeasy?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy)|
 
 Supports Dynamics CRM 2011, 2013, 2015, 2016, and Dynamics 365 (8.x and 9.x). <b>NOTE:</b> With the release of Dynamics 365 v9 we are changing the naming convention for new packages to match the major version.
 
