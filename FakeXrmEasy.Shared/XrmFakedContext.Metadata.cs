@@ -18,6 +18,11 @@ namespace FakeXrmEasy
         protected internal Dictionary<string, Dictionary<string, string>> AttributeMetadataNames { get; set; }
 
         /// <summary>
+        /// Auto generate metadata from context entities
+        /// </summary>
+        public bool AutoGenerateMetadata { get; set; }
+
+        /// <summary>
         /// Stores fake global option set metadata
         /// </summary>
         public Dictionary<string, OptionSetMetadata> OptionSetValuesMetadata { get; set; }
@@ -31,7 +36,6 @@ namespace FakeXrmEasy
         /// Stores fake entity metadata
         /// </summary>
         protected internal Dictionary<string, EntityMetadata> EntityMetadata { get; set; }
-
 
         public void InitializeMetadata(IEnumerable<EntityMetadata> entityMetadataList)
         {
@@ -67,6 +71,28 @@ namespace FakeXrmEasy
             if (entityMetadatas.Any())
             {
                 this.InitializeMetadata(entityMetadatas);
+            }
+        }
+
+        public void InitializeMetadata(IEnumerable<Entity> entities)
+        {
+            IEnumerable<EntityMetadata> entityMetadatas = MetadataGenerator.FromContextEntities(entities);
+            foreach (var entityMetadata in entityMetadatas)
+            {
+                EntityMetadata existingMetadata;
+                if (EntityMetadata.TryGetValue(entityMetadata.LogicalName, out existingMetadata))
+                {
+                    var existingAttributes = existingMetadata.Attributes ?? new AttributeMetadata[] { };
+                    var newAttributes = entityMetadata.Attributes.Where(a => !existingAttributes.Any(x => x.LogicalName == a.LogicalName));
+                    if (newAttributes.Any())
+                    {
+                        existingMetadata.SetAttributeCollection(newAttributes.Concat(existingAttributes));
+                    }
+                }
+                else
+                {
+                    EntityMetadata.Add(entityMetadata.LogicalName, entityMetadata);
+                }
             }
         }
 
