@@ -105,7 +105,11 @@ namespace FakeXrmEasy.Metadata
                 }
                 if (attributeMetadatas.Any())
                 {
-                    metadata.SetSealedPropertyValue("Attributes", attributeMetadatas.ToArray());
+                    //Some implementation of EBG such as the one in XrmToolbox may created extra properties. Dedup here and keep the one with OptionSets populated from Enum
+                    attributeMetadatas.Sort(new AttributeMetadataComparer());
+                    var dedupedAttributeMeatadatas = attributeMetadatas.GroupBy(x => x.LogicalName)
+                       .Select(g => g.First()).ToArray();
+                    metadata.SetSealedPropertyValue("Attributes", dedupedAttributeMeatadatas);
                 }
                 if (manyToManyRelationshipMetadatas.Any())
                 {
@@ -188,7 +192,18 @@ namespace FakeXrmEasy.Metadata
                     }
                     else if (typeof(Enum).IsAssignableFrom(genericType))
                     {
-                        return new StateAttributeMetadata();
+                        var ameta = new PicklistAttributeMetadata();
+                        String[] names = Enum.GetNames(genericType);
+                        Array values = Enum.GetValues(genericType);
+                        ameta.OptionSet = new OptionSetMetadata
+                        {
+                            OptionSetType = OptionSetType.Picklist,
+                        };
+                        for (int i = 0; i < names.Length; i++)
+                        {
+                            ameta.OptionSet.Options.Add(new OptionMetadata(new Label(new LocalizedLabel(names[i], 1033), null), (int)(values.GetValue(i))));
+                        }
+                        return ameta;
                     }
                     else
                     {
@@ -248,6 +263,23 @@ namespace FakeXrmEasy.Metadata
             relationshipMetadata.ReferencedAttribute = GetCustomAttribute<AttributeLogicalNameAttribute>(referencedAttribute).LogicalName;
 
             relationshipMetadatas.Add(relationshipMetadata);
+        }
+    }
+    /// <summary>
+    /// Compare AttributeMetadata and pick the one with OptionSet populated for deduping. 
+    /// </summary>
+    class AttributeMetadataComparer : IComparer<AttributeMetadata>
+    {
+        public int Compare(AttributeMetadata x, AttributeMetadata y)
+        {
+            if (x.LogicalName == x.LogicalName)
+            {
+                if (x is PicklistAttributeMetadata && y is PicklistAttributeMetadata)
+                {
+                    return ((PicklistAttributeMetadata)x).OptionSet == null ? 1 : -1;
+                }
+            }
+            return x.LogicalName.CompareTo(y.LogicalName);
         }
     }
 }
