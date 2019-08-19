@@ -105,7 +105,22 @@ namespace FakeXrmEasy.Metadata
                 }
                 if (attributeMetadatas.Any())
                 {
-                    metadata.SetSealedPropertyValue("Attributes", attributeMetadatas.ToArray());
+                    //Some implementation of EBG such as the one in XrmToolbox may created extra properties. Dedup here and keep the one with OptionSets populated from Enum
+                    IComparer<AttributeMetadata> comparer = Comparer<AttributeMetadata>.Create((a1, a2) =>
+                    {
+                        if (a1.LogicalName == a2.LogicalName)
+                        {
+                            if (a1 is PicklistAttributeMetadata)
+                            {
+                                return ((PicklistAttributeMetadata)a1).OptionSet == null ? 1 : -1;
+                            }
+                        }
+                        return a1.LogicalName.CompareTo(a2.LogicalName);
+                     });
+                    attributeMetadatas.Sort(comparer);
+                    var dedupedAttributeMeatadatas = attributeMetadatas.GroupBy(x => x.LogicalName)
+                       .Select(g => g.First()).ToArray();
+                    metadata.SetSealedPropertyValue("Attributes", dedupedAttributeMeatadatas);
                 }
                 if (manyToManyRelationshipMetadatas.Any())
                 {
@@ -188,7 +203,18 @@ namespace FakeXrmEasy.Metadata
                     }
                     else if (typeof(Enum).IsAssignableFrom(genericType))
                     {
-                        return new StateAttributeMetadata();
+                        var ameta = new PicklistAttributeMetadata();
+                        String[] names = Enum.GetNames(genericType);
+                        Array values = Enum.GetValues(genericType);
+                        ameta.OptionSet = new OptionSetMetadata
+                        {
+                            OptionSetType = OptionSetType.Picklist,
+                        };
+                        for (int i = 0; i < names.Length; i++)
+                        {
+                            ameta.OptionSet.Options.Add(new OptionMetadata(new Label(new LocalizedLabel(names[i], 1033), null), (int)(values.GetValue(i))));
+                        }
+                        return ameta;
                     }
                     else
                     {
