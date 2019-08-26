@@ -16,7 +16,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteMultipleRequestTests
         {
             var context = new XrmFakedContext();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account1 = new Account
             {
@@ -64,7 +64,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteMultipleRequestTests
         {
             var context = new XrmFakedContext();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account1 = new Account
             {
@@ -135,7 +135,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteMultipleRequestTests
         {
             var context = new XrmFakedContext();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account1 = new Account
             {
@@ -183,7 +183,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteMultipleRequestTests
         {
             var context = new XrmFakedContext();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account1 = new Account
             {
@@ -231,7 +231,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteMultipleRequestTests
         {
             var context = new XrmFakedContext();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account1 = new Account
             {
@@ -282,7 +282,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteMultipleRequestTests
         {
             var context = new XrmFakedContext();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account1 = new Account
             {
@@ -344,7 +344,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteMultipleRequestTests
         {
             var context = new XrmFakedContext();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account1 = new Account
             {

@@ -32,7 +32,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);
@@ -66,7 +66,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);
@@ -108,7 +108,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);
@@ -150,7 +150,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);
@@ -182,7 +182,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);
@@ -214,7 +214,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);
@@ -247,7 +247,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);
@@ -284,7 +284,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);
@@ -316,7 +316,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);
@@ -348,7 +348,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);
@@ -380,7 +380,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);
@@ -412,7 +412,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
 
             var context = new XrmFakedContext();
             context.Initialize(contactList);
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryExpression qry = new QueryExpression("contact");
             qry.ColumnSet = new ColumnSet(true);

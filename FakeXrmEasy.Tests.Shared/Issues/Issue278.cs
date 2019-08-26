@@ -44,7 +44,7 @@ namespace FakeXrmEasy.Tests.Issues
 
             fakedContext.InitializeMetadata(entityMetadata);
 
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
             fakedService.Execute(req);
 
 

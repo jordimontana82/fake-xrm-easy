@@ -58,7 +58,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryByAttributeTests
                 account, account2
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             QueryByAttribute query = new QueryByAttribute();
             query.Attributes.AddRange(new string[] { "name" });
@@ -86,7 +86,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryByAttributeTests
                 account, account2
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var query = new QueryByAttribute
             {
@@ -109,7 +109,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryByAttributeTests
         public static void When_a_query_by_attribute_is_executed_with_one_null_attribute_it_is_not_returned()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var contact = new Contact
             {
@@ -132,7 +132,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryByAttributeTests
         public static void When_a_query_by_attribute_is_executed_with_non_existing_attribute_it_is_not_returned()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var contact = new Contact
             {
@@ -154,7 +154,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryByAttributeTests
         public static void Page_info_is_respected_for_query_by_attribute()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var contact1 = new Contact
             {
@@ -187,7 +187,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryByAttributeTests
         public static void Return_total_record_count_is_respected_for_query_by_attribute()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var contact1 = new Contact
             {

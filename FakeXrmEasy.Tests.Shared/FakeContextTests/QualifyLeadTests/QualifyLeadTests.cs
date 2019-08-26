@@ -16,7 +16,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QualifyLeadTests
         {
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var lead = new Lead()
             {
@@ -47,7 +47,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QualifyLeadTests
         {
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var lead = new Lead()
             {
@@ -78,7 +78,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QualifyLeadTests
         {
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var lead = new Lead()
             {
@@ -109,7 +109,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QualifyLeadTests
         {
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account = new Account()
             {

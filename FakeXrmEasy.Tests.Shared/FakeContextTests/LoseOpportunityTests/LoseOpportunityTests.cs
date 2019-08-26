@@ -15,7 +15,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LoseOpportunityTests
         {
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var opportunity = new Opportunity()
             {

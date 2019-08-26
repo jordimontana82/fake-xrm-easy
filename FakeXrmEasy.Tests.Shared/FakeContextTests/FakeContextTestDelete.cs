@@ -19,7 +19,7 @@ namespace FakeXrmEasy.Tests
         public void When_delete_is_invoked_with_an_empty_logical_name_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var ex = Assert.Throws<InvalidOperationException>(() => service.Delete(null, Guid.Empty));
             Assert.Equal(ex.Message, "The entity logical name must not be null or empty.");
@@ -35,7 +35,7 @@ namespace FakeXrmEasy.Tests
         public void When_delete_is_invoked_with_an_empty_guid_an_exception_is_thrown()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var ex = Assert.Throws<InvalidOperationException>(() => service.Delete("account", Guid.Empty));
             Assert.Equal(ex.Message, "The id must not be empty.");
@@ -55,7 +55,7 @@ namespace FakeXrmEasy.Tests
 
             context.Initialize(data);
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var ex = Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Delete("account", nonExistingGuid));
             Assert.Equal(ex.Message, string.Format("account with Id {0} Does Not Exist", nonExistingGuid));
@@ -69,7 +69,7 @@ namespace FakeXrmEasy.Tests
             //Initialize the context with a single entity
             var nonExistingGuid = Guid.NewGuid();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var ex = Assert.Throws<InvalidOperationException>(() => service.Delete("account", nonExistingGuid));
             Assert.Equal(ex.Message.ToLower(), "the entity logical name account is not valid.");
@@ -84,7 +84,7 @@ namespace FakeXrmEasy.Tests
             //Initialize the context with a single entity
             var nonExistingGuid = Guid.NewGuid();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var ex = Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Delete("account", nonExistingGuid));
             Assert.Equal(ex.Message, string.Format("account with Id {0} Does Not Exist", nonExistingGuid));
@@ -103,7 +103,7 @@ namespace FakeXrmEasy.Tests
 
             context.Initialize(data);
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             service.Delete("account", guid);
             Assert.True(context.Data["account"].Count == 0);
@@ -117,7 +117,7 @@ namespace FakeXrmEasy.Tests
 
             var account = new Account() { Id = Guid.NewGuid(), Name = "Super Great Customer", AccountNumber = "69" };
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             using (var ctx = new OrganizationServiceContext(service))
             {

@@ -13,7 +13,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.WhoAmIRequestTests
             var context = new XrmFakedContext();
             context.CallerId = new EntityReference() { Id = Guid.NewGuid(), Name = "Super Faked User" };
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
             WhoAmIRequest req = new WhoAmIRequest();
 
             var response = service.Execute(req) as WhoAmIResponse;

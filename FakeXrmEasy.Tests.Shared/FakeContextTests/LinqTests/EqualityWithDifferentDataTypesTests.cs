@@ -25,7 +25,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new Contact() { Id = guid, FirstName = "Jordi" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -46,7 +46,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new Contact() { Id = guid, FirstName = "11.1" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -68,7 +68,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new Contact() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -91,7 +91,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new Report() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -113,7 +113,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new Contact() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -137,7 +137,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
 
             fakedContext.Data["contact"][guid]["versionnumber"] = long.MaxValue; //Couldn´t be set by the Proxy types but set here just for testing long data types
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -159,7 +159,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new Contact() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -181,7 +181,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new Contact() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -203,7 +203,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new SalesOrderDetail() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -226,7 +226,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new Account() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -248,7 +248,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new SalesOrderDetail() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -270,7 +270,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new SalesOrderDetail() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -293,7 +293,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new SalesOrderDetail() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -315,7 +315,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new Account() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -351,7 +351,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new ActivityParty() { Id = Guid.NewGuid()}  //To test also nulls
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {

@@ -66,7 +66,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DisassociateRequestTests
                 Entity2LogicalName = "team"
             });
 
-            var orgSvc = context.GetFakedOrganizationService();
+            var orgSvc = context.GetOrganizationService();
             orgSvc.Disassociate("team", teamId, new Relationship("teammembership"),
                 new EntityReferenceCollection(new List<EntityReference> { new EntityReference("systemuser", userId), new EntityReference("systemuser", user2Id) }));
 
@@ -160,7 +160,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DisassociateRequestTests
                 Entity2LogicalName = "team"
             });
 
-            var orgSvc = context.GetFakedOrganizationService();
+            var orgSvc = context.GetOrganizationService();
             orgSvc.Disassociate("systmuser", userId, new Relationship("teammembership"),
                 new EntityReferenceCollection(new List<EntityReference> { new EntityReference("team", teamId), new EntityReference("team", team2Id) }));
 
