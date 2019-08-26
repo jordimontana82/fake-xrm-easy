@@ -173,7 +173,7 @@ namespace FakeXrmEasy.Tests
         public void When_initializing_the_context_with_an_entity_it_should_have_default_createdon_createdby_modifiedon_and_modifiedby_attributes()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var e = new Entity("account") { Id = Guid.NewGuid() };
             context.Initialize(new List<Entity>() { e });
@@ -189,7 +189,7 @@ namespace FakeXrmEasy.Tests
         public void When_updating_an_entity_Modified_On_Should_Also_Be_Updated()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var e = new Entity("account") { Id = Guid.NewGuid() };
             context.Initialize(new List<Entity>() { e });
@@ -212,7 +212,7 @@ namespace FakeXrmEasy.Tests
         public void When_using_typed_entities_ProxyTypesAssembly_is_not_mandatory()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Jordi" };
             context.Initialize(new List<Entity>() { c });
@@ -241,7 +241,7 @@ namespace FakeXrmEasy.Tests
             var assembly = Assembly.GetAssembly(typeof(Contact));
 
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Jordi" };
             context.Initialize(new List<Entity>() { c });
@@ -253,7 +253,7 @@ namespace FakeXrmEasy.Tests
         public void When_using_proxy_types_entity_names_are_validated()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var c = new Contact() { Id = Guid.NewGuid(), FirstName = "Jordi" };
             context.Initialize(new List<Entity>() { c });
@@ -284,8 +284,8 @@ namespace FakeXrmEasy.Tests
         public void When_getting_a_fake_service_reference_it_uses_a_singleton_pattern()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
-            var service2 = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
+            var service2 = context.GetOrganizationService();
 
             Assert.Equal(service, service2);
         }

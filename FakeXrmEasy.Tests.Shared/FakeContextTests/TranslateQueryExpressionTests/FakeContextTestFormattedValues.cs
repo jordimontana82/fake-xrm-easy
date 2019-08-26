@@ -15,7 +15,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
         public void When_an_optionset_is_retrieved_where_its_value_is_an_enum_formatted_value_doesnt_contain_key_if_value_was_null()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account = new Account() { Id = Guid.NewGuid() };
             account["statecode"] = null;
@@ -39,7 +39,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
         public void When_an_optionset_is_retrieved_where_its_value_is_an_enum_formatted_value_is_returned()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account = new Account() { Id = Guid.NewGuid() };
             account["statecode"] = AccountState.Active;
@@ -64,7 +64,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
         public void When_an_entity_is_returned_formatted_values_are_also_cloned()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account = new Account() { Id = Guid.NewGuid() };
             account["statecode"] = new OptionSetValue(0);
@@ -93,7 +93,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
         public void When_an_entity_is_returned_with_specific_columns_formatted_values_are_also_cloned()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var account = new Account() { Id = Guid.NewGuid() };
             account["statecode"] = AccountState.Active;
@@ -119,7 +119,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
         public void When_an_entity_is_returned_with_link_entity_and_specific_columns_formatted_values_are_also_cloned()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var contact = new Contact() { Id = Guid.NewGuid() };
             contact["statecode"] = new OptionSetValue((int) ContactState.Inactive);
@@ -162,7 +162,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests
         public void When_an_entity_is_returned_with_link_entity_and_specific_columns_formatted_values_are_also_cloned2()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var contact = new Contact() { Id = Guid.NewGuid() };
             contact["statecode"] = ContactState.Inactive;

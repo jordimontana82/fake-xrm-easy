@@ -454,7 +454,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                 Query = new FetchExpression(fetchXml)
             };
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
             var response = service.Execute(retrieveMultiple) as RetrieveMultipleResponse;
 
             Assert.Equal(2, response.EntityCollection.Entities.Count);
@@ -493,7 +493,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                 Query = new FetchExpression(fetchXml)
             };
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
             var response = service.Execute(retrieveMultiple) as RetrieveMultipleResponse;
 
             Assert.Equal(7, response.EntityCollection.Entities.Count);
@@ -521,7 +521,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                 Query = new FetchExpression(fetchXml)
             };
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
             Assert.Throws<Exception>(() => service.Execute(retrieveMultiple));
         }
 
@@ -552,7 +552,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                  "  </entity>" +
                  "</fetch>";
             fetchXml = string.Format(fetchXml, accountId);
-            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var rows = context.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
             Assert.Equal(rows.Entities.Count, 2);
         }
 
@@ -585,7 +585,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                  "  </entity>" +
                  "</fetch>";
             fetchXml = string.Format(fetchXml, contactId1);
-            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var rows = context.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
             Assert.Equal(rows.Entities.Count, 1);
         }
 
@@ -617,7 +617,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                  "     </filter>" +
                  "  </entity>" +
                  "</fetch>";
-            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var rows = context.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
             Assert.Equal(rows.Entities.Count, 1);
         }
 
@@ -648,7 +648,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                  "     </filter>" +
                  "  </entity>" +
                  "</fetch>";
-            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var rows = context.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
             Assert.Equal(rows.Entities.Count, 1);
             Assert.Equal(rows.Entities[0]["name"], account1["name"]);
         }
@@ -680,7 +680,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                  "     </filter>" +
                  "  </entity>" +
                  "</fetch>";
-            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var rows = context.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
             Assert.Equal(rows.Entities.Count, 1);
             Assert.Equal(rows.Entities[0].ToEntity<Account>().Name, account1.Name);
         }
@@ -718,7 +718,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
               </entity>
             </fetch>";
 
-            var rows = fakedContext.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var rows = fakedContext.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
             Assert.Equal(rows.Entities.Count, 1);
         }
 
@@ -750,7 +750,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                  "     </filter>" +
                  "  </entity>" +
                  "</fetch>";
-            var rows = context.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var rows = context.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
             Assert.Equal(rows.Entities.Count, 1);
         }
 
@@ -758,7 +758,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         public void When_querying_the_same_entity_records_with_joins_no_collection_modified_exception_is_thrown()
         {
             var fakedContext = new XrmFakedContext { };
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             var entityAccount = new Account { Id = Guid.NewGuid(), Name = "My First Faked Account yeah!", LogicalName = "account" };
             var entityContact = new Contact { Id = Guid.NewGuid(), ParentCustomerId = entityAccount.ToEntityReference() };
@@ -807,7 +807,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         public void When_querying_fetchxml_with_linked_entities_linked_entity_properties_match_the_equivalent_linq_expression()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var contact = new Contact()
             {
@@ -879,7 +879,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         public void When_querying_fetchxml_with_linked_entities_with_left_outer_join_right_result_is_returned()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var contact = new Contact()
             {

@@ -18,7 +18,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             var executeTransactionRequest = (ExecuteTransactionRequest)request;
             var response = new ExecuteTransactionResponse { ["Responses"] = new OrganizationResponseCollection() };
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             foreach (var r in executeTransactionRequest.Requests)
             {

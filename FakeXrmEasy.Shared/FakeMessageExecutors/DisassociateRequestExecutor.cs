@@ -16,7 +16,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
         public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
         {
             var disassociateRequest = request as DisassociateRequest;
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             if (disassociateRequest == null)
             {

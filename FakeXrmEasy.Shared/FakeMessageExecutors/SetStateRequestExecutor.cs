@@ -24,7 +24,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             entityToUpdate["statecode"] = req.State;
             entityToUpdate["statuscode"] = req.Status;
 
-            var fakedService = ctx.GetFakedOrganizationService();
+            var fakedService = ctx.GetOrganizationService();
             fakedService.Update(entityToUpdate);
 
             return new SetStateResponse();

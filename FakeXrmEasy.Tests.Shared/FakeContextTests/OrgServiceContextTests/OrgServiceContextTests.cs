@@ -13,7 +13,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.OrgServiceContextTests
         public void When_calling_context_add_and_save_changes_entity_is_added_to_the_faked_context()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             using (var ctx = new XrmServiceContext(service))
             {
@@ -32,7 +32,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.OrgServiceContextTests
         public void When_calling_context_add_and_save_changes_returns_correct_result()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             using (var ctx = new XrmServiceContext(service))
             {
@@ -62,7 +62,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.OrgServiceContextTests
             };
             context.AddRelationship("accountleads", relationship);
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             using (var ctx = new XrmServiceContext(service))
             {

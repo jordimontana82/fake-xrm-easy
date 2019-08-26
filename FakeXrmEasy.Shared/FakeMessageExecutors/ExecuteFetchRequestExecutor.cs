@@ -28,7 +28,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "You need to provide FetchXml value");
             }
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var retrieveMultiple = new RetrieveMultipleRequest()
             {

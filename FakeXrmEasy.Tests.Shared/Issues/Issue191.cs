@@ -36,7 +36,7 @@ namespace FakeXrmEasy.Tests.Issues
             // initialise
             var context = new XrmFakedContext();
             context.Initialize(new[] { contact, child, pet });
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             // join contact and child and pet
             var query2 = new QueryExpression("contact");

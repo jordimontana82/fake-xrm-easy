@@ -71,7 +71,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AssociateRequestTests
                 Entity2LogicalName = "team"
             });
 
-            var orgSvc = context.GetFakedOrganizationService();
+            var orgSvc = context.GetOrganizationService();
             orgSvc.Associate("team", teamId, new Relationship("teammembership"),
                 new EntityReferenceCollection(new List<EntityReference> { new EntityReference("systemuser", userId) }));
 

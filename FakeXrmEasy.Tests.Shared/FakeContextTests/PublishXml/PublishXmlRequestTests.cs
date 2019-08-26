@@ -10,7 +10,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PublishXml
         public void When_calling_publish_xml_exception_is_raised_if_parameter_xml_is_blank()
         {
             var ctx = new XrmFakedContext();
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var req = new PublishXmlRequest()
             {
@@ -24,7 +24,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PublishXml
         public void When_calling_publish_xml_no_exception_is_raised()
         {
             var ctx = new XrmFakedContext();
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var req = new PublishXmlRequest()
             {

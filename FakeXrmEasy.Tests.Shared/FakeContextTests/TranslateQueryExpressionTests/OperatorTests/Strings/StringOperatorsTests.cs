@@ -17,7 +17,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests.Opera
         {
             var context = new XrmFakedContext();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
             service.Create(new Contact { FirstName = "Jimmy" });
 
             var qe = new QueryExpression("contact");
@@ -31,7 +31,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests.Opera
         {
             var context = new XrmFakedContext();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
             service.Create(new Contact { FirstName = "JimmY" });
 
             var qe = new QueryExpression("contact");
@@ -44,7 +44,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.TranslateQueryExpressionTests.Opera
         public void When_executing_a_query_expression_like_operator_is_case_insensitive()
         {
             var context = new XrmFakedContext { ProxyTypesAssembly = Assembly.GetExecutingAssembly() };
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             service.Create(new Contact { FirstName = "Jimmy" });
 

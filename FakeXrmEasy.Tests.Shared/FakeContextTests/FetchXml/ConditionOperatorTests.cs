@@ -642,7 +642,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct2 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.33 };
             var ct3 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.2345 };
             ctx.Initialize(new[] { ct1, ct2, ct3 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -751,7 +751,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct2 = new Contact() { Id = Guid.NewGuid(), BirthDate = date.AddDays(-8) }; //Shouldn't be returned
             var ct3 = new Contact() { Id = Guid.NewGuid(), BirthDate = date.AddDays(1) }; //Shouldn't be returned
             ctx.Initialize(new[] { ct1, ct2, ct3 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -777,7 +777,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct2 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.33 };
             var ct3 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.2345 };
             ctx.Initialize(new[] { ct1, ct2, ct3 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -830,7 +830,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct2 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.33 };
             var ct3 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.2345 };
             ctx.Initialize(new[] { ct1, ct2, ct3 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -880,7 +880,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct2 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.33 };
             var ct3 = new Contact() { Id = Guid.NewGuid(), Address1_Longitude = 1.2345 };
             ctx.Initialize(new[] { ct1, ct2, ct3 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -935,7 +935,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date };
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(1) };
             ctx.Initialize(new[] { ct1, ct2 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -965,7 +965,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(-1) }; //Should be returned
             var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(1) }; //Shouldnt
             ctx.Initialize(new[] { ct1, ct2, ct3 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -994,7 +994,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(-1) }; //Shouldnt
             var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(1) }; //Should be returned
             ctx.Initialize(new[] { ct1, ct2, ct3 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1022,7 +1022,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Should be returned
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(-1) }; //Shouldnt
             ctx.Initialize(new[] { ct1, ct2 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1049,7 +1049,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt 
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(-1) }; //Should be returned
             ctx.Initialize(new[] { ct1, ct2 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1076,7 +1076,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt 
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(1) }; //Should be returned
             ctx.Initialize(new[] { ct1, ct2 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1118,7 +1118,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         public void FetchXml_Operator_Between_Execution_Without_Exact_Values_Raises_Exception()
         {
             var ctx = new XrmFakedContext();
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
                               <entity name='contact'>
@@ -1166,7 +1166,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Shouldnt 
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(2013, 05, 19) }; //Should be returned
             ctx.Initialize(new[] { ct1, ct2 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1208,7 +1208,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         public void FetchXml_Operator_NotBetween_Execution_Without_Exact_Values_Raises_Exception()
         {
             var ctx = new XrmFakedContext();
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
                               <entity name='contact'>
@@ -1256,7 +1256,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date }; //Should
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(2013, 05, 19) }; //Shouldnt
             ctx.Initialize(new[] { ct1, ct2 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1289,7 +1289,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct6 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear + 1, 1, 1) };      // First day of next year - should not be returned
             var ct7 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear - 1, 12, 31) };    // Last day of last year - should not be returned
             ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1324,7 +1324,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct6 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(1) };                                               // One year in the future - should not be returned
             var ct7 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(1) };                                               // One year in the past - should not be returned
             ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1359,7 +1359,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct5 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddMonths(-1) };              // First day of last month - should be returned
             var ct6 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddDays(-1) };                // Last day of last month - should be returned
             ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1395,7 +1395,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct7 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddMonths(-1) };              // First day of last month - should not be returned
             
             ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1428,7 +1428,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct6 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear - 1, 1, 1) };    // First day of last year - should be returned
             var ct7 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear - 1, 12, 31) };  // Last day of last year - should be returned
             ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1462,7 +1462,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct6 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear + 1, 1, 1) };    // First day of next year - should be returned
             var ct7 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear + 1, 12, 31) };  // Last day of next year - should be returned
             ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1839,7 +1839,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct1 = new Contact() { Id = Guid.NewGuid(), new_MultiSelectAttribute = new OptionSetValueCollection() { new OptionSetValue(1) } }; //Should be returned
             var ct2 = new Contact() { Id = Guid.NewGuid(), new_MultiSelectAttribute = new OptionSetValueCollection() { new OptionSetValue(3) } }; //Shouldn't be returned
             ctx.Initialize(new[] { ct1, ct2 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1895,7 +1895,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct1 = new Contact() { Id = Guid.NewGuid(), new_MultiSelectAttribute = new OptionSetValueCollection() { new OptionSetValue(1) } }; //Shouldn't be returned
             var ct2 = new Contact() { Id = Guid.NewGuid(), new_MultiSelectAttribute = new OptionSetValueCollection() { new OptionSetValue(3) } }; //Should be returned
             ctx.Initialize(new[] { ct1, ct2 });
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
@@ -1972,7 +1972,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                 product, quote, quoteProduct
             });
 
-            var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var collection = ctx.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
 
             Assert.Equal(0, collection.Entities.Count);
         }

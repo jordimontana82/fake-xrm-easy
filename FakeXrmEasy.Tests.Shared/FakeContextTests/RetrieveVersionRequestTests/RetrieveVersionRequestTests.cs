@@ -20,7 +20,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveVersionRequestTests
         public void AddsFakeVersionRequest()
         {
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var fakeVersionExecutor = new RetrieveVersionRequestExecutor();
             fakedContext.AddFakeMessageExecutor<RetrieveVersionRequest>(fakeVersionExecutor);

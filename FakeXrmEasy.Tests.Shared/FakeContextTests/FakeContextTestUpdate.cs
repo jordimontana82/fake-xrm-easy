@@ -136,7 +136,7 @@ namespace FakeXrmEasy.Tests
         public void When_updating_an_optionsetvaluecollection_the_context_should_reflect_changes()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var e = new Entity("contact") { Id = Guid.Empty };
             e["new_multiselectattribute"] = new OptionSetValueCollection() { new OptionSetValue(1) };

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using System;
-using System.Linq;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -20,7 +19,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new Exception("Only RetrieveRelationshipRequest can be processed!");
             }
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
             var fakeRelationShip = ctx.GetRelationship(retrieveRequest.Name);
             if (fakeRelationShip == null)
             {

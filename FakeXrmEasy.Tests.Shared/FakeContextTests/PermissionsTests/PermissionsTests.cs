@@ -21,7 +21,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PermissionsTests
                 contact, user
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             GrantAccessRequest gar = new GrantAccessRequest
             {
@@ -64,7 +64,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PermissionsTests
                 contact, user
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             GrantAccessRequest gar = new GrantAccessRequest
             {
@@ -108,7 +108,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PermissionsTests
                 contact1, contact2, user
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             GrantAccessRequest gar = new GrantAccessRequest
             {
@@ -162,7 +162,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PermissionsTests
                 contact, user
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             RetrievePrincipalAccessRequest rpar = new RetrievePrincipalAccessRequest
             {
@@ -186,7 +186,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PermissionsTests
                 contact, user
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             GrantAccessRequest gar = new GrantAccessRequest
             {
@@ -246,7 +246,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PermissionsTests
                 contact, user1, user2
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             GrantAccessRequest gar = new GrantAccessRequest
             {
@@ -353,7 +353,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PermissionsTests
                 contact1, user1, contact2, user2, user3
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             GrantAccessRequest gar1 = new GrantAccessRequest
             {
@@ -501,7 +501,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PermissionsTests
                 contact1, user1, contact2, user2, user3
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             GrantAccessRequest gar1 = new GrantAccessRequest
             {
@@ -636,7 +636,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.PermissionsTests
                 contact1, user1
             });
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             GrantAccessRequest gar1 = new GrantAccessRequest
             {

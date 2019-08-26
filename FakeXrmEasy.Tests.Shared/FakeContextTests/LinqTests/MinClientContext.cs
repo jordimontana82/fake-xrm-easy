@@ -26,7 +26,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.LinqTests
                 new fake_minclient() { Id = Guid.NewGuid(), fake_name= "Mason", ["statecode"] = 1 , OwnerId = new EntityReference (Crm.SystemUser.EntityLogicalName, Guid.NewGuid())  }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (CrmContext ctx = new CrmContext(service))
             {
