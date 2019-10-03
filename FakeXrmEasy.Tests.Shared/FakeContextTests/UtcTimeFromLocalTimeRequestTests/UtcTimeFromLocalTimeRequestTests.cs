@@ -21,21 +21,21 @@ namespace FakeXrmEasy.Tests.FakeContextTests.UtcTimeFromLocalTimeRequestTests
         [Fact]
         public static void UtcTimeResponse_GivesCorrectResponse_ForBST()
         {
-            const string localTime = "2019-10-02 12:00:00";
+            const string localTime = "2019-10-02 12:00:00 +01:00";
             const string utcTime = "2019-10-02 11:00:00";
             const int crmTimeZoneCode = 90; // Greenwich Time (date in summer time)
-            
+
             var returnedUtcTime = GetUtcTimeResponse(localTime, crmTimeZoneCode);
             var expectedUtcDateTime = DateTime.SpecifyKind(DateTime.Parse(utcTime), DateTimeKind.Utc);
             Assert.Equal(expectedUtcDateTime, returnedUtcTime);
         }
         
         [Fact]
-        public static void UtcTimeResponse_GivesCorrectResponse_ForUTC()
+        public static void UtcTimeResponse_GivesCorrectResponse_ForGMT()
         {
-            const string localTime = "2019-11-02 12:00:00";
+            const string localTime = "2019-11-02 12:00:00 +00:00";
             const string utcTime = "2019-11-02 12:00:00";
-            const int crmTimeZoneCode = 90; // Greenwich Time (date not in summer time)
+            const int crmTimeZoneCode = 90; // Greenwich Time
             
             var returnedUtcTime = GetUtcTimeResponse(localTime, crmTimeZoneCode);
             var expectedUtcDateTime = DateTime.SpecifyKind(DateTime.Parse(utcTime), DateTimeKind.Utc);
@@ -70,7 +70,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.UtcTimeFromLocalTimeRequestTests
         {
             var context = new XrmFakedContext();
             var organizationService = context.GetOrganizationService();
-            
+
             var localTime = DateTime.SpecifyKind(DateTime.Parse(time), DateTimeKind.Local);
             var request = new UtcTimeFromLocalTimeRequest
             {
