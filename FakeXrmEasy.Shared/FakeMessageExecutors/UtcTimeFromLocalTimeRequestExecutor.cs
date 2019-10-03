@@ -15,11 +15,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             var req = request as UtcTimeFromLocalTimeRequest;
             
-            var utcTime = TimeZoneInfo.ConvertTimeToUtc(req.LocalTime);
-
-            ctx.ConvertToUtc(req.LocalTime);
             var res = new UtcTimeFromLocalTimeResponse();
-            res["UtcTime"] = utcTime;
+            res["UtcTime"] = TimeZoneInfo.ConvertTimeToUtc(req.LocalTime);
             return res;
         }
 
