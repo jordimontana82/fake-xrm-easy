@@ -6,6 +6,7 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -23,22 +24,20 @@ namespace FakeXrmEasy.FakeMessageExecutors
             PagingInfo pageInfo = null;
             QueryExpression qe;
 
-            string entityName = null;
-
-            if (request.Query is QueryExpression)
+            if (request.Query is QueryExpression q)
             {
-                qe = (request.Query as QueryExpression).Clone();
-                entityName = qe.EntityName;
+                qe = q.Clone();
+                CheckQuickFindCondition(qe);
 
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();
             }
-            else if (request.Query is FetchExpression)
+            else if (request.Query is FetchExpression fe)
             {
-                var fetchXml = (request.Query as FetchExpression).Query;
+                var fetchXml = fe.Query;
                 var xmlDoc = XrmFakedContext.ParseFetchXml(fetchXml);
                 qe = XrmFakedContext.TranslateFetchXmlDocumentToQueryExpression(ctx, xmlDoc);
-                entityName = qe.EntityName;
+                CheckQuickFindCondition(qe);
 
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();
@@ -48,12 +47,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     list = XrmFakedContext.ProcessAggregateFetchXml(ctx, xmlDoc, list);
                 }
             }
-            else if (request.Query is QueryByAttribute)
+            else if (request.Query is QueryByAttribute query)
             {
                 // We instantiate a QueryExpression to be executed as we have the implementation done already
-                var query = request.Query as QueryByAttribute;
                 qe = new QueryExpression(query.EntityName);
-                entityName = qe.EntityName;
 
                 qe.ColumnSet = query.ColumnSet;
                 qe.Criteria = new FilterExpression();
@@ -136,7 +133,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                                     { "EntityCollection", new EntityCollection(recordsToReturn) }
                                  }
             };
-            response.EntityCollection.EntityName = entityName;
+            response.EntityCollection.EntityName = qe.EntityName;
             response.EntityCollection.MoreRecords = (list.Count - pageSize * pageNumber) > 0;
             response.EntityCollection.TotalRecordCount = totalRecordCount;
 
@@ -150,8 +147,61 @@ namespace FakeXrmEasy.FakeMessageExecutors
             return response;
         }
 
+        //Check if FilterExpression satisfy quick find filter requirements
+        //https://docs.microsoft.com/en-us/previous-versions/dynamicscrm-2016/developers-guide/gg309410%28v%3dcrm.8%29
+        private void CheckQuickFindCondition(QueryExpression qe)
+        {
+            CheckQuickFindFilterRecursive(qe.Criteria);
+        }
+        private void CheckQuickFindFilterRecursive(FilterExpression fe)
+        {
+            bool isQuickFind = fe.IsQuickFindFilter;
+
+            //Official documentation says that IsQuickFindFilter property is ignored
+            //if filter operator is set to LogicalOperator.And, but on practice is throws
+            if (isQuickFind && fe.FilterOperator != LogicalOperator.Or)
+                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault()
+                {
+                    ErrorCode = -2147217118,
+                    Message = "A filter cannot be a quick find filter unless it has a LogicalOperator of \"Or\""
+                });
+
+            //If a filter expression has IsQuickFindFilter set to true, it cannot have any child filter expression properties, it can only have ConditionExpression properties
+            if (isQuickFind && fe.Filters?.Count > 0)
+                throw new FaultException<OrganizationServiceFault>(
+                    new OrganizationServiceFault()
+                    {
+                        ErrorCode = -2147217118,
+                        Message = "A quick find filter cannot have any child filters"
+                    });
+
+            //Only one filter expression in a filter expression hierarchy can be set with IsQuickFindFilter = true
+            if (fe.Filters.Where(f => f.IsQuickFindFilter == true).Count() > 1)
+                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault()
+                {
+                    ErrorCode = -2147217118,
+                    Message = "Only one quick find filter is allowed per query"
+                });
+
+            //All condition expressions related to a filter expression with IsQuickFindFilter set to true must be single non-null value conditions
+            if (isQuickFind && fe.Conditions.Where(c => c.Values == null || c.Values.Count > 1).Count() > 0)
+            {
+                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault()
+                {
+                    ErrorCode = -2147217118,
+                    Message = "A quick find condition must have a single value"
+                });
+            }
+
+            ///Iterate on child filters
+            foreach (var filter in fe.Filters)
+            {
+                CheckQuickFindFilterRecursive(filter);
+            }
+        }
+
         /// <summary>
-        /// Populates the formmated values property of this entity record based on the proxy types
+        /// Populates the formated values property of this entity record based on the proxy types
         /// </summary>
         /// <param name="e"></param>
         protected void PopulateFormattedValues(Entity e)
