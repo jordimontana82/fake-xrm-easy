@@ -151,7 +151,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
         //https://docs.microsoft.com/en-us/previous-versions/dynamicscrm-2016/developers-guide/gg309410%28v%3dcrm.8%29
         private void CheckQuickFindCondition(QueryExpression qe)
         {
-            CheckQuickFindFilterRecursive(qe.Criteria);
+            if (qe.Criteria != null)
+            {
+                CheckQuickFindFilterRecursive(qe.Criteria);
+            }
         }
         private void CheckQuickFindFilterRecursive(FilterExpression fe)
         {
@@ -184,7 +187,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 });
 
             //All condition expressions related to a filter expression with IsQuickFindFilter set to true must be single non-null value conditions
-            if (isQuickFind && fe.Conditions.Where(c => c.Values == null || c.Values.Count > 1).Count() > 0)
+            if (isQuickFind && fe.Conditions?.Where(c => c.Values?.Count != 1).Count() > 0)
             {
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault()
                 {
