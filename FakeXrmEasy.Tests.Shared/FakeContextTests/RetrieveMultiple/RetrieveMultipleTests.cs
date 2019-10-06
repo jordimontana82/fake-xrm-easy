@@ -5,6 +5,7 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
@@ -565,6 +566,129 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
 
             Assert.True(accounts.Entities.First().Contains("primary.contact.firstname"));
             Assert.Equal("Jordi", accounts.Entities.First().GetAttributeValue<AliasedValue>("primary.contact.firstname").Value);
+        }
+
+        [Fact]
+        public void TestThatQuckFindFilterCanOnlyBeOrFilter()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            QueryExpression query = new QueryExpression("entity")
+            {
+                Criteria = new FilterExpression()
+                {
+                    IsQuickFindFilter = true,
+                }
+            };
+
+            var e = Assert.Throws<FaultException<OrganizationServiceFault>>(() =>
+            {
+                service.RetrieveMultiple(query);
+            });
+
+            Assert.Equal(-2147217118, e.Detail.ErrorCode);
+            Assert.Equal("A filter cannot be a quick find filter unless it has a LogicalOperator of \"Or\"", e.Detail.Message);
+        }
+
+        [Fact]
+        public void TestThatQuckFindFilterCantHaveChilds()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            QueryExpression query = new QueryExpression("entity")
+            {
+                Criteria = new FilterExpression()
+                {
+                    FilterOperator = LogicalOperator.Or,
+                    IsQuickFindFilter = true,
+                    Filters =
+                    {
+                        new FilterExpression(),
+                        new FilterExpression()
+                    }
+                }
+            };
+
+            var e = Assert.Throws<FaultException<OrganizationServiceFault>>(() =>
+            {
+                service.RetrieveMultiple(query);
+            });
+
+            Assert.Equal(-2147217118, e.Detail.ErrorCode);
+            Assert.Equal("A quick find filter cannot have any child filters", e.Detail.Message);
+        }
+
+        [Fact]
+        public void TestThatQuckFindFilterIsAlowedOnce()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            QueryExpression query = new QueryExpression("entity")
+            {
+                Criteria = new FilterExpression()
+                {
+                    FilterOperator = LogicalOperator.Or,
+                    Filters =
+                    {
+                        new FilterExpression()
+                        {
+                            FilterOperator = LogicalOperator.Or,
+                            IsQuickFindFilter = true,
+                        },
+                        new FilterExpression()
+                        {
+                            FilterOperator = LogicalOperator.Or,
+                            IsQuickFindFilter = true,
+                        }
+                    }
+                }
+            };
+
+            var e = Assert.Throws<FaultException<OrganizationServiceFault>>(() =>
+            {
+                service.RetrieveMultiple(query);
+            });
+
+            Assert.Equal(-2147217118, e.Detail.ErrorCode);
+            Assert.Equal("Only one quick find filter is allowed per query", e.Detail.Message);
+        }
+
+        [Fact]
+        public void TestThatQuckFindFilterCanHaveSingleValueConditionsOnly()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+            QueryExpression query = new QueryExpression("entity")
+            {
+                Criteria = new FilterExpression()
+                {
+                    FilterOperator = LogicalOperator.Or,
+                    Filters =
+                    {
+                        new FilterExpression()
+                        {
+                            FilterOperator = LogicalOperator.Or,
+                            IsQuickFindFilter = true,
+                            Conditions =
+                            {
+                                new ConditionExpression("any", ConditionOperator.Null)
+                            }
+                        }
+                    }
+                }
+            };
+
+            var e = Assert.Throws<FaultException<OrganizationServiceFault>>(() =>
+            {
+                service.RetrieveMultiple(query);
+            });
+
+            Assert.Equal(-2147217118, e.Detail.ErrorCode);
+            Assert.Equal("A quick find condition must have a single value", e.Detail.Message);
         }
     }
 }
