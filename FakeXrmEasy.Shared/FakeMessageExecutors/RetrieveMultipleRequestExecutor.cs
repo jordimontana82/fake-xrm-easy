@@ -24,9 +24,9 @@ namespace FakeXrmEasy.FakeMessageExecutors
             PagingInfo pageInfo = null;
             QueryExpression qe;
 
-            if (request.Query is QueryExpression q)
+            if (request.Query is QueryExpression)
             {
-                qe = q.Clone();
+                qe = (request.Query as QueryExpression).Clone();
                 CheckQuickFindCondition(qe);
 
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
@@ -34,7 +34,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             }
             else if (request.Query is FetchExpression fe)
             {
-                var fetchXml = fe.Query;
+                var fetchXml = (request.Query as FetchExpression).Query;
                 var xmlDoc = XrmFakedContext.ParseFetchXml(fetchXml);
                 qe = XrmFakedContext.TranslateFetchXmlDocumentToQueryExpression(ctx, xmlDoc);
                 CheckQuickFindCondition(qe);
@@ -47,9 +47,10 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     list = XrmFakedContext.ProcessAggregateFetchXml(ctx, xmlDoc, list);
                 }
             }
-            else if (request.Query is QueryByAttribute query)
+            else if (request.Query is QueryByAttribute)
             {
                 // We instantiate a QueryExpression to be executed as we have the implementation done already
+                var query = request.Query as QueryByAttribute;
                 qe = new QueryExpression(query.EntityName);
 
                 qe.ColumnSet = query.ColumnSet;
