@@ -32,7 +32,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();
             }
-            else if (request.Query is FetchExpression fe)
+            else if (request.Query is FetchExpression)
             {
                 var fetchXml = (request.Query as FetchExpression).Query;
                 var xmlDoc = XrmFakedContext.ParseFetchXml(fetchXml);
