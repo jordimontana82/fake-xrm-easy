@@ -840,6 +840,7 @@ namespace FakeXrmEasy
                     operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression, olderThanDate);
                     break;
 
+                case ConditionOperator.NextXDays:
                 case ConditionOperator.NextXWeeks:
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
@@ -2098,28 +2099,30 @@ namespace FakeXrmEasy
 
             return Expression.Constant(true); //Satisfy filter if there are no conditions nor filters
         }
+
         protected static Expression TranslateConditionExpressionNext(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             var c = tc.CondExpression;
 
             var nextDateTime = default(DateTime);
             var currentDateTime = DateTime.UtcNow;
-            var numberOfWeeks = c.Values.Any() ? (int)c.Values[0] : 1;
+            var periodsToAdd = c.Values.Any() ? (int) c.Values[0] : 1;
 
             switch (c.Operator)
             {
+                case ConditionOperator.NextXDays:
+                    nextDateTime = currentDateTime.AddDays(periodsToAdd);
+                    break;
                 case ConditionOperator.NextXWeeks:
-                    nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
-                    c.Values[0] = (currentDateTime);
-                    c.Values.Add(nextDateTime);
-                    c.Values.Add(numberOfWeeks);
+                    nextDateTime = currentDateTime.AddDays(7 * periodsToAdd);
                     break;
                 case ConditionOperator.Next7Days:
-                    nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
-                    c.Values.Add(currentDateTime);
-                    c.Values.Add(nextDateTime);
+                    nextDateTime = currentDateTime.AddDays(7);
                     break;
             }
+
+            c.Values[0] = currentDateTime;
+            c.Values.Add(nextDateTime);
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }

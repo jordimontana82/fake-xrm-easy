@@ -50,6 +50,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="ne-userid" />
       <xs:enumeration value="olderthan-x-months" />
       <xs:enumeration value="last-seven-days" />
+      <xs:enumeration value="next-x-days" />
       <xs:enumeration value="next-x-weeks" />
       <xs:enumeration value="next-seven-days" />
       <xs:enumeration value="last-week" />
@@ -68,7 +69,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
       <xs:enumeration value="last-x-hours" />
       <xs:enumeration value="next-x-hours" />
       <xs:enumeration value="last-x-days" />
-      <xs:enumeration value="next-x-days" />
       <xs:enumeration value="last-x-weeks" />    
       <xs:enumeration value="last-x-months" />
       <xs:enumeration value="next-x-months" />     
@@ -1565,6 +1565,31 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal(1, collection.Entities.Count);
             var retrievedUser = collection.Entities[0].Id;
             Assert.Equal(retrievedUser, su2.Id);
+        }
+
+        [Fact]
+        public void FetchXml_Operator_Next_X_Days_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='anniversary' />
+                                        <filter type='and'>
+                                            <condition attribute='anniversary' operator='next-x-days' value='2' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var date = DateTime.Now;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(1) }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(3) }; //Should not be returned
+            ctx.Initialize(new[] { ct1, ct2 });
+            var service = ctx.GetOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            Assert.Equal(ct1.Id, collection.Entities.First().Id);
         }
 
         [Fact]

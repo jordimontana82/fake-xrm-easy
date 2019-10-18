@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Xrm.Sdk;
@@ -26,6 +25,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             ConditionOperator.LastXMonths,
             ConditionOperator.LastXWeeks,
             ConditionOperator.LastXYears,
+            ConditionOperator.NextXDays,
             ConditionOperator.NextXWeeks
         };
 
@@ -486,6 +486,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     break;
                 case "neq-businessid":
                     op = ConditionOperator.NotEqualBusinessId;
+                    break;
+                case "next-x-days":
+                    op = ConditionOperator.NextXDays;
                     break;
                 case "next-x-weeks":
                     op = ConditionOperator.NextXWeeks;
