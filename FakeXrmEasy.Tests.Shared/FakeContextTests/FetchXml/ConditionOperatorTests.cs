@@ -1566,6 +1566,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var retrievedUser = collection.Entities[0].Id;
             Assert.Equal(retrievedUser, su2.Id);
         }
+
         [Fact]
         public void FetchXml_Operator_Next_X_Weeks_Execution()
         {
@@ -1588,11 +1589,9 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
             Assert.Equal(1, collection.Entities.Count);
-            var retrievedDateFirst = collection.Entities[0]["anniversary"] as DateTime?;
-            //var retrievedDateSecond = collection.Entities[1]["anniversary"] as DateTime?;
-            //Assert.Equal(23, retrievedDateFirst.Value.Day);
-            //Assert.Equal(22, retrievedDateSecond.Value.Day);
+            Assert.Equal(ct1.Id, collection.Entities.First().Id);
         }
+
         [Fact]
         public void FetchXml_Operator_Next_Seven_Days_Execution()
         {
