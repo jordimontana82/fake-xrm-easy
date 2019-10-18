@@ -840,6 +840,7 @@ namespace FakeXrmEasy
                     operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression, olderThanDate);
                     break;
 
+                case ConditionOperator.NextXHours:
                 case ConditionOperator.NextXDays:
                 case ConditionOperator.NextXWeeks:
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
@@ -2110,6 +2111,9 @@ namespace FakeXrmEasy
 
             switch (c.Operator)
             {
+                case ConditionOperator.NextXHours:
+                    nextDateTime = currentDateTime.AddHours(periodsToAdd);
+                    break;
                 case ConditionOperator.NextXDays:
                     nextDateTime = currentDateTime.AddDays(periodsToAdd);
                     break;

@@ -25,6 +25,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             ConditionOperator.LastXMonths,
             ConditionOperator.LastXWeeks,
             ConditionOperator.LastXYears,
+            ConditionOperator.NextXHours,
             ConditionOperator.NextXDays,
             ConditionOperator.NextXWeeks
         };
@@ -486,6 +487,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     break;
                 case "neq-businessid":
                     op = ConditionOperator.NotEqualBusinessId;
+                    break;
+                case "next-x-hours":
+                    op = ConditionOperator.NextXHours;
                     break;
                 case "next-x-days":
                     op = ConditionOperator.NextXDays;
