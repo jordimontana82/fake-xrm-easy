@@ -844,6 +844,7 @@ namespace FakeXrmEasy
                 case ConditionOperator.Next7Days:
                 case ConditionOperator.NextXDays:
                 case ConditionOperator.NextXWeeks:
+                case ConditionOperator.NextXMonths:
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
 
@@ -2114,6 +2115,9 @@ namespace FakeXrmEasy
                     break;
                 case ConditionOperator.Next7Days:
                     nextDateTime = currentDateTime.AddDays(7);
+                    break;
+                case ConditionOperator.NextXMonths:
+                    nextDateTime = currentDateTime.AddMonths(periodsToAdd);
                     break;
             }
 
