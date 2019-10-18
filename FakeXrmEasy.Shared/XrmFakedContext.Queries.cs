@@ -843,6 +843,10 @@ namespace FakeXrmEasy
                 case ConditionOperator.NextXWeeks:
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
+                
+                case ConditionOperator.LastXWeeks:
+                    operatorExpression = TranslateConditionExpressionLast(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
 
                 case ConditionOperator.ThisYear:
                 case ConditionOperator.LastYear:
@@ -1661,8 +1665,13 @@ namespace FakeXrmEasy
                 case ConditionOperator.Last7Days:
                     beforeDateTime = currentDateTime.AddDays(-7);
                     break;
+                case ConditionOperator.LastXWeeks:
+                    var numberOfWeeks = (int) c.Values[0];
+                    beforeDateTime = currentDateTime.AddDays(-7 * numberOfWeeks);
+                    break;
             }
 
+            c.Values.Clear();
             c.Values.Add(beforeDateTime);
             c.Values.Add(currentDateTime);
 

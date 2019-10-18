@@ -490,6 +490,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "next-x-weeks":
                     op = ConditionOperator.NextXWeeks;
                     break;
+                case "last-x-weeks":
+                    op = ConditionOperator.LastXWeeks;
+                    break;
                 case "next-seven-days":
                     op = ConditionOperator.Next7Days;
                     break;
