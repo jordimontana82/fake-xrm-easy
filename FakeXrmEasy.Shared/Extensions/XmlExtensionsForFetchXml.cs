@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Xrm.Sdk;
@@ -26,7 +25,11 @@ namespace FakeXrmEasy.Extensions.FetchXml
             ConditionOperator.LastXMonths,
             ConditionOperator.LastXWeeks,
             ConditionOperator.LastXYears,
-            ConditionOperator.NextXWeeks
+            ConditionOperator.NextXHours,
+            ConditionOperator.NextXDays,
+            ConditionOperator.NextXWeeks,
+            ConditionOperator.NextXMonths,
+            ConditionOperator.NextXYears
         };
 
         public static bool IsAttributeTrue(this XElement elem, string attributeName)
@@ -487,8 +490,20 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "neq-businessid":
                     op = ConditionOperator.NotEqualBusinessId;
                     break;
+                case "next-x-hours":
+                    op = ConditionOperator.NextXHours;
+                    break;
+                case "next-x-days":
+                    op = ConditionOperator.NextXDays;
+                    break;
                 case "next-x-weeks":
                     op = ConditionOperator.NextXWeeks;
+                    break;
+                case "next-x-months":
+                    op = ConditionOperator.NextXMonths;
+                    break;
+                case "next-x-years":
+                    op = ConditionOperator.NextXYears;
                     break;
                 case "next-seven-days":
                     op = ConditionOperator.Next7Days;
