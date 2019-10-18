@@ -1715,19 +1715,22 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal("anniversary", query.Criteria.Conditions[0].AttributeName);
             Assert.Equal(ConditionOperator.Next7Days, query.Criteria.Conditions[0].Operator);
 
-            var date = DateTime.Now;
-            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(3) }; //Should be returned
-            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7) }; //Shouldnt
+            var date = DateTime.UtcNow;
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(3) }; // Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(7) }; // Should be returned
             var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = date.AddDays(8) }; //Shouldnt
             ctx.Initialize(new[] { ct1, ct2, ct3 });
             var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
-            Assert.Single(collection.Entities);
-            var retrievedUser = collection.Entities[0].Id;
-            Assert.Equal(retrievedUser, ct1.Id);
+            var returnedEntityIds = collection.Entities.Select(e => e.Id).ToList();
+
+            Assert.Equal(2, collection.Entities.Count);
+            Assert.Contains(ct1.Id, returnedEntityIds);
+            Assert.Contains(ct2.Id, returnedEntityIds);
         }
+
         [Fact]
         public void FetchXml_Operator_Last_Week_Execution()
         {
