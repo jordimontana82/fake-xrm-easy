@@ -81,6 +81,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveMultiple\RetrieveMultipleTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveOptionSetRequestTests\RetrieveOptionSetRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveRelationshipRequestTests\RetrieveRelationshipRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveRequestTests\RetrieveRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveVersionRequestTests\RetrieveVersionRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ReviseQuoteRequestTests\ReviseQuoteRequestTests.cs" />

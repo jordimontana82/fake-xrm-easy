@@ -2,6 +2,7 @@
 using Microsoft.Xrm.Sdk.Messages;
 using System;
 using System.Linq;
+using Microsoft.Xrm.Sdk.Metadata;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -20,7 +21,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new Exception("Only RetrieveRelationshipRequest can be processed!");
             }
 
-            var service = ctx.GetFakedOrganizationService();
             var fakeRelationShip = ctx.GetRelationship(retrieveRequest.Name);
             if (fakeRelationShip == null)
             {
@@ -30,13 +30,13 @@ namespace FakeXrmEasy.FakeMessageExecutors
             
             var response = new RetrieveRelationshipResponse();
             response.Results = new ParameterCollection();
-            response.Results.Add("RelationshipMetadata", GetRelationshipMetadata(fakeRelationShip));
+            response.Results.Add("RelationshipMetadata", GetRelationshipMetadata(retrieveRequest.Name, fakeRelationShip));
             response.ResponseName = "RetrieveRelationship";
 
             return response;
         }
 
-        private static object GetRelationshipMetadata(XrmFakedRelationship fakeRelationShip)
+        private static RelationshipMetadataBase GetRelationshipMetadata(string schemaName, XrmFakedRelationship fakeRelationShip)
         {
             if (fakeRelationShip.RelationshipType == XrmFakedRelationship.enmFakeRelationshipType.ManyToMany)
             {
@@ -45,8 +45,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 mtm.Entity1IntersectAttribute = fakeRelationShip.Entity1Attribute;
                 mtm.Entity2LogicalName = fakeRelationShip.Entity2LogicalName;
                 mtm.Entity2IntersectAttribute = fakeRelationShip.Entity2Attribute;
-                mtm.SchemaName = fakeRelationShip.IntersectEntity;
                 mtm.IntersectEntityName = fakeRelationShip.IntersectEntity.ToLower();
+                mtm.SchemaName = schemaName;
                 return mtm;
             } else {
 
@@ -58,7 +58,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 otm.ReferencingEntity = fakeRelationShip.Entity1LogicalName;
                 otm.ReferencedAttribute = fakeRelationShip.Entity2Attribute;
                 otm.ReferencedEntity = fakeRelationShip.Entity2LogicalName;
-                otm.SchemaName = fakeRelationShip.IntersectEntity;
+                otm.SchemaName = schemaName;
                 return otm;
             }
         }
