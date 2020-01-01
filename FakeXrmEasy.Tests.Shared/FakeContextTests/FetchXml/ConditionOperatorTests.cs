@@ -1654,7 +1654,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             var date = DateTime.Now;
             var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date, CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
-            var lastWeek = weekOfYear - 1;
+            var lastWeek = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date.AddDays(-7), CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
 
             Func<int, DateTime> getRandomDateOfWeek = (week) =>
             {
@@ -1707,7 +1707,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             var date = DateTime.Now;
             var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date, CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
-            var lastWeek = weekOfYear - 1;
+            var lastWeek = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date.AddDays(-7), CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
 
             Func<int, DateTime> getRandomDateOfWeek = (week) =>
             {
