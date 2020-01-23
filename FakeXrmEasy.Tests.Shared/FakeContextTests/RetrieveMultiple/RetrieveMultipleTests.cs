@@ -572,7 +572,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         public void TheCorrectResultIsReturnedWhenUsingConditionOperatorInWithGuid()
         {
             var context = new XrmFakedContext();
-            context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
             var contact = new Crm.Contact()
             {
                 Id = Guid.NewGuid()
