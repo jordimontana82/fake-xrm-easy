@@ -56,14 +56,14 @@ Please consider the below guidelines for contributing to the project:
 
 ## Donate 
 
-*  If you're a business / company who delivers solutions on top of the Power Platform, you can help make OSS sustainable while getting more visibility by becoming a sponsor. Please reach out to me (Jordi) for sponsorship enquiries.
+*  If you're a business / company who delivers solutions on top of the Power Platform, you can help make OSS sustainable while getting more visibility by becoming a sponsor. Please [reach out to me](https://github.com/jordimontana82) for sponsorship enquiries.
 
 ## Roadmap
 
 *  TODO:  Add support for date operators. See `ConditionOperator` implementation status [here](https://github.com/jordimontana82/fake-xrm-easy/blob/master/FakeXrmEasy.Tests.Shared/FakeContextTests/FetchXml/ConditionOperatorTests.cs#L19-L110). Feel free to add missing ones!
 *  TODO: Implement remaining CRM messages. To know which ones have been implemented so far, see `FakeMessageExecutor` implementation status [here](https://github.com/jordimontana82/fake-xrm-easy/tree/master/FakeXrmEasy.Shared/FakeMessageExecutors).
 *  TODO: Increase test coverage.
-*  **NEW! **: I'm planning a 2.x version, this version will contain all the major improvements I always thought of adding but that will introduce considerable breaking changes. If you want to join a private preview list, let me know.
+*  **NEW!** I'm planning a 2.x version, this version will contain all the major improvements I always thought of adding but that will introduce considerable breaking changes. If you want to join a private preview list, let me know.
 
 
 
