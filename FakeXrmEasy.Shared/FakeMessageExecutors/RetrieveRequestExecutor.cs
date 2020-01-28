@@ -157,7 +157,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
             else
             {
                 // Entity not found in the context => FaultException
-                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{entityName} With Id = {id:D} Does Not Exist");
+                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault() { ErrorCode = unchecked((int)0x80040217) }, $"{entityName} With Id = {id:D} Does Not Exist");
             }
         }
 
