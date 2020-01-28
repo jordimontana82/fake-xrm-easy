@@ -853,7 +853,8 @@ namespace FakeXrmEasy
                 case ConditionOperator.LastWeek:
                 case ConditionOperator.ThisWeek:
                 case ConditionOperator.NextWeek:
-                    operatorExpression = TranslateConditionExpressionBetweenDates(c, getNonBasicValueExpr, containsAttributeExpression);
+                case ConditionOperator.InFiscalYear:
+                    operatorExpression = TranslateConditionExpressionBetweenDates(c, getNonBasicValueExpr, containsAttributeExpression, context);
                     break;
 
                 case ConditionOperator.Next7Days:
@@ -1679,7 +1680,7 @@ namespace FakeXrmEasy
         /// <summary>
         /// Takes a condition expression which needs translating into a 'between two dates' expression and works out the relevant dates
         /// </summary>        
-        protected static Expression TranslateConditionExpressionBetweenDates(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        protected static Expression TranslateConditionExpressionBetweenDates(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr, XrmFakedContext context)
         {
             var c = tc.CondExpression;
 
@@ -1689,6 +1690,7 @@ namespace FakeXrmEasy
             var today = DateTime.Today;
             var thisYear = today.Year;
             var thisMonth = today.Month;
+
 
             switch (c.Operator)
             {
@@ -1730,6 +1732,13 @@ namespace FakeXrmEasy
                 case ConditionOperator.NextWeek:
                     fromDate = today.ToFirstDayOfDeltaWeek(1);
                     toDate = today.ToLastDayOfDeltaWeek(1).AddDays(1);
+                    break;
+                case ConditionOperator.InFiscalYear:
+                    var fiscalYear = (int)c.Values[0];
+                    c.Values.Clear();
+                    var fiscalYearDate = context.FiscalYearSettings?.StartDate ?? new DateTime(fiscalYear, 4, 1);
+                    fromDate = fiscalYearDate;
+                    toDate = fiscalYearDate.AddYears(1).AddDays(-1);
                     break;
             }
 

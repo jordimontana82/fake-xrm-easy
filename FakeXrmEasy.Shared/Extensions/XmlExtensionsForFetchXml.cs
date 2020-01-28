@@ -26,7 +26,8 @@ namespace FakeXrmEasy.Extensions.FetchXml
             ConditionOperator.LastXMonths,
             ConditionOperator.LastXWeeks,
             ConditionOperator.LastXYears,
-            ConditionOperator.NextXWeeks
+            ConditionOperator.NextXWeeks,
+            ConditionOperator.InFiscalYear
         };
 
         public static bool IsAttributeTrue(this XElement elem, string attributeName)
@@ -519,6 +520,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     break;
                 case "next-week":
                     op = ConditionOperator.NextWeek;
+                    break;
+                case "in-fiscal-year":
+                    op = ConditionOperator.InFiscalYear;
                     break;
 #if FAKE_XRM_EASY_9
                 case "contain-values":

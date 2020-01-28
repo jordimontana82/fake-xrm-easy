@@ -68,6 +68,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\UpsertRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\WhoAmIRequestExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeMessageExecutors\WinOpportunityRequestExecutor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FiscalYearSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IXrmFakedContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Metadata\DateTimeAttributeBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Metadata\MetadataGenerator.cs" />
