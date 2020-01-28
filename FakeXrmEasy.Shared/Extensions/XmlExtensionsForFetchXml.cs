@@ -30,7 +30,7 @@ namespace FakeXrmEasy.Extensions.FetchXml
             ConditionOperator.NextXDays,
             ConditionOperator.NextXWeeks,
             ConditionOperator.NextXMonths,
-            ConditionOperator.NextXYears
+            ConditionOperator.NextXYears,
             ConditionOperator.NextXWeeks,
             ConditionOperator.InFiscalYear
         };
