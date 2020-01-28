@@ -978,6 +978,10 @@ namespace FakeXrmEasy
             if (attributeType == null)
                 return GetAppropiateTypedValue(value);
 
+            if (Nullable.GetUnderlyingType(attributeType) != null)
+            {
+                attributeType = Nullable.GetUnderlyingType(attributeType);
+            }
 
             //Basic types conversions
             //Special case => datetime is sent as a string
@@ -996,7 +1000,7 @@ namespace FakeXrmEasy
                 {
                     return Expression.Constant(iValue, typeof(int));
                 }
-                else if (attributeType == typeof(EntityReference) && Guid.TryParse((string)value, out id))
+                else if ((attributeType == typeof(EntityReference) || attributeType == typeof(Guid)) && Guid.TryParse((string)value, out id))
                 {
                     return Expression.Constant(id);
                 }
@@ -1078,7 +1082,10 @@ namespace FakeXrmEasy
         {
             if (attributeType != null)
             {
-
+                if (Nullable.GetUnderlyingType(attributeType) != null)
+                {
+                    attributeType = Nullable.GetUnderlyingType(attributeType);
+                }
 #if FAKE_XRM_EASY || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015
                 if (attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference))
                     return GetAppropiateCastExpressionBasedGuid(input);
