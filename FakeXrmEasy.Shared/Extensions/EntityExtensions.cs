@@ -1,5 +1,4 @@
 ﻿using FakeXrmEasy.Metadata;
-using FakeXrmEasy.OrganizationFaults;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
@@ -143,7 +142,7 @@ namespace FakeXrmEasy.Extensions
                     //Check if attribute really exists in metadata
                     if (!context.AttributeExistsInMetadata(e.LogicalName, attKey))
                     {
-                        OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
+                        FakeOrganizationServiceFault.Throw(ErrorCodes.QueryBuilderNoAttribute, string.Format("The attribute {0} does not exist on this entity.", attKey));
                     }
 
                     if (e.Attributes.ContainsKey(attKey) && e.Attributes[attKey] != null)
@@ -386,7 +385,7 @@ namespace FakeXrmEasy.Extensions
                 {
                     if (!context.AttributeExistsInMetadata(otherEntity.LogicalName, attKey))
                     {
-                        OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
+                        FakeOrganizationServiceFault.Throw(ErrorCodes.QueryBuilderNoAttribute, string.Format("The attribute {0} does not exist on this entity.", attKey));
                     }
 
                     if (otherEntity.Attributes.ContainsKey(attKey))
@@ -432,7 +431,7 @@ namespace FakeXrmEasy.Extensions
                     {
                         if (!context.AttributeExistsInMetadata(otherEntity.LogicalName, attKey))
                         {
-                            OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(attKey);
+                            FakeOrganizationServiceFault.Throw(ErrorCodes.QueryBuilderNoAttribute, string.Format("The attribute {0} does not exist on this entity.", attKey));
                         }
 
                         if (otherClonedEntity.Attributes.ContainsKey(attKey))

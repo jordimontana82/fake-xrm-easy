@@ -11,7 +11,6 @@ using System.Xml.Linq;
 using FakeXrmEasy.Extensions;
 using FakeXrmEasy.Extensions.FetchXml;
 using FakeXrmEasy.Models;
-using FakeXrmEasy.OrganizationFaults;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Query;
@@ -317,7 +316,7 @@ namespace FakeXrmEasy
             {
                 if (!Regex.IsMatch(le.EntityAlias, "^[A-Za-z_](\\w|\\.)*$", RegexOptions.ECMAScript))
                 {
-                    throw new FaultException(new FaultReason($"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _."));
+                FakeOrganizationServiceFault.Throw(ErrorCodes.QueryBuilderInvalid_Alias, $"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _.");
                 }
             }
 
@@ -327,7 +326,7 @@ namespace FakeXrmEasy
 
             if (!context.AttributeExistsInMetadata(le.LinkToEntityName, le.LinkToAttributeName))
             {
-                OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(le.LinkToAttributeName);
+                FakeOrganizationServiceFault.Throw(ErrorCodes.QueryBuilderNoAttribute, string.Format("The attribute {0} does not exist on this entity.", le.LinkToAttributeName));
             }
 
             IQueryable<Entity> inner = null;
@@ -907,7 +906,7 @@ namespace FakeXrmEasy
 
             if (!supportedOperators.Contains(typedExpression.CondExpression.Operator))
             {
-                OrganizationServiceFaultOperatorIsNotValidException.Throw();
+                FakeOrganizationServiceFault.Throw(ErrorCodes.InvalidOperatorCode, "The operator is not valid or it is not supported.");
             }
         }
 
@@ -1410,7 +1409,7 @@ namespace FakeXrmEasy
         {
             if (c.CondExpression.Values.Count != 1)
             {
-                OrganizationServiceFaultInvalidArgument.Throw($"The {c.CondExpression.Operator} requires 1 value/s, not {c.CondExpression.Values.Count}.Parameter name: {c.CondExpression.AttributeName}");
+                FakeOrganizationServiceFault.Throw(ErrorCodes.InvalidArgument, $"The {c.CondExpression.Operator} requires 1 value/s, not {c.CondExpression.Values.Count}.Parameter name: {c.CondExpression.AttributeName}");
             }
 
             var conditionValue = c.CondExpression.Values.Single();
@@ -1428,7 +1427,7 @@ namespace FakeXrmEasy
 
                 if (count != 1)
                 {
-                    OrganizationServiceFaultInvalidArgument.Throw($"The {c.CondExpression.Operator} requires 1 value/s, not {count}.Parameter name: {c.CondExpression.AttributeName}");
+                    FakeOrganizationServiceFault.Throw(ErrorCodes.InvalidArgument, $"The {c.CondExpression.Operator} requires 1 value/s, not {count}.Parameter name: {c.CondExpression.AttributeName}");
                 }
             }
 
