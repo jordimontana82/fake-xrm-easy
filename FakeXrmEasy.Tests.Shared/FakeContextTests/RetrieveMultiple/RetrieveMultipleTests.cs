@@ -57,6 +57,37 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         }
 
         /// <summary>
+        /// Tests that paging works correctly
+        /// </summary>
+        [Fact]
+        public void TestDistinct()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+
+
+            Entity e1 = new Entity("entity");
+            e1.Id = Guid.NewGuid();
+            e1["name"] = "FakeXrmEasy";
+
+            Entity e2 = new Entity("entity");
+            e2.Id = Guid.NewGuid();
+            e2["name"] = "FakeXrmEasy";
+
+            context.Initialize(new Entity[] { e1, e2 });
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true' returntotalrecordcount='true'>
+                              <entity name='entity'>
+                                    <attribute name='name' />                                    
+                              </entity>
+                            </fetch>";
+            var query = new FetchExpression(fetchXml);
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+            Assert.False(result.MoreRecords);
+        }
+
+        /// <summary>
         /// Tests that top count works correctly
         /// </summary>
         [Fact]

@@ -48,6 +48,11 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return doc.Root.IsAttributeTrue("aggregate");
         }
 
+        public static bool IsDistincFetchXml(this XDocument doc)
+        {
+            return doc.Root.IsAttributeTrue("distinct");
+        }
+
         public static bool IsFetchXmlNodeValid(this XElement elem)
         {
             switch (elem.Name.LocalName)
