@@ -7,7 +7,7 @@
     <owners>@jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
     <projectUrl>http://dynamicsvalue.com/home?source=nuget</projectUrl>
-    <iconUrl>http://dynamicsvalue.com/images/fakexrmeasy.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/FakeXrmEasyLogo_128x128.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Utilities to streamline unit testing in Dynamics CRM 2011 by faking the IOrganizationService against an In-Memory context which runs blazingly fast.</description>
     <releaseNotes>@releaseNotes@</releaseNotes>
