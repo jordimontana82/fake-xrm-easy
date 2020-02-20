@@ -77,9 +77,9 @@ namespace FakeXrmEasy
                 throw new InvalidOperationException("The id must not be empty.");
             }
             */
-            
+
             return record.Id;
-        }   
+        }
 
         /// <summary>
         /// A fake retrieve method that will query the FakedContext to retrieve the specified
@@ -142,9 +142,13 @@ namespace FakeXrmEasy
             if (Data.ContainsKey(e.LogicalName) &&
                 Data[e.LogicalName].ContainsKey(e.Id))
             {
+                Entity preImage = null;
                 if (this.UsePipelineSimulation)
                 {
-                    ExecutePipelineStage("Update", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);
+                    preImage = Data[e.LogicalName][e.Id].Clone(e.GetType());
+                    
+                    ExecutePipelineStage("Update", ProcessingStepStage.Prevalidation, ProcessingStepMode.Synchronous, e, preImage);
+                    ExecutePipelineStage("Update", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e, preImage);
                 }
 
                 // Add as many attributes to the entity as the ones received (this will keep existing ones)
@@ -177,10 +181,12 @@ namespace FakeXrmEasy
 
                 if (this.UsePipelineSimulation)
                 {
-                    ExecutePipelineStage("Update", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, e);
+                    Entity postImage = cachedEntity.Clone(e.GetType());
+
+                    ExecutePipelineStage("Update", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, e, preImage, postImage);
 
                     var clone = e.Clone(e.GetType());
-                    ExecutePipelineStage("Update", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous, clone);
+                    ExecutePipelineStage("Update", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous, clone, preImage, postImage);
                 }
             }
             else
@@ -259,12 +265,18 @@ namespace FakeXrmEasy
             }
 
             // Entity logical name exists, so , check if the requested entity exists
-            if (this.Data.ContainsKey(er.LogicalName) && this.Data[er.LogicalName] != null &&
-                this.Data[er.LogicalName].ContainsKey(er.Id))
+            if (this.Data.TryGetValue(er.LogicalName, out var elements) && elements.TryGetValue(er.Id, out Entity previousValues))
             {
                 if (this.UsePipelineSimulation)
                 {
-                    ExecutePipelineStage("Delete", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, er);
+                    ExecutePipelineStage("Delete", ProcessingStepStage.Prevalidation, ProcessingStepMode.Synchronous, er, previousValues);
+                }
+
+                // ToDo ace - remove References in other Entities (performing :) )
+
+                if (this.UsePipelineSimulation)
+                {
+                    ExecutePipelineStage("Delete", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, er, previousValues);
                 }
 
                 // Entity found => return only the subset of columns specified or all of them
@@ -272,8 +284,8 @@ namespace FakeXrmEasy
 
                 if (this.UsePipelineSimulation)
                 {
-                    ExecutePipelineStage("Delete", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, er);
-                    ExecutePipelineStage("Delete", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous, er);
+                    ExecutePipelineStage("Delete", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, er, previousValues);
+                    ExecutePipelineStage("Delete", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous, er, previousValues);
                 }
             }
             else
@@ -438,10 +450,12 @@ namespace FakeXrmEasy
             // Store
             AddEntity(clone ? e.Clone(e.GetType()) : e);
 
+            Entity savedEntity = Data[e.LogicalName][e.Id];
+
             if (usePluginPipeline)
             {
-                ExecutePipelineStage("Create", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, e);
-                ExecutePipelineStage("Create", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous, e);
+                ExecutePipelineStage("Create", ProcessingStepStage.Postoperation, ProcessingStepMode.Synchronous, e, resultingAttributes: savedEntity);
+                ExecutePipelineStage("Create", ProcessingStepStage.Postoperation, ProcessingStepMode.Asynchronous, e, resultingAttributes: savedEntity);
             }
         }
 
