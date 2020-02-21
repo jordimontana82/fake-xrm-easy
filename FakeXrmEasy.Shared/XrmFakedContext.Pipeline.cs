@@ -27,9 +27,8 @@ namespace FakeXrmEasy
             where TPlugin : IPlugin
             where TEntity : Entity, new()
         {
-            var entity = new TEntity();
-            var entityTypeCode = (int)entity.GetType().GetField("EntityTypeCode").GetValue(entity);
-
+            int entityTypeCode = typeof(TEntity).GetEntityTypeCode();
+            
             RegisterPluginStep<TPlugin>(message, stage, mode, rank, filteringAttributes, entityTypeCode, registeredImages);
         }
 
@@ -268,7 +267,8 @@ namespace FakeXrmEasy
                 }
             };
 
-            var entityTypeCode = (int?)entity.GetType().GetField("EntityTypeCode")?.GetValue(entity);
+            int? entityTypeCode = null;
+            entity.TryGetEntityTypeCode(out entityTypeCode);
 
             var plugins = this.Service.RetrieveMultiple(query).Entities.AsEnumerable();
             plugins = plugins.Where(p =>

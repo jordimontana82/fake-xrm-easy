@@ -543,6 +543,14 @@ namespace FakeXrmEasy.Extensions
             return result;
         }
 
+        internal static int GetEntityTypeCode(this Entity e)
+        {
+            return e.GetType().GetEntityTypeCode();
+        }
 
+        internal static bool TryGetEntityTypeCode(this Entity e, out int? objectTypeCode)
+        {
+            return e.GetType().TryGetEntityTypeCode(out objectTypeCode);
+        }
     }
 }
