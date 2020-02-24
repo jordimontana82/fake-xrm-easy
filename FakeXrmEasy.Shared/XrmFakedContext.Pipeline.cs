@@ -28,7 +28,7 @@ namespace FakeXrmEasy
             where TEntity : Entity, new()
         {
             int entityTypeCode = typeof(TEntity).GetEntityTypeCode();
-            
+
             RegisterPluginStep<TPlugin>(message, stage, mode, rank, filteringAttributes, entityTypeCode, registeredImages);
         }
 
@@ -273,9 +273,30 @@ namespace FakeXrmEasy
             var plugins = this.Service.RetrieveMultiple(query).Entities.AsEnumerable();
             plugins = plugins.Where(p =>
             {
+                bool shouldBeExecuted = true;
+
                 var primaryObjectTypeCode = p.GetAttributeValue<AliasedValue>("sdkmessagefilter.primaryobjecttypecode");
 
-                return primaryObjectTypeCode == null || entityTypeCode.HasValue && (int)primaryObjectTypeCode.Value == entityTypeCode.Value;
+                if (primaryObjectTypeCode != null && entityTypeCode.HasValue && (int)primaryObjectTypeCode.Value != entityTypeCode.Value)
+                {
+                    shouldBeExecuted = false;
+                }
+
+                if (shouldBeExecuted)
+                {
+                    string attributes = p.GetAttributeValue<string>("filteringattributes");
+                    if (!string.IsNullOrEmpty(attributes))
+                    {
+                        string[] filteringAttributes = attributes.Split(',');
+
+                        if (!filteringAttributes.Any(attr => entity.Attributes.ContainsKey(attr)))
+                        {
+                            shouldBeExecuted = false;
+                        }
+                    }
+                }
+
+                return shouldBeExecuted;
             });
 
             // Todo: Filter on attributes
