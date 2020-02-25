@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy", "FakeXrmEasy\FakeXrmEasy.csproj", "{1FF34479-D38A-4B6B-86A7-B48182403437}"
 EndProject
@@ -239,6 +239,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "9", "9", "{A4AE544E-ECE6-4E
 		Install-scripts\9\Install.ps1 = Install-scripts\9\Install.ps1
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy.Cds.Client", "FakeXrmEasy.Cds.Client\FakeXrmEasy.Cds.Client.csproj", "{32370866-550A-4669-BB19-0983E0654746}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems*{08798ee6-7d8c-478e-a102-9424ad5dd321}*SharedItemsImports = 4
@@ -309,6 +311,10 @@ Global
 		{783F88EA-F23F-48F4-9089-8B0AD8AE1772}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{783F88EA-F23F-48F4-9089-8B0AD8AE1772}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{783F88EA-F23F-48F4-9089-8B0AD8AE1772}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32370866-550A-4669-BB19-0983E0654746}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32370866-550A-4669-BB19-0983E0654746}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32370866-550A-4669-BB19-0983E0654746}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32370866-550A-4669-BB19-0983E0654746}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -323,6 +329,9 @@ Global
 		{2AFDE012-E9AE-4BDD-A664-445C121466D1} = {6F09E415-3E7D-468E-A1D4-74A8C43267BB}
 		{DABE779C-7900-4357-A67E-890FCE4B67BD} = {7B1103ED-3843-4670-A8DB-F462B4C8FBE2}
 		{A4AE544E-ECE6-4EF9-B60A-C2BE7428EA14} = {7B1103ED-3843-4670-A8DB-F462B4C8FBE2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E04D514E-D843-420A-A7F2-FDBE783ED378}
 	EndGlobalSection
 	GlobalSection(CRMSolutionProperties) = preSolution
 		SolutionIsBoundToCRM = True

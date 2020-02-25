@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FakeItEasy" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Dynamics.Sdk.Messages" Version="0.0.1.7-Alpha" />
+    <PackageReference Include="Microsoft.Powerplatform.Cds.Client" Version="0.0.1.7-Alpha" />
+    <PackageReference Include="Microsoft.Powerplatform.Cds.Client.Dynamics" Version="0.0.1.7-Alpha" />
+  </ItemGroup>
+
+</Project>
