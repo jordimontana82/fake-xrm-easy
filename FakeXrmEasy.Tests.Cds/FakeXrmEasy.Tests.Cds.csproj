@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="CodeActivitiesForTesting\**" />
+    <Compile Remove="FakeContextTests\BasePluginTests\**" />
+    <Compile Remove="PluginsForTesting\**" />
+    <EmbeddedResource Remove="CodeActivitiesForTesting\**" />
+    <EmbeddedResource Remove="FakeContextTests\BasePluginTests\**" />
+    <EmbeddedResource Remove="PluginsForTesting\**" />
+    <None Remove="CodeActivitiesForTesting\**" />
+    <None Remove="FakeContextTests\BasePluginTests\**" />
+    <None Remove="PluginsForTesting\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="FakeContextTests\FakeContextTestCodeActivities.cs" />
+    <Compile Remove="FakeContextTests\FakeContextTestPlugins.cs" />
+    <Compile Remove="Issues\Issue308.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FakeItEasy" Version="6.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Include="xunit.assert" Version="2.4.1" />
+    <PackageReference Include="xunit.core" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="1.2.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Tracing\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FakeXrmEasy.Cds\FakeXrmEasy.Cds.csproj" />
+  </ItemGroup>
+
+</Project>
