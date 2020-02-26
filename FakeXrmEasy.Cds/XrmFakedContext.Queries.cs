@@ -186,7 +186,7 @@ namespace FakeXrmEasy
                 attributeName = attributeName.Substring(0, attributeName.Length - 4);
                 attributeInfo = GetEarlyBoundTypeAttribute(earlyBoundType, attributeName);
 
-                if (attributeInfo.PropertyType != typeof(EntityReference))
+                if (attributeInfo?.PropertyType != typeof(EntityReference))
                 {
                     // Don't mess up if other attributes follow this naming pattern
                     attributeInfo = null;
