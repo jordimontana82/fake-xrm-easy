@@ -11,7 +11,6 @@ using System.Xml.Linq;
 using FakeXrmEasy.Extensions;
 using FakeXrmEasy.Extensions.FetchXml;
 using FakeXrmEasy.Models;
-using FakeXrmEasy.OrganizationFaults;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Query;
@@ -317,7 +316,7 @@ namespace FakeXrmEasy
             {
                 if (!Regex.IsMatch(le.EntityAlias, "^[A-Za-z_](\\w|\\.)*$", RegexOptions.ECMAScript))
                 {
-                    throw new FaultException(new FaultReason($"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _."));
+                FakeOrganizationServiceFault.Throw(ErrorCodes.QueryBuilderInvalid_Alias, $"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _.");
                 }
             }
 
@@ -327,7 +326,7 @@ namespace FakeXrmEasy
 
             if (!context.AttributeExistsInMetadata(le.LinkToEntityName, le.LinkToAttributeName))
             {
-                OrganizationServiceFaultQueryBuilderNoAttributeException.Throw(le.LinkToAttributeName);
+                FakeOrganizationServiceFault.Throw(ErrorCodes.QueryBuilderNoAttribute, string.Format("The attribute {0} does not exist on this entity.", le.LinkToAttributeName));
             }
 
             IQueryable<Entity> inner = null;
@@ -476,6 +475,8 @@ namespace FakeXrmEasy
                     query.AddOrder(order.AttributeName, order.OrderType);
                 }
             }
+
+            query.Distinct = xlDoc.IsDistincFetchXml();
 
             query.Criteria = xlDoc.ToCriteria(context);
 
@@ -796,7 +797,12 @@ namespace FakeXrmEasy
                                TranslateConditionExpressionEqual(context, c, getNonBasicValueExpr, containsAttributeExpression),
                                TranslateConditionExpressionGreaterThan(c, getNonBasicValueExpr, containsAttributeExpression));
                     break;
+                case ConditionOperator.LastXHours:
+                case ConditionOperator.LastXDays:
                 case ConditionOperator.Last7Days:
+                case ConditionOperator.LastXWeeks:
+                case ConditionOperator.LastXMonths:
+                case ConditionOperator.LastXYears:
                     operatorExpression = TranslateConditionExpressionLast(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
 
@@ -821,29 +827,25 @@ namespace FakeXrmEasy
                     }
                     operatorExpression = Expression.Not(TranslateConditionExpressionBetween(c, getNonBasicValueExpr, containsAttributeExpression));
                     break;
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013
+                case ConditionOperator.OlderThanXMinutes:
+                case ConditionOperator.OlderThanXHours:
+                case ConditionOperator.OlderThanXDays:
+                case ConditionOperator.OlderThanXWeeks:
+                case ConditionOperator.OlderThanXYears:                  
+#endif
                 case ConditionOperator.OlderThanXMonths:
-                    var monthsToAdd = 0;
-                    var parsedMonths = int.TryParse(c.CondExpression.Values[0].ToString(), out monthsToAdd);
-
-                    if (parsedMonths == false)
-                    {
-                        throw new Exception("Older than X months requires an integer value in the ConditionExpression.");
-                    }
-
-                    if (monthsToAdd <= 0)
-                    {
-                        throw new Exception("Older than X months requires a value greater than 0.");
-                    }
-
-                    var olderThanDate = DateTime.Now.AddMonths(-monthsToAdd);
-
-                    operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression, olderThanDate);
+                    operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
 
-                case ConditionOperator.NextXWeeks:
+                case ConditionOperator.NextXHours:               
+                case ConditionOperator.NextXDays:                  
+                case ConditionOperator.Next7Days:
+                case ConditionOperator.NextXWeeks:                 
+                case ConditionOperator.NextXMonths:                    
+                case ConditionOperator.NextXYears:
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
-
                 case ConditionOperator.ThisYear:
                 case ConditionOperator.LastYear:
                 case ConditionOperator.NextYear:
@@ -853,18 +855,9 @@ namespace FakeXrmEasy
                 case ConditionOperator.LastWeek:
                 case ConditionOperator.ThisWeek:
                 case ConditionOperator.NextWeek:
-                    operatorExpression = TranslateConditionExpressionBetweenDates(c, getNonBasicValueExpr, containsAttributeExpression);
+                case ConditionOperator.InFiscalYear:
+                    operatorExpression = TranslateConditionExpressionBetweenDates(c, getNonBasicValueExpr, containsAttributeExpression, context);
                     break;
-
-                case ConditionOperator.Next7Days:
-                    {
-                        DateTime today = DateTime.Today;
-                        c.CondExpression.Values.Add(today);
-                        c.CondExpression.Values.Add(today.AddDays(7));
-                        operatorExpression = TranslateConditionExpressionBetween(c, getAttributeValueExpr, containsAttributeExpression);
-                    }
-                    break;
-
 #if FAKE_XRM_EASY_9
                 case ConditionOperator.ContainValues:
                     operatorExpression = TranslateConditionExpressionContainValues(c, getNonBasicValueExpr, containsAttributeExpression);
@@ -915,7 +908,7 @@ namespace FakeXrmEasy
 
             if (!supportedOperators.Contains(typedExpression.CondExpression.Operator))
             {
-                OrganizationServiceFaultOperatorIsNotValidException.Throw();
+                FakeOrganizationServiceFault.Throw(ErrorCodes.InvalidOperatorCode, "The operator is not valid or it is not supported.");
             }
         }
 
@@ -978,6 +971,10 @@ namespace FakeXrmEasy
             if (attributeType == null)
                 return GetAppropiateTypedValue(value);
 
+            if (Nullable.GetUnderlyingType(attributeType) != null)
+            {
+                attributeType = Nullable.GetUnderlyingType(attributeType);
+            }
 
             //Basic types conversions
             //Special case => datetime is sent as a string
@@ -996,7 +993,7 @@ namespace FakeXrmEasy
                 {
                     return Expression.Constant(iValue, typeof(int));
                 }
-                else if (attributeType == typeof(EntityReference) && Guid.TryParse((string)value, out id))
+                else if ((attributeType == typeof(EntityReference) || attributeType == typeof(Guid)) && Guid.TryParse((string)value, out id))
                 {
                     return Expression.Constant(id);
                 }
@@ -1078,7 +1075,10 @@ namespace FakeXrmEasy
         {
             if (attributeType != null)
             {
-
+                if (Nullable.GetUnderlyingType(attributeType) != null)
+                {
+                    attributeType = Nullable.GetUnderlyingType(attributeType);
+                }
 #if FAKE_XRM_EASY || FAKE_XRM_EASY_2013 || FAKE_XRM_EASY_2015
                 if (attributeType == typeof(Microsoft.Xrm.Client.CrmEntityReference))
                     return GetAppropiateCastExpressionBasedGuid(input);
@@ -1411,7 +1411,7 @@ namespace FakeXrmEasy
         {
             if (c.CondExpression.Values.Count != 1)
             {
-                OrganizationServiceFaultInvalidArgument.Throw($"The {c.CondExpression.Operator} requires 1 value/s, not {c.CondExpression.Values.Count}.Parameter name: {c.CondExpression.AttributeName}");
+                FakeOrganizationServiceFault.Throw(ErrorCodes.InvalidArgument, $"The {c.CondExpression.Operator} requires 1 value/s, not {c.CondExpression.Values.Count}.Parameter name: {c.CondExpression.AttributeName}");
             }
 
             var conditionValue = c.CondExpression.Values.Single();
@@ -1429,7 +1429,7 @@ namespace FakeXrmEasy
 
                 if (count != 1)
                 {
-                    OrganizationServiceFaultInvalidArgument.Throw($"The {c.CondExpression.Operator} requires 1 value/s, not {count}.Parameter name: {c.CondExpression.AttributeName}");
+                    FakeOrganizationServiceFault.Throw(ErrorCodes.InvalidArgument, $"The {c.CondExpression.Operator} requires 1 value/s, not {count}.Parameter name: {c.CondExpression.AttributeName}");
                 }
             }
 
@@ -1655,24 +1655,39 @@ namespace FakeXrmEasy
 
             var beforeDateTime = default(DateTime);
             var currentDateTime = DateTime.UtcNow;
-
             switch (c.Operator)
             {
+                case ConditionOperator.LastXHours:
+                    beforeDateTime = currentDateTime.AddHours(-(int)c.Values[0]);
+                    break;
+                case ConditionOperator.LastXDays:
+                    beforeDateTime = currentDateTime.AddDays(-(int)c.Values[0]);
+                    break;
                 case ConditionOperator.Last7Days:
                     beforeDateTime = currentDateTime.AddDays(-7);
                     break;
+                case ConditionOperator.LastXWeeks:
+                    beforeDateTime = currentDateTime.AddDays(-7 * (int)c.Values[0]);
+                    break;
+                case ConditionOperator.LastXMonths:
+                    beforeDateTime = currentDateTime.AddMonths(-(int)c.Values[0]);
+                    break;
+                case ConditionOperator.LastXYears:
+                    beforeDateTime = currentDateTime.AddYears(-(int)c.Values[0]);
+                    break;
             }
 
+            c.Values.Clear();          
             c.Values.Add(beforeDateTime);
             c.Values.Add(currentDateTime);
-
+            
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
 
         /// <summary>
         /// Takes a condition expression which needs translating into a 'between two dates' expression and works out the relevant dates
         /// </summary>        
-        protected static Expression TranslateConditionExpressionBetweenDates(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        protected static Expression TranslateConditionExpressionBetweenDates(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr, XrmFakedContext context)
         {
             var c = tc.CondExpression;
 
@@ -1682,6 +1697,7 @@ namespace FakeXrmEasy
             var today = DateTime.Today;
             var thisYear = today.Year;
             var thisMonth = today.Month;
+
 
             switch (c.Operator)
             {
@@ -1724,6 +1740,13 @@ namespace FakeXrmEasy
                     fromDate = today.ToFirstDayOfDeltaWeek(1);
                     toDate = today.ToLastDayOfDeltaWeek(1).AddDays(1);
                     break;
+                case ConditionOperator.InFiscalYear:
+                    var fiscalYear = (int)c.Values[0];
+                    c.Values.Clear();
+                    var fiscalYearDate = context.FiscalYearSettings?.StartDate ?? new DateTime(fiscalYear, 4, 1);
+                    fromDate = fiscalYearDate;
+                    toDate = fiscalYearDate.AddYears(1).AddDays(-1);
+                    break;
             }
 
             c.Values.Add(fromDate);
@@ -1731,6 +1754,53 @@ namespace FakeXrmEasy
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
+
+
+        protected static Expression TranslateConditionExpressionOlderThan(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
+            var valueToAdd = 0;
+
+            if (!int.TryParse(c.Values[0].ToString(), out valueToAdd))
+            {
+                throw new Exception(c.Operator + " requires an integer value in the ConditionExpression.");
+            }
+
+            if (valueToAdd <= 0)
+            {
+                throw new Exception(c.Operator + " requires a value greater than 0.");
+            }
+
+            DateTime toDate = default(DateTime);
+
+            switch (c.Operator)
+            {
+                case ConditionOperator.OlderThanXMonths:
+                    toDate = DateTime.UtcNow.AddMonths(-valueToAdd);
+                    break;
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013
+                case ConditionOperator.OlderThanXMinutes:      
+                    toDate = DateTime.UtcNow.AddMinutes(-valueToAdd);
+                    break;
+                case ConditionOperator.OlderThanXHours: 
+                    toDate = DateTime.UtcNow.AddHours(-valueToAdd);
+                    break;
+                case ConditionOperator.OlderThanXDays: 
+                    toDate = DateTime.UtcNow.AddDays(-valueToAdd);
+                    break;
+                case ConditionOperator.OlderThanXWeeks:              
+                    toDate = DateTime.UtcNow.AddDays(-7 * valueToAdd);
+                    break;              
+                case ConditionOperator.OlderThanXYears: 
+                    toDate = DateTime.UtcNow.AddYears(-valueToAdd);
+                    break;
+#endif
+            }
+                        
+            return TranslateConditionExpressionOlderThan(tc, getAttributeValueExpr, containsAttributeExpr, toDate);
+        }
+     
 
         protected static Expression TranslateConditionExpressionBetween(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
@@ -2104,22 +2174,32 @@ namespace FakeXrmEasy
 
             var nextDateTime = default(DateTime);
             var currentDateTime = DateTime.UtcNow;
-            var numberOfWeeks = c.Values.Any() ? (int)c.Values[0] : 1;
-
             switch (c.Operator)
             {
-                case ConditionOperator.NextXWeeks:
-                    nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
-                    c.Values[0] = (currentDateTime);
-                    c.Values.Add(nextDateTime);
-                    c.Values.Add(numberOfWeeks);
+                case ConditionOperator.NextXHours:
+                    nextDateTime = currentDateTime.AddHours((int)c.Values[0]);
+                    break;
+                case ConditionOperator.NextXDays:
+                    nextDateTime = currentDateTime.AddDays((int)c.Values[0]);
                     break;
                 case ConditionOperator.Next7Days:
-                    nextDateTime = currentDateTime.AddDays(7 * numberOfWeeks);
-                    c.Values.Add(currentDateTime);
-                    c.Values.Add(nextDateTime);
+                    nextDateTime = currentDateTime.AddDays(7);
+                    break;
+                case ConditionOperator.NextXWeeks:                  
+                    nextDateTime = currentDateTime.AddDays(7 * (int)c.Values[0]);
+                    break;              
+                case ConditionOperator.NextXMonths:
+                    nextDateTime = currentDateTime.AddMonths((int)c.Values[0]);
+                    break;
+                case ConditionOperator.NextXYears:
+                    nextDateTime = currentDateTime.AddYears((int)c.Values[0]);
                     break;
             }
+
+            c.Values.Clear();
+            c.Values.Add(currentDateTime);
+            c.Values.Add(nextDateTime);
+
 
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }

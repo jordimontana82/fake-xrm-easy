@@ -26,7 +26,13 @@ namespace FakeXrmEasy.Extensions.FetchXml
             ConditionOperator.LastXMonths,
             ConditionOperator.LastXWeeks,
             ConditionOperator.LastXYears,
-            ConditionOperator.NextXWeeks
+            ConditionOperator.NextXHours,
+            ConditionOperator.NextXDays,
+            ConditionOperator.NextXWeeks,
+            ConditionOperator.NextXMonths,
+            ConditionOperator.NextXYears,
+            ConditionOperator.NextXWeeks,
+            ConditionOperator.InFiscalYear
         };
 
         public static bool IsAttributeTrue(this XElement elem, string attributeName)
@@ -40,6 +46,11 @@ namespace FakeXrmEasy.Extensions.FetchXml
         public static bool IsAggregateFetchXml(this XDocument doc)
         {
             return doc.Root.IsAttributeTrue("aggregate");
+        }
+
+        public static bool IsDistincFetchXml(this XDocument doc)
+        {
+            return doc.Root.IsAttributeTrue("distinct");
         }
 
         public static bool IsFetchXmlNodeValid(this XElement elem)
@@ -502,6 +513,33 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "next-year":
                     op = ConditionOperator.NextYear;
                     break;
+                case "last-x-hours":
+                    op = ConditionOperator.LastXHours;
+                    break;
+                case "last-x-days":
+                    op = ConditionOperator.LastXDays;
+                    break;
+                case "last-x-weeks":
+                    op = ConditionOperator.LastXWeeks;
+                    break;
+                case "last-x-months":
+                    op = ConditionOperator.LastXMonths;
+                    break;
+                case "last-x-years":
+                    op = ConditionOperator.LastXYears;
+                    break;
+                case "next-x-hours":
+                    op = ConditionOperator.NextXHours;
+                    break;
+                case "next-x-days":
+                    op = ConditionOperator.NextXDays;
+                    break;
+                case "next-x-months":
+                    op = ConditionOperator.NextXMonths;
+                    break;
+                case "next-x-years":
+                    op = ConditionOperator.NextXYears;
+                    break;
                 case "this-month":
                     op = ConditionOperator.ThisMonth;
                     break;
@@ -520,6 +558,26 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "next-week":
                     op = ConditionOperator.NextWeek;
                     break;
+                case "in-fiscal-year":
+                    op = ConditionOperator.InFiscalYear;
+                    break;
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013
+                case "olderthan-x-minutes":
+                    op = ConditionOperator.OlderThanXMinutes;
+                    break;
+                case "olderthan-x-hours":
+                    op = ConditionOperator.OlderThanXHours;
+                    break;
+                case "olderthan-x-days":
+                    op = ConditionOperator.OlderThanXDays;
+                    break;
+                case "olderthan-x-weeks":
+                    op = ConditionOperator.OlderThanXWeeks;
+                    break;
+                case "olderthan-x-years":
+                    op = ConditionOperator.OlderThanXYears;
+                    break;
+#endif
 #if FAKE_XRM_EASY_9
                 case "contain-values":
                     op = ConditionOperator.ContainValues;

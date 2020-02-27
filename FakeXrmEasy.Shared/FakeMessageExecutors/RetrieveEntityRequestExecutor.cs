@@ -63,7 +63,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 return response;
             }
 
-            throw new Exception("Entity Filter not supported");
+            throw new Exception("At least EntityFilters.Entity or EntityFilters.Attributes must be present on EntityFilters of Request.");
         }
 
         public Type GetResponsibleRequestType()

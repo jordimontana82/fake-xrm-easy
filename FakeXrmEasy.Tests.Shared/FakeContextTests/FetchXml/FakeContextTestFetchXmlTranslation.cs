@@ -948,5 +948,24 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             Assert.True(query.PageInfo.ReturnTotalRecordCount);
         }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_distinct_is_translated_correctly()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true' returntotalrecordcount='true'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                              </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Distinct);
+        }
     }
 }
