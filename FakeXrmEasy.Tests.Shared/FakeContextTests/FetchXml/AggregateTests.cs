@@ -49,7 +49,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
-        public void FetchXml_Aggregate_GroupByOptionset_Count()
+        public void FetchXml_Aggregate_Group_OptionSet_Count()
         {
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' aggregate='true'>
                               <entity name='contact'>
@@ -85,7 +85,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var femaleGroup = collection.Entities.SingleOrDefault(x => (female.Value).Equals(x.GetAttributeValue<AliasedValue>("group.gendercode").Value));
             Assert.Equal(1, femaleGroup.GetAttributeValue<AliasedValue>("count.contacts").Value);
         }
-
 
         [Fact]
         public void FetchXml_Aggregate_Group_EntityReference_Count()
