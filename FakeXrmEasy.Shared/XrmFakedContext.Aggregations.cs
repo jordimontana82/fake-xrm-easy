@@ -40,7 +40,7 @@ namespace FakeXrmEasy
                 namespacedAlias.Add(attr.GetAttribute("name")?.Value);
                 var logicalName = string.Join(".", namespacedAlias);
 
-                if (string.IsNullOrEmpty("alias"))
+                if (string.IsNullOrEmpty(alias))
                 {
                     throw new Exception("Missing alias for attribute in aggregate fetch xml");
                 }
@@ -157,7 +157,7 @@ namespace FakeXrmEasy
                 {
                     throw new Exception("An attribute cannot be specified for an order clause for an aggregate Query. Use an alias");
                 }
-                if (string.IsNullOrEmpty("alias"))
+                if (string.IsNullOrEmpty(alias))
                 {
                     throw new Exception("An alias is required for an order clause for an aggregate Query.");
                 }
