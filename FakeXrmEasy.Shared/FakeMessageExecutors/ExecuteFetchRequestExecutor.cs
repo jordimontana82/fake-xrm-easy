@@ -117,7 +117,19 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 return null;
             if (entAtt.Value is DateTime?)
             {
-                attributeValueElement = XElement.Parse(String.Format("<{0} date=\"{1:yyyy-MM-dd}\" time=\"{1:hh:mm tt}\">{1:yyyy-MM-ddTHH:mm:sszz:00}</{0}>", entAtt.Key, entAtt.Value));
+                // https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings#timeSeparator
+                // The ":" custom format specifier represents the time separator,
+                // which is used to differentiate hours, minutes, and seconds.
+                // The appropriate localized time separator is retrieved from the
+                // DateTimeFormatInfo.TimeSeparator property of the current or
+                // specified culture. To change the time separator for a particular
+                // date and time string, specify the separator character within
+                // a literal string delimiter. For example, the custom format
+                // string hh'_'dd'_'ss produces a result string in which "_"
+                // (an underscore) is always used as the time separator. 
+
+                // TODO See https://github.com/jordimontana82/fake-xrm-easy/issues/439
+                attributeValueElement = XElement.Parse(String.Format("<{0} date=\"{1:yyyy-MM-dd}\" time=\"{1:hh':'mm tt}\">{1:yyyy-MM-ddTHH':'mm':'sszz':'00}</{0}>", entAtt.Key, entAtt.Value));
             }
             else if (entAtt.Value is EntityReference)
             {
