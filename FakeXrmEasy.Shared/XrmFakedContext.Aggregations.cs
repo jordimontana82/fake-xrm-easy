@@ -44,10 +44,6 @@ namespace FakeXrmEasy
                 {
                     throw new Exception("Missing alias for attribute in aggregate fetch xml");
                 }
-                if (string.IsNullOrEmpty("name"))
-                {
-                    throw new Exception("Missing name for attribute in aggregate fetch xml");
-                }
 
                 if (attr.IsAttributeTrue("groupby"))
                 {
