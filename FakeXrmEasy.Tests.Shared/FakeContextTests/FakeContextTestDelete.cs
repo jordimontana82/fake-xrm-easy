@@ -172,5 +172,36 @@ namespace FakeXrmEasy.Tests
         }
 #endif
 
+        [Fact]
+        public void When_Deleting_Using_Organization_Context_Lookup_On_Oters_Should_Be_Removed()
+        {
+            // Arange
+            var context = new XrmFakedContext();
+
+            var accountId = Guid.NewGuid();
+            var contactId = Guid.NewGuid();
+
+            Account account = new Account
+            {
+                Id = accountId
+            };
+
+            Contact contact = new Contact
+            {
+                Id = contactId
+            };
+
+            contact["accountid"] = account.ToEntityReference();
+
+            context.Initialize(new Entity[] { account, contact });
+
+            // Act
+            var service = context.GetOrganizationService();
+            service.Delete(Account.EntityLogicalName, accountId);
+
+            // Assert
+            var c = context.Data["contact"].First();
+            Assert.False(c.Value.Contains("accountid"));
+        }
     }
 }

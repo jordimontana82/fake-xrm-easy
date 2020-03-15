@@ -36,7 +36,7 @@ namespace FakeXrmEasy.Tests
         [Fact]
         public void When_PluginIsRegisteredWithEntity_And_OtherPluginCreatesAnAccount_Expect_AccountNumberIsSet()
         {
-            var context = new XrmFakedContext() { UsePipelineSimulation = true }; 
+            var context = new XrmFakedContext() { UsePipelineSimulation = true };
 
             context.RegisterPluginStep<AccountNumberPlugin, Account>("Create");
 
@@ -280,7 +280,7 @@ namespace FakeXrmEasy.Tests
             Assert.Contains($"Entity Logical Name: {Contact.EntityLogicalName}", trace);
             Assert.Contains($"Entity ID: {id}", trace);
         }
-        
+
         [Fact]
         public void When_PluginStepRegisteredAsCreatePreOperationSyncronous_Expect_CorrectValues()
         {
@@ -461,6 +461,73 @@ namespace FakeXrmEasy.Tests
             var trace = context.GetFakeTracingService().DumpTrace().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
             Assert.Equal(0, trace.Length);
+        }
+
+
+        [Fact]
+        public void When_PreValidationUpdatePluginStepRegistered_Plugin_Triggered()
+        {
+            var context = new XrmFakedContext { UsePipelineSimulation = true };
+            var accountId = Guid.NewGuid();
+
+            var oldAccount = new Account()
+            {
+                Id = accountId
+            };
+
+            context.RegisterPluginStep<ValidatePipelinePlugin, Account>("Update", ProcessingStepStage.Prevalidation, ProcessingStepMode.Synchronous);
+            context.Initialize(oldAccount);
+
+            IOrganizationService serivce = context.GetOrganizationService();
+
+            // Act
+            var target = new Account
+            {
+                Id = accountId
+            };
+
+            serivce.Update(target);
+
+            // Assert
+            var trace = context.GetFakeTracingService().DumpTrace().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            Assert.Equal(5, trace.Length);
+            Assert.Contains("Message Name: Update", trace);
+            Assert.Contains("Stage: 10", trace);
+            Assert.Contains("Mode: 0", trace);
+            Assert.Contains($"Entity Logical Name: {Account.EntityLogicalName}", trace);
+            Assert.Contains($"Entity ID: {accountId}", trace);
+        }
+
+        [Fact]
+        public void When_PreValidationCreatePluginStepRegistered_Plugin_Triggered()
+        {
+            var context = new XrmFakedContext { UsePipelineSimulation = true };
+            var accountId = Guid.NewGuid();
+
+            context.RegisterPluginStep<ValidatePipelinePlugin, Account>("Create", ProcessingStepStage.Prevalidation, ProcessingStepMode.Synchronous);
+            //context.Initialize(oldAccount);
+
+            IOrganizationService serivce = context.GetOrganizationService();
+
+            // Act
+            var target = new Account
+            {
+                Id = accountId,
+                AccountNumber = "01234"
+            };
+
+            serivce.Create(target);
+
+            // Assert
+            var trace = context.GetFakeTracingService().DumpTrace().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            Assert.Equal(5, trace.Length);
+            Assert.Contains("Message Name: Create", trace);
+            Assert.Contains("Stage: 10", trace);
+            Assert.Contains("Mode: 0", trace);
+            Assert.Contains($"Entity Logical Name: {Account.EntityLogicalName}", trace);
+            Assert.Contains($"Entity ID: {accountId}", trace);
         }
     }
 }

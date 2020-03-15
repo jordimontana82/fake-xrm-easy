@@ -146,7 +146,7 @@ namespace FakeXrmEasy
                 if (this.UsePipelineSimulation)
                 {
                     preImage = Data[e.LogicalName][e.Id].Clone(e.GetType());
-                    
+
                     ExecutePipelineStage("Update", ProcessingStepStage.Prevalidation, ProcessingStepMode.Synchronous, e, preImage);
                     ExecutePipelineStage("Update", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e, preImage);
                 }
@@ -273,6 +273,27 @@ namespace FakeXrmEasy
                 }
 
                 // ToDo ace - remove References in other Entities (performing :) )
+                foreach (var item in this.Data)
+                {
+                    foreach (var kvPair in item.Value)
+                    {
+                        IEnumerable<string> attributesToDelete = kvPair.Value.Attributes.Where(x => er.Equals(x.Value)).Select(x => x.Key);
+
+                        if (attributesToDelete.Any())
+                        {
+                            Entity updateEntity = (Entity)Activator.CreateInstance(kvPair.Value.GetType());
+
+                            updateEntity.Id = kvPair.Key;
+
+                            foreach (var attr in attributesToDelete)
+                            {
+                                updateEntity[attr] = null;
+                            }
+
+                            this.UpdateEntity(updateEntity);
+                        }
+                    }
+                }
 
                 if (this.UsePipelineSimulation)
                 {
@@ -444,6 +465,7 @@ namespace FakeXrmEasy
 
             if (usePluginPipeline)
             {
+                ExecutePipelineStage("Create", ProcessingStepStage.Prevalidation, ProcessingStepMode.Synchronous, e);
                 ExecutePipelineStage("Create", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, e);
             }
 
