@@ -577,7 +577,7 @@ namespace FakeXrmEasy
 
         protected internal DateTime ConvertToUtc(DateTime attribute)
         {
-            return DateTime.SpecifyKind(attribute, DateTimeKind.Utc);
+            return attribute.ToUniversalTime();
         }
         #endregion
     }

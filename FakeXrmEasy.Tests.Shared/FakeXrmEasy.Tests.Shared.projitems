@@ -118,6 +118,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue300.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue308.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue312.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Issues\Issue491.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\ProxyEntities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\TestCRMHandlingOfNullsAndMissingFields.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\PipelineTests.cs" />
