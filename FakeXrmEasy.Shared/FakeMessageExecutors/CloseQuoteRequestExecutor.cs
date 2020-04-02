@@ -34,14 +34,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new Exception("Quote ID is not set on QuoteClose, but is required");
             }
 
-            var update = new Entity
+            var update = new Entity("quote")
             {
                 Id = quoteId.Id,
-                LogicalName = "quote",
-                Attributes = new AttributeCollection
-                {
-                    { "statuscode", closeRequest.Status }
-                }
+                ["statecode"] = new OptionSetValue(3),
+                ["statuscode"] = closeRequest.Status
             };
 
             var service = ctx.GetOrganizationService();
