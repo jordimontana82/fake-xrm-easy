@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using System;
-using System.ServiceModel;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -16,16 +15,21 @@ namespace FakeXrmEasy.FakeMessageExecutors
         {
             var retrieveOptionSetRequest = (RetrieveOptionSetRequest)request;
 
+            if (retrieveOptionSetRequest.MetadataId != Guid.Empty) //ToDo: Implement retrieving option sets by Id
+            {
+                FakeOrganizationServiceFault.Throw(ErrorCodes.ObjectDoesNotExist, $"Could not find optionset with optionset id: {retrieveOptionSetRequest.MetadataId}");
+            }
+
             var name = retrieveOptionSetRequest.Name;
 
             if (string.IsNullOrEmpty(name))
             {
-                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "Can not retrieve option set without a name.");
+                FakeOrganizationServiceFault.Throw(ErrorCodes.InvalidArgument, "Name is required when optionSet id is not specified");
             }
 
             if (!ctx.OptionSetValuesMetadata.ContainsKey(name))
             {
-                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), string.Format("An OptionSetMetadata with the name {0} does not exist.", name));
+                FakeOrganizationServiceFault.Throw(ErrorCodes.ObjectDoesNotExist, string.Format("An OptionSetMetadata with the name {0} does not exist.", name));
             }
 
             var optionSetMetadata = ctx.OptionSetValuesMetadata[name];

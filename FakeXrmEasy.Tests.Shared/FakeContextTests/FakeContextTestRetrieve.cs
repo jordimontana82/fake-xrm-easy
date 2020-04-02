@@ -76,7 +76,8 @@ namespace FakeXrmEasy.Tests
 
             var service = context.GetOrganizationService();
 
-            Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Retrieve("account", Guid.NewGuid(), new ColumnSet()));
+            var ex = Assert.Throws<FaultException<OrganizationServiceFault>>(() => service.Retrieve("account", Guid.NewGuid(), new ColumnSet()));
+            Assert.Equal<uint>((uint)0x80040217, (uint)ex.Detail.ErrorCode);
         }
 
         [Fact]
