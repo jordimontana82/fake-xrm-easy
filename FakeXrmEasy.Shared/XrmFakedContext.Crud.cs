@@ -272,7 +272,7 @@ namespace FakeXrmEasy
                     ExecutePipelineStage("Delete", ProcessingStepStage.Prevalidation, ProcessingStepMode.Synchronous, er, previousValues);
                 }
 
-                // ToDo ace - remove References in other Entities (performing :) )
+                // any ideas for better performance?
                 foreach (var item in this.Data)
                 {
                     foreach (var kvPair in item.Value)

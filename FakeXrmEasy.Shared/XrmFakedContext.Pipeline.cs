@@ -299,8 +299,6 @@ namespace FakeXrmEasy
                 return shouldBeExecuted;
             });
 
-            // Todo: Filter on attributes
-
             return plugins;
         }
 
