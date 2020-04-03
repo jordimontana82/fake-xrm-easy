@@ -266,8 +266,9 @@ namespace FakeXrmEasy
 
             // Entity logical name exists, so , check if the requested entity exists
 
+            Dictionary<Guid, Entity> elements;
             Entity previousValues;
-            if (this.Data.TryGetValue(er.LogicalName, out var elements) && elements.TryGetValue(er.Id, out previousValues))
+            if (this.Data.TryGetValue(er.LogicalName, out elements) && elements.TryGetValue(er.Id, out previousValues))
             {
                 if (this.UsePipelineSimulation)
                 {
