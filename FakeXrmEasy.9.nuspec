@@ -26,7 +26,7 @@
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src="..\Publish\FakeXrmEasy.9\FakeXrmEasy.dll" target="lib\net452\FakeXrmEasy.dll" />
+    <file src="..\Publish\FakeXrmEasy.9\FakeXrmEasy.dll" target="lib\net462\FakeXrmEasy.dll" />
     <file src="..\Install-Scripts\9\Install.ps1" target="tools\Install.ps1" />
   </files>
 </package>
