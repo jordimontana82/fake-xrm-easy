@@ -35,6 +35,20 @@ y: minor version. Any minor updates add new functionality without breaking chang
 
 z: patch. Any update to this number means new bug fixes for the existing functionality. A new minor version might also include bug fixes too.
 
+## Support 
+
+We believe in <b>sustainable</b> Open Source. The software is MIT licensed and provided to you for free but we encourage you (and by you, we mean the whole community) to extend it / improve it by yourselves, of course, with help from us. 
+
+In programming terms: 
+
+    Free Open Source !== Free Support. 
+
+If you're a business entity who delivers solutions on top of the Power Platform and are using this project already, you can help make OSS sustainable while getting more visibility by becoming a sponsor. Please [reach out to me](jordi@dynamicsvalue.com) for sponsorship enquiries and to contribute and give back to this project.  
+
+If you're an individual, feel free to check the Sponsorship tiers, any help is welcome and greatly appreciated.
+
+For contributing, please see section below.
+
 ## Contributing
 
 Please consider the below guidelines for contributing to the project:
@@ -54,12 +68,11 @@ Please consider the below guidelines for contributing to the project:
 
 * **If you're using the framework, please do [Star](https://github.com/jordimontana82/fake-xrm-easy/star) the project**, it'll give more visibility to the wider community to keep extending and improving it.
 
-## Donate 
 
-*  If you're a business / company who delivers solutions on top of the Power Platform, you can help make OSS sustainable while getting more visibility by becoming a sponsor. Please [reach out to me](https://github.com/jordimontana82) for sponsorship enquiries.
 
 ## Roadmap
 
+*  TODO: We're working on a v2.x of this package which targets .net core. That new version has been developed for the last couple of months, and we're VERY close to make it public, but in the meantime, PRs and issue will be on hold to keep track of "where we are" in order to be merged into both versions 1.x and 2.x. More info here #504.
 *  TODO:  Add support for date operators. See `ConditionOperator` implementation status [here](https://github.com/jordimontana82/fake-xrm-easy/blob/master/FakeXrmEasy.Tests.Shared/FakeContextTests/FetchXml/ConditionOperatorTests.cs#L19-L110). Feel free to add missing ones!
 *  TODO: Implement remaining CRM messages. To know which ones have been implemented so far, see `FakeMessageExecutor` implementation status [here](https://github.com/jordimontana82/fake-xrm-easy/tree/master/FakeXrmEasy.Shared/FakeMessageExecutors).
 *  TODO: Increase test coverage.
