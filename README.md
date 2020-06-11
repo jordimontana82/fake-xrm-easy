@@ -72,7 +72,8 @@ Please consider the below guidelines for contributing to the project:
 
 ## Roadmap
 
-*  TODO: We're working on a v2.x of this package which targets .net core. That new version has been developed for the last couple of months, and we're VERY close to make it public, but in the meantime, PRs and issue will be on hold to keep track of "where we are" in order to be merged into both versions 1.x and 2.x. More info here #504.
+*  TODO: We're working on a v2.x of this package which targets .net core. That new version has been developed for the last couple of months, and we're VERY close to make it public. In the meantime, PRs and issues will be on hold for the time being to keep track of "where we are" in order to be merged into both versions 1.x and 2.x. [More info here](https://github.com/jordimontana82/fake-xrm-easy/issues/504)
+
 *  TODO:  Add support for date operators. See `ConditionOperator` implementation status [here](https://github.com/jordimontana82/fake-xrm-easy/blob/master/FakeXrmEasy.Tests.Shared/FakeContextTests/FetchXml/ConditionOperatorTests.cs#L19-L110). Feel free to add missing ones!
 *  TODO: Implement remaining CRM messages. To know which ones have been implemented so far, see `FakeMessageExecutor` implementation status [here](https://github.com/jordimontana82/fake-xrm-easy/tree/master/FakeXrmEasy.Shared/FakeMessageExecutors).
 *  TODO: Increase test coverage.
