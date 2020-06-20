@@ -418,17 +418,17 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "like":
                     op = ConditionOperator.Like;
 
-                    if (value != null)
-                    {
-                        if (value.StartsWith("%") && !value.EndsWith("%"))
-                            op = ConditionOperator.EndsWith;
-                        else if (!value.StartsWith("%") && value.EndsWith("%"))
-                            op = ConditionOperator.BeginsWith;
-                        else if (value.StartsWith("%") && value.EndsWith("%"))
-                            op = ConditionOperator.Contains;
+                    //if (value != null)
+                    //{
+                    //    if (value.StartsWith("%") && !value.EndsWith("%"))
+                    //        op = ConditionOperator.EndsWith;
+                    //    else if (!value.StartsWith("%") && value.EndsWith("%"))
+                    //        op = ConditionOperator.BeginsWith;
+                    //    else if (value.StartsWith("%") && value.EndsWith("%"))
+                    //        op = ConditionOperator.Contains;
 
-                        value = value.Replace("%", "");
-                    }
+                    //    value = value.Replace("%", "");
+                    //}
                     break;
                 case "not-like":
                     op = ConditionOperator.NotLike;
