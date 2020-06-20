@@ -119,5 +119,31 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml.OperatorTests.Strings
             Assert.Equal("Bob", collection.Entities[0]["nickname"]);
             Assert.Equal("Nati", collection.Entities[1]["nickname"]);
         }
+
+        [Fact]
+        public void FetchXml_Operator_Like_Execution()
+        {
+            var ctx = new XrmFakedContext();
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                              <entity name='contact'>
+                                    <attribute name='nickname' />
+                                        <filter type='and'>
+                                            <condition attribute='nickname' operator='like' value='A%i%e' />
+                                        </filter>
+                                  </entity>
+                            </fetch>";
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), NickName = "Alice" };
+            var ct2 = new Contact() { Id = Guid.NewGuid(), NickName = "Bob" };
+            var ct3 = new Contact() { Id = Guid.NewGuid(), NickName = "Nati" };
+            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(1, collection.Entities.Count);
+            Assert.Equal("Alice", collection.Entities[0]["nickname"]);
+        }
     }
 }
