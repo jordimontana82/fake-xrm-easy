@@ -97,6 +97,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OperatorTests\Strings\StringOperatorsTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\TranslateQueryExpressionTests\OrderByTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\UpsertRequestTests\UpsertRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\UtcTimeFromLocalTimeRequestTests\UtcTimeFromLocalTimeRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ValidateReferencesTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WhoAmIRequest\WhoAmITests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WinOpportunityRequestTests\WinOpportunityTests.cs" />
