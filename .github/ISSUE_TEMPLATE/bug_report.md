@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 **Is this a bug really?**
-If you have general questions about how to do something specific with FakeXrmEasy then we enabled Discussions in this repo. Please use Discussions instead to share questions, new ideas, suggest improvements etc.  
+If you have general questions about how to do something specific with FakeXrmEasy then we enabled Discussions in this repo. Please use [Discussions](https://github.com/jordimontana82/fake-xrm-easy/discussions) instead to share questions, new ideas, suggest improvements etc.  
 
 Otherwise please feel free to use this template to report any issues you might have.
 
