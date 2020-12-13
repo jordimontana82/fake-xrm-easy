@@ -30,6 +30,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 qe = (request.Query as QueryExpression).Clone();
                 entityName = qe.EntityName;
 
+                if (qe.TopCount > 5000 || qe.TopCount < 0)
+                {
+                    throw new Exception("Expected value between 0 and 5000 inclusive.");
+                }
+
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
                 list = linqQuery.ToList();
             }

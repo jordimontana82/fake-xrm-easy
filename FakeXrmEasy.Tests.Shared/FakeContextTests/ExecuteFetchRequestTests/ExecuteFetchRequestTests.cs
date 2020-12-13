@@ -180,6 +180,46 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
         }
 
         [Fact]
+        public void When_executing_fetchxml_with_count_attribute_requesting_more_than_5000_rows_throws_an_error()
+        {
+            //This will test a count attribute can not be more than 5000
+
+            var ctx = new XrmFakedContext();
+
+            //Act
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' count='50001'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                  </entity>
+                            </fetch>";
+
+            var service = ctx.GetFakedOrganizationService();
+
+            Exception exception = Assert.Throws<Exception>(() => service.Execute(new ExecuteFetchRequest { FetchXml = fetchXml }));
+            Assert.Equal("Expected value between 0 and 5000 inclusive.", exception.Message);
+        }
+
+        [Fact]
+        public void When_executing_fetchxml_with_count_attribute_requesting_less_than_0_rows_throws_an_error()
+        {
+            //This will test a count attribute can not be less than 0
+
+            var ctx = new XrmFakedContext();
+
+            //Act
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' count='-1'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                  </entity>
+                            </fetch>";
+
+            var service = ctx.GetFakedOrganizationService();
+
+            Exception exception = Assert.Throws<Exception>(() => service.Execute(new ExecuteFetchRequest { FetchXml = fetchXml }));
+            Assert.Equal("Expected value between 0 and 5000 inclusive.", exception.Message);
+        }
+
+        [Fact]
         public void When_executing_fetchxml_with_paging_cookies_correct_page_is_returned()
         {
             //This will test a query expression is generated and executed

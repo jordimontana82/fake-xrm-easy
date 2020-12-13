@@ -80,6 +80,54 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
         }
 
         /// <summary>
+        /// Tests that top count works correctly > 5000
+        /// </summary>
+        [Fact]
+        public void TestMaxTopIsFiveThousand()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            for (int i = 0; i < 1; i++)
+            {
+                Entity e = new Entity("entity");
+                e.Id = Guid.NewGuid();
+                initialEntities.Add(e);
+            }
+            context.Initialize(initialEntities);
+
+            QueryExpression query = new QueryExpression("entity");
+            query.TopCount = 50001;
+            Exception exception = Assert.Throws<Exception>(() => service.RetrieveMultiple(query));
+            Assert.Equal("Expected value between 0 and 5000 inclusive.", exception.Message);
+        }
+
+        /// <summary>
+        /// Tests that top count works correctly < 0
+        /// </summary>
+        [Fact]
+        public void TestMinTopIsZero()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            for (int i = 0; i < 1; i++)
+            {
+                Entity e = new Entity("entity");
+                e.Id = Guid.NewGuid();
+                initialEntities.Add(e);
+            }
+            context.Initialize(initialEntities);
+
+            QueryExpression query = new QueryExpression("entity");
+            query.TopCount = -1;
+            Exception exception = Assert.Throws<Exception>(() => service.RetrieveMultiple(query));
+            Assert.Equal("Expected value between 0 and 5000 inclusive.", exception.Message);
+        }
+
+        /// <summary>
         /// Tests that an empty result set doesn't cause an error and that more records is correctly set to false
         /// </summary>
         [Fact]
