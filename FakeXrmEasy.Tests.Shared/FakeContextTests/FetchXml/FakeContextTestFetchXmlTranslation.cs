@@ -929,5 +929,43 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             Assert.Equal("Lionel", (entities[0]["aa.firstname"] as AliasedValue).Value.ToString());
             Assert.False(entities[1].Attributes.ContainsKey("aa.firstname"));
         }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_return_total_count_is_translated_correctly()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' returntotalrecordcount='true'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                              </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.PageInfo.ReturnTotalRecordCount);
+        }
+
+        [Fact]
+        public void When_translating_a_fetch_xml_distinct_is_translated_correctly()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true' returntotalrecordcount='true'>
+                              <entity name='contact'>
+                                    <attribute name='fullname' />
+                                    <attribute name='telephone1' />
+                                    <attribute name='contactid' />
+                              </entity>
+                            </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Distinct);
+        }
     }
 }

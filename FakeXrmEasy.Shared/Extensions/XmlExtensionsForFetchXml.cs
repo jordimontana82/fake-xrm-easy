@@ -26,7 +26,13 @@ namespace FakeXrmEasy.Extensions.FetchXml
             ConditionOperator.LastXMonths,
             ConditionOperator.LastXWeeks,
             ConditionOperator.LastXYears,
-            ConditionOperator.NextXWeeks
+            ConditionOperator.NextXHours,
+            ConditionOperator.NextXDays,
+            ConditionOperator.NextXWeeks,
+            ConditionOperator.NextXMonths,
+            ConditionOperator.NextXYears,
+            ConditionOperator.NextXWeeks,
+            ConditionOperator.InFiscalYear
         };
 
         public static bool IsAttributeTrue(this XElement elem, string attributeName)
@@ -40,6 +46,11 @@ namespace FakeXrmEasy.Extensions.FetchXml
         public static bool IsAggregateFetchXml(this XDocument doc)
         {
             return doc.Root.IsAttributeTrue("aggregate");
+        }
+
+        public static bool IsDistincFetchXml(this XDocument doc)
+        {
+            return doc.Root.IsAttributeTrue("distinct");
         }
 
         public static bool IsFetchXmlNodeValid(this XElement elem)
@@ -136,6 +147,19 @@ namespace FakeXrmEasy.Extensions.FetchXml
             return iCount;
         }
 
+
+        public static bool ToReturnTotalRecordCount(this XElement el)
+        {
+            var returnTotalRecordCountAttr = el.GetAttribute("returntotalrecordcount");
+            if (returnTotalRecordCountAttr == null) return false;
+
+            bool bReturnCount;
+            if (!bool.TryParse(returnTotalRecordCountAttr.Value, out bReturnCount))
+                throw new Exception("returntotalrecordcount attribute in fetch node must be an boolean");
+
+            return bReturnCount;
+        }
+
         public static int? ToPageNumber(this XElement el)
         {
             var pageAttr = el.GetAttribute("page");
@@ -173,6 +197,14 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     .FirstOrDefault()
                     .ToCount();
         }
+
+        public static bool ToReturnTotalRecordCount(this XDocument xlDoc)
+        {
+            return xlDoc.Elements()   //fetch
+                    .FirstOrDefault()
+                    .ToReturnTotalRecordCount();
+        }
+
 
         public static int? ToPageNumber(this XDocument xlDoc)
         {
@@ -398,10 +430,8 @@ namespace FakeXrmEasy.Extensions.FetchXml
                         value = value.Replace("%", "");
                     }
                     break;
-
                 case "not-like":
                     op = ConditionOperator.NotLike;
-
                     if (value != null)
                     {
                         if (value.StartsWith("%") && !value.EndsWith("%"))
@@ -414,23 +444,18 @@ namespace FakeXrmEasy.Extensions.FetchXml
                         value = value.Replace("%", "");
                     }
                     break;
-
                 case "gt":
                     op = ConditionOperator.GreaterThan;
                     break;
-
                 case "ge":
                     op = ConditionOperator.GreaterEqual;
                     break;
-
                 case "lt":
                     op = ConditionOperator.LessThan;
                     break;
-
                 case "le":
                     op = ConditionOperator.LessEqual;
                     break;
-
                 case "on":
                     op = ConditionOperator.On;
                     break;
@@ -476,6 +501,9 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "next-x-weeks":
                     op = ConditionOperator.NextXWeeks;
                     break;
+                case "next-seven-days":
+                    op = ConditionOperator.Next7Days;
+                    break;
                 case "this-year":
                     op = ConditionOperator.ThisYear;
                     break;
@@ -484,6 +512,33 @@ namespace FakeXrmEasy.Extensions.FetchXml
                     break;
                 case "next-year":
                     op = ConditionOperator.NextYear;
+                    break;
+                case "last-x-hours":
+                    op = ConditionOperator.LastXHours;
+                    break;
+                case "last-x-days":
+                    op = ConditionOperator.LastXDays;
+                    break;
+                case "last-x-weeks":
+                    op = ConditionOperator.LastXWeeks;
+                    break;
+                case "last-x-months":
+                    op = ConditionOperator.LastXMonths;
+                    break;
+                case "last-x-years":
+                    op = ConditionOperator.LastXYears;
+                    break;
+                case "next-x-hours":
+                    op = ConditionOperator.NextXHours;
+                    break;
+                case "next-x-days":
+                    op = ConditionOperator.NextXDays;
+                    break;
+                case "next-x-months":
+                    op = ConditionOperator.NextXMonths;
+                    break;
+                case "next-x-years":
+                    op = ConditionOperator.NextXYears;
                     break;
                 case "this-month":
                     op = ConditionOperator.ThisMonth;
@@ -494,6 +549,35 @@ namespace FakeXrmEasy.Extensions.FetchXml
                 case "next-month":
                     op = ConditionOperator.NextMonth;
                     break;
+                case "last-week":
+                    op = ConditionOperator.LastWeek;
+                    break;
+                case "this-week":
+                    op = ConditionOperator.ThisWeek;
+                    break;
+                case "next-week":
+                    op = ConditionOperator.NextWeek;
+                    break;
+                case "in-fiscal-year":
+                    op = ConditionOperator.InFiscalYear;
+                    break;
+#if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013
+                case "olderthan-x-minutes":
+                    op = ConditionOperator.OlderThanXMinutes;
+                    break;
+                case "olderthan-x-hours":
+                    op = ConditionOperator.OlderThanXHours;
+                    break;
+                case "olderthan-x-days":
+                    op = ConditionOperator.OlderThanXDays;
+                    break;
+                case "olderthan-x-weeks":
+                    op = ConditionOperator.OlderThanXWeeks;
+                    break;
+                case "olderthan-x-years":
+                    op = ConditionOperator.OlderThanXYears;
+                    break;
+#endif
 #if FAKE_XRM_EASY_9
                 case "contain-values":
                     op = ConditionOperator.ContainValues;

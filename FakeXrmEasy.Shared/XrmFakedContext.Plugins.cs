@@ -28,7 +28,8 @@ namespace FakeXrmEasy
                 OutputParameters = new ParameterCollection(),
                 SharedVariables = new ParameterCollection(),
                 PreEntityImages = new EntityImageCollection(),
-                PostEntityImages = new EntityImageCollection()
+                PostEntityImages = new EntityImageCollection(),
+                IsolationMode = 1
             };
         }
 
@@ -66,6 +67,9 @@ namespace FakeXrmEasy
             A.CallTo(() => context.BusinessUnitId).ReturnsLazily(() => ctx.BusinessUnitId);
             A.CallTo(() => context.CorrelationId).ReturnsLazily(() => ctx.CorrelationId);
             A.CallTo(() => context.OperationCreatedOn).ReturnsLazily(() => ctx.OperationCreatedOn);
+            A.CallTo(() => context.IsolationMode).ReturnsLazily(() => ctx.IsolationMode);
+            A.CallTo(() => context.IsInTransaction).ReturnsLazily(() => ctx.IsInTransaction);
+
 
             // Create message will pass an Entity as the target but this is not always true
             // For instance, a Delete request will receive an EntityReference
@@ -94,7 +98,7 @@ namespace FakeXrmEasy
 
             return context;
         }
-        
+
         /// <summary>
         /// Executes a plugin passing a custom context. This is useful whenever we need to mock more complex plugin contexts (ex: passing MessageName, plugin Depth, InitiatingUserId etc...)
         /// </summary>
@@ -369,12 +373,21 @@ namespace FakeXrmEasy
                    {
                        return GetFakedServiceEndpointNotificationService();
                    }
-
+#if FAKE_XRM_EASY_9
+                   if (t == typeof(IEntityDataSourceRetrieverService))
+                   {
+                       return GetFakedEntityDataSourceRetrieverService();
+                   }
+#endif
                    throw new PullRequestException("The specified service type is not supported");
                });
 
             return fakedServiceProvider;
         }
+
+#if FAKE_XRM_EASY_9
+        public Entity EntityDataSourceRetriever { get; set; }
+#endif
 
         public XrmFakedTracingService GetFakeTracingService()
         {
