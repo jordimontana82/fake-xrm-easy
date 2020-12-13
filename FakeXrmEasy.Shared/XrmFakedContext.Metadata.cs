@@ -3,6 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FakeXrmEasy.Extensions;
+using System.Reflection;
+using Microsoft.Xrm.Sdk.Client;
+using Microsoft.Xrm.Sdk;
+using FakeXrmEasy.Metadata;
 
 namespace FakeXrmEasy
 {
@@ -36,7 +40,7 @@ namespace FakeXrmEasy
                 throw new Exception("Entity metadata parameter can not be null");
             }
 
-            this.EntityMetadata = new Dictionary<string, EntityMetadata>();
+            //  this.EntityMetadata = new Dictionary<string, EntityMetadata>();
             foreach (var eMetadata in entityMetadataList)
             {
                 if (string.IsNullOrWhiteSpace(eMetadata.LogicalName))
@@ -57,6 +61,15 @@ namespace FakeXrmEasy
             this.InitializeMetadata(new List<EntityMetadata>() { entityMetadata });
         }
 
+        public void InitializeMetadata(Assembly earlyBoundEntitiesAssembly)
+        {
+            IEnumerable<EntityMetadata> entityMetadatas = MetadataGenerator.FromEarlyBoundEntities(earlyBoundEntitiesAssembly);
+            if (entityMetadatas.Any())
+            {
+                this.InitializeMetadata(entityMetadatas);
+            }
+        }
+
         public IQueryable<EntityMetadata> CreateMetadataQuery()
         {
             return this.EntityMetadata.Values
@@ -67,9 +80,10 @@ namespace FakeXrmEasy
 
         public EntityMetadata GetEntityMetadataByName(string sLogicalName)
         {
-            return CreateMetadataQuery()
-                .Where(em => em.LogicalName.Equals(sLogicalName))
-                .FirstOrDefault();
+            if (EntityMetadata.ContainsKey(sLogicalName))
+                return EntityMetadata[sLogicalName].Copy();
+
+            return null;
         }
 
         public void SetEntityMetadata(EntityMetadata em)

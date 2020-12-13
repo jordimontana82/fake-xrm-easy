@@ -80,12 +80,12 @@ namespace FakeXrmEasy.Tests.Issues
 
             EntityCollection result2 = service.RetrieveMultiple(new FetchExpression(fetchXml2));
             Assert.Equal(1, result2.Entities.Count);
-            Assert.Equal(1, result2.Entities[0].Attributes.Count);
+            Assert.Equal(2, result2.Entities[0].Attributes.Count);
             Assert.Equal("Test Account", result2.Entities[0].Attributes["name"].ToString());
 
             EntityCollection result = service.RetrieveMultiple(new FetchExpression(fetchXml));
             Assert.Equal(1, result.Entities.Count);
-            Assert.Equal(2, result.Entities[0].Attributes.Count);
+            Assert.Equal(3, result.Entities[0].Attributes.Count);
             Assert.Equal("Test Account", result.Entities[0].Attributes["name"].ToString());
             Assert.Equal("Dave", ((AliasedValue)result.Entities[0].Attributes["dev.firstname"]).Value);
 

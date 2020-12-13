@@ -49,6 +49,30 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void FetchXml_Aggregate_Group_EntityReference_Count()
+        {
+            var fetchXml = @"<fetch no-lock='true' aggregate='true'> <entity name='account'> <attribute name='parentaccountid' alias='pa' groupby='true' /> <attribute name='accountid' alias='Qt' aggregate='countcolumn' /> <order alias='Qt' descending='true' /> </entity> </fetch>";
+
+            EntityReference parentId = new EntityReference("account", Guid.NewGuid());
+
+            var ctx = new XrmFakedContext();
+            ctx.Initialize(new[] {
+                new Account() { Id = Guid.NewGuid(), ParentAccountId=parentId },
+                new Account() { Id = Guid.NewGuid(), ParentAccountId=parentId },
+                new Account() { Id = Guid.NewGuid(), ParentAccountId=new EntityReference("account",Guid.NewGuid()) },
+                new Account() { Id = Guid.NewGuid()}
+            });
+
+            var collection = ctx.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Equal(3, collection.Entities.Count);
+
+            var biggestGroup = collection.Entities.Where(x => x.Attributes.ContainsKey("pa")).SingleOrDefault(x => parentId.Id.Equals((x.GetAttributeValue<AliasedValue>("pa")?.Value as EntityReference)?.Id));
+            Assert.Equal(2, biggestGroup.GetAttributeValue<AliasedValue>("Qt").Value);
+        }
+
+
+        [Fact]
         public void FetchXml_Aggregate_CountDistinct()
         {
             var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' aggregate='true'>
@@ -277,7 +301,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
 
             var ctx = new XrmFakedContext();
             ctx.Initialize(BirthdateContacts);
-            var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var collection = ctx.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
 
             Assert.Equal(3, collection.Entities.Count);
             Assert.Equal(new int?[] { 1, 1, 2 }, collection.Entities.Select(x => x.GetAttributeValue<AliasedValue>("count")?.Value as int?));
@@ -295,7 +319,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                             </fetch>";
 
             var ctx = new XrmFakedContext();
-            var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var collection = ctx.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
 
             Assert.Equal(1, collection.Entities.Count);
             Assert.Equal(0, collection.Entities.First().GetAttributeValue<AliasedValue>("count.contacts")?.Value);
@@ -313,7 +337,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                             </fetch>";
 
             var ctx = new XrmFakedContext();
-            var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var collection = ctx.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
 
             Assert.Equal(1, collection.Entities.Count);
             Assert.Equal(1, collection.Entities.First().Attributes.Count);
@@ -332,11 +356,159 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
                             </fetch>";
 
             var ctx = new XrmFakedContext();
-            var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+            var collection = ctx.GetOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
 
             Assert.Equal(1, collection.Entities.Count);
             Assert.Equal(1, collection.Entities.First().Attributes.Count);
             Assert.True(collection.Entities.First().Contains("avg"));
+        }
+
+        [Fact]
+        public void FetchXml_Aggregate_Min_Date()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity e = new Entity("entity");
+            e.Id = Guid.NewGuid();
+            e["value"] = new DateTime(2011, 01, 01);
+            initialEntities.Add(e);
+
+            Entity e2 = new Entity("entity");
+            e2.Id = Guid.NewGuid();
+            e2["value"] = new DateTime(2011, 01, 02);
+            initialEntities.Add(e2);
+
+            Entity e3 = new Entity("entity");
+            e3.Id = Guid.NewGuid();
+            e3["value"] = new DateTime(2011, 01, 03);
+            initialEntities.Add(e3);
+
+            context.Initialize(initialEntities);
+
+            FetchExpression query = new FetchExpression($@"
+                <fetch aggregate='true' >
+                  <entity name='entity' >
+                    <attribute name='value' alias='minvalue' aggregate='min' />
+                  </entity>
+                </fetch>
+                ");
+
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+            Assert.Equal(new DateTime(2011, 01, 01), result.Entities.Single().GetAttributeValue<AliasedValue>("minvalue").Value);
+        }
+
+        [Fact]
+        public void FetchXml_Aggregate_Min_Date_With_Nulls()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity e = new Entity("entity");
+            e.Id = Guid.NewGuid();
+            e["value"] = new DateTime(2011, 01, 01);
+            initialEntities.Add(e);
+
+            Entity e2 = new Entity("entity");
+            e2.Id = Guid.NewGuid();
+            e2["value"] = null;
+            initialEntities.Add(e2);
+
+            Entity e3 = new Entity("entity");
+            e3.Id = Guid.NewGuid();
+            e3["value"] = new DateTime(2011, 01, 03);
+            initialEntities.Add(e3);
+
+            context.Initialize(initialEntities);
+
+            FetchExpression query = new FetchExpression($@"
+                <fetch aggregate='true' >
+                  <entity name='entity' >
+                    <attribute name='value' alias='minvalue' aggregate='min' />
+                  </entity>
+                </fetch>
+                ");
+
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+            Assert.Equal(new DateTime(2011, 01, 01), result.Entities.Single().GetAttributeValue<AliasedValue>("minvalue").Value);
+        }
+
+        [Fact]
+        public void FetchXml_Aggregate_Max_Date()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity e = new Entity("entity");
+            e.Id = Guid.NewGuid();
+            e["value"] = new DateTime(2011, 01, 01);
+            initialEntities.Add(e);
+
+            Entity e2 = new Entity("entity");
+            e2.Id = Guid.NewGuid();
+            e2["value"] = new DateTime(2011, 01, 02);
+            initialEntities.Add(e2);
+
+            Entity e3 = new Entity("entity");
+            e3.Id = Guid.NewGuid();
+            e3["value"] = new DateTime(2011, 01, 03);
+            initialEntities.Add(e3);
+
+            context.Initialize(initialEntities);
+
+            FetchExpression query = new FetchExpression($@"
+                <fetch aggregate='true' >
+                  <entity name='entity' >
+                    <attribute name='value' alias='maxvalue' aggregate='max' />
+                  </entity>
+                </fetch>
+                ");
+
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+            Assert.Equal(new DateTime(2011, 01, 03), result.Entities.Single().GetAttributeValue<AliasedValue>("maxvalue").Value);
+        }
+
+        [Fact]
+        public void FetchXml_Aggregate_Max_Date_With_Nulls()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            Entity e = new Entity("entity");
+            e.Id = Guid.NewGuid();
+            e["value"] = new DateTime(2011, 01, 01);
+            initialEntities.Add(e);
+
+            Entity e2 = new Entity("entity");
+            e2.Id = Guid.NewGuid();
+            e2["value"] = null;
+            initialEntities.Add(e2);
+
+            Entity e3 = new Entity("entity");
+            e3.Id = Guid.NewGuid();
+            e3["value"] = new DateTime(2011, 01, 03);
+            initialEntities.Add(e3);
+
+            context.Initialize(initialEntities);
+
+            FetchExpression query = new FetchExpression($@"
+                <fetch aggregate='true' >
+                  <entity name='entity' >
+                    <attribute name='value' alias='maxvalue' aggregate='max' />
+                  </entity>
+                </fetch>
+                ");
+
+            EntityCollection result = service.RetrieveMultiple(query);
+            Assert.Equal(1, result.Entities.Count);
+            Assert.Equal(new DateTime(2011, 01, 03), result.Entities.Single().GetAttributeValue<AliasedValue>("maxvalue").Value);
         }
 
         [Fact]
@@ -448,6 +620,37 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             EntityCollection result = service.RetrieveMultiple(query);
             Assert.Equal(1, result.Entities.Count);
             Assert.Equal(-1.5m, result.Entities.Single().GetAttributeValue<AliasedValue>("avgvalue").Value);
+        }
+
+        [Fact]
+        public void FetchXml_Aggregate_Sum_With_Linked_Entity()
+        {
+            var context = new XrmFakedContext();
+            var contact = new Contact() { Id = Guid.NewGuid() };
+            var sale1 = new SalesOrder() { Id = Guid.NewGuid() };
+            sale1.CustomerId = contact.ToEntityReference();
+            sale1.TotalAmount = new Money(10m);
+            sale1.DateFulfilled = new DateTime(2019, 1, 1);
+            context.Initialize(new Entity[] { contact, sale1 });
+
+            EntityCollection result = context.GetOrganizationService().RetrieveMultiple(new FetchExpression(@"
+<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true' aggregate='true'>
+  <entity name='contact'>
+	<attribute name='contactid' groupby='true' alias='agg_contactid' />	
+    <link-entity name='salesorder' from='customerid' to='contactid' alias='sales12m' link-type='inner'>
+		<attribute name='totalamount' aggregate='sum' alias='TotalAmount' />
+        <filter type='and'>
+	      <condition attribute='datefulfilled' operator='on-or-before' value='2019-02-01' />
+	    </filter>
+	</link-entity>
+  </entity>
+</fetch>"));
+
+
+            Assert.Equal(1, result.Entities.Count);
+            var value = result.Entities.First().GetAttributeValue<AliasedValue>("sales12m.TotalAmount");
+            Assert.NotNull(value);
+            Assert.Equal(10m, ((Money)value.Value).Value);
         }
 
         [Fact]
