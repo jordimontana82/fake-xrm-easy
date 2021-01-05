@@ -43,7 +43,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             // HasFlag -> used to verify flag matches --> to verify EntityFilters.Entity | EntityFilters.Attributes
             if (req.EntityFilters.HasFlag(Microsoft.Xrm.Sdk.Metadata.EntityFilters.Entity) ||
-                req.EntityFilters.HasFlag(Microsoft.Xrm.Sdk.Metadata.EntityFilters.Attributes))
+                req.EntityFilters.HasFlag(Microsoft.Xrm.Sdk.Metadata.EntityFilters.Attributes) || req.EntityFilters.HasFlag(Microsoft.Xrm.Sdk.Metadata.EntityFilters.Relationships))
             {
                 if(!ctx.EntityMetadata.ContainsKey(req.LogicalName))
                 {
@@ -63,7 +63,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 return response;
             }
 
-            throw new Exception("At least EntityFilters.Entity or EntityFilters.Attributes must be present on EntityFilters of Request.");
+            throw new Exception("At least EntityFilters.Entity or EntityFilters.Attributes or EntityFilters.Relationships must be present on EntityFilters of Request.");
         }
 
         public Type GetResponsibleRequestType()
