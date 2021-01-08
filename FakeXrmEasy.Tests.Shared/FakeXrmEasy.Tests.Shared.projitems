@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AddListMembersListRequestTests\Tests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\AddMemberListRequestTests\Tests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\BulkDeleteRequestTests\BulkDeleteRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\DeleteRecordChangeHistoryRequestTests\DeleteRecordChangeHistoryRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\FetchXmlToQueryExpressionRequestTests\FetchXmlToQueryExpressionRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\QueryTranslationTests\ProjectionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RemoveUserFromRecordTeamRequestTests\RemoveUserFromRecordTeamRequestTests.cs" />
