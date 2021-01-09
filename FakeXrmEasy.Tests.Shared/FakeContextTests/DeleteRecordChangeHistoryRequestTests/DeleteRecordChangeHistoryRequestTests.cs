@@ -4,6 +4,7 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Xunit;
 
+#if FAKE_XRM_EASY_9
 namespace FakeXrmEasy.Tests.FakeContextTests.DeleteRecordChangeHistoryRequestTests
 {
     public class DeleteRecordChangeHistoryRequestTests
@@ -27,3 +28,4 @@ namespace FakeXrmEasy.Tests.FakeContextTests.DeleteRecordChangeHistoryRequestTes
         }
     }
 }
+#endif
