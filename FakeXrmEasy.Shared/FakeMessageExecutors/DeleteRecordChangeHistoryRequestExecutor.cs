@@ -2,6 +2,7 @@
 using Microsoft.Crm.Sdk.Messages;
 using System;
 using System.ServiceModel;
+#if FAKE_XRM_EASY_9
 namespace FakeXrmEasy.FakeMessageExecutors
 {
     public class DeleteRecordChangeHistoryRequestExecutor : IFakeMessageExecutor
@@ -28,3 +29,4 @@ namespace FakeXrmEasy.FakeMessageExecutors
     }
 
 }
+#endif
