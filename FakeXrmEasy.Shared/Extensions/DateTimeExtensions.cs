@@ -11,6 +11,15 @@ namespace FakeXrmEasy.Extensions
             return startOfYear.AddDays(7 * (week - 2) + ((dayOfWeek - startOfYear.DayOfWeek + 7) % 7));
         }
 
+        public static DateTime ToFirstDayOfWeek(this DateTime dateTime)
+        {
+            var dayOfWeekDelta = (int)dateTime.DayOfWeek - (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
+
+            dayOfWeekDelta = dayOfWeekDelta == -1 ? 6 : dayOfWeekDelta;
+
+            return dateTime.AddDays(-dayOfWeekDelta);
+        }
+
         public static DateTime ToDayOfDeltaWeek(this DateTime dateTime, Int32 deltaWeek, DayOfWeek dayOfWeek)
             => dateTime.ToDayOfWeek(CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(dateTime
                 , CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule

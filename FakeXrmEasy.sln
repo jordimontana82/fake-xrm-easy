@@ -324,7 +324,4 @@ Global
 		{DABE779C-7900-4357-A67E-890FCE4B67BD} = {7B1103ED-3843-4670-A8DB-F462B4C8FBE2}
 		{A4AE544E-ECE6-4EF9-B60A-C2BE7428EA14} = {7B1103ED-3843-4670-A8DB-F462B4C8FBE2}
 	EndGlobalSection
-	GlobalSection(CRMSolutionProperties) = preSolution
-		SolutionIsBoundToCRM = True
-	EndGlobalSection
 EndGlobal
