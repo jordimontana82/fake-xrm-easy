@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Reflection;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using System.ServiceModel;
+#else
+using FakeXrmEasy.DotNetCore;
+#endif
 using Crm;
 using FakeXrmEasy.FakeMessageExecutors;
 using Microsoft.Crm.Sdk.Messages;

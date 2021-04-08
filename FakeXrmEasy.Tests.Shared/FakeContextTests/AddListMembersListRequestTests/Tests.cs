@@ -10,7 +10,11 @@ using Xunit.Sdk;
 using System.Linq;
 using Microsoft.Crm.Sdk.Messages;
 using Crm;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using System.ServiceModel;
+#else
+using FakeXrmEasy.DotNetCore;
+#endif
 
 namespace FakeXrmEasy.Tests.FakeContextTests.AddListMembersListRequestTests
 {

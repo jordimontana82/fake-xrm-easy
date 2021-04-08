@@ -3,7 +3,11 @@
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using System;
+#if FAKE_XRM_EASY_DOTNETCORE
+using FakeXrmEasy.DotNetCore;
+#else
 using System.ServiceModel;
+#endif
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {

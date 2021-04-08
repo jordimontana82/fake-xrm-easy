@@ -4,7 +4,11 @@ using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using System.ServiceModel;
+#else
+using FakeXrmEasy.DotNetCore;
+#endif
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.AddMemberListRequestTests

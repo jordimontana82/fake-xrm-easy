@@ -6,7 +6,11 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using System;
 using System.Linq;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using System.ServiceModel;
+#else
+using FakeXrmEasy.DotNetCore;
+#endif
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.RemoveFromQueueRequestTests

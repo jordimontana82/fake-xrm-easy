@@ -5,7 +5,11 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Linq;
+#if FAKE_XRM_EASY_DOTNETCORE
+using FakeXrmEasy.DotNetCore;
+#else
 using System.ServiceModel;
+#endif
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {

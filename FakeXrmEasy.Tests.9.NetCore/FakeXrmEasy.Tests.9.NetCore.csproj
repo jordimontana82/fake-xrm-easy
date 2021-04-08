@@ -1,16 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>FakeXrmEasy.Tests.NetCore</RootNamespace>
 
     <IsPackable>false</IsPackable>
-	<DefineConstants>FAKE_XRM_EASY_DOTNETCORE</DefineConstants>
+	<DefineConstants>FAKE_XRM_EASY_DOTNETCORE,FAKE_XRM_EASY_9</DefineConstants>
   </PropertyGroup>
 	<Import Project="..\FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Dynamics.Sdk.Messages" Version="0.4.6" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="0.4.6" />
+    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" Version="0.4.6" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
     <PackageReference Include="coverlet.collector" Version="1.2.0" />

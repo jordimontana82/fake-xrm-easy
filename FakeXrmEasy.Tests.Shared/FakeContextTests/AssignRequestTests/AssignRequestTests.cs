@@ -4,7 +4,11 @@ using FakeXrmEasy.FakeMessageExecutors;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using System.ServiceModel;
+#else
+using FakeXrmEasy.DotNetCore;
+#endif
 using Xunit;
 using Crm;
 

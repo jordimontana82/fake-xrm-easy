@@ -11,7 +11,7 @@ using System.Linq;
 using System.IO.Compression;
 using System.Runtime.Serialization;
 
-#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
+#if (FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9) && !FAKE_XRM_EASY_DOTNETCORE
 using Microsoft.Xrm.Tooling.Connector;
 #elif FAKE_XRM_EASY_DOTNETCORE
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -76,7 +76,7 @@ namespace FakeXrmEasy
                 throw new Exception("The ConnectionStringName property must be either a connection string or a connection string name");
             }
 
-#if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
+#if (FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9) && !FAKE_XRM_EASY_DOTNETCORE
 
             // Connect to the CRM web service using a connection string.
             CrmServiceClient client = new Microsoft.Xrm.Tooling.Connector.CrmServiceClient(connectionString);

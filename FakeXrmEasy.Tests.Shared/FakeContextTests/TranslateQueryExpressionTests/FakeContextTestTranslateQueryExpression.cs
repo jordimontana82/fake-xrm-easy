@@ -5,7 +5,11 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel;  //TypedEntities generated code for testing
+#if !FAKE_XRM_EASY_DOTNETCORE
+using System.ServiceModel; //TypedEntities generated code for testing
+#else
+using FakeXrmEasy.DotNetCore;
+#endif
 using Xunit;
 
 namespace FakeXrmEasy.Tests
