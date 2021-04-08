@@ -12,6 +12,7 @@ namespace FakeXrmEasy.Tests.XrmRealContextTests
 {
     public class XrmRealContextTests
     {
+#if !FAKE_XRM_EASY_DOTNETCORE
         [Fact]
         public void Should_connect_to_CRM()
         {
@@ -19,6 +20,7 @@ namespace FakeXrmEasy.Tests.XrmRealContextTests
             var ex = Record.Exception(() => ctx.GetOrganizationService());
             Assert.Null(ex);
         }
+#endif
 
         [Fact]
         public void Should_connect_to_CRM_with_given_ConnectionString()
@@ -27,6 +29,7 @@ namespace FakeXrmEasy.Tests.XrmRealContextTests
             Assert.Equal("myfirstconnectionstring", ctx.ConnectionStringName);
         }
 
+#if !FAKE_XRM_EASY_DOTNETCORE
         [Fact]
         public void Should_connect_to_CRM_with_given_OrganizationService()
         {
@@ -35,6 +38,7 @@ namespace FakeXrmEasy.Tests.XrmRealContextTests
             var ctx2 = new XrmRealContext(organizationService);
             Assert.Equal(organizationService, ctx2.GetOrganizationService());
         }
+#endif
 
         [Fact]
         public void Should_not_initialize_records_when_using_a_real_CRM_instance()
