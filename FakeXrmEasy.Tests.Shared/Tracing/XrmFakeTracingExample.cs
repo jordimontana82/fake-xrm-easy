@@ -1,4 +1,6 @@
-﻿using FakeXrmEasy.Tests.CodeActivitiesForTesting;
+﻿#if !FAKE_XRM_EASY_DOTNETCORE
+using FakeXrmEasy.Tests.CodeActivitiesForTesting;
+#endif
 using FakeXrmEasy.Tests.PluginsForTesting;
 using Microsoft.Xrm.Sdk;
 using System;
@@ -28,6 +30,7 @@ namespace FakeXrmEasy.Tests.Tracing
             Assert.Equal(log, "Contains target\r\nIs Account\r\n");
         }
 
+#if !FAKE_XRM_EASY_DOTNETCORE
         [Fact]
         public void Should_retrieve_traces_from_a_code_activity()
         {
@@ -48,6 +51,7 @@ namespace FakeXrmEasy.Tests.Tracing
             //Assert that the target contains a new attribute
             Assert.Equal(log, "{ title: \"Complex message\", description: \"That could brake Formatter if not treated carefully\" }" + System.Environment.NewLine);
         }
+#endif
 
         [Fact]
         public void The_TracingService_Should_Be_Retrievable_Without_Calling_Execute_Before()

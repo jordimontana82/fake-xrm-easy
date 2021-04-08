@@ -35,6 +35,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryTests
             Assert.Equal(ConditionOperator.EqualBusinessId, _query.Criteria.Conditions[0].Operator);
         }
 
+#if !FAKE_XRM_EASY_DOTNETCORE
         [Fact]
         public void FetchXml_Operator_EqualBusinessId_Execution()
         {
@@ -74,6 +75,6 @@ namespace FakeXrmEasy.Tests.FakeContextTests.QueryTests
             Assert.Single(_collection.Entities);
             Assert.Equal(Guid.Parse(_resource2Id), _collection.Entities[0].Id);
         }
-
+#endif
     }
 }

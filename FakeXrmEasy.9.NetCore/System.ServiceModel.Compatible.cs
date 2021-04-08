@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 
-namespace FakeXrmEasy.NetCore
+namespace FakeXrmEasy.DotNetCore
 {
     public class FaultException<T>: System.ServiceModel.FaultException<T>
     {
