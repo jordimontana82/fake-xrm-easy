@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using Microsoft.Xrm.Sdk.Workflow;
 using System;
 using System.Activities;
@@ -42,3 +43,4 @@ namespace FakeXrmEasy.Tests.CodeActivitiesForTesting
         public OutArgument<EntityReference> taskCreated { get; set; }
     }
 }
+#endif

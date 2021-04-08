@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using Microsoft.Xrm.Sdk.Workflow;
 using System.Activities;
 
@@ -25,3 +26,4 @@ namespace FakeXrmEasy.Tests.CodeActivitiesForTesting
         public OutArgument<string> MessageName { get; set; }
     }
 }
+#endif

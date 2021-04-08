@@ -1,4 +1,5 @@
 ﻿using Crm;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using FakeXrmEasy.Tests.CodeActivitiesForTesting;
 using Microsoft.Xrm.Sdk;
 using System;
@@ -115,3 +116,4 @@ namespace FakeXrmEasy.Tests
         }
     }
 }
+#endif
