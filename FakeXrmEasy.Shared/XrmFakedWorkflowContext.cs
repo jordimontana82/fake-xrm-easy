@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using Microsoft.Xrm.Sdk.Workflow;
 using System;
 
@@ -67,3 +68,4 @@ namespace FakeXrmEasy
 #endif
     }
 }
+#endif

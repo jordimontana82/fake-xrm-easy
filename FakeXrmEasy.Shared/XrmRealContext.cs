@@ -13,6 +13,8 @@ using System.Runtime.Serialization;
 
 #if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
 using Microsoft.Xrm.Tooling.Connector;
+#elif FAKE_XRM_EASY_DOTNETCORE
+using Microsoft.PowerPlatform.Dataverse.Client;
 #else
 
 using Microsoft.Xrm.Client;
@@ -79,7 +81,9 @@ namespace FakeXrmEasy
             // Connect to the CRM web service using a connection string.
             CrmServiceClient client = new Microsoft.Xrm.Tooling.Connector.CrmServiceClient(connectionString);
             return client;
-
+#elif FAKE_XRM_EASY_DOTNETCORE
+            var client = new Microsoft.PowerPlatform.Dataverse.Client.ServiceClient(connectionString);
+            return client;
 #else
             CrmConnection crmConnection = CrmConnection.Parse(connectionString);
             OrganizationService service = new OrganizationService(crmConnection);

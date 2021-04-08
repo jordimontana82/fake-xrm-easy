@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+	  <DefineConstants>FAKE_XRM_EASY_DOTNETCORE</DefineConstants>
+  </PropertyGroup>
+	<Import Project="..\FakeXrmEasy.Shared\FakeXrmEasy.Shared.projitems" Label="Shared" />
+	<ItemGroup>
+	  <PackageReference Include="FakeItEasy" Version="7.0.1" />
+	  <PackageReference Include="Microsoft.Dynamics.Sdk.Messages" Version="0.4.6" />
+	  <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="0.4.6" />
+	  <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" Version="0.4.6" />
+	  <PackageReference Include="System.ServiceModel.Primitives" Version="4.8.1" />
+	</ItemGroup>
+</Project>

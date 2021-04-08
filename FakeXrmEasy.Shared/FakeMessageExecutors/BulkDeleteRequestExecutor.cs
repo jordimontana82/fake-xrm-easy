@@ -1,5 +1,9 @@
 ﻿using System;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using System.ServiceModel;
+#else
+using FakeXrmEasy.DotNetCore;
+#endif
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
@@ -16,7 +20,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
         public OrganizationResponse Execute(OrganizationRequest request, XrmFakedContext ctx)
         {
             var bulkDeleteRequest = (BulkDeleteRequest)request;
-           
+
             if (string.IsNullOrEmpty(bulkDeleteRequest.JobName))
             {
                 throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "Can not Bulk delete without JobName");

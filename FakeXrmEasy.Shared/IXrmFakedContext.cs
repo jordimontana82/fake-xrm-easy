@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using System.Activities;
+#endif
 using System.Collections.Generic;
 using System.Linq;
 
@@ -142,6 +144,7 @@ namespace FakeXrmEasy
         IPlugin ExecutePluginWithConfigurations<T>(XrmFakedPluginExecutionContext plugCtx, T instance, string unsecureConfiguration, string secureConfiguration)
             where T : class, IPlugin;
 
+#if !FAKE_XRM_EASY_DOTNETCORE
         /// <summary>
         /// Executes a code activity against this context
         /// An optional instance can be passed.
@@ -158,5 +161,6 @@ namespace FakeXrmEasy
         /// <typeparam name="T"></typeparam>
         IDictionary<string, object> ExecuteCodeActivity<T>(Entity primaryEntity, Dictionary<string, object> inputs = null, T instance = null)
             where T : CodeActivity, new();
+#endif
     }
 }

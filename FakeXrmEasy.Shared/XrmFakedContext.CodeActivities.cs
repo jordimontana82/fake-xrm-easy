@@ -1,14 +1,19 @@
 ﻿using FakeItEasy;
 using Microsoft.Xrm.Sdk;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using Microsoft.Xrm.Sdk.Workflow;
+#endif
 using System;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using System.Activities;
+#endif
 using System.Collections.Generic;
 
 namespace FakeXrmEasy
 {
     public partial class XrmFakedContext : IXrmContext
     {
+#if !FAKE_XRM_EASY_DOTNETCORE
         public XrmFakedWorkflowContext GetDefaultWorkflowContext()
         {
             var userId = CallerId?.Id ?? Guid.NewGuid();
@@ -99,5 +104,6 @@ namespace FakeXrmEasy
                 throw new TypeLoadException($"When loading type: {typeName}.{exception.Message}in domain directory: {AppDomain.CurrentDomain.BaseDirectory}\nDebug={debugText}");
             }
         }
+#endif
     }
 }

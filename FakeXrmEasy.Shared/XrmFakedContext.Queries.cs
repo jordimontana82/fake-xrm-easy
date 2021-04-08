@@ -5,7 +5,11 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+#if !FAKE_XRM_EASY_DOTNETCORE
 using System.ServiceModel;
+#else
+using FakeXrmEasy.DotNetCore;
+#endif
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using FakeXrmEasy.Extensions;
