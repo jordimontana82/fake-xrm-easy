@@ -6,6 +6,12 @@
 
     <IsPackable>false</IsPackable>
 	<DefineConstants>FAKE_XRM_EASY_DOTNETCORE,FAKE_XRM_EASY_9</DefineConstants>
+	  <Version>1.57.1</Version>
+	  <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+	  <SignAssembly>true</SignAssembly>
+	  <AssemblyOriginatorKeyFile>fakexrmeasy.snk</AssemblyOriginatorKeyFile>
+	  <PackageId>FakeXrmEasy.Tests.9.NetCore</PackageId>
+	  <Product>FakeXrmEasy.Tests.9.NetCore</Product>
   </PropertyGroup>
 	<Import Project="..\FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems" Label="Shared" />
 
