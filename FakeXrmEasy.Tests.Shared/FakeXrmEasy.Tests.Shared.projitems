@@ -100,6 +100,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\ValidateReferencesTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WhoAmIRequest\WhoAmITests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WinOpportunityRequestTests\WinOpportunityTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WinQuoteRequestTests\WinQuoteRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\XrmFakedRelationshipTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeXrmEasyTestsBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Features\RetrieveMultipleDataProviderTesting.cs" />
