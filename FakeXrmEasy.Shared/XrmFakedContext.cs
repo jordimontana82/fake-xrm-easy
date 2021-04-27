@@ -25,6 +25,10 @@ namespace FakeXrmEasy
         private IServiceEndpointNotificationService _serviceEndpointNotificationService;
 
         private readonly Lazy<XrmFakedTracingService> _tracingService = new Lazy<XrmFakedTracingService>(() => new XrmFakedTracingService());
+        /// <summary>
+        /// A Dictionary to bring FakeObjects in a PluginPipeLine
+        /// </summary>
+        public Dictionary<string, object> FakeObjects { get; set; }
 
         /// <summary>
         /// All proxy type assemblies available on mocked database.
