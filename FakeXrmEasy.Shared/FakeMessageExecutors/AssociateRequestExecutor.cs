@@ -36,6 +36,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new Exception("Association without target is invalid!");
             }
 
+            if(associateRequest.RelatedEntities.Count == 0)
+            {
+                throw new IndexOutOfRangeException($"Association without any related entities is invalid!");
+            }
+
             foreach (var relatedEntityReference in associateRequest.RelatedEntities)
             {
                 if (fakeRelationShip.RelationshipType == XrmFakedRelationship.enmFakeRelationshipType.ManyToMany)
@@ -66,6 +71,16 @@ namespace FakeXrmEasy.FakeMessageExecutors
                     {
                         throw new Exception(string.Format("{0} with Id {1} doesn't exist", toEntityName, relatedEntityReference.Id.ToString()));
                     }
+
+                    var associationExists = ctx.CreateQuery(fakeRelationShip.IntersectEntity)
+                                                    .FirstOrDefault(x => Guid.Equals(x.GetAttributeValue<Guid>(fromAttribute), associateRequest.Target.Id)
+                                                                        && Guid.Equals(x.GetAttributeValue<Guid>(toAttribute), relatedEntityReference.Id))
+                                                    != null;
+                    if(associationExists)
+                    {
+                        throw new Exception($"{fromEntityName} with Id {associateRequest.Target.Id} and {toEntityName} with Id {relatedEntityReference.Id} are already associated");
+                    }
+
 
                     var association = new Entity(fakeRelationShip.IntersectEntity)
                     {
