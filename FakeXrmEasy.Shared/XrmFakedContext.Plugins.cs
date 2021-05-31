@@ -378,6 +378,11 @@ namespace FakeXrmEasy
                    {
                        return GetFakedEntityDataSourceRetrieverService();
                    }
+
+                   if (t == typeof(Microsoft.Xrm.Sdk.PluginTelemetry.ILogger))
+                   {
+                       return A.Fake<Microsoft.Xrm.Sdk.PluginTelemetry.ILogger>();
+                   }
 #endif
                    throw new PullRequestException("The specified service type is not supported");
                });
