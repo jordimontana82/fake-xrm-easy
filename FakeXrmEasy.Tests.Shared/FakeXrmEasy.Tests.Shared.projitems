@@ -102,6 +102,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\WinOpportunityRequestTests\WinOpportunityTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\XrmFakedRelationshipTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeXrmEasyTestsBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Features\LoggerPluginTesting.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Features\RetrieveMultipleDataProviderTesting.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GeneratedCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issue116.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\PipelineTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\AccountSetTerritories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\EntityImagesPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\LoggerPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\PostOperationUpdatePlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\RetrieveMultipleDataProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\ServiceEndpointNotificationPlugin.cs" />
