@@ -148,7 +148,7 @@ namespace FakeXrmEasy
         private static MethodInfo GetPluginMethod(Entity pluginEntity)
         {
             var assemblyName = (string)pluginEntity.GetAttributeValue<AliasedValue>("plugintype.assemblyname").Value;
-            var assembly = AppDomain.CurrentDomain.Load(assemblyName);
+            var assembly = FindOrLoadAssembly(assemblyName);
 
             var pluginTypeName = (string)pluginEntity.GetAttributeValue<AliasedValue>("plugintype.typename").Value;
             var pluginType = assembly.GetType(pluginTypeName);
@@ -157,6 +157,18 @@ namespace FakeXrmEasy
             var pluginMethod = methodInfo.MakeGenericMethod(pluginType);
 
             return pluginMethod;
+        }
+
+        private static Assembly FindOrLoadAssembly(string assemblyName)
+        {
+            var referenceAssemblyName = new AssemblyName(assemblyName);
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().Where(a => AssemblyName.ReferenceMatchesDefinition(referenceAssemblyName, a.GetName())).FirstOrDefault();
+            if (assembly == null)
+            {
+                assembly = AppDomain.CurrentDomain.Load(assemblyName);
+            }
+
+            return assembly;
         }
 
         private IEnumerable<Entity> GetStepsForStage(string method, ProcessingStepStage stage, ProcessingStepMode mode, Entity entity)
