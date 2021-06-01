@@ -11,8 +11,37 @@ namespace FakeXrmEasy.Extensions
         public static void SetAttributeCollection(this EntityMetadata entityMetadata, AttributeMetadata[] attributes)
         {
             //AttributeMetadata is internal set in a sealed class so... just doing this
+            typeof(EntityMetadata)
+                .GetProperty(nameof(entityMetadata.Attributes))
+                .SetValue(entityMetadata, attributes, null);
+        }
 
-            entityMetadata.GetType().GetProperty("Attributes").SetValue(entityMetadata, attributes, null);
+        public static void SetSecurityPrivilegeCollection(this EntityMetadata entityMetadata, SecurityPrivilegeMetadata[] securityPrivileges)
+        {
+            typeof(EntityMetadata)
+                .GetProperty(nameof(entityMetadata.Privileges))
+                .SetValue(entityMetadata, securityPrivileges, null);
+        }
+
+        public static void SetManyToManyRelationshipCollection(this EntityMetadata entityMetadata, ManyToManyRelationshipMetadata[] relationships)
+        {
+            typeof(EntityMetadata)
+                .GetProperty(nameof(entityMetadata.ManyToManyRelationships))
+                .SetValue(entityMetadata, relationships, null);
+        }
+
+        public static void SetOneToManyRelationshipCollection(this EntityMetadata entityMetadata, OneToManyRelationshipMetadata[] relationships)
+        {
+            typeof(EntityMetadata)
+                .GetProperty(nameof(entityMetadata.OneToManyRelationships))
+                .SetValue(entityMetadata, relationships, null);
+        }
+
+        public static void SetManyToOneRelationshipCollection(this EntityMetadata entityMetadata, OneToManyRelationshipMetadata[] relationships)
+        {
+            typeof(EntityMetadata)
+                .GetProperty(nameof(entityMetadata.ManyToOneRelationships))
+                .SetValue(entityMetadata, relationships, null);
         }
 
         public static void SetAttribute(this EntityMetadata entityMetadata, AttributeMetadata attribute)
