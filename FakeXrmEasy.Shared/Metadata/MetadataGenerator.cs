@@ -21,10 +21,10 @@ namespace FakeXrmEasy.Metadata
                 EntityMetadata metadata = new EntityMetadata();
                 metadata.LogicalName = entityLogicalNameAttribute.LogicalName;
 
-                FieldInfo entityTypeCode = earlyBoundEntity.GetField("EntityTypeCode", BindingFlags.Static | BindingFlags.Public);
-                if (entityTypeCode != null)
+                int? entityTypeCode;
+                if (earlyBoundEntity.TryGetEntityTypeCode(out entityTypeCode))
                 {
-                    metadata.SetFieldValue("_objectTypeCode", entityTypeCode.GetValue(null));
+                    metadata.SetFieldValue("_objectTypeCode", entityTypeCode);
                 }
 
                 List<AttributeMetadata> attributeMetadatas = new List<AttributeMetadata>();

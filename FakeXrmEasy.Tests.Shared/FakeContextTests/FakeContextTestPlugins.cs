@@ -306,10 +306,10 @@ namespace FakeXrmEasy.Tests
         {
             // arrange
             var context = new XrmFakedContext();
-            var target = new Entity();
+            var target = new Entity("account");
 
             EntityImageCollection preEntityImages = new EntityImageCollection();
-            preEntityImages.Add("PreImage", new Entity());
+            preEntityImages.Add("PreImage", new Entity("account"));
 
             // act
             context.ExecutePluginWithTargetAndPreEntityImages<EntityImagesPlugin>(target, preEntityImages);
@@ -331,10 +331,10 @@ namespace FakeXrmEasy.Tests
         {
             // arrange
             var context = new XrmFakedContext();
-            var target = new Entity();
+            var target = new Entity("account");
 
             EntityImageCollection postEntityImages = new EntityImageCollection();
-            postEntityImages.Add("PostImage", new Entity());
+            postEntityImages.Add("PostImage", new Entity("account"));
 
             // act
             context.ExecutePluginWithTargetAndPostEntityImages<EntityImagesPlugin>(target, postEntityImages);
