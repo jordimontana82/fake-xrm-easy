@@ -3053,5 +3053,46 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var retrievedUser = collection.Entities[0].Id;
             Assert.Equal(retrievedUser, ct1.Id);
         }
+
+        [Fact]
+        public void FetchXml_Operator_Multiple_Filter_Execution()
+        {
+            var ctx = new XrmFakedContext();
+            ctx.ProxyTypesAssembly = Assembly.GetAssembly(typeof(Contact));
+
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                               <entity name='contact'>
+                                 <attribute name='fullname' />
+                                 <attribute name='telephone1' />
+                                 <order attribute='fullname' descending='false' />
+                                 <filter type='and'>
+                                   <condition attribute='telephone1' operator='eq' value='123' />
+                                 </filter>
+                                 <filter type='or'>
+                                   <condition attribute='telephone1' operator='neq' value='321' />
+                                 </filter>
+                               </entity>
+                             </fetch>";
+
+            var query = XrmFakedContext.TranslateFetchXmlToQueryExpression(ctx, fetchXml);
+
+            Assert.True(query.Criteria != null);
+            Assert.Equal(2, query.Criteria.Filters.Count);
+            Assert.Equal("telephone1", query.Criteria.Filters[0].Conditions[0].AttributeName);
+            Assert.Equal(ConditionOperator.Equal, query.Criteria.Filters[0].Conditions[0].Operator);
+            Assert.Equal(ConditionOperator.NotEqual, query.Criteria.Filters[1].Conditions[0].Operator);
+
+            var ct1 = new Contact() { Id = Guid.NewGuid(), Telephone1 = "123" }; //Should be returned
+            var ct2 = new Contact() { Id = Guid.NewGuid(), Telephone1 = "321" }; //Shouldnt
+            var ct3 = new Contact() { Id = Guid.NewGuid(), Telephone1 = "000" }; //Shouldnt
+            ctx.Initialize(new[] { ct1, ct2, ct3 });
+            var service = ctx.GetOrganizationService();
+
+            var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
+
+            Assert.Single(collection.Entities);
+            var retrievedUser = collection.Entities[0].Id;
+            Assert.Equal(retrievedUser, ct1.Id);
+        }
     }
 }
