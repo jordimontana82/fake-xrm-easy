@@ -1743,9 +1743,9 @@ namespace FakeXrmEasy
                 case ConditionOperator.InFiscalYear:
                     var fiscalYear = (int)c.Values[0];
                     c.Values.Clear();
-                    var fiscalYearDate = context.FiscalYearSettings?.StartDate ?? new DateTime(fiscalYear, 4, 1);
-                    fromDate = fiscalYearDate;
-                    toDate = fiscalYearDate.AddYears(1).AddDays(-1);
+                    FiscalYearSettings.GetFiscalYearStartAndEndDate(context.FiscalYearSettings, fiscalYear, out DateTime startDate, out DateTime endDate);
+                    fromDate = startDate;
+                    toDate = endDate;
                     break;
             }
 
