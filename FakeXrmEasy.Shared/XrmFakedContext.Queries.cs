@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.ServiceModel;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using FakeXrmEasy.Extensions;
@@ -316,7 +317,7 @@ namespace FakeXrmEasy
             {
                 if (!Regex.IsMatch(le.EntityAlias, "^[A-Za-z_](\\w|\\.)*$", RegexOptions.ECMAScript))
                 {
-                FakeOrganizationServiceFault.Throw(ErrorCodes.QueryBuilderInvalid_Alias, $"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _.");
+                    FakeOrganizationServiceFault.Throw(ErrorCodes.QueryBuilderInvalid_Alias, $"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _.");
                 }
             }
 
@@ -729,6 +730,9 @@ namespace FakeXrmEasy
                     break;
 
                 case ConditionOperator.BeginsWith:
+                    operatorExpression = TranslateConditionExpressionStartsWith(c, getNonBasicValueExpr, containsAttributeExpression);
+                    break;
+
                 case ConditionOperator.Like:
                     operatorExpression = TranslateConditionExpressionLike(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
@@ -832,17 +836,17 @@ namespace FakeXrmEasy
                 case ConditionOperator.OlderThanXHours:
                 case ConditionOperator.OlderThanXDays:
                 case ConditionOperator.OlderThanXWeeks:
-                case ConditionOperator.OlderThanXYears:                  
+                case ConditionOperator.OlderThanXYears:
 #endif
                 case ConditionOperator.OlderThanXMonths:
                     operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
 
-                case ConditionOperator.NextXHours:               
-                case ConditionOperator.NextXDays:                  
+                case ConditionOperator.NextXHours:
+                case ConditionOperator.NextXDays:
                 case ConditionOperator.Next7Days:
-                case ConditionOperator.NextXWeeks:                 
-                case ConditionOperator.NextXMonths:                    
+                case ConditionOperator.NextXWeeks:
+                case ConditionOperator.NextXMonths:
                 case ConditionOperator.NextXYears:
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
@@ -1677,10 +1681,10 @@ namespace FakeXrmEasy
                     break;
             }
 
-            c.Values.Clear();          
+            c.Values.Clear();
             c.Values.Add(beforeDateTime);
             c.Values.Add(currentDateTime);
-            
+
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
 
@@ -1780,27 +1784,27 @@ namespace FakeXrmEasy
                     toDate = DateTime.UtcNow.AddMonths(-valueToAdd);
                     break;
 #if !FAKE_XRM_EASY && !FAKE_XRM_EASY_2013
-                case ConditionOperator.OlderThanXMinutes:      
+                case ConditionOperator.OlderThanXMinutes:
                     toDate = DateTime.UtcNow.AddMinutes(-valueToAdd);
                     break;
-                case ConditionOperator.OlderThanXHours: 
+                case ConditionOperator.OlderThanXHours:
                     toDate = DateTime.UtcNow.AddHours(-valueToAdd);
                     break;
-                case ConditionOperator.OlderThanXDays: 
+                case ConditionOperator.OlderThanXDays:
                     toDate = DateTime.UtcNow.AddDays(-valueToAdd);
                     break;
-                case ConditionOperator.OlderThanXWeeks:              
+                case ConditionOperator.OlderThanXWeeks:
                     toDate = DateTime.UtcNow.AddDays(-7 * valueToAdd);
-                    break;              
-                case ConditionOperator.OlderThanXYears: 
+                    break;
+                case ConditionOperator.OlderThanXYears:
                     toDate = DateTime.UtcNow.AddYears(-valueToAdd);
                     break;
 #endif
             }
-                        
+
             return TranslateConditionExpressionOlderThan(tc, getAttributeValueExpr, containsAttributeExpr, toDate);
         }
-     
+
 
         protected static Expression TranslateConditionExpressionBetween(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
@@ -1857,11 +1861,25 @@ namespace FakeXrmEasy
         {
             var c = tc.CondExpression;
 
-            //Append a ´%´at the end of each condition value
+            //Append a ´%´ at the start of each condition value
             var computedCondition = new ConditionExpression(c.AttributeName, c.Operator, c.Values.Select(x => "%" + x.ToString()).ToList());
             var typedComputedCondition = new TypedConditionExpression(computedCondition);
             typedComputedCondition.AttributeType = tc.AttributeType;
 
+            return TranslateConditionExpressionLike(typedComputedCondition, getAttributeValueExpr, containsAttributeExpr);
+        }
+
+      
+        protected static Expression TranslateConditionExpressionStartsWith(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
+        {
+            var c = tc.CondExpression;
+
+            //Append a ´%´ at the end of each condition value
+            var computedCondition = new ConditionExpression(c.AttributeName, c.Operator, c.Values.Select(x =>  x.ToString() +"%" ).ToList());
+            var typedComputedCondition = new TypedConditionExpression(computedCondition);
+            typedComputedCondition.AttributeType = tc.AttributeType;
+
+            // Perhaps we are introducing some problems by converting a StartsWith to a Like Operator?
             return TranslateConditionExpressionLike(typedComputedCondition, getAttributeValueExpr, containsAttributeExpr);
         }
 
@@ -1875,6 +1893,11 @@ namespace FakeXrmEasy
                                 typeof(string).GetMethod("ToLowerInvariant", new Type[] { }));
         }
 
+        private static string ConvertToRegexDefinition(string value)
+        {
+            return value.Replace("\\", "\\\\").Replace("(", "\\(").Replace("{", "\\{").Replace(".", "\\.").Replace("*", "\\*").Replace("+", "\\+").Replace("?", "\\?").Replace("%", ".*").Replace("_", ".");
+        }
+
         protected static Expression TranslateConditionExpressionLike(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
             var c = tc.CondExpression;
@@ -1884,26 +1907,36 @@ namespace FakeXrmEasy
 
             Expression convertedValueToStrAndToLower = GetCaseInsensitiveExpression(convertedValueToStr);
 
-            string sLikeOperator = "%";
+         
             foreach (object value in c.Values)
             {
-                var strValue = value.ToString();
-                string sMethod = "";
+                //convert a like into a regular expression
+                string input = value.ToString();
+                string result = "^";
+                int lastMatch = 0;
+                var regex = new Regex("([^\\[]*)(\\[[^\\]]*\\])", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                foreach (Match match in regex.Matches(input))
+                {
+                    if (match.Groups[1].Success)
+                    {
+                        result += ConvertToRegexDefinition(match.Groups[1].Value);
+                    }
+                    result += match.Groups[2].Value.Replace("\\", "\\\\");
+                    lastMatch = match.Index + match.Length;
+                }
+                if (input.Length != lastMatch)
+                {
+                    result += ConvertToRegexDefinition(input.Substring(lastMatch));
+                }
+                result += "$";
 
-                if (strValue.EndsWith(sLikeOperator) && strValue.StartsWith(sLikeOperator))
-                    sMethod = "Contains";
-
-                else if (strValue.StartsWith(sLikeOperator))
-                    sMethod = "EndsWith";
-
-                else
-                    sMethod = "StartsWith";
+                regex = new Regex(result, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
                 expOrValues = Expression.Or(expOrValues, Expression.Call(
-                    convertedValueToStrAndToLower,
-                    typeof(string).GetMethod(sMethod, new Type[] { typeof(string) }),
-                    Expression.Constant(value.ToString().ToLowerInvariant().Replace("%", "")) //Linq2CRM adds the percentage value to be executed as a LIKE operator, here we are replacing it to just use the appropiate method
-                ));
+                    Expression.Constant(regex),
+                    typeof(Regex).GetMethod("IsMatch", new Type[] { typeof(string) }),
+                    convertedValueToStrAndToLower) //Linq2CRM adds the percentage value to be executed as a LIKE operator, here we are replacing it to just use the appropiate method
+                );
             }
 
             return Expression.AndAlso(
@@ -2185,9 +2218,9 @@ namespace FakeXrmEasy
                 case ConditionOperator.Next7Days:
                     nextDateTime = currentDateTime.AddDays(7);
                     break;
-                case ConditionOperator.NextXWeeks:                  
+                case ConditionOperator.NextXWeeks:
                     nextDateTime = currentDateTime.AddDays(7 * (int)c.Values[0]);
-                    break;              
+                    break;
                 case ConditionOperator.NextXMonths:
                     nextDateTime = currentDateTime.AddMonths((int)c.Values[0]);
                     break;
