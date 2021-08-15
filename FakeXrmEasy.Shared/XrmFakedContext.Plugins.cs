@@ -378,6 +378,11 @@ namespace FakeXrmEasy
                    {
                        return GetFakedEntityDataSourceRetrieverService();
                    }
+
+                   if (t == typeof(IAssemblyAuthenticationContext))
+                   {
+                       return GetFakedAssemblyAuthenticationContext();
+                   }
 #endif
                    throw new PullRequestException("The specified service type is not supported");
                });
@@ -387,6 +392,7 @@ namespace FakeXrmEasy
 
 #if FAKE_XRM_EASY_9
         public Entity EntityDataSourceRetriever { get; set; }
+        public string AuthenticationContextToken { get; set; }
 #endif
 
         public XrmFakedTracingService GetFakeTracingService()
