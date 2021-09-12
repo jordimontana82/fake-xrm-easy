@@ -10,6 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+#if FAKE_XRM_EASY_9
+using Microsoft.Xrm.Sdk.PluginTelemetry;
+#endif
 
 namespace FakeXrmEasy
 {
@@ -25,6 +28,10 @@ namespace FakeXrmEasy
         private IServiceEndpointNotificationService _serviceEndpointNotificationService;
 
         private readonly Lazy<XrmFakedTracingService> _tracingService = new Lazy<XrmFakedTracingService>(() => new XrmFakedTracingService());
+
+#if FAKE_XRM_EASY_9
+        private readonly Lazy<ILogger> _FakeLogger = new Lazy<ILogger>(() => A.Fake<ILogger>());
+#endif
 
         /// <summary>
         /// All proxy type assemblies available on mocked database.

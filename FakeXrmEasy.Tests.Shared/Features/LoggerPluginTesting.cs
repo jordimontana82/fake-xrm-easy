@@ -1,4 +1,5 @@
 ﻿#if FAKE_XRM_EASY_9
+using FakeItEasy;
 using FakeXrmEasy.Tests.PluginsForTesting;
 using Xunit;
 
@@ -12,6 +13,10 @@ namespace FakeXrmEasy.Tests.Features
             var context = new XrmFakedContext();
 
             context.ExecutePluginWith<LoggerPlugin>();
+
+            var logger = context.GetLogger();
+
+            A.CallTo(() => logger.LogInformation("Test")).MustHaveHappened(1, Times.Exactly);
         }
     }
 }
