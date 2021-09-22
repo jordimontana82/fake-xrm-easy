@@ -61,6 +61,7 @@ namespace FakeXrmEasy
             A.CallTo(() => context.OrganizationId).ReturnsLazily(() => ctx.OrganizationId);
             A.CallTo(() => context.InitiatingUserId).ReturnsLazily(() => ctx.InitiatingUserId == Guid.Empty ? newUserId : ctx.InitiatingUserId);
             A.CallTo(() => context.UserId).ReturnsLazily(() => ctx.UserId == Guid.Empty ? newUserId : ctx.UserId);
+            A.CallTo(() => context.PrimaryEntityId).ReturnsLazily(() => ctx.PrimaryEntityId);
             A.CallTo(() => context.PrimaryEntityName).ReturnsLazily(() => ctx.PrimaryEntityName);
             A.CallTo(() => context.SecondaryEntityName).ReturnsLazily(() => ctx.SecondaryEntityName);
             A.CallTo(() => context.SharedVariables).ReturnsLazily(() => ctx.SharedVariables);
