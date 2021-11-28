@@ -113,5 +113,6 @@ namespace FakeXrmEasy.Tests
 
             Assert.True(((string)result["MessageName"]).Equals("Update"));
         }
+
     }
 }
