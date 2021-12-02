@@ -4,7 +4,11 @@
 Follow me for updates on [Twitter](https://twitter.com/fakexrmeasy)!
 -----------------------------------------------------------------------
 
-**UPDATE**: FakeXrmEasy v2.x and v3.x are a major rewrite with .netcore support are public under a new home repo: https://github.com/DynamicsValue/fake-xrm-easy. Do check them out!
+
+**UPDATE**: FakeXrmEasy v2.x and v3.x are a major rewrite with .netcore support and are public under a new home repo: [https://github.com/DynamicsValue/fake-xrm-easy](https://github.com/DynamicsValue/fake-xrm-easy). Please do check them out!
+-------------------------------------------------------------------------------------------------------
+
+
 
 
 
