@@ -4,7 +4,7 @@
 Follow me for updates on [Twitter](https://twitter.com/fakexrmeasy)!
 -----------------------------------------------------------------------
 
-*NOTE*: There is a new v2 coming up, follow the above Twitter handle for updates and also [this repo for important announcements](https://github.com/DynamicsValue/announcements).
+**UPDATE**: FakeXrmEasy v2.x and v3.x are a major rewrite with .netcore support are public under a new home repo: https://github.com/DynamicsValue/fake-xrm-easy. Do check them out!
 
 
 
