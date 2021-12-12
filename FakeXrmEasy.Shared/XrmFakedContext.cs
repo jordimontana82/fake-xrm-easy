@@ -422,6 +422,14 @@ namespace FakeXrmEasy
                 .ReturnsLazily(() => EntityDataSourceRetriever);
             return service;
         }
+
+        public IAssemblyAuthenticationContext GetFakedAssemblyAuthenticationContext()
+        {
+            var service = A.Fake<IAssemblyAuthenticationContext>();
+            A.CallTo(() => service.AcquireToken(A<string>._, A<string>._, A<AuthenticationType>._))
+                .ReturnsLazily(() => AuthenticationContextToken);
+            return service;
+        }        
 #endif
     }
 }

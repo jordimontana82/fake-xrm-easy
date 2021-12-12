@@ -25,6 +25,9 @@ namespace FakeXrmEasy.Tests.PluginsForTesting
             var tracing = (ITracingService)serviceProvider.GetService(typeof(ITracingService));
             var retriever = serviceProvider.Get<IEntityDataSourceRetrieverService>();
             var dataSource = retriever.RetrieveEntityDataSource();
+            
+            var assemblyAuthCtx = (IAssemblyAuthenticationContext)serviceProvider.GetService(typeof(IAssemblyAuthenticationContext));
+            var authToken = assemblyAuthCtx.AcquireToken();
 
             var crmUrl = dataSource.GetAttributeValue<string>("abc_crmurl");
             var userName = dataSource.GetAttributeValue<string>("abc_username");
