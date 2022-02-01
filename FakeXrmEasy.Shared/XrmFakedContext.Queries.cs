@@ -1748,7 +1748,7 @@ namespace FakeXrmEasy
                     toDate = fiscalYearDate.AddYears(1).AddDays(-1);
                     break;
             }
-
+            toDate = toDate == null ? null : (DateTime?)((DateTime)toDate).ToEndOfDay();
             c.Values.Add(fromDate);
             c.Values.Add(toDate);
 
