@@ -4,10 +4,10 @@
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<RootNamespace>FakeXrmEasy.Tests.NetCore</RootNamespace>
 
-		<IsPackable>false</IsPackable>
+		<IsPackable>true</IsPackable>
 		<DefineConstants>FAKE_XRM_EASY_DOTNETCORE,FAKE_XRM_EASY_9</DefineConstants>
-		<Version>1.57.2</Version>
-		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<Version>1.57.3</Version>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>fakexrmeasy.snk</AssemblyOriginatorKeyFile>
 		<PackageId>FakeXrmEasy.Tests.9.NetCore</PackageId>
