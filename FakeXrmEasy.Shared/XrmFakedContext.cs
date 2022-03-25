@@ -10,6 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+#if FAKE_XRM_EASY_9
+    using Microsoft.Xrm.Sdk.PluginTelemetry;
+#endif
 
 namespace FakeXrmEasy
 {
@@ -421,6 +424,13 @@ namespace FakeXrmEasy
             A.CallTo(() => service.RetrieveEntityDataSource())
                 .ReturnsLazily(() => EntityDataSourceRetriever);
             return service;
+        }
+
+        protected ILogger GetFakedLogger()
+        {
+            var logger = A.Fake<ILogger>();
+
+            return logger;
         }
 #endif
     }

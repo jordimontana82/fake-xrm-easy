@@ -2,6 +2,9 @@
 using Microsoft.Xrm.Sdk;
 using System;
 using System.Linq;
+#if FAKE_XRM_EASY_9
+using Microsoft.Xrm.Sdk.PluginTelemetry;
+#endif
 
 namespace FakeXrmEasy
 {
@@ -378,6 +381,11 @@ namespace FakeXrmEasy
                    if (t == typeof(IEntityDataSourceRetrieverService))
                    {
                        return GetFakedEntityDataSourceRetrieverService();
+                   }
+
+                   if (t == typeof(ILogger))
+                   {
+                       return GetFakedLogger();
                    }
 #endif
                    throw new PullRequestException("The specified service type is not supported");
