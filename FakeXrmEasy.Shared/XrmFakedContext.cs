@@ -91,6 +91,7 @@ namespace FakeXrmEasy
 
         public EntityInitializationLevel InitializationLevel { get; set; }
 
+        [Obsolete("FakeXrmEasy v1.x is deprecated and will stop receiving updates soon. Please start planning your upgrade to the latest v2.x and v3.x versions that support both the traditional SDK and the new DataverseClient in .net core. Check this post for more details: https://dynamicsvalue.github.io/fake-xrm-easy-docs/quickstart/migrating-from-1x/")]
         public XrmFakedContext()
         {
             MaxRetrieveCount = 5000;
@@ -131,6 +132,7 @@ namespace FakeXrmEasy
         /// Initializes the context with the provided entities
         /// </summary>
         /// <param name="entities"></param>
+        [Obsolete("FakeXrmEasy v1.x is deprecated and will stop receiving updates soon. Please start planning your upgrade to the latest v2.x and v3.x versions that support both the traditional SDK and the new DataverseClient in .net core. Check this post for more details: https://dynamicsvalue.github.io/fake-xrm-easy-docs/quickstart/migrating-from-1x/")]
         public virtual void Initialize(IEnumerable<Entity> entities)
         {
             if (Initialised)
