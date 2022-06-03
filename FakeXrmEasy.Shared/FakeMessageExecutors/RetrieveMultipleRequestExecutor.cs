@@ -68,6 +68,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 }
 
                 qe.PageInfo = query.PageInfo;
+                qe.TopCount = query.TopCount;
 
                 // QueryExpression now done... execute it!
                 var linqQuery = XrmFakedContext.TranslateQueryExpressionToLinq(ctx, qe);
