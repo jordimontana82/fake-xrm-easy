@@ -5,9 +5,8 @@ Follow me for updates on [Twitter](https://twitter.com/fakexrmeasy)!
 -----------------------------------------------------------------------
 
 
-**UPDATE**: FakeXrmEasy v2.x and v3.x are a major rewrite with .netcore support and are public under a new home repo: [https://github.com/DynamicsValue/fake-xrm-easy](https://github.com/DynamicsValue/fake-xrm-easy). Please do check them out!
+**UPDATE**: FakeXrmEasy v1.x is deprecated and will stop receiving updates soon. [Start planning your transition to versions 2.x and 3.x now!](https://dynamicsvalue.github.io/fake-xrm-easy-docs/quickstart/migrating-from-1x/)
 -------------------------------------------------------------------------------------------------------
-
 
 
 
