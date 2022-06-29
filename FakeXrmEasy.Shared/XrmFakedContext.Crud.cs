@@ -60,7 +60,7 @@ namespace FakeXrmEasy
                             }
                             if (validate)
                             {
-                                new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{record.LogicalName} with the specified Alternate Keys Does Not Exist");
+                                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), $"{record.LogicalName} with the specified Alternate Keys Does Not Exist");
                             }
                         }
                     }
