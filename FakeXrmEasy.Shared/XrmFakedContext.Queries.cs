@@ -383,8 +383,8 @@ namespace FakeXrmEasy
                                     innerKey => innerKey.KeySelector(le.LinkToAttributeName, context),
                                     (outerEl, innerElemsCol) => new { outerEl, innerElemsCol })
                                                 .SelectMany(x => x.innerElemsCol.DefaultIfEmpty()
-                                                            , (x, y) => x.outerEl
-                                                                            .JoinAttributes(y, new ColumnSet(true), leAlias, context));
+                                                            , (x, y) => x.outerEl.Clone(x.outerEl.GetType(), context)
+                                                                         .JoinAttributes(y, new ColumnSet(true), leAlias, context));
 
 
                     break;
