@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace FakeXrmEasy.Extensions
 {
@@ -19,7 +20,8 @@ namespace FakeXrmEasy.Extensions
         public static bool IsOptionSetValueCollection(this Type t)
         {
             var nullableType = Nullable.GetUnderlyingType(t);
-            return t == typeof(OptionSetValueCollection);
+            return t == typeof(OptionSetValueCollection)
+                   || IsIEnumerableOfT(t) && t.GenericTypeArguments.Length == 1 && IsOptionSet(t.GenericTypeArguments[0]);
         }
 #endif
 
@@ -36,6 +38,13 @@ namespace FakeXrmEasy.Extensions
                 t.IsGenericType
                 && t.GetGenericTypeDefinition() == typeof(Nullable<>)
                 && t.GetGenericArguments()[0].IsEnum;
+        }
+
+        public static bool IsIEnumerableOfT(this Type type)
+        {
+            var interfaces = type.GetInterfaces().ToList();
+            interfaces.Add(type);
+            return interfaces.Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>));
         }
     }
 }

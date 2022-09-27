@@ -206,7 +206,8 @@ namespace FakeXrmEasy
                 return injectedType;
             }
 
-            if (attributeInfo.PropertyType.FullName.EndsWith("Enum") || attributeInfo.PropertyType.BaseType.FullName.EndsWith("Enum"))
+            if (attributeInfo.PropertyType.FullName.EndsWith("Enum")
+               || (attributeInfo.PropertyType.BaseType != null && attributeInfo.PropertyType.BaseType.FullName.EndsWith("Enum")))
             {
                 return typeof(int);
             }
@@ -316,7 +317,7 @@ namespace FakeXrmEasy
             {
                 if (!Regex.IsMatch(le.EntityAlias, "^[A-Za-z_](\\w|\\.)*$", RegexOptions.ECMAScript))
                 {
-                FakeOrganizationServiceFault.Throw(ErrorCodes.QueryBuilderInvalid_Alias, $"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _.");
+                    FakeOrganizationServiceFault.Throw(ErrorCodes.QueryBuilderInvalid_Alias, $"Invalid character specified for alias: {le.EntityAlias}. Only characters within the ranges [A-Z], [a-z] or [0-9] or _ are allowed.  The first character may only be in the ranges [A-Z], [a-z] or _.");
                 }
             }
 
@@ -838,11 +839,11 @@ namespace FakeXrmEasy
                     operatorExpression = TranslateConditionExpressionOlderThan(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
 
-                case ConditionOperator.NextXHours:               
-                case ConditionOperator.NextXDays:                  
+                case ConditionOperator.NextXHours:
+                case ConditionOperator.NextXDays:
                 case ConditionOperator.Next7Days:
-                case ConditionOperator.NextXWeeks:                 
-                case ConditionOperator.NextXMonths:                    
+                case ConditionOperator.NextXWeeks:
+                case ConditionOperator.NextXMonths:
                 case ConditionOperator.NextXYears:
                     operatorExpression = TranslateConditionExpressionNext(c, getNonBasicValueExpr, containsAttributeExpression);
                     break;
@@ -1677,10 +1678,10 @@ namespace FakeXrmEasy
                     break;
             }
 
-            c.Values.Clear();          
+            c.Values.Clear();
             c.Values.Add(beforeDateTime);
             c.Values.Add(currentDateTime);
-            
+
             return TranslateConditionExpressionBetween(tc, getAttributeValueExpr, containsAttributeExpr);
         }
 
@@ -1797,10 +1798,10 @@ namespace FakeXrmEasy
                     break;
 #endif
             }
-                        
+
             return TranslateConditionExpressionOlderThan(tc, getAttributeValueExpr, containsAttributeExpr, toDate);
         }
-     
+
 
         protected static Expression TranslateConditionExpressionBetween(TypedConditionExpression tc, Expression getAttributeValueExpr, Expression containsAttributeExpr)
         {
@@ -2185,9 +2186,9 @@ namespace FakeXrmEasy
                 case ConditionOperator.Next7Days:
                     nextDateTime = currentDateTime.AddDays(7);
                     break;
-                case ConditionOperator.NextXWeeks:                  
+                case ConditionOperator.NextXWeeks:
                     nextDateTime = currentDateTime.AddDays(7 * (int)c.Values[0]);
-                    break;              
+                    break;
                 case ConditionOperator.NextXMonths:
                     nextDateTime = currentDateTime.AddMonths((int)c.Values[0]);
                     break;
