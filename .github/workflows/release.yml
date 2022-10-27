@@ -18,6 +18,6 @@ jobs:
     - name: Test
       run: dotnet test FakeXrmEasy.Tests.9.Net -c Release
     - name: Pack nugets
-      run: nuget pack FakeXrmEasy.9.net.nuspec -prop configuration=release -BasePath FakeXrmEasy.9.Net
+      run: nuget pack FakeXrmEasy.9.net.nuspec -prop configuration=release -BasePath FakeXrmEasy.9.Net -version ${{ github.ref_name }}
     - name: Push to NuGet
       run: dotnet nuget push "**/*.nupkg" --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
