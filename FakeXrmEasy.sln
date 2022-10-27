@@ -239,9 +239,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "9", "9", "{A4AE544E-ECE6-4E
 		Install-scripts\9\Install.ps1 = Install-scripts\9\Install.ps1
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FakeXrmEasy.9.NetCore", "FakeXrmEasy.9.NetCore\FakeXrmEasy.9.NetCore.csproj", "{B4446F82-9C04-4714-B20A-E37DF9D81655}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FakeXrmEasy.9.Net", "FakeXrmEasy.9.Net\FakeXrmEasy.9.Net.csproj", "{B4446F82-9C04-4714-B20A-E37DF9D81655}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy.Tests.9.NetCore", "FakeXrmEasy.Tests.9.NetCore\FakeXrmEasy.Tests.9.NetCore.csproj", "{D082C140-6840-4A97-99EF-1A837D783AC4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXrmEasy.Tests.9.Net", "FakeXrmEasy.Tests.9.Net\FakeXrmEasy.Tests.9.Net.csproj", "{D082C140-6840-4A97-99EF-1A837D783AC4}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

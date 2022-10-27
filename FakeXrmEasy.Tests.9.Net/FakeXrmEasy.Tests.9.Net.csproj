@@ -2,13 +2,13 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
-		<RootNamespace>FakeXrmEasy.Tests.NetCore</RootNamespace>
+		<RootNamespace>FakeXrmEasy.Tests.Net</RootNamespace>
 		<DefineConstants>FAKE_XRM_EASY_DOTNETCORE,FAKE_XRM_EASY_9</DefineConstants>
 		<Version>1.57.3</Version>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>fakexrmeasy.snk</AssemblyOriginatorKeyFile>
-		<PackageId>FakeXrmEasy.Tests.9.NetCore</PackageId>
-		<Product>FakeXrmEasy.Tests.9.NetCore</Product>
+		<PackageId>FakeXrmEasy.Tests.9.Net</PackageId>
+		<Product>FakeXrmEasy.Tests.9.Net</Product>
 	</PropertyGroup>
 	<Import Project="..\FakeXrmEasy.Tests.Shared\FakeXrmEasy.Tests.Shared.projitems" Label="Shared" />
 
@@ -28,7 +28,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\FakeXrmEasy.9.NetCore\FakeXrmEasy.9.NetCore.csproj" />
+		<ProjectReference Include="..\FakeXrmEasy.9.Net\FakeXrmEasy.9.Net.csproj" />
 	</ItemGroup>
 
 </Project>
