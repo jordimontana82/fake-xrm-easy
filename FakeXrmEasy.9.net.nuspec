@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>FakeXrmEasy.9.Net</id>
+    <id>RentReady.FakeXrmEasy.9.Net</id>
     <version>1.9.1</version>
     <authors>@jordimontana</authors>
     <owners>@jordimontana</owners>
