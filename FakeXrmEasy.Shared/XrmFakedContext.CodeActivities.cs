@@ -87,6 +87,7 @@ namespace FakeXrmEasy
                     A.CallTo(() => fakedServiceFactory.CreateOrganizationService(A<Guid?>._)).ReturnsLazily((Guid? g) => GetOrganizationService());
                     return fakedServiceFactory;
                 });
+                invoker.Extensions.Add<IServiceEndpointNotificationService>(() => GetFakedServiceEndpointNotificationService());
 
                 debugText += "Adding extensions...ok." + Environment.NewLine;
                 debugText += "Invoking activity..." + Environment.NewLine;
