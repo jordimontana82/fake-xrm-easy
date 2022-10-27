@@ -27,7 +27,8 @@ namespace FakeXrmEasy.Tests.Tracing
             var log = fakeTracingService.DumpTrace();
 
             //Assert that the target contains a new attribute
-            Assert.Equal(log, "Contains target\r\nIs Account\r\n");
+            Assert.Contains("Contains target", log);
+            Assert.Contains("Is Account", log);
         }
 
 #if !FAKE_XRM_EASY_DOTNETCORE
