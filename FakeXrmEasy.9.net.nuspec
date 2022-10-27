@@ -3,8 +3,8 @@
   <metadata>
     <id>RentReady.FakeXrmEasy.9.Net</id>
     <version>1.9.1</version>
-    <authors>@jordimontana</authors>
-    <owners>@jordimontana</owners>
+    <authors>Rent Ready Engineering Team, @jordimontana</authors>
+    <owners>Rent Ready, @jordimontana</owners>
     <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
     <projectUrl>http://dynamicsvalue.com/home?source=nuget</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/FakeXrmEasyLogo_128x128.png</iconUrl>
@@ -21,6 +21,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\**\FakeXrmEasy.9.Net.dll" target="lib/{framework name}[{version}]" />
+    <file src="bin\Release\**\FakeXrmEasy.9.Net.dll" target="lib" />
   </files>
 </package>
