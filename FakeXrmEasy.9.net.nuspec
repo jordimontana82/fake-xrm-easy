@@ -22,6 +22,5 @@
   </metadata>
   <files>
     <file src="bin\Release\**\FakeXrmEasy.9.Net.dll" target="lib/{framework name}[{version}]" />
-    <file src="Install-Scripts\9\Install.ps1" target="tools\Install.ps1" />
   </files>
 </package>
