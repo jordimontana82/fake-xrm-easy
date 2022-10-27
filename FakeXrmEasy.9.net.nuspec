@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>lnetrebskii.FakeXrmEasy.9.Net</id>
+    <version>1.9.1</version>
+    <authors>@jordimontana</authors>
+    <owners>@jordimontana</owners>
+    <licenseUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/LICENSE.md</licenseUrl>
+    <projectUrl>http://dynamicsvalue.com/home?source=nuget</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/jordimontana82/fake-xrm-easy/master/FakeXrmEasyLogo_128x128.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>Utilities to streamline unit testing in Dynamics CRM 365 by faking the IOrganizationService against an In-Memory context which runs blazing fast in .NET Core 3.1 and Net 6.0 projects.</description>
+    <releaseNotes>@releaseNotes@</releaseNotes>
+    <copyright>Copyright 2014-2016</copyright>
+    <tags>dynamics crm 365 unit testing xrm mock mocking fake fakes net6</tags>
+    <dependencies>
+      <dependency id="FakeItEasy" version="7.3.1" />
+      <dependency id="Microsoft.PowerPlatform.Dataverse.Client" version="1.0.23" />
+      <dependency id="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" version="1.0.23"  />
+      <dependency id="System.ServiceModel.Primitives" version="4.10.0"  />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\**\FakeXrmEasy.9.Net.dll" target="lib/{framework name}[{version}]" />
+    <file src="..\Install-Scripts\9\Install.ps1" target="tools\Install.ps1" />
+  </files>
+</package>

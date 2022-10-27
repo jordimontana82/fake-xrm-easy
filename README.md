@@ -24,6 +24,7 @@ Follow me for updates on [Twitter](https://twitter.com/fakexrmeasy)!
 
 |Version|Package Name|NuGet|
 |-----------|------|-----|
+|Dynamics v9 (>= 9.x)|FakeXrmEasy.9|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.9.net?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.9.net)|
 |Dynamics v9 (>= 9.x)|FakeXrmEasy.9|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.9?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.9)|
 |Dynamics 365 (8.2.x)|FakeXrmEasy.365|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.365?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.365)|
 |Dynamics CRM 2016 ( >= 8.0 && <= 8.1)|FakeXrmEasy.2016|[![Nuget](https://buildstats.info/nuget/fakexrmeasy.2016?v=1.55.0)](https://www.nuget.org/packages/fakexrmeasy.2016)|
