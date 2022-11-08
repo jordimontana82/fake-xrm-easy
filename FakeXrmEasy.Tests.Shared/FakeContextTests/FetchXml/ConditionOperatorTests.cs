@@ -1709,6 +1709,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var today = DateTime.Today;
             var thisYear = today.Year;
             var thisMonth = today.Month;
+            var lastDayOfMonth = new DateTime(thisYear, thisMonth, 1).AddMonths(1).AddDays(-1).Day;
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = today }; //Today - Should be returned
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1) };                            // First day of this month - should be returned
             var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddMonths(1).AddDays(-1) };   // Last day of this month - should be returned
@@ -1716,16 +1717,19 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var ct5 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddDays(-1) };                // Last day of previous month - should not be returned
             var ct6 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(1) };                                               // One year in the future - should not be returned
             var ct7 = new Contact() { Id = Guid.NewGuid(), Anniversary = today.AddYears(1) };                                               // One year in the past - should not be returned
-            ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7 });
+            var ct8 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, lastDayOfMonth, 23,59,0) };      // Last day of month after midday - should be returned
+
+            ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7, ct8 });
             var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
-            Assert.Equal(3, collection.Entities.Count);
+            Assert.Equal(4, collection.Entities.Count);
 
             Assert.Equal(((DateTime)collection.Entities[0]["anniversary"]).Month, thisMonth);
             Assert.Equal(((DateTime)collection.Entities[1]["anniversary"]).Month, thisMonth);
             Assert.Equal(((DateTime)collection.Entities[2]["anniversary"]).Month, thisMonth);
+            Assert.Equal(((DateTime)collection.Entities[3]["anniversary"]).Month, thisMonth);
         }
 
         [Fact]
@@ -1745,21 +1749,27 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
             var thisYear = today.Year;
             var thisMonth = today.Month;
             var lastMonth = new DateTime(thisYear, thisMonth, 1).AddMonths(-1).Month;
+            var lastDayOfMonth = new DateTime(thisYear, lastMonth, 1).AddMonths(-1).AddDays(-1).Day;
+
             var ct1 = new Contact() { Id = Guid.NewGuid(), Anniversary = today };                                                           // Today - Should not be returned
             var ct2 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1) };                            // First day of this month - should not be returned
             var ct3 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddMonths(1).AddDays(-1) };   // Last day of this month - should not be returned
             var ct4 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddMonths(1) };               // First day of next month - should not be returned
             var ct5 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddMonths(-1) };              // First day of last month - should be returned
             var ct6 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1).AddDays(-1) };                // Last day of last month - should be returned
-            ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6 });
+            var ct7 = new Contact() { Id = Guid.NewGuid(), Anniversary = new DateTime(thisYear, thisMonth, 1, 23,59,0).AddDays(-1) };      // Last day of month after midday - should be returned
+
+            ctx.Initialize(new[] { ct1, ct2, ct3, ct4, ct5, ct6, ct7 });
             var service = ctx.GetOrganizationService();
 
             var collection = service.RetrieveMultiple(new FetchExpression(fetchXml));
 
-            Assert.Equal(2, collection.Entities.Count);
+            Assert.Equal(3, collection.Entities.Count);
 
             Assert.Equal(((DateTime)collection.Entities[0]["anniversary"]).Month, lastMonth);
             Assert.Equal(((DateTime)collection.Entities[1]["anniversary"]).Month, lastMonth);
+            Assert.Equal(((DateTime)collection.Entities[2]["anniversary"]).Month, lastMonth);
+
         }
 
         [Fact]

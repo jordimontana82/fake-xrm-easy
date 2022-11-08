@@ -39,5 +39,10 @@ namespace FakeXrmEasy.Extensions
 
         public static DateTime ToLastDayOfMonth(this DateTime dateTime)
             => dateTime.ToLastDayOfMonth(dateTime.Month);
+
+        public static DateTime ToEndOfDay(this DateTime dateTime)
+        {
+            return dateTime.Date.AddDays(1).AddTicks(-1);
+        }
     }
 }
