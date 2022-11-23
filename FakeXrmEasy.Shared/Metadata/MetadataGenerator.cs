@@ -1,4 +1,5 @@
-﻿using FakeXrmEasy.Extensions;
+﻿using Castle.Core.Internal;
+using FakeXrmEasy.Extensions;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Metadata;
@@ -79,6 +80,10 @@ namespace FakeXrmEasy.Metadata
                         else
                         {
                             attributeMetadata = CreateAttributeMetadata(property.PropertyType);
+                            if (attributeMetadata is LookupAttributeMetadata lookupAttributeMetadata)
+                            {
+                                lookupAttributeMetadata.Targets = GetTargets(earlyBoundEntity, attributeLogicalNameAttribute.LogicalName);
+                            }
                         }
 
                         attributeMetadata.SetFieldValue("_entityLogicalName", entityLogicalNameAttribute.LogicalName);
@@ -128,6 +133,27 @@ namespace FakeXrmEasy.Metadata
                 entityMetadatas.Add(metadata);
             }
             return entityMetadatas;
+        }
+
+        private static string[] GetTargets(Type earlyBoundEntity, string attributeLogicalName)
+        {
+            PropertyInfo[] props = earlyBoundEntity.GetProperties().Where(x =>
+            Attribute.IsDefined(x, typeof(RelationshipSchemaNameAttribute)) &&
+            x.GetCustomAttributes(true).Count(attr =>
+                attr is AttributeLogicalNameAttribute &&
+                ((AttributeLogicalNameAttribute)attr).LogicalName == attributeLogicalName) > 0).ToArray();
+
+            var targets = new List<string>();
+            foreach (var item in props)
+            {
+                var entityLogicalNameAttribute = item.PropertyType.GetAttribute<EntityLogicalNameAttribute>();
+                if (entityLogicalNameAttribute != null)
+                {
+                    targets.Add(entityLogicalNameAttribute.LogicalName);
+                }
+            }
+
+            return targets.ToArray();
         }
 
         private static T GetCustomAttribute<T>(MemberInfo member) where T : Attribute

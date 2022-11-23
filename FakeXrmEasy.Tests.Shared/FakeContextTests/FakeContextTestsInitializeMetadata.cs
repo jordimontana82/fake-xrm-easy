@@ -36,6 +36,26 @@ namespace FakeXrmEasy.Tests
             Assert.Equal("name", metadata.PrimaryNameAttribute);
         }
 
+        [Fact]
+        public void When_an_earlyboundentity_lookup_then_target_populated()
+        {
+            var lookupAttributeLogicalName = "primarycontactid";
+            var context = new XrmFakedContext();
+            context.InitializeMetadata(typeof(Account).Assembly);
+
+            var req = new RetrieveEntityRequest()
+            {
+                EntityFilters = EntityFilters.Attributes,
+                RetrieveAsIfPublished = true,
+                LogicalName = Account.EntityLogicalName,
+            };
+
+            var metadata = ((RetrieveEntityResponse)context.GetOrganizationService().Execute(req)).EntityMetadata;
+            var attribute = metadata.Attributes.Where(a => a.LogicalName.Equals(lookupAttributeLogicalName)).FirstOrDefault() as LookupAttributeMetadata;
+
+            Assert.Contains("contact", attribute.Targets);
+        }
+
 
         /// <summary>
         /// Business that represents a customer or potential customer. The company that is billed in business transactions.
