@@ -39,6 +39,12 @@ namespace FakeXrmEasy.Metadata
                     metadata.SetFieldValue("_primaryIdAttribute", attributeLogicalNameAttribute.LogicalName);
                 }
 
+                var primaryNameValue = earlyBoundEntity.GetType().GetField("PrimaryNameAttribute")?.GetValue(null) as String;
+                if (primaryNameValue != null)
+                {
+                    metadata.SetFieldValue("_primaryNameAttribute", primaryNameValue);
+                }
+
                 var properties = earlyBoundEntity.GetProperties(BindingFlags.Instance | BindingFlags.Public)
                                     .Where(x => x.Name != "Id" && Attribute.IsDefined(x, typeof(AttributeLogicalNameAttribute))
                                              || Attribute.IsDefined(x, typeof(RelationshipSchemaNameAttribute)));
