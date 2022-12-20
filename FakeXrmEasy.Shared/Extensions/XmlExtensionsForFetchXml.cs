@@ -216,12 +216,19 @@ namespace FakeXrmEasy.Extensions.FetchXml
 
         public static FilterExpression ToCriteria(this XDocument xlDoc, XrmFakedContext ctx)
         {
-            return xlDoc.Elements()   //fetch
+            var filters = xlDoc.Elements()   //fetch
                     .Elements()     //entity
                     .Elements()     //child nodes of entity
                     .Where(el => el.Name.LocalName.Equals("filter"))
-                    .Select(el => el.ToFilterExpression(ctx))
-                    .FirstOrDefault();
+                    .Select(el => el.ToFilterExpression(ctx));
+
+            if (filters.Count() > 1)
+            {
+                var result = new FilterExpression(LogicalOperator.And);
+                result.Filters.AddRange(filters);
+                return result;
+            }
+            return filters.FirstOrDefault();
         }
 
         public static string GetAssociatedEntityNameForConditionExpression(this XElement el)
