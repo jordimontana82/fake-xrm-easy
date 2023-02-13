@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 
 namespace FakeXrmEasy
@@ -204,16 +206,32 @@ namespace FakeXrmEasy
             };
 
             var entityTypeCode = (int?)entity.GetType().GetField("EntityTypeCode")?.GetValue(entity);
+            if (!entityTypeCode.HasValue)
+            {
+                var response = (RetrieveEntityResponse)this.Service.Execute(new RetrieveEntityRequest { LogicalName = entity.LogicalName, EntityFilters = EntityFilters.Entity });
+                entityTypeCode = response.EntityMetadata.ObjectTypeCode;
+            }
 
             var plugins = this.Service.RetrieveMultiple(query).Entities.AsEnumerable();
             plugins = plugins.Where(p =>
             {
                 var primaryObjectTypeCode = p.GetAttributeValue<AliasedValue>("sdkmessagefilter.primaryobjecttypecode");
 
-                return primaryObjectTypeCode == null || entityTypeCode.HasValue && (int)primaryObjectTypeCode.Value == entityTypeCode.Value;
-            });
+                bool consider = primaryObjectTypeCode == null || entityTypeCode.HasValue && (int)primaryObjectTypeCode.Value == entityTypeCode.Value;
+                if (!consider)
+                {
+                    return false;
+                }
 
-            // Todo: Filter on attributes
+                var filteringAttributes = p.GetAttributeValue<string>("filteringattributes");
+                if (method == "Update" && filteringAttributes != null && !string.IsNullOrEmpty(filteringAttributes.Trim()))
+                {
+                    var parts = filteringAttributes.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList();
+                    return parts.Any(filter => entity.Attributes.ContainsKey(filter));
+                }
+
+                return true;
+            });
 
             return plugins;
         }
