@@ -401,7 +401,11 @@ namespace FakeXrmEasy
 
                     foreach (var relatedEntity in relationshipSet.Value.Entities)
                     {
-                        var relatedId = CreateEntity(relatedEntity);
+                        var relatedId = relatedEntity.Id;
+                        if (relatedEntity.EntityState == null || relatedEntity.EntityState == EntityState.Created)
+                        {
+                            relatedId = CreateEntity(relatedEntity);
+                        }
                         entityReferenceCollection.Add(new EntityReference(relatedEntity.LogicalName, relatedId));
                     }
 
