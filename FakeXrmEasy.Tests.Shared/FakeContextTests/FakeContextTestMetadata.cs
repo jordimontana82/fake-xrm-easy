@@ -119,6 +119,16 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             Assert.Equal("accountid", accountMetadata.PrimaryIdAttribute);
             Assert.NotNull(accountid);
             Assert.Equal(AttributeTypeCode.Uniqueidentifier, accountid.AttributeType);
+
+            // NL: 2019-08-21: test the optionsets, some tools will create multiple property for one attributes
+            var accountcategorycode = accountMetadata.Attributes.Where(x => x.LogicalName == "accountcategorycode").FirstOrDefault() as PicklistAttributeMetadata;
+            Assert.NotNull(accountcategorycode);
+            Assert.NotNull(accountcategorycode.OptionSet);
+
+            //NL: some tools may just generate Enum instead of adding extra property for Optionsets fields
+            var accountclassificationcode = accountMetadata.Attributes.Where(x => x.LogicalName == "accountclassificationcode").FirstOrDefault() as PicklistAttributeMetadata;
+            Assert.NotNull(accountclassificationcode);
+            Assert.NotNull(accountclassificationcode.OptionSet);
         }
     }
 }
