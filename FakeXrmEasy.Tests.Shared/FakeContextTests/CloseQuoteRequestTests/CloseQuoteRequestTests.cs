@@ -10,6 +10,11 @@ namespace FakeXrmEasy.Tests.FakeContextTests.CloseQuoteRequestTests
 {
     public class CloseQuoteRequestTests
     {
+        private static readonly OptionSetValue StateDraft = new OptionSetValue(0);
+        private static readonly OptionSetValue StateClosed = new OptionSetValue(3);
+        private static readonly OptionSetValue StatusInProgress = new OptionSetValue(1);
+        private static readonly OptionSetValue StatusCanceled = new OptionSetValue(6);
+
         [Fact]
         public void When_can_execute_is_called_with_an_invalid_request_result_is_false()
         {
@@ -24,14 +29,11 @@ namespace FakeXrmEasy.Tests.FakeContextTests.CloseQuoteRequestTests
             var context = new XrmFakedContext();
             var service = context.GetOrganizationService();
 
-            var quote = new Entity
+            var quote = new Entity("quote")
             {
-                LogicalName = "quote",
                 Id = Guid.NewGuid(),
-                Attributes = new AttributeCollection
-                {
-                    {"statuscode", new OptionSetValue(0)}
-                }
+                ["statecode"] = StateDraft,
+                ["statuscode"] = StatusInProgress
             };
 
             context.Initialize(new[]
@@ -43,21 +45,19 @@ namespace FakeXrmEasy.Tests.FakeContextTests.CloseQuoteRequestTests
 
             var req = new CloseQuoteRequest
             {
-                QuoteClose = new Entity
+                QuoteClose = new Entity("quoteclose")
                 {
-                    Attributes = new AttributeCollection
-                    {
-                        { "quoteid", quote.ToEntityReference() }
-                    }
+                    ["quoteid"] = quote.ToEntityReference()
                 },
-                Status = new OptionSetValue(1)
+                Status = StatusCanceled
             };
 
             executor.Execute(req, context);
 
             quote = service.Retrieve("quote", quote.Id, new ColumnSet(true));
 
-            Assert.Equal(new OptionSetValue(1), quote.GetAttributeValue<OptionSetValue>("statuscode"));
+            Assert.Equal(StateClosed, quote.GetAttributeValue<OptionSetValue>("statecode"));
+            Assert.Equal(StatusCanceled, quote.GetAttributeValue<OptionSetValue>("statuscode"));
         }
     }
 }
