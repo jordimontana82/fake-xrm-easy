@@ -2,6 +2,7 @@
 using Microsoft.Xrm.Sdk.Messages;
 using System;
 using System.Linq;
+using Microsoft.Xrm.Sdk.Metadata;
 
 namespace FakeXrmEasy.FakeMessageExecutors
 {
@@ -20,7 +21,6 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 throw new Exception("Only RetrieveRelationshipRequest can be processed!");
             }
 
-            var service = ctx.GetFakedOrganizationService();
             var fakeRelationShip = ctx.GetRelationship(retrieveRequest.Name);
             if (fakeRelationShip == null)
             {
@@ -30,27 +30,27 @@ namespace FakeXrmEasy.FakeMessageExecutors
             
             var response = new RetrieveRelationshipResponse();
             response.Results = new ParameterCollection();
-            response.Results.Add("RelationshipMetadata", GetRelationshipMetadata(fakeRelationShip));
+            response.Results.Add("RelationshipMetadata", GetRelationshipMetadata(retrieveRequest.Name, fakeRelationShip));
             response.ResponseName = "RetrieveRelationship";
 
             return response;
         }
 
-        private static object GetRelationshipMetadata(XrmFakedRelationship fakeRelationShip)
+        private static RelationshipMetadataBase GetRelationshipMetadata(string schemaName, XrmFakedRelationship fakeRelationShip)
         {
             if (fakeRelationShip.RelationshipType == XrmFakedRelationship.enmFakeRelationshipType.ManyToMany)
             {
-                var mtm = new Microsoft.Xrm.Sdk.Metadata.ManyToManyRelationshipMetadata();
+                var mtm = new ManyToManyRelationshipMetadata();
                 mtm.Entity1LogicalName = fakeRelationShip.Entity1LogicalName;
                 mtm.Entity1IntersectAttribute = fakeRelationShip.Entity1Attribute;
                 mtm.Entity2LogicalName = fakeRelationShip.Entity2LogicalName;
                 mtm.Entity2IntersectAttribute = fakeRelationShip.Entity2Attribute;
-                mtm.SchemaName = fakeRelationShip.IntersectEntity;
                 mtm.IntersectEntityName = fakeRelationShip.IntersectEntity.ToLower();
+                mtm.SchemaName = schemaName;
                 return mtm;
             } else {
 
-                var otm = new Microsoft.Xrm.Sdk.Metadata.OneToManyRelationshipMetadata();
+                var otm = new OneToManyRelationshipMetadata();
 #if FAKE_XRM_EASY_2016 || FAKE_XRM_EASY_365 || FAKE_XRM_EASY_9
                 otm.ReferencedEntityNavigationPropertyName = fakeRelationShip.IntersectEntity;
 #endif
@@ -59,6 +59,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 otm.ReferencedAttribute = fakeRelationShip.Entity2Attribute;
                 otm.ReferencedEntity = fakeRelationShip.Entity2LogicalName;
                 otm.SchemaName = fakeRelationShip.IntersectEntity;
+                otm.SchemaName = schemaName;
                 return otm;
             }
         }
