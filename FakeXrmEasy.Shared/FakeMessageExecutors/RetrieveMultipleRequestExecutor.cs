@@ -204,13 +204,73 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
             foreach (var entity in input)
             {
-                if (!output.Any(i => i.LogicalName == entity.LogicalName && i.Attributes.SequenceEqual(entity.Attributes)))
+                if (!output.Any(i => EntitiesEqual(i, entity)))
                 {
                     output.Add(entity);
                 }
             }
 
             return output;
+        }
+
+        private static bool EntitiesEqual(Entity firstEntity, Entity secondEntity)
+        {
+            if (Object.ReferenceEquals(firstEntity, secondEntity))
+            {
+                return true;
+            }
+
+            if (Object.ReferenceEquals(firstEntity, null) || Object.ReferenceEquals(secondEntity, null))
+            {
+                return false;
+            }
+
+            if (firstEntity.LogicalName != secondEntity.LogicalName)
+            {
+                return false;
+            }
+
+            if (firstEntity.Attributes.Keys.Count != secondEntity.Attributes.Keys.Count)
+            {
+                return false;
+            }
+
+            foreach (var key in firstEntity.Attributes.Keys)
+            {
+                var gotFirstEntityAttrVal = firstEntity.Attributes.TryGetValue(key, out var firstEntityAttrVal);
+                var gotSecondEntityAttrVal = secondEntity.Attributes.TryGetValue(key, out var secondEntityAttrVal);
+
+                if (!gotFirstEntityAttrVal && gotSecondEntityAttrVal)
+                {
+                    return false;
+                }
+
+                if (gotFirstEntityAttrVal && !gotSecondEntityAttrVal)
+                {
+                    return false;
+                }
+
+                if (!gotFirstEntityAttrVal && !gotSecondEntityAttrVal)
+                {
+                    return true;
+                }
+
+                if (firstEntityAttrVal is AliasedValue && secondEntityAttrVal is AliasedValue)
+                {
+                    var firstAliasedVal = ((AliasedValue)firstEntityAttrVal)?.Value;
+                    var secondAliasedVal = ((AliasedValue)secondEntityAttrVal)?.Value;
+                    if (!Equals(firstAliasedVal, secondAliasedVal))
+                    {
+                        return false;
+                    }
+                }
+                else if (!Equals(firstEntityAttrVal, secondEntityAttrVal))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
