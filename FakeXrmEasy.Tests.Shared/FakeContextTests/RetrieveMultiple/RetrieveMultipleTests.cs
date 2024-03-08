@@ -5,7 +5,6 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Xunit;
 
 namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
@@ -317,6 +316,66 @@ namespace FakeXrmEasy.Tests.FakeContextTests.RetrieveMultiple
             query.LinkEntities.Add(link);
 
             Assert.Equal(2, service.RetrieveMultiple(query).Entities.Count);
+        }
+
+        /// <summary>
+        /// Tests that if distinct is asked for AliasedValues that contain value types are handled and
+        /// the correct records are returned
+        /// </summary>
+        [Fact]
+        public void TestThatDistinctWorksWithLinkEntityAliasedValuesThatContainValueTypes()
+        {
+            XrmFakedContext context = new XrmFakedContext();
+            IOrganizationService service = context.GetOrganizationService();
+            List<Entity> initialEntities = new List<Entity>();
+
+            var gen = new Entity("component");
+            gen.Id = Guid.NewGuid();
+            initialEntities.Add(gen);
+
+            var genCircuit = new Entity("powercircuit");
+            genCircuit.Id = Guid.NewGuid();
+            genCircuit["linkfield"] = "value";
+            initialEntities.Add(genCircuit);
+
+            var genLoadTerminal1 = new Entity("powerterminal");
+            genLoadTerminal1.Id = Guid.NewGuid();
+            genLoadTerminal1["component"] = gen.ToEntityReference();
+            genLoadTerminal1["powercircuit"] = genCircuit.ToEntityReference();
+            initialEntities.Add(genLoadTerminal1);
+
+            var genLoadTerminal2 = new Entity("powerterminal");
+            genLoadTerminal2.Id = Guid.NewGuid();
+            genLoadTerminal2["component"] = gen.ToEntityReference();
+            genLoadTerminal2["powercircuit"] = genCircuit.ToEntityReference();
+            initialEntities.Add(genLoadTerminal2);
+
+            var genLoadTerminal3 = new Entity("powerterminal");
+            genLoadTerminal3.Id = Guid.NewGuid();
+            genLoadTerminal3["component"] = gen.ToEntityReference();
+            genLoadTerminal3["powercircuit"] = genCircuit.ToEntityReference();
+            initialEntities.Add(genLoadTerminal3);
+
+            context.Initialize(initialEntities);
+
+            var query = new QueryExpression("component");
+            query.Distinct = true;
+            query.Criteria.AddCondition("componentid", ConditionOperator.Equal, gen.Id);
+
+            var terminalLink = query.AddLink(
+                "powerterminal",
+                "componentid",
+                "component",
+                JoinOperator.LeftOuter);
+
+            var powerCircuitLink = terminalLink.AddLink(
+                "powercircuit",
+                "powercircuitid",
+                "powercircuit",
+                JoinOperator.LeftOuter);
+            powerCircuitLink.Columns = new ColumnSet("linkfield");
+
+            Assert.Equal(1, service.RetrieveMultiple(query).Entities.Count);
         }
 
         /// <summary>
