@@ -5,9 +5,11 @@ Follow me for updates on [Twitter](https://twitter.com/fakexrmeasy)!
 -----------------------------------------------------------------------
 
 
-**UPDATE**: FakeXrmEasy v1.x is deprecated and will stop receiving updates soon. [Start planning your transition to versions 2.x and 3.x now!](https://dynamicsvalue.github.io/fake-xrm-easy-docs/quickstart/migrating-from-1x/)
+**IMPORTANT**: FakeXrmEasy v1.x is no longer maintained and is offically read-only [Start planning your transition to the newer versions 2.x and 3.x now!](https://dynamicsvalue.github.io/fake-xrm-easy-docs/quickstart/migrating-from-1x/)
 -------------------------------------------------------------------------------------------------------
 
+**NEW ISSUE TRACKER**: The new repo lives at https://github.com/DynamicsValue/fake-xrm-easy
+---------------------------------------
 
 
 
