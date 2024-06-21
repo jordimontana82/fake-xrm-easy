@@ -144,6 +144,11 @@ namespace FakeXrmEasy.Extensions.FetchXml
             if (!int.TryParse(countAttr.Value, out iCount))
                 throw new Exception("Count attribute in fetch node must be an integer");
 
+            if (int.Parse(countAttr.Value) > 5000 || int.Parse(countAttr.Value) < 0)
+            {
+                throw new Exception("Expected value between 0 and 5000 inclusive.");
+            }
+
             return iCount;
         }
 
