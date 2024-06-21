@@ -36,7 +36,7 @@ namespace FakeXrmEasy.Tests
         [Fact]
         public void When_PluginIsRegisteredWithEntity_And_OtherPluginCreatesAnAccount_Expect_AccountNumberIsSet()
         {
-            var context = new XrmFakedContext() { UsePipelineSimulation = true }; 
+            var context = new XrmFakedContext() { UsePipelineSimulation = true };
 
             context.RegisterPluginStep<AccountNumberPlugin, Account>("Create");
 
@@ -280,7 +280,7 @@ namespace FakeXrmEasy.Tests
             Assert.Contains($"Entity Logical Name: {Contact.EntityLogicalName}", trace);
             Assert.Contains($"Entity ID: {id}", trace);
         }
-        
+
         [Fact]
         public void When_PluginStepRegisteredAsCreatePreOperationSyncronous_Expect_CorrectValues()
         {
@@ -374,7 +374,7 @@ namespace FakeXrmEasy.Tests
         [Fact]
         public void When_PluginStepRegisteredAsCreatePostOperation_Entity_Available()
         {
-            var context = new XrmFakedContext {UsePipelineSimulation = true};
+            var context = new XrmFakedContext { UsePipelineSimulation = true };
 
             var target = new Account
             {
@@ -392,5 +392,142 @@ namespace FakeXrmEasy.Tests
             Assert.Equal("Updated", updatedAccount.Name);
         }
 
+        [Fact]
+        public void When_PluginStepRegisteredWithFilteringAttributes_Plugin_Triggered()
+        {
+            var context = new XrmFakedContext { UsePipelineSimulation = true };
+            var accountId = Guid.NewGuid();
+
+            var oldAccount = new Account()
+            {
+                Id = accountId,
+                Name = "Original",
+                AccountNumber = "12345"
+            };
+
+            context.RegisterPluginStep<ValidatePipelinePlugin, Account>("Update", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, filteringAttributes: new string[] { "accountnumber" });
+            context.Initialize(oldAccount);
+
+            IOrganizationService serivce = context.GetOrganizationService();
+
+            // Act
+            var target = new Account
+            {
+                Id = accountId,
+                AccountNumber = "01234"
+            };
+
+            serivce.Update(target);
+
+            // Assert
+            var trace = context.GetFakeTracingService().DumpTrace().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            Assert.Equal(5, trace.Length);
+            Assert.Contains("Message Name: Update", trace);
+            Assert.Contains("Stage: 20", trace);
+            Assert.Contains("Mode: 0", trace);
+            Assert.Contains($"Entity Logical Name: {Account.EntityLogicalName}", trace);
+            Assert.Contains($"Entity ID: {accountId}", trace);
+        }
+
+        [Fact]
+        public void When_PluginStepRegisteredWithFilteringAttributes_Plugin_NotTriggered()
+        {
+            var context = new XrmFakedContext { UsePipelineSimulation = true };
+            var accountId = Guid.NewGuid();
+
+            var oldAccount = new Account()
+            {
+                Id = accountId,
+                Name = "Original",
+                AccountNumber = "12345"
+            };
+
+            context.RegisterPluginStep<ValidatePipelinePlugin, Account>("Update", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, filteringAttributes: new string[] { "primarycontactid" });
+            context.Initialize(oldAccount);
+
+            IOrganizationService serivce = context.GetOrganizationService();
+
+            // Act
+            var target = new Account
+            {
+                Id = accountId,
+                AccountNumber = "01234"
+            };
+
+            serivce.Update(target);
+
+            // Assert
+            var trace = context.GetFakeTracingService().DumpTrace().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            Assert.Equal(0, trace.Length);
+        }
+
+
+        [Fact]
+        public void When_PreValidationUpdatePluginStepRegistered_Plugin_Triggered()
+        {
+            var context = new XrmFakedContext { UsePipelineSimulation = true };
+            var accountId = Guid.NewGuid();
+
+            var oldAccount = new Account()
+            {
+                Id = accountId
+            };
+
+            context.RegisterPluginStep<ValidatePipelinePlugin, Account>("Update", ProcessingStepStage.Prevalidation, ProcessingStepMode.Synchronous);
+            context.Initialize(oldAccount);
+
+            IOrganizationService serivce = context.GetOrganizationService();
+
+            // Act
+            var target = new Account
+            {
+                Id = accountId
+            };
+
+            serivce.Update(target);
+
+            // Assert
+            var trace = context.GetFakeTracingService().DumpTrace().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            Assert.Equal(5, trace.Length);
+            Assert.Contains("Message Name: Update", trace);
+            Assert.Contains("Stage: 10", trace);
+            Assert.Contains("Mode: 0", trace);
+            Assert.Contains($"Entity Logical Name: {Account.EntityLogicalName}", trace);
+            Assert.Contains($"Entity ID: {accountId}", trace);
+        }
+
+        [Fact]
+        public void When_PreValidationCreatePluginStepRegistered_Plugin_Triggered()
+        {
+            var context = new XrmFakedContext { UsePipelineSimulation = true };
+            var accountId = Guid.NewGuid();
+
+            context.RegisterPluginStep<ValidatePipelinePlugin, Account>("Create", ProcessingStepStage.Prevalidation, ProcessingStepMode.Synchronous);
+            //context.Initialize(oldAccount);
+
+            IOrganizationService serivce = context.GetOrganizationService();
+
+            // Act
+            var target = new Account
+            {
+                Id = accountId,
+                AccountNumber = "01234"
+            };
+
+            serivce.Create(target);
+
+            // Assert
+            var trace = context.GetFakeTracingService().DumpTrace().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            Assert.Equal(5, trace.Length);
+            Assert.Contains("Message Name: Create", trace);
+            Assert.Contains("Stage: 10", trace);
+            Assert.Contains("Mode: 0", trace);
+            Assert.Contains($"Entity Logical Name: {Account.EntityLogicalName}", trace);
+            Assert.Contains($"Entity ID: {accountId}", trace);
+        }
     }
 }

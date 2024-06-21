@@ -37,5 +37,21 @@ namespace FakeXrmEasy.Extensions
                 && t.GetGenericTypeDefinition() == typeof(Nullable<>)
                 && t.GetGenericArguments()[0].IsEnum;
         }
+
+        internal static int GetEntityTypeCode(this Type e)
+        {
+            var otc = e.GetField("EntityTypeCode").GetValue(null) as int?;
+
+            if (otc == null)
+                throw new Exception("Entity does not contain the Field \"EntityTypeCode\".");
+
+            return otc.Value;
+        }
+
+        internal static bool TryGetEntityTypeCode(this Type e, out int? objectTypeCode)
+        {
+            objectTypeCode = e.GetField("EntityTypeCode")?.GetValue(null) as int?;
+            return objectTypeCode.HasValue;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Crm.Sdk.Messages;
+﻿using FakeXrmEasy.Extensions;
+using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
@@ -125,7 +126,8 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 if (!_typeCodes.ContainsKey(entRef.LogicalName))
                 {
                     var entType = RetrieveEntityRequestExecutor.GetEntityProxyType(entRef.LogicalName, ctx);
-                    var typeCode = entType.GetField("EntityTypeCode").GetValue(null);
+                    int? typeCode = null;
+                    entType.TryGetEntityTypeCode(out typeCode);
 
                     _typeCodes.Add(entRef.LogicalName, (int?)typeCode);
                 }

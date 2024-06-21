@@ -123,7 +123,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Issues\ProxyEntities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Issues\TestCRMHandlingOfNullsAndMissingFields.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\PipelineTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\PipelineWithProcessingImagesTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\AccountSetTerritories.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\EntityImagesInPluginPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\EntityImagesPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\PostOperationUpdatePlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginsForTesting\RetrieveMultipleDataProvider.cs" />
