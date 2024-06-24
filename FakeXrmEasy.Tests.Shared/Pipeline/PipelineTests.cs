@@ -63,6 +63,96 @@ namespace FakeXrmEasy.Tests
         }
 
         [Fact]
+        public void When_UsingWeaklyTypedEntity_And_AccountNumberPlugin_Expect_AccountNumberIsSet()
+        {
+            var context = new XrmFakedContext() { UsePipelineSimulation = true };
+
+            context.InitializeMetadata(typeof(Account).Assembly);
+            context.RegisterPluginStep<AccountNumberPlugin, Account>("Create");
+            context.ExecutePluginWith<CreateAccountPlugin>();
+
+            var organizationService = context.GetOrganizationService();
+            var accountId = organizationService.Create(new Entity(Account.EntityLogicalName));
+            Assert.NotEqual(Guid.Empty, accountId);
+            var account = organizationService.Retrieve(Account.EntityLogicalName, accountId, new ColumnSet(true));
+            Assert.True(account.Attributes.ContainsKey("accountnumber"));
+        }
+
+        [Fact]
+        public void When_UsingFilteringAttributes_And_TheyMatch_Expect_PluginTriggers()
+        {
+            // Arange
+            var context = new XrmFakedContext() { UsePipelineSimulation = true };
+
+            var id = Guid.NewGuid();
+
+            var entities = new List<Entity>
+            {
+                new Contact
+                {
+                    Id = id
+                }
+            };
+            context.Initialize(entities);
+
+            // Act
+            context.RegisterPluginStep<ValidatePipelinePlugin, Contact>("Update", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, filteringAttributes: new string[] { "address1_city" });
+
+            var updatedEntity = new Contact
+            {
+                Id = id,
+                Address1_City = "NY"
+            };
+
+            var service = context.GetOrganizationService();
+            service.Update(updatedEntity);
+
+            // Assert
+            var trace = context.GetFakeTracingService().DumpTrace().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            Assert.Equal(5, trace.Length);
+            Assert.Contains("Message Name: Update", trace);
+            Assert.Contains("Stage: 20", trace);
+            Assert.Contains("Mode: 0", trace);
+            Assert.Contains($"Entity Logical Name: {Contact.EntityLogicalName}", trace);
+            Assert.Contains($"Entity ID: {id}", trace);
+        }
+
+        [Fact]
+        public void When_UsingFilteringAttributes_And_TheyDontMatch_Expect_PluginDoesNotTriggers()
+        {
+            // Arange
+            var context = new XrmFakedContext() { UsePipelineSimulation = true };
+
+            var id = Guid.NewGuid();
+
+            var entities = new List<Entity>
+            {
+                new Contact
+                {
+                    Id = id
+                }
+            };
+            context.Initialize(entities);
+
+            // Act
+            context.RegisterPluginStep<ValidatePipelinePlugin, Contact>("Update", ProcessingStepStage.Preoperation, ProcessingStepMode.Synchronous, filteringAttributes: new string[] { "address1_city" });
+
+            var updatedEntity = new Contact
+            {
+                Id = id
+            };
+
+            var service = context.GetOrganizationService();
+            service.Update(updatedEntity);
+
+            // Assert
+            var trace = context.GetFakeTracingService().DumpTrace().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            Assert.Equal(0, trace.Length);
+        }
+
+        [Fact]
         public void When_PluginStepRegisteredAsDeletePreOperationSyncronous_Expect_CorrectValues()
         {
             // Arange
