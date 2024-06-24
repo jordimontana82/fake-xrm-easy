@@ -70,7 +70,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
 
         public Type GetResponsibleRequestType()
         {
-            return typeof(CloseIncidentResponse);
+            return typeof(CloseIncidentRequest);
         }
     }
 }
