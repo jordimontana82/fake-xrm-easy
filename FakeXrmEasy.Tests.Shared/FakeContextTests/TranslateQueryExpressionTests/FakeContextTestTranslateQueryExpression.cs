@@ -509,7 +509,7 @@ namespace FakeXrmEasy.Tests
                 }
             };
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
             var result = service.Execute(new RetrieveMultipleRequest()
             {
                 Query = qe
@@ -558,7 +558,7 @@ namespace FakeXrmEasy.Tests
                 }
             };
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
             var result = service.Execute(new RetrieveMultipleRequest()
             {
                 Query = qe
@@ -607,7 +607,7 @@ namespace FakeXrmEasy.Tests
                 }
             };
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
             var result = service.RetrieveMultiple(qe);
 
             Assert.True(result.Entities.Count == 1);
@@ -654,7 +654,7 @@ namespace FakeXrmEasy.Tests
             context.Initialize(new List<Entity>() { invoice_entity, pmr_entity, op_entity, opi_entity });
 
             //create the mock service
-            IOrganizationService service = context.GetFakedOrganizationService();
+            IOrganizationService service = context.GetOrganizationService();
 
             QueryExpression query = new QueryExpression("new_onlinepaymentitem");
             query.Criteria.AddCondition("new_onlinepaymentid", ConditionOperator.Equal, op_entity.Id);
@@ -712,7 +712,7 @@ namespace FakeXrmEasy.Tests
             // initialise
             var context = new XrmFakedContext();
             context.Initialize(new[] { contact, child, pet });
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             // 1st Query: join contact and child
             //var query1 = new QueryExpression("contact");
@@ -734,7 +734,7 @@ namespace FakeXrmEasy.Tests
         public void When_querying_early_bound_entities_attribute_not_initialised_returns_null_in_joins()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var role = new Role() { Id = Guid.NewGuid() };
             var parentRole = new Role() { Id = Guid.NewGuid() };
@@ -755,7 +755,7 @@ namespace FakeXrmEasy.Tests
         public void When_querying_early_bound_entities_unexisting_attribute_raises_exception_when_selected()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var role = new Role() { Id = Guid.NewGuid() };
             var parentRole = new Role() { Id = Guid.NewGuid() };
@@ -785,7 +785,7 @@ namespace FakeXrmEasy.Tests
         public void When_querying_early_bound_entities_unexisting_attribute_raises_exception_when_linked_to()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var role = new Role() { Id = Guid.NewGuid() };
             var parentRole = new Role() { Id = Guid.NewGuid() };
@@ -816,7 +816,7 @@ namespace FakeXrmEasy.Tests
         {
             var context = new XrmFakedContext();
 
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             Entity account1 = new Entity("account");
             account1.Id = Guid.NewGuid();

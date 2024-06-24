@@ -12,7 +12,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public void Should_Execute_Mock_For_OrganizationRequests()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var e = new Entity("Contact") { Id = Guid.NewGuid() };
             context.Initialize(new[] { e });
@@ -44,7 +44,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public void Should_Override_Execution_Mock()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var e = new Entity("Contact") { Id = Guid.NewGuid() };
             context.Initialize(new[] { e });
@@ -67,7 +67,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
         public void Should_Override_FakeMessageExecutor()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var e = new Entity("Contact") { Id = Guid.NewGuid() };
             context.Initialize(new[] { e });

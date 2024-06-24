@@ -91,7 +91,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.BulkDeleteRequestTests
         {
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             // initialize data
             var parentAccountId = Guid.NewGuid();

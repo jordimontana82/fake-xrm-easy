@@ -122,7 +122,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
                                   </entity>
                             </fetch>";
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var response = service.Execute(new ExecuteFetchRequest { FetchXml = fetchXml }) as ExecuteFetchResponse;
 
@@ -166,7 +166,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
                                   </entity>
                             </fetch>";
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var response = service.Execute(new ExecuteFetchRequest { FetchXml = fetchXml }) as ExecuteFetchResponse;
 
@@ -203,7 +203,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
                                   </entity>
                             </fetch>";
 
-            var service = ctx.GetFakedOrganizationService();
+            var service = ctx.GetOrganizationService();
 
             var response = service.Execute(new ExecuteFetchRequest { FetchXml = string.Format(fetchXml, String.Empty) }) as ExecuteFetchResponse;
 
@@ -245,7 +245,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
         public void When_querying_fetchxml_with_linked_entities_with_left_outer_join_right_result_is_returned()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var contact = new Contact()
             {
@@ -297,7 +297,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.ExecuteFetchRequestTests
         public void When_querying_fetchxml_with_multiple_linked_entities_with_the_same_entity_right_result_is_returned()
         {
             var context = new XrmFakedContext();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var user1 = new SystemUser
             {

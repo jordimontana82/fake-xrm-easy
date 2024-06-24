@@ -23,7 +23,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid, FirstName = "Jordi" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -46,7 +46,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid2, FirstName = "Other" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -78,7 +78,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid2, FirstName = "Other" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -111,7 +111,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid2, FirstName = "Other" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -139,7 +139,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid2, FirstName = null }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -173,7 +173,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid3, FirstName = "Other" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -201,7 +201,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid3, FirstName = "Other" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -229,7 +229,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid3, FirstName = "Other" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -256,7 +256,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid3, FirstName = "Other" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -284,7 +284,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid3, FirstName = "Other" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -311,7 +311,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid3, FirstName = "Other" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -339,7 +339,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid3, FirstName = "Other" }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -365,7 +365,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid2, NumberOfChildren = 1 }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -392,7 +392,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid3, NumberOfChildren = 2 }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -420,7 +420,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid3, NumberOfChildren = 2 }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -448,7 +448,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = guid3, NumberOfChildren = 2 }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -475,7 +475,7 @@ namespace FakeXrmEasy.Tests
                                 ParentCustomerId = new EntityReference(Account.EntityLogicalName, accountId) },
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -504,7 +504,7 @@ namespace FakeXrmEasy.Tests
                                 ParentCustomerId = null }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -531,7 +531,7 @@ namespace FakeXrmEasy.Tests
                                 ParentCustomerId = null }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -555,7 +555,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = contactId, StatusCode = new OptionSetValue(1) },
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -580,7 +580,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = Guid.NewGuid(), StatusCode = null },
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -605,7 +605,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = Guid.NewGuid(), StatusCode = null },
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -630,7 +630,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = contactId, new_MultiSelectAttribute = new OptionSetValueCollection(new[] { new OptionSetValue(1) }) },
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -655,7 +655,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = Guid.NewGuid(), new_MultiSelectAttribute = null },
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -685,7 +685,7 @@ namespace FakeXrmEasy.Tests
                                 ParentCustomerId = null }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -714,7 +714,7 @@ namespace FakeXrmEasy.Tests
                 user, systemRole, role
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -749,7 +749,7 @@ namespace FakeXrmEasy.Tests
                 contact, parentAccount, account
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -788,7 +788,7 @@ namespace FakeXrmEasy.Tests
                 contact, parentAccount, account
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -827,7 +827,7 @@ namespace FakeXrmEasy.Tests
                 contact, parentAccount, account
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -870,7 +870,7 @@ namespace FakeXrmEasy.Tests
                 contact, parentAccount, account
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -914,7 +914,7 @@ namespace FakeXrmEasy.Tests
                 contact, parentAccount, account
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -958,7 +958,7 @@ namespace FakeXrmEasy.Tests
                 contact, parentAccount, account
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -1001,7 +1001,7 @@ namespace FakeXrmEasy.Tests
                 anotherUser, anotherSystemRole, anotherRole
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -1035,7 +1035,7 @@ namespace FakeXrmEasy.Tests
                 user, systemRole, role, parentRole
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -1070,7 +1070,7 @@ namespace FakeXrmEasy.Tests
                 user, systemRole, role, parentRole
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -1168,7 +1168,7 @@ namespace FakeXrmEasy.Tests
                                 ParentCustomerId = null }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -1198,7 +1198,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = Guid.NewGuid(), ParentCustomerId = null, NumberOfChildren = 3 }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -1234,7 +1234,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() { Id = contactId, NumberOfChildren = 2, OriginatingLeadId = lead.ToEntityReference()}
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -1269,7 +1269,7 @@ namespace FakeXrmEasy.Tests
                 new Task() { Id = Guid.NewGuid() }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -1298,7 +1298,7 @@ namespace FakeXrmEasy.Tests
                 new Task() { Id = Guid.NewGuid()  }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -1331,7 +1331,7 @@ namespace FakeXrmEasy.Tests
                 new Task() { Id = Guid.NewGuid()  }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {
@@ -1369,7 +1369,7 @@ namespace FakeXrmEasy.Tests
                 new Contact() {Id = Guid.NewGuid(), ParentCustomerId =  new EntityReference(Account.EntityLogicalName, accountId2) }
             });
 
-            var service = fakedContext.GetFakedOrganizationService();
+            var service = fakedContext.GetOrganizationService();
 
             using (XrmServiceContext ctx = new XrmServiceContext(service))
             {

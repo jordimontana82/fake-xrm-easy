@@ -15,7 +15,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.SetStateRequestTests
         {
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var c = new Contact()
             {
@@ -46,7 +46,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.SetStateRequestTests
         {
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var c = new Contact()
             {
@@ -67,7 +67,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests.SetStateRequestTests
         {
             var context = new XrmFakedContext();
             context.ProxyTypesAssembly = Assembly.GetExecutingAssembly();
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var c = new Contact()
             {

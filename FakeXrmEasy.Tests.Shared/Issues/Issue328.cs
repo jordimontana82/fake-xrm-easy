@@ -43,7 +43,7 @@ namespace FakeXrmEasy.Tests.Issues
 
             var context = new XrmFakedContext();
             context.Initialize(new List<Entity> { a1, a2 });
-            var service = context.GetFakedOrganizationService();
+            var service = context.GetOrganizationService();
 
             var nonDistinctResult = service.RetrieveMultiple(queryNonDistinct);
             nonDistinctResult.Entities.ToList().ForEach(e => Debug.WriteLine($"Id: {e.Id} distinct_value_field: {e.GetAttributeValue<string>("distinct_value_field")}"));

@@ -137,7 +137,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
 
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             fakedContext.Initialize(new Entity[] { account1, account2, account3, contact1, contact2, contact3, contact4, contact5 });
             fakedContext.AddRelationship("contact_customer_accounts", new XrmFakedRelationship
@@ -241,7 +241,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
 
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var relationshipName = "accountleads_association";
 
@@ -365,7 +365,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
 
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var relationshipName = "accountleads_association";
 
@@ -490,7 +490,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
 
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var accountLeadsRelationshipName = "accountleads_association";
 
@@ -634,7 +634,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
 
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             fakedContext.Initialize(new[] { account1, account2, contact1, contact2, contact3, contact4 });
             fakedContext.AddRelationship("contact_customer_accounts", new XrmFakedRelationship
@@ -726,7 +726,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
 
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             fakedContext.Initialize(new Entity[] { account1, account2, contact1, contact2, contact3 });
             fakedContext.AddRelationship("contact_customer_accounts", new XrmFakedRelationship
@@ -814,7 +814,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             };
 
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var relationshipName = "accountleads_association";
 
@@ -906,7 +906,7 @@ namespace FakeXrmEasy.Tests.FakeContextTests
             }
 
             var fakedContext = new XrmFakedContext();
-            var fakedService = fakedContext.GetFakedOrganizationService();
+            var fakedService = fakedContext.GetOrganizationService();
 
             var relationshipName = "accountleads_association";
 
