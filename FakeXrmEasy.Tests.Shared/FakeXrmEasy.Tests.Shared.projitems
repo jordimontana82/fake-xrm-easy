@@ -78,6 +78,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RemoveFromQueueRequestTests\RemoveFromQueueRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RemoveMembersTeamRequestTests\Tests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveAttributeRequestTests\RetrieveAttributeRequestTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveAllEntitiesRequestTests\RetrieveAllEntitiesRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveEntityRequestTests\RetrieveEntityRequestTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveMultiple\QueryLinkEntityTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FakeContextTests\RetrieveMultiple\RetrieveMultipleTests.cs" />
