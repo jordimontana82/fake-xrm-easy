@@ -161,5 +161,75 @@ namespace FakeXrmEasy.Tests.FakeContextTests.AssociateRequestTests
             };
             Assert.Throws<Exception>(() => executor.Execute(req, context));
         }
+
+        [Fact]
+        public void When_execute_is_called_with_duplicate_request_exception_is_thrown()
+        {
+            // arrange
+            var context = new XrmFakedContext();
+
+            var userId = Guid.NewGuid();
+            var teamId = Guid.NewGuid();
+            context.Initialize(new List<Entity> {
+                new SystemUser
+                {
+                    Id = userId
+                },
+                new Team
+                {
+                    Id = teamId
+                }
+            });
+
+            context.AddRelationship("teammembership", new XrmFakedRelationship()
+            {
+                RelationshipType = XrmFakedRelationship.enmFakeRelationshipType.ManyToMany,
+                IntersectEntity = "teammembership",
+                Entity1Attribute = "systemuserid",
+                Entity1LogicalName = "systemuser",
+                Entity2Attribute = "teamid",
+                Entity2LogicalName = "team"
+            });
+
+            var orgSvc = context.GetFakedOrganizationService();
+            orgSvc.Associate("team", teamId, new Relationship("teammembership"),
+                new EntityReferenceCollection(new List<EntityReference> { new EntityReference("systemuser", userId) }));
+
+            // act, assert
+            Assert.Throws<Exception>(() => orgSvc.Associate("team", teamId, new Relationship("teammembership"),
+                new EntityReferenceCollection(new List<EntityReference> { new EntityReference("systemuser", userId) }))); // duplicate request                 
+        }
+
+        [Fact]
+        public void When_execute_is_called_with_empty_relatedentities_collection_exception_is_thrown()
+        {
+            // arrange
+            var context = new XrmFakedContext();
+
+            var teamId = Guid.NewGuid();
+            context.Initialize(new List<Entity> {
+                new Team
+                {
+                    Id = teamId
+                }
+            });
+
+            context.AddRelationship("teammembership", new XrmFakedRelationship()
+            {
+                RelationshipType = XrmFakedRelationship.enmFakeRelationshipType.ManyToMany,
+                IntersectEntity = "teammembership",
+                Entity1Attribute = "systemuserid",
+                Entity1LogicalName = "systemuser",
+                Entity2Attribute = "teamid",
+                Entity2LogicalName = "team"
+            });
+
+            var orgSvc = context.GetFakedOrganizationService();
+            
+
+            // act, assert
+            Assert.Throws<IndexOutOfRangeException>(() => orgSvc.Associate("team", teamId, new Relationship("teammembership"),
+                new EntityReferenceCollection())); 
+        }
     }
 }
