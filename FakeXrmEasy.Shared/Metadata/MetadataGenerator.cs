@@ -124,6 +124,63 @@ namespace FakeXrmEasy.Metadata
             return entityMetadatas;
         }
 
+        public static IEnumerable<EntityMetadata> FromContextEntities(IEnumerable<Entity> entities)
+        {
+            List<EntityMetadata> entityMetadatas = new List<EntityMetadata>();
+            foreach (var item in entities.GroupBy(x => x.LogicalName))
+            {
+                var metadata = new EntityMetadata()
+                {
+                    LogicalName = item.Key
+                };
+                metadata.SetSealedPropertyValue("PrimaryIdAttribute", item.Key + "id");
+                var attributeMetadatas = new Dictionary<string, AttributeMetadata>();
+                foreach (var entity in item)
+                {
+                    foreach (var attribute in entity.Attributes)
+                    {
+                        if (attributeMetadatas.ContainsKey(attribute.Key)) continue;
+                        if (attribute.Value == null) continue;
+
+                        AttributeMetadata attributeMetadata;
+                        if (attribute.Key == "statecode")
+                        {
+                            attributeMetadata = new StateAttributeMetadata();
+                        }
+                        else if (attribute.Key == "statuscode")
+                        {
+                            attributeMetadata = new StatusAttributeMetadata();
+                        }
+                        else if (attribute.Key == metadata.PrimaryIdAttribute)
+                        {
+                            attributeMetadata = new AttributeMetadata();
+                            attributeMetadata.SetSealedPropertyValue("AttributeType", AttributeTypeCode.Uniqueidentifier);
+                        }
+                        else
+                        {
+                            attributeMetadata = CreateAttributeMetadata(attribute.Value.GetType());
+                        }
+
+                        attributeMetadata.SetFieldValue("_entityLogicalName", entity.LogicalName);
+                        attributeMetadata.SetFieldValue("_logicalName", attribute.Key);
+
+                        attributeMetadatas.Add(attribute.Key, attributeMetadata);
+                    }
+                    if (!attributeMetadatas.ContainsKey(metadata.PrimaryIdAttribute))
+                    {
+                        var attributeMetadata = new AttributeMetadata();
+                        attributeMetadata.SetSealedPropertyValue("AttributeType", AttributeTypeCode.Uniqueidentifier);
+                        attributeMetadata.SetFieldValue("_entityLogicalName", entity.LogicalName);
+                        attributeMetadata.SetFieldValue("_logicalName", metadata.PrimaryIdAttribute);
+                        attributeMetadatas.Add(metadata.PrimaryIdAttribute, attributeMetadata);
+                    }
+                }
+                metadata.SetAttributeCollection(attributeMetadatas.Values);
+                entityMetadatas.Add(metadata);
+            }
+            return entityMetadatas;
+        }
+
         private static T GetCustomAttribute<T>(MemberInfo member) where T : Attribute
         {
             return (T)Attribute.GetCustomAttribute(member, typeof(T));

@@ -121,6 +121,8 @@ namespace FakeXrmEasy
 
             EntityMetadata = new Dictionary<string, EntityMetadata>();
 
+            AutoGenerateMetadata = System.Configuration.ConfigurationManager.AppSettings["FakeXrmEasy:AutoGenerateMetadata"] == "true";
+
             UsePipelineSimulation = false;
 
             InitializationLevel = EntityInitializationLevel.Default;
@@ -143,6 +145,11 @@ namespace FakeXrmEasy
             if (entities == null)
             {
                 throw new InvalidOperationException("The entities parameter must be not null");
+            }
+
+            if (AutoGenerateMetadata)
+            {
+                InitializeMetadata(entities);
             }
 
             foreach (var e in entities)
