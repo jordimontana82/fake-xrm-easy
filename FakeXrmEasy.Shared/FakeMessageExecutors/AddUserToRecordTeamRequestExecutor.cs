@@ -48,11 +48,11 @@ namespace FakeXrmEasy.FakeMessageExecutors
             Entity user = ctx.CreateQuery("systemuser").FirstOrDefault(p => p.Id == systemuserId);
             if (user == null)
             {
-                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "User with id=" + teamTemplateId + " does not exist");
+                throw new FaultException<OrganizationServiceFault>(new OrganizationServiceFault(), "User with id=" + systemuserId + " does not exist");
             }
 
 
-            Entity team = ctx.CreateQuery("team").FirstOrDefault(p => ((EntityReference)p["teamtemplateid"]).Id == teamTemplateId);
+            Entity team = (from t in ctx.CreateQuery("team") where t.Contains("teamtemplateid") && t["teamtemplateid"] != null && ((EntityReference)t["teamtemplateid"]).Id == teamTemplateId select t).FirstOrDefault();
             if (team == null)
             {
                 team = new Entity("team")
@@ -82,7 +82,7 @@ namespace FakeXrmEasy.FakeMessageExecutors
                 Principal = user.ToEntityReference(),
                 AccessMask = (AccessRights)poa["accessrightsmask"]
             });
-            
+
             return new AddUserToRecordTeamResponse
             {
                 ResponseName = "AddUserToRecordTeam"
