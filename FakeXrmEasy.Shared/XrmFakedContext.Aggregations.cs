@@ -530,6 +530,10 @@ namespace FakeXrmEasy
                 {
                     return new ComparableEntityReference(attributeValue as EntityReference) as IComparable;
                 }
+                else if (attributeValue is OptionSetValue)
+                {
+                    return ((OptionSetValue)attributeValue).Value as IComparable;
+                }
                 else
                 {
                     return attributeValue as IComparable;

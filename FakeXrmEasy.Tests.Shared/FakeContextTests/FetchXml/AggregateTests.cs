@@ -49,6 +49,44 @@ namespace FakeXrmEasy.Tests.FakeContextTests.FetchXml
         }
 
         [Fact]
+        public void FetchXml_Aggregate_Group_OptionSet_Count()
+        {
+            var fetchXml = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false' aggregate='true'>
+                              <entity name='contact'>
+                                    <attribute name='contactid' alias='count.contacts' aggregate='count' />
+                                    <attribute name='gendercode' alias='group.gendercode' groupby='true' />
+                                  </entity>
+                            </fetch>";
+
+            var male = new OptionSetValue(1);
+            var female = new OptionSetValue(2);
+
+            var ctx = new XrmFakedContext();
+            ctx.Initialize(new[] {
+                new Contact() { Id = Guid.NewGuid(), GenderCode = male, FirstName = "John" },
+                new Contact() { Id = Guid.NewGuid(), GenderCode = female, FirstName = "Jane" },
+                new Contact() { Id = Guid.NewGuid(), GenderCode = male, FirstName = "Sam" },
+                new Contact() { Id = Guid.NewGuid(), GenderCode = male, FirstName = "John" },
+            });
+
+            var collection = ctx.GetFakedOrganizationService().RetrieveMultiple(new FetchExpression(fetchXml));
+
+            // Make sure we only have the expected properties
+            foreach (var e in collection.Entities)
+            {
+                Assert.Equal(new[] { "count.contacts", "group.gendercode" }, e.Attributes.Keys.OrderBy(x => x));
+            }
+
+            Assert.Equal(2, collection.Entities.Count);
+
+            var maleGroup = collection.Entities.SingleOrDefault(x => (male.Value).Equals(x.GetAttributeValue<AliasedValue>("group.gendercode").Value));
+            Assert.Equal(3, maleGroup.GetAttributeValue<AliasedValue>("count.contacts").Value);
+
+            var femaleGroup = collection.Entities.SingleOrDefault(x => (female.Value).Equals(x.GetAttributeValue<AliasedValue>("group.gendercode").Value));
+            Assert.Equal(1, femaleGroup.GetAttributeValue<AliasedValue>("count.contacts").Value);
+        }
+
+        [Fact]
         public void FetchXml_Aggregate_Group_EntityReference_Count()
         {
             var fetchXml = @"<fetch no-lock='true' aggregate='true'> <entity name='account'> <attribute name='parentaccountid' alias='pa' groupby='true' /> <attribute name='accountid' alias='Qt' aggregate='countcolumn' /> <order alias='Qt' descending='true' /> </entity> </fetch>";
