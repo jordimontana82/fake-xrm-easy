@@ -87,11 +87,28 @@ namespace Crm
 				this.OnPropertyChanged("AccountCategoryCode");
 			}
 		}
-		
-		/// <summary>
-		/// Select a classification code to indicate the potential value of the customer account based on the projected return on investment, cooperation level, sales cycle length or other criteria.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountclassificationcode")]
+        /// <summary>
+        /// Some implementation of EBG will create an EXTRA property to return Enum type for OptionSet fields 
+        /// </summary>
+        [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountcategorycode")]
+        public virtual Account_AccountCategoryCode? AccountCategoryCodeEnum
+        {
+            [System.Diagnostics.DebuggerNonUserCode()]
+            get
+            {
+                return ((Account_AccountCategoryCode?)(EntityOptionSetEnum.GetEnum(this, "accountcategorycode")));
+            }
+            [System.Diagnostics.DebuggerNonUserCode()]
+            set
+            {
+                AccountCategoryCode = value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null;
+            }
+        }
+        /* Some implementation of EBG will create Enum as return type for OptionSet fields 
+        /// <summary>
+        /// Select a classification code to indicate the potential value of the customer account based on the projected return on investment, cooperation level, sales cycle length or other criteria.
+        /// </summary>
+        [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountclassificationcode")]
 		public Microsoft.Xrm.Sdk.OptionSetValue AccountClassificationCode
 		{
 			get
@@ -105,11 +122,44 @@ namespace Crm
 				this.OnPropertyChanged("AccountClassificationCode");
 			}
 		}
-		
-		/// <summary>
-		/// Unique identifier of the account.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountid")]
+        */
+        /// <summary>
+        /// NL: 2019-08-19 XrmToolbox has option to create Optionsets
+        /// </summary>
+        [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountclassificationcode")]
+        public virtual Account_AccountClassificationCode? AccountClassificationCode
+        {
+            get
+            {
+                Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("accountclassificationcode");
+                if ((optionSet != null))
+                {
+                    return ((Account_AccountClassificationCode)(System.Enum.ToObject(typeof(Crm.Account_AccountClassificationCode), optionSet.Value)));
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                this.OnPropertyChanging("accountclassificationcode");
+                if ((value == null))
+                {
+                    this.SetAttributeValue("accountclassificationcode", null);
+                }
+                else
+                {
+                    this.SetAttributeValue("accountclassificationcode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+                }
+                this.OnPropertyChanged("accountclassificationcode");
+            }
+        }
+
+        /// <summary>
+        /// Unique identifier of the account.
+        /// </summary>
+        [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountid")]
 		public System.Nullable<System.Guid> AccountId
 		{
 			get
@@ -3766,9 +3816,12 @@ namespace Crm
 				return this.GetRelatedEntity<Crm.SystemUser>("user_accounts", null);
 			}
 		}
-	}
-	
-	[System.Runtime.Serialization.DataContractAttribute()]
+
+        
+
+    }
+
+    [System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("principalobjectaccess")]
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "7.0.0000.3543")]
 	public partial class PrincipalObjectAccess : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
@@ -7236,8 +7289,8 @@ namespace Crm
 		public Crm.Opportunity Opportunity_ActivityPointers
 		{
 			get
-			{
-				return this.GetRelatedEntity<Crm.Opportunity>("Opportunity_ActivityPointers", null);
+            {
+                return this.GetRelatedEntity<Crm.Opportunity>("Opportunity_ActivityPointers", null);
 			}
 			set
 			{
@@ -213686,4 +213739,75 @@ namespace Crm
 			}
 		}
 	}
+
+
+    /// <summary>
+    /// NL: 2019-08-19 XrmToolbox has option to create Optionsets
+    /// </summary>
+    [System.Runtime.Serialization.DataContractAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.0.0.9479")]
+    public enum Account_AccountCategoryCode
+    {
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Court = 286680000,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Employer = 286680001,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Gang = 286680002,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        HalfwayHouse = 100000001,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Housing = 100000002,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        HumanService = 100000003,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Institution = 286680003,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        LawEnforcementAgency = 286680004,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Other = 286680005,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        ReleaseUnit = 100000000,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Shelter = 286680006,
+    }
+    [System.Runtime.Serialization.DataContractAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.0.0.9479")]
+    public enum Account_AccountClassificationCode
+    {
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        DefaultValue = 1,
+    }
+    /// <summary>
+    /// NL: 2019-08-19 XrmToolbox has option to create Optionsets
+    /// </summary>
+    internal sealed class EntityOptionSetEnum
+    {
+
+        [System.Diagnostics.DebuggerNonUserCode()]
+        public static System.Nullable<int> GetEnum(Microsoft.Xrm.Sdk.Entity entity, string attributeLogicalName)
+        {
+            if (entity.Attributes.ContainsKey(attributeLogicalName))
+            {
+                Microsoft.Xrm.Sdk.OptionSetValue value = entity.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>(attributeLogicalName);
+                if (value != null)
+                {
+                    return value.Value;
+                }
+            }
+            return null;
+        }
+    }
 }
